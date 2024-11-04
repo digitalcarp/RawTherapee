@@ -164,6 +164,9 @@ const std::vector<ToolTree> TRANSFORM_PANEL_TOOLS = {
             {
                 .id = Tool::PR_SHARPENING,
             },
+            {
+                .id = Tool::FRAMING,
+            },
         },
     },
     {
@@ -324,6 +327,7 @@ ToolPanelCoordinator::ToolPanelCoordinator (bool batch) : ipc (nullptr), favorit
     blackwhite          = Gtk::manage(new BlackWhite());
     resize              = Gtk::manage(new Resize());
     prsharpening        = Gtk::manage(new PrSharpening());
+    framing             = Gtk::manage(new Framing());
     crop                = Gtk::manage(new Crop());
     icm                 = Gtk::manage(new ICMPanel());
     metadata            = Gtk::manage(new MetaDataPanel());
@@ -638,6 +642,8 @@ std::string ToolPanelCoordinator::getToolName(Tool tool)
             return Resize::TOOL_NAME;
         case Tool::PR_SHARPENING:
             return PrSharpening::TOOL_NAME;
+        case Tool::FRAMING:
+            return Framing::TOOL_NAME;
         case Tool::CROP_TOOL:
             return Crop::TOOL_NAME;
         case Tool::ICM:
@@ -1117,9 +1123,13 @@ void ToolPanelCoordinator::panelChanged(const rtengine::ProcEvent& event, const 
         crop->write(params);
         resize->update(params->crop.enabled, params->crop.w, params->crop.h, ipc->getFullWidth(), ipc->getFullHeight());
         resize->write(params);
+        framing->update(params->crop.enabled, params->crop.w, params->crop.h, ipc->getFullWidth(), ipc->getFullHeight());
+        framing->write(params);
     } else if (event == rtengine::EvCrop) {
         resize->update(params->crop.enabled, params->crop.w, params->crop.h);
         resize->write(params);
+        framing->update(params->crop.enabled, params->crop.w, params->crop.h, ipc->getFullWidth(), ipc->getFullHeight());
+        framing->write(params);
     }
 
     /*
@@ -2001,6 +2011,8 @@ FoldableToolPanel *ToolPanelCoordinator::getFoldableToolPanel(Tool tool) const
             return resize;
         case Tool::PR_SHARPENING:
             return prsharpening;
+        case Tool::FRAMING:
+            return framing;
         case Tool::CROP_TOOL:
             return crop;
         case Tool::ICM:

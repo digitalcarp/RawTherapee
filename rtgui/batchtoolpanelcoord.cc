@@ -467,9 +467,13 @@ void BatchToolPanelCoordinator::panelChanged(const rtengine::ProcEvent& event, c
             crop->write (&pparams, &pparamsEdited);
             resize->update (pparams.crop.enabled, pparams.crop.w, pparams.crop.h, w, h);
             resize->write (&pparams, &pparamsEdited);
+            framing->update (pparams.crop.enabled, pparams.crop.w, pparams.crop.h, w, h);
+            framing->write (&pparams, &pparamsEdited);
         } else if (event == rtengine::EvCrop) {
             resize->update (pparams.crop.enabled, pparams.crop.w, pparams.crop.h);
             resize->write (&pparams, &pparamsEdited);
+            framing->update (pparams.crop.enabled, pparams.crop.w, pparams.crop.h, w, h);
+            framing->write (&pparams, &pparamsEdited);
         }
     } else {
         // Compensate rotation on flip

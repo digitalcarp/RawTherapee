@@ -2425,6 +2425,56 @@ bool ResizeParams::operator !=(const ResizeParams& other) const
     return !(*this == other);
 }
 
+FramingParams::FramingParams() :
+    enabled(false),
+    framingMethod(FramingMethod::STANDARD),
+    aspectRatio(0),
+    orientation(Orientation::AS_IMAGE),
+    framedWidth(800),
+    framedHeight(600),
+    allowUpscaling(false),
+    borderSizingMethod(BorderSizing::PERCENTAGE),
+    basis(Basis::AUTO),
+    relativeBorderSize(0.1),
+    minSizeEnabled(false),
+    minWidth(0),
+    minHeight(0),
+    absWidth(0),
+    absHeight(0),
+    borderRed(255),
+    borderGreen(255),
+    borderBlue(255)
+{
+}
+
+bool FramingParams::operator ==(const FramingParams& other) const
+{
+    return
+        enabled == other.enabled
+        && framingMethod == other.framingMethod
+        && aspectRatio == other.aspectRatio
+        && orientation == other.orientation
+        && framedWidth == other.framedWidth
+        && framedHeight == other.framedHeight
+        && allowUpscaling == other.allowUpscaling
+        && borderSizingMethod == other.borderSizingMethod
+        && basis == other.basis
+        && relativeBorderSize == other.relativeBorderSize
+        && minSizeEnabled == other.minSizeEnabled
+        && minWidth == other.minWidth
+        && minHeight == other.minHeight
+        && absWidth == other.absWidth
+        && absHeight == other.absHeight
+        && borderRed == other.borderRed
+        && borderGreen == other.borderGreen
+        && borderBlue == other.borderBlue;
+}
+
+bool FramingParams::operator !=(const FramingParams& other) const
+{
+    return !(*this == other);
+}
+
 const Glib::ustring ColorManagementParams::NoICMString = Glib::ustring("No ICM: sRGB output");
 const Glib::ustring ColorManagementParams::NoProfileString = Glib::ustring("(none)");
 

@@ -77,6 +77,7 @@ set(NONCLISOURCEFILES
     filterpanel.cc
     flatcurveeditorsubgroup.cc
     flatfield.cc
+    framing.cc
     gradient.cc
     guiutils.cc
     histogrampanel.cc

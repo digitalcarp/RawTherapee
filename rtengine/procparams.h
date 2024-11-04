@@ -1984,6 +1984,64 @@ struct ResizeParams {
     bool operator !=(const ResizeParams& other) const;
 };
 
+struct FramingParams {
+    // How is framed size determined?
+    enum class FramingMethod {
+        STANDARD,   // Unconstrained framed size
+        BBOX,       // Framed size within bounding box
+        FIXED_SIZE  // Fixed framed size
+    };
+
+    // Orientation of framed image
+    enum class Orientation {
+        AS_IMAGE,
+        LANDSCAPE,
+        PORTRAIT
+    };
+
+    // How to size border?
+    enum class BorderSizing {
+        PERCENTAGE,  // Percentage of image size
+        FIXED_SIZE   // Fixed pixel dimensions
+    };
+
+    // Which dimension to use for percentage based border sizing?
+    enum class Basis {
+        AUTO,    // Determine by aspect ratio of image and frame
+        WIDTH,
+        HEIGHT,
+        LONG,    // Use long side of image
+        SHORT    // Use short side of image
+    };
+
+    FramingParams();
+
+    bool enabled;
+
+    FramingMethod framingMethod;
+    double aspectRatio;  // 0 - Use aspect ratio of image
+    Orientation orientation;
+    int framedWidth;
+    int framedHeight;
+    bool allowUpscaling;
+
+    BorderSizing borderSizingMethod;
+    Basis basis;
+    double relativeBorderSize;
+    bool minSizeEnabled;
+    int minWidth;
+    int minHeight;
+    int absWidth;
+    int absHeight;
+
+    int borderRed;
+    int borderGreen;
+    int borderBlue;
+
+    bool operator ==(const FramingParams& other) const;
+    bool operator !=(const FramingParams& other) const;
+};
+
 /**
   * Parameters entry
   */
