@@ -13,6 +13,7 @@ set(CLISOURCEFILES
 set(NONCLISOURCEFILES
     adjuster.cc
     alignedmalloc.cc
+    aspectratios.cc
     batchqueue.cc
     batchqueuebuttonset.cc
     batchqueueentry.cc
