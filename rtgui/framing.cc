@@ -502,7 +502,9 @@ void Framing::readParams(const rtengine::procparams::ProcParams* pp)
     aspectRatio->set_active(aspectRatioData->findIndex(params.aspectRatio));
     orientation->set_active(mapOrientation(params.orientation));
     width.setValue(params.framedWidth);
+    width.isDirty = false;
     height.setValue(params.framedHeight);
+    height.isDirty = false;
     allowUpscaling->set_active(params.allowUpscaling);
 
     borderSizeMethod->set_active(mapBorderSizeMethod(params.borderSizingMethod));
@@ -510,9 +512,13 @@ void Framing::readParams(const rtengine::procparams::ProcParams* pp)
     relativeBorderSize->setValue(params.relativeBorderSize);
     minSizeEnabled->set_active(params.minSizeEnabled);
     minWidth.setValue(params.minWidth);
+    minWidth.isDirty = false;
     minHeight.setValue(params.minHeight);
+    minHeight.isDirty = false;
     absWidth.setValue(params.absWidth);
+    absWidth.isDirty = false;
     absHeight.setValue(params.absHeight);
+    absHeight.isDirty = false;
 
     redAdj->setValue(params.borderRed);
     greenAdj->setValue(params.borderGreen);
@@ -745,10 +751,12 @@ void Framing::onOrientationChanged()
 
 void Framing::onWidthChanged()
 {
+    width.isDirty = true;
 }
 
 void Framing::onHeightChanged()
 {
+    height.isDirty = true;
 }
 
 void Framing::onAllowUpscalingToggled()
@@ -771,16 +779,20 @@ void Framing::onMinSizeToggled()
 
 void Framing::onMinWidthChanged()
 {
+    minWidth.isDirty = true;
 }
 
 void Framing::onMinHeightChanged()
 {
+    minHeight.isDirty = true;
 }
 
 void Framing::onAbsWidthChanged()
 {
+    absWidth.isDirty = true;
 }
 
 void Framing::onAbsHeightChanged()
 {
+    absHeight.isDirty = true;
 }
