@@ -1705,6 +1705,7 @@ struct ParamsEdited {
     ChannelMixerParamsEdited chmixer;
     BlackWhiteParamsEdited blackwhite;
     ResizeParamsEdited resize;
+    FramingParamsEdited framing;
     SpotParamsEdited spot;
     ColorManagementParamsEdited icm;
     RAWParamsEdited raw;

@@ -88,11 +88,17 @@ private:
         Gtk::Box* box;
         MySpinButton* value;
         sigc::connection connection;
+        bool isDirty;
     };
 
     void setupFramingMethodGui();
     void setupBorderSizeGui();
     void setupBorderColorsGui();
+
+    void readParams(const rtengine::procparams::ProcParams* pp);
+    void readEdited(const ParamsEdited* pedited);
+    void writeParams(rtengine::procparams::ProcParams* pp);
+    void writeEdited(ParamsEdited* pedited);
 
     void setDimensions();
     void updateFramingMethodGui();

@@ -22,11 +22,20 @@
 #include "framing.h"
 
 #include "aspectratios.h"
+#include "paramsedited.h"
 #include "resize.h"
 
-#include <array>
+#include "../rtengine/procparams.h"
 
-namespace {
+#include <array>
+#include <vector>
+
+namespace
+{
+
+using rtengine::procparams::FramingParams;
+
+constexpr int EMPTY_COMBO_INDEX = -1;
 
 // Framing method combo box data
 constexpr int INDEX_STANDARD = 0;
@@ -38,6 +47,36 @@ constexpr std::array<const char*, 3> FRAMING_METHODS = {
     "TP_FRAMING_METHOD_FIXED"
 };
 
+int mapFramingMethod(FramingParams::FramingMethod framingMethod)
+{
+    using FramingMethod = FramingParams::FramingMethod;
+    switch (framingMethod) {
+        case FramingMethod::STANDARD:
+            return INDEX_STANDARD;
+        case FramingMethod::BBOX:
+            return INDEX_BBOX;
+        case FramingMethod::FIXED_SIZE:
+            return INDEX_FIXED;
+        default:
+            return INDEX_STANDARD;
+    }
+}
+
+FramingParams::FramingMethod mapFramingMethod(int comboIndex)
+{
+    using FramingMethod = FramingParams::FramingMethod;
+    switch (comboIndex) {
+        case INDEX_STANDARD:
+            return FramingMethod::STANDARD;
+        case INDEX_BBOX:
+            return FramingMethod::BBOX;
+        case INDEX_FIXED:
+            return FramingMethod::FIXED_SIZE;
+        default:
+            return FramingMethod::STANDARD;
+    }
+}
+
 // Orientation combo box data
 constexpr int INDEX_AS_IMAGE = 0;
 constexpr int INDEX_LANDSCAPE = 1;
@@ -48,6 +87,36 @@ constexpr std::array<const char*, 3> ORIENTATION = {
     "GENERAL_PORTRAIT"
 };
 
+int mapOrientation(FramingParams::Orientation orientation)
+{
+    using Orientation = FramingParams::Orientation;
+    switch (orientation) {
+        case Orientation::AS_IMAGE:
+            return INDEX_AS_IMAGE;
+        case Orientation::LANDSCAPE:
+            return INDEX_LANDSCAPE;
+        case Orientation::PORTRAIT:
+            return INDEX_PORTRAIT;
+        default:
+            return INDEX_AS_IMAGE;
+    }
+}
+
+FramingParams::Orientation mapOrientation(int comboIndex)
+{
+    using Orientation = FramingParams::Orientation;
+    switch (comboIndex) {
+        case INDEX_AS_IMAGE:
+            return Orientation::AS_IMAGE;
+        case INDEX_LANDSCAPE:
+            return Orientation::LANDSCAPE;
+        case INDEX_PORTRAIT:
+            return Orientation::PORTRAIT;
+        default:
+            return Orientation::AS_IMAGE;
+    }
+}
+
 // Border sizing method combo box data
 constexpr int INDEX_SIZE_RELATIVE = 0;
 constexpr int INDEX_SIZE_ABSOLUTE = 1;
@@ -55,6 +124,32 @@ constexpr std::array<const char*, 2> BORDER_SIZE_METHODS = {
     "TP_FRAMING_BORDER_SIZE_RELATIVE",
     "TP_FRAMING_BORDER_SIZE_ABSOLUTE"
 };
+
+int mapBorderSizeMethod(FramingParams::BorderSizing sizing)
+{
+    using BorderSizing = FramingParams::BorderSizing;
+    switch (sizing) {
+        case BorderSizing::PERCENTAGE:
+            return INDEX_SIZE_RELATIVE;
+        case BorderSizing::FIXED_SIZE:
+            return INDEX_SIZE_ABSOLUTE;
+        default:
+            return INDEX_SIZE_RELATIVE;
+    }
+}
+
+FramingParams::BorderSizing mapBorderSizeMethod(int comboIndex)
+{
+    using BorderSizing = FramingParams::BorderSizing;
+    switch (comboIndex) {
+        case INDEX_SIZE_RELATIVE:
+            return BorderSizing::PERCENTAGE;
+        case INDEX_SIZE_ABSOLUTE:
+            return BorderSizing::FIXED_SIZE;
+        default:
+            return BorderSizing::PERCENTAGE;
+    }
+}
 
 // Relative sizing basis combo box data
 constexpr int INDEX_BASIS_AUTO = 0;
@@ -69,6 +164,44 @@ constexpr std::array<const char*, 5> BORDER_SIZE_BASIS = {
     "TP_FRAMING_BASIS_LONG_SIDE",
     "TP_FRAMING_BASIS_SHORT_SIDE"
 };
+
+int mapBasis(FramingParams::Basis basis)
+{
+    using Basis = FramingParams::Basis;
+    switch(basis) {
+        case Basis::AUTO:
+            return INDEX_BASIS_AUTO;
+        case Basis::WIDTH:
+            return INDEX_BASIS_WIDTH;
+        case Basis::HEIGHT:
+            return INDEX_BASIS_HEIGHT;
+        case Basis::LONG:
+            return INDEX_BASIS_LONG;
+        case Basis::SHORT:
+            return INDEX_BASIS_SHORT;
+        default:
+            return INDEX_BASIS_AUTO;
+    }
+}
+
+FramingParams::Basis mapBasis(int comboIndex)
+{
+    using Basis = FramingParams::Basis;
+    switch(comboIndex) {
+        case INDEX_BASIS_AUTO:
+            return Basis::AUTO;
+        case INDEX_BASIS_WIDTH:
+            return Basis::WIDTH;
+        case INDEX_BASIS_HEIGHT:
+            return Basis::HEIGHT;
+        case INDEX_BASIS_LONG:
+            return Basis::LONG;
+        case INDEX_BASIS_SHORT:
+            return Basis::SHORT;
+        default:
+            return Basis::AUTO;
+    }
+}
 
 constexpr int INITIAL_IMG_WIDTH = 800;
 constexpr int INITIAL_IMG_HEIGHT = 600;
@@ -109,12 +242,29 @@ public:
         fillAspectRatios(ratios);
     }
 
-    void fillCombo(MyComboBoxText* combo)
+    void fillCombo(MyComboBoxText* combo) const
     {
         for (const auto& aspectRatio : ratios) {
             combo->append(aspectRatio.label);
         }
         combo->set_active(INDEX_CURRENT);
+    }
+
+    double value(int index)
+    {
+        return ratios.at(index).value;
+    }
+
+    int findIndex(double aspectRatio) const
+    {
+        if (aspectRatio == 0) return INDEX_CURRENT;
+
+        for (size_t i = 1; i < ratios.size(); i++) {
+            if (ratios[i].value == aspectRatio) return i;
+        }
+
+        // Couldn't find a matching value
+        return INDEX_CURRENT;
     }
 
 private:
@@ -314,14 +464,184 @@ void Framing::setupBorderColorsGui()
 
 void Framing::read(const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited)
 {
+    DisableListener disableListener(this);
+    std::vector<ConnectionBlocker> blockers;
+    blockers.reserve(13);
+    blockers.emplace_back(framingMethodChanged);
+    blockers.emplace_back(aspectRatioChanged);
+    blockers.emplace_back(orientationChanged);
+    blockers.emplace_back(width.connection);
+    blockers.emplace_back(height.connection);
+    blockers.emplace_back(allowUpscalingConnection);
+    blockers.emplace_back(borderSizeMethodChanged);
+    blockers.emplace_back(basisChanged);
+    blockers.emplace_back(minSizeEnabledConnection);
+    blockers.emplace_back(minWidth.connection);
+    blockers.emplace_back(minHeight.connection);
+    blockers.emplace_back(absWidth.connection);
+    blockers.emplace_back(absHeight.connection);
+    BlockAdjusterEvents blockRelative(relativeBorderSize);
+    BlockAdjusterEvents blockRed(redAdj);
+    BlockAdjusterEvents blockGreen(greenAdj);
+    BlockAdjusterEvents blockBlue(blueAdj);
+
+    readParams(pp);
+    readEdited(pedited);
+
+    updateFramingMethodGui();
+    updateBorderSizeGui();
+}
+
+void Framing::readParams(const rtengine::procparams::ProcParams* pp)
+{
+    const rtengine::procparams::FramingParams& params = pp->framing;
+
+    setEnabled(params.enabled);
+
+    framingMethod->set_active(mapFramingMethod(params.framingMethod));
+    aspectRatio->set_active(aspectRatioData->findIndex(params.aspectRatio));
+    orientation->set_active(mapOrientation(params.orientation));
+    width.setValue(params.framedWidth);
+    height.setValue(params.framedHeight);
+    allowUpscaling->set_active(params.allowUpscaling);
+
+    borderSizeMethod->set_active(mapBorderSizeMethod(params.borderSizingMethod));
+    basis->set_active(mapBasis(params.basis));
+    relativeBorderSize->setValue(params.relativeBorderSize);
+    minSizeEnabled->set_active(params.minSizeEnabled);
+    minWidth.setValue(params.minWidth);
+    minHeight.setValue(params.minHeight);
+    absWidth.setValue(params.absWidth);
+    absHeight.setValue(params.absHeight);
+
+    redAdj->setValue(params.borderRed);
+    greenAdj->setValue(params.borderGreen);
+    blueAdj->setValue(params.borderBlue);
+}
+
+void Framing::readEdited(const ParamsEdited* pedited)
+{
+    if (!pedited) return;
+
+    const FramingParamsEdited& edits = pedited->framing;
+
+    set_inconsistent(multiImage && !edits.enabled);
+
+    if (!edits.framingMethod) {
+        framingMethod->set_active(EMPTY_COMBO_INDEX);
+    }
+    if (!edits.aspectRatio) {
+        aspectRatio->set_active(EMPTY_COMBO_INDEX);
+    }
+    if (!edits.orientation) {
+        orientation->set_active(EMPTY_COMBO_INDEX);
+    }
+    width.isDirty = edits.framedWidth;
+    height.isDirty = edits.framedHeight;
+    allowUpscaling->set_inconsistent(edits.allowUpscaling);
+
+    if (!edits.borderSizingMethod) {
+        borderSizeMethod->set_active(EMPTY_COMBO_INDEX);
+    }
+    if (!edits.basis) {
+        basis->set_active(EMPTY_COMBO_INDEX);
+    }
+    relativeBorderSize->setEditedState(edits.relativeBorderSize ? Edited : UnEdited);
+    minSizeEnabled->set_inconsistent(edits.minSizeEnabled);
+    minWidth.isDirty = edits.minWidth;
+    minHeight.isDirty = edits.minHeight;
+    absWidth.isDirty = edits.absWidth;
+    absHeight.isDirty = edits.absHeight;
+
+    redAdj->setEditedState(edits.borderRed ? Edited : UnEdited);
+    greenAdj->setEditedState(edits.borderGreen ? Edited : UnEdited);
+    blueAdj->setEditedState(edits.borderBlue ? Edited : UnEdited);
 }
 
 void Framing::write(rtengine::procparams::ProcParams* pp, ParamsEdited* pedited)
 {
+    writeParams(pp);
+    writeEdited(pedited);
+}
+
+void Framing::writeParams(rtengine::procparams::ProcParams* pp)
+{
+    rtengine::procparams::FramingParams& params = pp->framing;
+
+    params.enabled = getEnabled();
+
+    params.framingMethod = mapFramingMethod(framingMethod->get_active_row_number());
+    params.aspectRatio = aspectRatioData->value(aspectRatio->get_active_row_number());
+    params.orientation = mapOrientation(orientation->get_active_row_number());
+    params.framedWidth = width.value->get_value_as_int();
+    params.framedHeight = height.value->get_value_as_int();
+    params.allowUpscaling = allowUpscaling->get_active();
+
+    params.borderSizingMethod = mapBorderSizeMethod(borderSizeMethod->get_active_row_number());
+    params.basis = mapBasis(basis->get_active_row_number());
+    params.relativeBorderSize = relativeBorderSize->getValue();
+    params.minSizeEnabled = minSizeEnabled->get_active();
+    params.minWidth = minWidth.value->get_value_as_int();
+    params.minHeight = minHeight.value->get_value_as_int();
+    params.absWidth = absWidth.value->get_value_as_int();
+    params.absHeight = absHeight.value->get_value_as_int();
+
+    params.borderRed = redAdj->getValue();
+    params.borderGreen = greenAdj->getValue();
+    params.borderBlue = blueAdj->getValue();
+}
+
+void Framing::writeEdited(ParamsEdited* pedited)
+{
+    if (!pedited) return;
+
+    FramingParamsEdited& edits = pedited->framing;
+
+    edits.enabled = !get_inconsistent();
+
+    edits.framingMethod = framingMethod->get_active_row_number() != EMPTY_COMBO_INDEX;
+    edits.aspectRatio = aspectRatio->get_active_row_number() != EMPTY_COMBO_INDEX;
+    edits.orientation = orientation->get_active_row_number() != EMPTY_COMBO_INDEX;
+    edits.framedWidth = width.isDirty;
+    edits.framedHeight = height.isDirty;
+    edits.allowUpscaling = !allowUpscaling->get_inconsistent();
+
+    edits.borderSizingMethod = borderSizeMethod->get_active_row_number() != EMPTY_COMBO_INDEX;
+    edits.basis = basis->get_active_row_number() != EMPTY_COMBO_INDEX;
+    edits.relativeBorderSize = relativeBorderSize->getEditedState();
+    edits.minSizeEnabled = !minSizeEnabled->get_inconsistent();
+    edits.minWidth = minWidth.isDirty;
+    edits.minHeight = minHeight.isDirty;
+    edits.absWidth = absWidth.isDirty;
+    edits.absHeight = absHeight.isDirty;
+
+    edits.borderRed = redAdj->getEditedState();
+    edits.borderGreen = greenAdj->getEditedState();
+    edits.borderBlue = blueAdj->getEditedState();
 }
 
 void Framing::setDefaults(const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited)
 {
+    const FramingParams& params = defParams->framing;
+
+    relativeBorderSize->setDefault(params.relativeBorderSize);
+    redAdj->setDefault(params.borderRed);
+    greenAdj->setDefault(params.borderGreen);
+    blueAdj->setDefault(params.borderBlue);
+
+    if (pedited) {
+        const FramingParamsEdited& edits = pedited->framing;
+
+        relativeBorderSize->setDefaultEditedState(edits.relativeBorderSize ? Edited : UnEdited);
+        redAdj->setDefaultEditedState(edits.borderRed ? Edited : UnEdited);
+        greenAdj->setDefaultEditedState(edits.borderGreen ? Edited : UnEdited);
+        blueAdj->setDefaultEditedState(edits.borderBlue ? Edited : UnEdited);
+    } else {
+        relativeBorderSize->setDefaultEditedState(Irrelevant);
+        redAdj->setDefaultEditedState(Irrelevant);
+        greenAdj->setDefaultEditedState(Irrelevant);
+        blueAdj->setDefaultEditedState(Irrelevant);
+    }
 }
 
 void Framing::setBatchMode(bool batchMode)
