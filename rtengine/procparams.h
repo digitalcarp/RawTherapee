@@ -2014,12 +2014,15 @@ struct FramingParams {
         SHORT    // Use short side of image
     };
 
+    // Indicates to use the image aspect ratio for border
+    static constexpr double AS_IMAGE_ASPECT_RATIO = 0.0;
+
     FramingParams();
 
     bool enabled;
 
     FramingMethod framingMethod;
-    double aspectRatio;  // 0 - Use aspect ratio of image
+    double aspectRatio;
     Orientation orientation;
     int framedWidth;
     int framedHeight;

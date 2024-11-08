@@ -38,6 +38,7 @@ public:
     Framing();
     ~Framing();
 
+    // FoldableToolPanel
     void read(const rtengine::procparams::ProcParams* pp,
               const ParamsEdited* pedited = nullptr) override;
     void write(rtengine::procparams::ProcParams* pp,
@@ -45,6 +46,7 @@ public:
     void setDefaults(const rtengine::procparams::ProcParams* defParams,
                      const ParamsEdited* pedited = nullptr) override;
     void setBatchMode(bool batchMode) override;
+    void enabledChanged() override;
 
     void update(bool isCropped, int croppedWidth, int croppedHeight,
                 int originalWidth = 0, int originalHeight = 0);

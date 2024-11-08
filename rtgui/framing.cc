@@ -28,11 +28,13 @@
 #include "../rtengine/procparams.h"
 
 #include <array>
+#include <iomanip>
 #include <vector>
 
 namespace
 {
 
+using namespace rtengine;
 using rtengine::procparams::FramingParams;
 
 constexpr int EMPTY_COMBO_INDEX = -1;
@@ -257,7 +259,7 @@ public:
 
     int findIndex(double aspectRatio) const
     {
-        if (aspectRatio == 0) return INDEX_CURRENT;
+        if (aspectRatio == FramingParams::AS_IMAGE_ASPECT_RATIO) return INDEX_CURRENT;
 
         for (size_t i = 1; i < ratios.size(); i++) {
             if (ratios[i].value == aspectRatio) return i;
@@ -655,6 +657,19 @@ void Framing::setBatchMode(bool batchMode)
     ToolPanel::setBatchMode(batchMode);
 }
 
+void Framing::enabledChanged()
+{
+    if (listener) {
+        if (get_inconsistent()) {
+            listener->panelChanged(EvFramingEnabled, M("GENERAL_UNCHANGED"));
+        } else if (getEnabled()) {
+            listener->panelChanged(EvFramingEnabled, M("GENERAL_ENABLED"));
+        } else {
+            listener->panelChanged(EvFramingEnabled, M("GENERAL_DISABLED"));
+        }
+    }
+}
+
 void Framing::update(bool isCropped, int croppedWidth, int croppedHeight,
                      int originalWidth, int originalHeight)
 {
@@ -734,65 +749,150 @@ void Framing::updateBorderSizeGui()
 
 void Framing::adjusterChanged(Adjuster* adj, double newVal)
 {
+    if (listener && (getEnabled() || batchMode)) {
+        Glib::ustring costr;
+        if (adj == relativeBorderSize) {
+            costr = Glib::ustring::format(std::setw(3), std::fixed, std::setprecision(2),
+                                          adj->getValue());
+        } else {
+            costr = Glib::ustring::format(static_cast<int>(adj->getValue()));
+        }
+
+        if (adj == relativeBorderSize) {
+            listener->panelChanged(EvFramingRelativeBorderSize, costr);
+        } else if (adj == redAdj) {
+            listener->panelChanged(EvFramingBorderRed, costr);
+        } else if (adj == greenAdj) {
+            listener->panelChanged(EvFramingBorderGreen, costr);
+        } else if (adj == blueAdj) {
+            listener->panelChanged(EvFramingBorderBlue, costr);
+        }
+    }
 }
 
 void Framing::onFramingMethodChanged()
 {
     updateFramingMethodGui();
+
+    if (listener && (getEnabled() || batchMode)) {
+        listener->panelChanged(EvFramingMethod, framingMethod->get_active_text());
+    }
 }
 
 void Framing::onAspectRatioChanged()
 {
+    if (listener && (getEnabled() || batchMode)) {
+        listener->panelChanged(EvFramingAspectRatio, aspectRatio->get_active_text());
+    }
 }
 
 void Framing::onOrientationChanged()
 {
+    if (listener && (getEnabled() || batchMode)) {
+        listener->panelChanged(EvFramingOrientation, orientation->get_active_text());
+    }
 }
 
 void Framing::onWidthChanged()
 {
     width.isDirty = true;
+
+    if (listener && (getEnabled() || batchMode)) {
+        listener->panelChanged(EvFramingFramedWidth,
+                               Glib::ustring::format(width.value->get_value_as_int()));
+    }
 }
 
 void Framing::onHeightChanged()
 {
     height.isDirty = true;
+
+    if (listener && (getEnabled() || batchMode)) {
+        listener->panelChanged(EvFramingFramedHeight,
+                               Glib::ustring::format(height.value->get_value_as_int()));
+    }
 }
 
 void Framing::onAllowUpscalingToggled()
 {
+    if (listener && (getEnabled() || batchMode)) {
+        if (allowUpscaling->get_inconsistent()) {
+            listener->panelChanged(EvFramingAllowUpscaling, M("GENERAL_UNCHANGED"));
+        } else if (allowUpscaling->get_active()) {
+            listener->panelChanged(EvFramingAllowUpscaling, M("GENERAL_ENABLED"));
+        } else {
+            listener->panelChanged(EvFramingAllowUpscaling, M("GENERAL_DISABLED"));
+        }
+    }
 }
 
 void Framing::onBorderSizeMethodChanged()
 {
     updateBorderSizeGui();
+
+    if (listener && (getEnabled() || batchMode)) {
+        listener->panelChanged(EvFramingBorderSizingMethod, borderSizeMethod->get_active_text());
+    }
 }
 
 void Framing::onBasisChanged()
 {
+    if (listener && (getEnabled() || batchMode)) {
+        listener->panelChanged(EvFramingBasis, basis->get_active_text());
+    }
 }
 
 void Framing::onMinSizeToggled()
 {
     updateBorderSizeGui();
+
+    if (listener && (getEnabled() || batchMode)) {
+        if (minSizeEnabled->get_inconsistent()) {
+            listener->panelChanged(EvFramingMinSizeEnabled, M("GENERAL_UNCHANGED"));
+        } else if (minSizeEnabled->get_active()) {
+            listener->panelChanged(EvFramingMinSizeEnabled, M("GENERAL_ENABLED"));
+        } else {
+            listener->panelChanged(EvFramingMinSizeEnabled, M("GENERAL_DISABLED"));
+        }
+    }
 }
 
 void Framing::onMinWidthChanged()
 {
     minWidth.isDirty = true;
+
+    if (listener && (getEnabled() || batchMode)) {
+        listener->panelChanged(EvFramingMinWidth,
+                               Glib::ustring::format(minWidth.value->get_value_as_int()));
+    }
 }
 
 void Framing::onMinHeightChanged()
 {
     minHeight.isDirty = true;
+
+    if (listener && (getEnabled() || batchMode)) {
+        listener->panelChanged(EvFramingMinHeight,
+                               Glib::ustring::format(minHeight.value->get_value_as_int()));
+    }
 }
 
 void Framing::onAbsWidthChanged()
 {
     absWidth.isDirty = true;
+
+    if (listener && (getEnabled() || batchMode)) {
+        listener->panelChanged(EvFramingAbsWidth,
+                               Glib::ustring::format(absWidth.value->get_value_as_int()));
+    }
 }
 
 void Framing::onAbsHeightChanged()
 {
     absHeight.isDirty = true;
+
+    if (listener && (getEnabled() || batchMode)) {
+        listener->panelChanged(EvFramingAbsHeight,
+                               Glib::ustring::format(absHeight.value->get_value_as_int()));
+    }
 }
