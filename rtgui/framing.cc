@@ -711,7 +711,7 @@ void Framing::updateFramingMethodGui()
         orientation->show();
         width.show();
         height.show();
-        allowUpscaling->hide();
+        allowUpscaling->show();
     } else if (activeRow == INDEX_FIXED) {
         aspectRatioLabel->hide();
         aspectRatio->hide();
@@ -735,6 +735,9 @@ void Framing::updateBorderSizeGui()
         minSizeFrame->show();
         absWidth.hide();
         absHeight.hide();
+
+        aspectRatio->set_sensitive(true);
+        orientation->set_sensitive(true);
     } else if (activeRow == INDEX_SIZE_ABSOLUTE) {
         basisLabel->hide();
         basis->hide();
@@ -742,6 +745,9 @@ void Framing::updateBorderSizeGui()
         minSizeFrame->hide();
         absWidth.show();
         absHeight.show();
+
+        aspectRatio->set_sensitive(false);
+        orientation->set_sensitive(false);
     }
 
     minSizeFrameContent->set_sensitive(minSizeEnabled->get_active());
