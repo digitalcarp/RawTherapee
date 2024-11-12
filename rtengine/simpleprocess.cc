@@ -2027,7 +2027,9 @@ private:
             }
         }
 
-        // TODO: Blit framing border + image
+        if (framingData.enabled) {
+            readyImg = ipf.drawFrame(readyImg, params.framing, framingData);
+        }
 
         Exiv2Metadata info(imgsrc->getFileName());
 

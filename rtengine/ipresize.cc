@@ -20,6 +20,7 @@
 #include "improcfun.h"
 
 #include "alignedbuffer.h"
+#include "color.h"
 #include "imagefloat.h"
 #include "labimage.h"
 #include "opthelper.h"
@@ -1063,6 +1064,62 @@ ImProcFunctions::FramingData ImProcFunctions::framing(const FramingArgs& args) c
     result.framedHeight = std::round(framedSize.height);
 
     return result;
+}
+
+// Draws the border around the input image.
+// It should be called after gamma correction.
+Imagefloat* ImProcFunctions::drawFrame(Imagefloat* rgb, const FramingParams& params,
+                                       const FramingData& dims) const
+{
+    if (rgb->getWidth() > dims.framedWidth || rgb->getHeight() >  dims.framedHeight) {
+        return rgb;
+    }
+    if (rgb->getWidth() == dims.framedWidth && rgb->getHeight() == dims.framedHeight) {
+        return rgb;
+    }
+
+    Imagefloat* framed = new Imagefloat(dims.framedWidth, dims.framedHeight);
+
+    auto clip = [](int v) { return std::max(0, std::min(v, 65535)); };
+
+    float r = Color::gamma2curve[clip(params.borderRed)];
+    float g = Color::gamma2curve[clip(params.borderGreen)];
+    float b = Color::gamma2curve[clip(params.borderBlue)];
+
+#ifdef _OPENMP
+    #pragma omp parallel for if (multiThread)
+#endif
+    for (int i = 0; i < framed->getHeight(); i++) {
+        for (int j = 0; j < framed->getWidth(); j++) {
+            framed->r(i, j) = r;
+            framed->g(i, j) = g;
+            framed->b(i, j) = b;
+        }
+    }
+
+    auto offset = [](int inner, int outer) {
+        double u = inner;
+        double v = outer;
+        return static_cast<int>(std::round((v - u) / 2.0));
+    };
+    int rowOffset = offset(rgb->getHeight(), framed->getHeight());
+    int colOffset = offset(rgb->getWidth(), framed->getWidth());
+
+#ifdef _OPENMP
+    #pragma omp parallel for if (multiThread)
+#endif
+    for (int i = 0; i < rgb->getHeight(); i++) {
+        for (int j = 0; j < rgb->getWidth(); j++) {
+            int row = i + rowOffset;
+            int col = j + colOffset;
+
+            framed->r(row, col) = rgb->r(i, j);
+            framed->g(row, col) = rgb->g(i, j);
+            framed->b(row, col) = rgb->b(i, j);
+        }
+    }
+
+    return framed;
 }
 
 }  // namespace rtengine

@@ -449,11 +449,11 @@ void Framing::setupBorderColorsGui()
     frame->set_label_widget(*label);
 
     Gtk::Box* const box = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
-    redAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_RED"), 0, 255, 1, 255));
+    redAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_RED"), 0, 65535, 1, 65535));
     box->add(*redAdj);
-    greenAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_GREEN"), 0, 255, 1, 255));
+    greenAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_GREEN"), 0, 65535, 1, 65535));
     box->add(*greenAdj);
-    blueAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_BLUE"), 0, 255, 1, 255));
+    blueAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_BLUE"), 0, 65535, 1, 65535));
     box->add(*blueAdj);
 
     frame->add(*box);
