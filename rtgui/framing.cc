@@ -43,6 +43,7 @@ constexpr int EMPTY_COMBO_INDEX = -1;
 constexpr int INDEX_STANDARD = 0;
 constexpr int INDEX_BBOX = 1;
 constexpr int INDEX_FIXED = 2;
+constexpr int INDEX_FRAMING_METHOD_UNCHANGED = 3;
 constexpr std::array<const char*, 3> FRAMING_METHODS = {
     "TP_FRAMING_METHOD_STANDARD",
     "TP_FRAMING_METHOD_BBOX",
@@ -83,6 +84,7 @@ FramingParams::FramingMethod mapFramingMethod(int comboIndex)
 constexpr int INDEX_AS_IMAGE = 0;
 constexpr int INDEX_LANDSCAPE = 1;
 constexpr int INDEX_PORTRAIT = 2;
+constexpr int INDEX_ORIENTATION_UNCHANGED = 3;
 constexpr std::array<const char*, 3> ORIENTATION = {
     "GENERAL_ASIMAGE",
     "GENERAL_LANDSCAPE",
@@ -122,6 +124,7 @@ FramingParams::Orientation mapOrientation(int comboIndex)
 // Border sizing method combo box data
 constexpr int INDEX_SIZE_RELATIVE = 0;
 constexpr int INDEX_SIZE_ABSOLUTE = 1;
+constexpr int INDEX_SIZE_UNCHANGED = 2;
 constexpr std::array<const char*, 2> BORDER_SIZE_METHODS = {
     "TP_FRAMING_BORDER_SIZE_RELATIVE",
     "TP_FRAMING_BORDER_SIZE_ABSOLUTE"
@@ -159,6 +162,7 @@ constexpr int INDEX_BASIS_WIDTH = 1;
 constexpr int INDEX_BASIS_HEIGHT = 2;
 constexpr int INDEX_BASIS_LONG = 3;
 constexpr int INDEX_BASIS_SHORT = 4;
+constexpr int INDEX_BASIS_UNCHANGED = 5;
 constexpr std::array<const char*, 5> BORDER_SIZE_BASIS = {
     "TP_FRAMING_BASIS_AUTO",
     "TP_FRAMING_BASIS_WIDTH",
@@ -205,8 +209,8 @@ FramingParams::Basis mapBasis(int comboIndex)
     }
 }
 
-constexpr int INITIAL_IMG_WIDTH = 800;
-constexpr int INITIAL_IMG_HEIGHT = 600;
+constexpr int INITIAL_IMG_WIDTH = 100000;
+constexpr int INITIAL_IMG_HEIGHT = 100000;
 
 constexpr int ROW_SPACING = 4;
 constexpr float FRAME_LABEL_ALIGN_X = 0.025;
@@ -252,7 +256,9 @@ public:
         combo->set_active(INDEX_CURRENT);
     }
 
-    double value(int index)
+    int unchangedIndex() const { return ratios.size(); }
+
+    double value(int index) const
     {
         return ratios.at(index).value;
     }
@@ -293,7 +299,9 @@ Framing::Framing() :
     FoldableToolPanel(this, TOOL_NAME, M("TP_FRAMING_LABEL"), false, true),
     aspectRatioData(new AspectRatios),
     imgWidth(INITIAL_IMG_WIDTH),
-    imgHeight(INITIAL_IMG_HEIGHT)
+    imgHeight(INITIAL_IMG_HEIGHT),
+    lastAllowUpscaling(false),
+    lastMinSizeEnabled(false)
 {
     setupFramingMethodGui();
     pack_start(*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)));
@@ -467,21 +475,23 @@ void Framing::setupBorderColorsGui()
 void Framing::read(const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited)
 {
     DisableListener disableListener(this);
-    std::vector<ConnectionBlocker> blockers;
-    blockers.reserve(13);
-    blockers.emplace_back(framingMethodChanged);
-    blockers.emplace_back(aspectRatioChanged);
-    blockers.emplace_back(orientationChanged);
-    blockers.emplace_back(width.connection);
-    blockers.emplace_back(height.connection);
-    blockers.emplace_back(allowUpscalingConnection);
-    blockers.emplace_back(borderSizeMethodChanged);
-    blockers.emplace_back(basisChanged);
-    blockers.emplace_back(minSizeEnabledConnection);
-    blockers.emplace_back(minWidth.connection);
-    blockers.emplace_back(minHeight.connection);
-    blockers.emplace_back(absWidth.connection);
-    blockers.emplace_back(absHeight.connection);
+
+    std::array<ConnectionBlocker, 13> blockers = {
+        ConnectionBlocker(framingMethodChanged),
+        ConnectionBlocker(aspectRatioChanged),
+        ConnectionBlocker(orientationChanged),
+        ConnectionBlocker(width.connection),
+        ConnectionBlocker(height.connection),
+        ConnectionBlocker(allowUpscalingConnection),
+        ConnectionBlocker(borderSizeMethodChanged),
+        ConnectionBlocker(basisChanged),
+        ConnectionBlocker(minSizeEnabledConnection),
+        ConnectionBlocker(minWidth.connection),
+        ConnectionBlocker(minHeight.connection),
+        ConnectionBlocker(absWidth.connection),
+        ConnectionBlocker(absHeight.connection)
+    };
+
     BlockAdjusterEvents blockRelative(relativeBorderSize);
     BlockAdjusterEvents blockRed(redAdj);
     BlockAdjusterEvents blockGreen(greenAdj);
@@ -492,6 +502,7 @@ void Framing::read(const rtengine::procparams::ProcParams* pp, const ParamsEdite
 
     updateFramingMethodGui();
     updateBorderSizeGui();
+    setDimensions();
 }
 
 void Framing::readParams(const rtengine::procparams::ProcParams* pp)
@@ -508,11 +519,13 @@ void Framing::readParams(const rtengine::procparams::ProcParams* pp)
     height.setValue(params.framedHeight);
     height.isDirty = false;
     allowUpscaling->set_active(params.allowUpscaling);
+    lastAllowUpscaling = params.allowUpscaling;
 
     borderSizeMethod->set_active(mapBorderSizeMethod(params.borderSizingMethod));
     basis->set_active(mapBasis(params.basis));
     relativeBorderSize->setValue(params.relativeBorderSize);
     minSizeEnabled->set_active(params.minSizeEnabled);
+    lastMinSizeEnabled = params.minSizeEnabled;
     minWidth.setValue(params.minWidth);
     minWidth.isDirty = false;
     minHeight.setValue(params.minHeight);
@@ -607,15 +620,15 @@ void Framing::writeEdited(ParamsEdited* pedited)
 
     edits.enabled = !get_inconsistent();
 
-    edits.framingMethod = framingMethod->get_active_row_number() != EMPTY_COMBO_INDEX;
-    edits.aspectRatio = aspectRatio->get_active_row_number() != EMPTY_COMBO_INDEX;
-    edits.orientation = orientation->get_active_row_number() != EMPTY_COMBO_INDEX;
+    edits.framingMethod = framingMethod->get_active_row_number() != INDEX_FRAMING_METHOD_UNCHANGED;
+    edits.aspectRatio = aspectRatio->get_active_row_number() != aspectRatioData->unchangedIndex();
+    edits.orientation = orientation->get_active_row_number() != INDEX_ORIENTATION_UNCHANGED;
     edits.framedWidth = width.isDirty;
     edits.framedHeight = height.isDirty;
     edits.allowUpscaling = !allowUpscaling->get_inconsistent();
 
-    edits.borderSizingMethod = borderSizeMethod->get_active_row_number() != EMPTY_COMBO_INDEX;
-    edits.basis = basis->get_active_row_number() != EMPTY_COMBO_INDEX;
+    edits.borderSizingMethod = borderSizeMethod->get_active_row_number() != INDEX_SIZE_UNCHANGED;
+    edits.basis = basis->get_active_row_number() != INDEX_BASIS_UNCHANGED;
     edits.relativeBorderSize = relativeBorderSize->getEditedState();
     edits.minSizeEnabled = !minSizeEnabled->get_inconsistent();
     edits.minWidth = minWidth.isDirty;
@@ -652,9 +665,27 @@ void Framing::setDefaults(const rtengine::procparams::ProcParams* defParams, con
     }
 }
 
+void Framing::trimValues(rtengine::procparams::ProcParams* pp)
+{
+    relativeBorderSize->trimValue(pp->framing.relativeBorderSize);
+    redAdj->trimValue(pp->framing.borderRed);
+    greenAdj->trimValue(pp->framing.borderGreen);
+    blueAdj->trimValue(pp->framing.borderBlue);
+}
+
 void Framing::setBatchMode(bool batchMode)
 {
+    framingMethod->append(M("GENERAL_UNCHANGED"));
+    aspectRatio->append(M("GENERAL_UNCHANGED"));
+    orientation->append(M("GENERAL_UNCHANGED"));
+    borderSizeMethod->append(M("GENERAL_UNCHANGED"));
+    basis->append(M("GENERAL_UNCHANGED"));
+
     ToolPanel::setBatchMode(batchMode);
+    relativeBorderSize->showEditedCB();
+    redAdj->showEditedCB();
+    greenAdj->showEditedCB();
+    blueAdj->showEditedCB();
 }
 
 void Framing::enabledChanged()
@@ -670,22 +701,43 @@ void Framing::enabledChanged()
     }
 }
 
-void Framing::update(bool isCropped, int croppedWidth, int croppedHeight,
-                     int originalWidth, int originalHeight)
+void Framing::update(int originalWidth, int originalHeight)
 {
+    // This is how it is checked in resize.cc
     if (originalWidth && originalHeight) {
         imgWidth = originalWidth;
         imgHeight = originalHeight;
     }
+}
 
-    setDimensions();
+void Framing::setAdjusterBehavior(bool addRelativeBorderSize, bool addRed, bool addGreen,
+                                  bool addBlue)
+{
+    relativeBorderSize->setAddMode(addRelativeBorderSize);
+    redAdj->setAddMode(addRed);
+    greenAdj->setAddMode(addGreen);
+    blueAdj->setAddMode(addBlue);
 }
 
 void Framing::setDimensions()
 {
     idleRegister.add([this]() -> bool {
+        std::array<ConnectionBlocker, 6> blockers = {
+            ConnectionBlocker(width.connection),
+            ConnectionBlocker(height.connection),
+            ConnectionBlocker(minWidth.connection),
+            ConnectionBlocker(minHeight.connection),
+            ConnectionBlocker(absWidth.connection),
+            ConnectionBlocker(absHeight.connection)
+        };
+
+        // 16x the full image size is probably a reasonable max
         width.value->set_range(Resize::MIN_SIZE, Resize::MAX_SCALE * imgWidth);
         height.value->set_range(Resize::MIN_SIZE, Resize::MAX_SCALE * imgHeight);
+        minWidth.value->set_range(0, Resize::MAX_SCALE * imgWidth);
+        minHeight.value->set_range(0, Resize::MAX_SCALE * imgHeight);
+        absWidth.value->set_range(0, Resize::MAX_SCALE * imgWidth);
+        absHeight.value->set_range(0, Resize::MAX_SCALE * imgHeight);
 
         return false;
     });
@@ -693,7 +745,16 @@ void Framing::setDimensions()
 
 void Framing::updateFramingMethodGui()
 {
-    if (batchMode) return;
+    if (batchMode) {
+        aspectRatioLabel->show();
+        aspectRatio->show();
+        orientationLabel->show();
+        orientation->show();
+        width.show();
+        height.show();
+        allowUpscaling->show();
+        return;
+    }
 
     int activeRow = framingMethod->get_active_row_number();
     if (activeRow == INDEX_STANDARD) {
@@ -725,7 +786,20 @@ void Framing::updateFramingMethodGui()
 
 void Framing::updateBorderSizeGui()
 {
-    if (batchMode) return;
+    if (batchMode) {
+        basisLabel->show();
+        basis->show();
+        relativeBorderSize->show();
+        minSizeFrame->show();
+        absWidth.show();
+        absHeight.show();
+
+        aspectRatio->set_sensitive(true);
+        orientation->set_sensitive(true);
+
+        minSizeFrameContent->set_sensitive(true);
+        return;
+    }
 
     int activeRow = borderSizeMethod->get_active_row_number();
     if (activeRow == INDEX_SIZE_RELATIVE) {
@@ -821,6 +895,18 @@ void Framing::onHeightChanged()
 
 void Framing::onAllowUpscalingToggled()
 {
+    if (batchMode) {
+        if (allowUpscaling->get_inconsistent()) {
+            allowUpscaling->set_inconsistent(false);
+            ConnectionBlocker block(allowUpscalingConnection);
+            allowUpscaling->set_active(false);
+        } else if (lastAllowUpscaling) {
+            allowUpscaling->set_inconsistent(true);
+        }
+
+        lastAllowUpscaling = allowUpscaling->get_active();
+    }
+
     if (listener && (getEnabled() || batchMode)) {
         if (allowUpscaling->get_inconsistent()) {
             listener->panelChanged(EvFramingAllowUpscaling, M("GENERAL_UNCHANGED"));
@@ -850,6 +936,18 @@ void Framing::onBasisChanged()
 
 void Framing::onMinSizeToggled()
 {
+    if (batchMode) {
+        if (minSizeEnabled->get_inconsistent()) {
+            minSizeEnabled->set_inconsistent(false);
+            ConnectionBlocker block(minSizeEnabledConnection);
+            minSizeEnabled->set_active(false);
+        } else if (lastMinSizeEnabled) {
+            minSizeEnabled->set_inconsistent(true);
+        }
+
+        lastMinSizeEnabled = minSizeEnabled->get_active();
+    }
+
     updateBorderSizeGui();
 
     if (listener && (getEnabled() || batchMode)) {

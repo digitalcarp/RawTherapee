@@ -1123,12 +1123,12 @@ void ToolPanelCoordinator::panelChanged(const rtengine::ProcEvent& event, const 
         crop->write(params);
         resize->update(params->crop.enabled, params->crop.w, params->crop.h, ipc->getFullWidth(), ipc->getFullHeight());
         resize->write(params);
-        framing->update(params->crop.enabled, params->crop.w, params->crop.h, ipc->getFullWidth(), ipc->getFullHeight());
+        framing->update(ipc->getFullWidth(), ipc->getFullHeight());
         framing->write(params);
     } else if (event == rtengine::EvCrop) {
         resize->update(params->crop.enabled, params->crop.w, params->crop.h);
         resize->write(params);
-        framing->update(params->crop.enabled, params->crop.w, params->crop.h, ipc->getFullWidth(), ipc->getFullHeight());
+        framing->update(ipc->getFullWidth(), ipc->getFullHeight());
         framing->write(params);
     }
 

@@ -45,11 +45,12 @@ public:
                ParamsEdited* pedited = nullptr) override;
     void setDefaults(const rtengine::procparams::ProcParams* defParams,
                      const ParamsEdited* pedited = nullptr) override;
+    void trimValues(rtengine::procparams::ProcParams* pp) override;
     void setBatchMode(bool batchMode) override;
     void enabledChanged() override;
 
-    void update(bool isCropped, int croppedWidth, int croppedHeight,
-                int originalWidth = 0, int originalHeight = 0);
+    void update(int originalWidth = 0, int originalHeight = 0);
+    void setAdjusterBehavior(bool addRelativeBorderSize, bool addRed, bool addGreen, bool addBlue);
 
     // AdjusterListener
     void adjusterChanged(Adjuster* adj, double newVal) override;
@@ -146,4 +147,6 @@ private:
 
     int imgWidth;
     int imgHeight;
+    bool lastAllowUpscaling;
+    bool lastMinSizeEnabled;
 };

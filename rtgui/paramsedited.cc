@@ -81,7 +81,8 @@ void initFrom(FramingParamsEdited& edits, const ProcParams& params, const ProcPa
     edits.borderBlue &= curr.borderBlue == other.borderBlue;
 }
 
-void combine(FramingParams& toEdit, const FramingParams& mod, const FramingParamsEdited& edits)
+void combine(FramingParams& toEdit, const FramingParams& mod, const FramingParamsEdited& edits,
+             bool dontForceSet)
 {
     if (edits.enabled) {
         toEdit.enabled = mod.enabled;
@@ -112,7 +113,10 @@ void combine(FramingParams& toEdit, const FramingParams& mod, const FramingParam
         toEdit.basis = mod.basis;
     }
     if (edits.relativeBorderSize) {
-        toEdit.relativeBorderSize = mod.relativeBorderSize;
+        toEdit.relativeBorderSize =
+            dontForceSet && options.baBehav[ADDSET_FRAMING_RELATIVE_SCALE] ?
+                toEdit.relativeBorderSize + mod.relativeBorderSize :
+                mod.relativeBorderSize;
     }
     if (edits.minSizeEnabled) {
         toEdit.minSizeEnabled = mod.minSizeEnabled;
@@ -131,13 +135,19 @@ void combine(FramingParams& toEdit, const FramingParams& mod, const FramingParam
     }
 
     if (edits.borderRed) {
-        toEdit.borderRed = mod.borderRed;
+        toEdit.borderRed = dontForceSet && options.baBehav[ADDSET_FRAMING_BORDER_RED] ?
+            toEdit.borderRed + mod.borderRed :
+            mod.borderRed;
     }
     if (edits.borderGreen) {
-        toEdit.borderGreen = mod.borderGreen;
+        toEdit.borderGreen = dontForceSet && options.baBehav[ADDSET_FRAMING_BORDER_GREEN] ?
+            toEdit.borderGreen + mod.borderGreen :
+            mod.borderGreen;
     }
     if (edits.borderBlue) {
-        toEdit.borderBlue = mod.borderBlue;
+        toEdit.borderBlue = dontForceSet && options.baBehav[ADDSET_FRAMING_BORDER_BLUE] ?
+            toEdit.borderBlue + mod.borderBlue :
+            mod.borderBlue;
     }
 }
 
@@ -6978,7 +6988,7 @@ void ParamsEdited::combine(rtengine::procparams::ProcParams& toEdit, const rteng
         toEdit.resize.allowUpscaling = mods.resize.allowUpscaling;
     }
 
-    ::combine(toEdit.framing, mods.framing, framing);
+    ::combine(toEdit.framing, mods.framing, framing, dontforceSet);
 
     if (icm.inputProfile) {
         toEdit.icm.inputProfile = mods.icm.inputProfile;
