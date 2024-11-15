@@ -277,6 +277,10 @@ Dimensions upscaleToBBox(const Dimensions& img, const Dimensions& bbox) {
 double orientAspectRatio(const FramingParams& framing, const Dimensions& imgSize)
 {
     double aspectRatio = framing.aspectRatio;
+    if (aspectRatio == FramingParams::AS_IMAGE_ASPECT_RATIO) {
+        aspectRatio = imgSize.aspectRatio();
+    }
+
     Orientation borderOrient = orient(framing, imgSize);
     if ((borderOrient == Orientation::PORTRAIT && aspectRatio > 1.0) ||
             (borderOrient == Orientation::LANDSCAPE && aspectRatio < 1.0)) {
@@ -407,12 +411,13 @@ Dimensions Framing::computeRelativeImageBBoxInFrame(const Dimensions& imgSize,
     //            = frame_len * scale / (1 + 2 * scale)
     double borderBasis = frameBasis * scale / imgFrameScale;
 
-    // Compute image and border lengths for the non-basis side.
+    // Compute image and border lengths for the non-basis side
     double imgBasisToOther = side == Side::WIDTH ? 1.0 / imgAspectRatio : imgAspectRatio;
     double borderBasisToOther = side == Side::WIDTH ? 1.0 / borderAspectRatio : borderAspectRatio;
     double imgOther = imgBasis * imgBasisToOther;
     double borderOther = borderBasis * borderBasisToOther;
 
+    // Find the maximum allowed image size considering min size limits
     double maxImageBasis = frameBasis;
     double maxImageOther = frameOther;
     if (framing.minSizeEnabled) {
@@ -429,6 +434,12 @@ Dimensions Framing::computeRelativeImageBBoxInFrame(const Dimensions& imgSize,
         }
     }
 
+    // Image is too large to satisfy requirements:
+    //   a. Min border size limit not satisfied
+    //   b. Basis size is too small for the requested aspect ratio
+    //      (i.e. original image clipped)
+    //
+    // Resize the image so that it fits in bounds
     if (imgOther > maxImageOther) {
         imgOther = maxImageOther;
         imgBasis = imgOther / imgBasisToOther;
@@ -550,45 +561,23 @@ Dimensions Framing::computeFramedSize(const Dimensions& imgSize) const
 
 Dimensions Framing::computeSizeWithBorders(const Dimensions& imgSize) const
 {
-    auto length = [](double img, double border) {
-        return img + 2.0 * border;
-    };
-    auto evalBorder = [](double side, double scale, double img) {
-        double otherSide = side * scale;
-        double totalBorder = otherSide - img;
-        return std::max(totalBorder, 0.0) * 0.5;
-    };
-
     if (framing.borderSizingMethod == BorderSizing::FIXED_SIZE) {
-        return Dimensions(length(imgSize.width, framing.absWidth),
-                          length(imgSize.height, framing.absHeight));
+        return Dimensions(imgSize.width + 2.0 * framing.absWidth,
+                          imgSize.height + 2.0 * framing.absHeight);
     }
 
     Side side = pickReferenceSide(framing, imgSize);
     double aspectRatio = orientAspectRatio(framing, imgSize);
-
-    // Compute the size with borders given the requested reference side length
-    // and aspect ratio
-    Dimensions borderSize;
     double scale = framing.relativeBorderSize;
+
+    Dimensions framedSize;
     if (side == Side::WIDTH) {
-        borderSize.width = imgSize.width * scale;
-        double totalWidth = length(imgSize.width, borderSize.width);
-        borderSize.height = evalBorder(totalWidth, 1.0 / aspectRatio, imgSize.height);
+        framedSize.width = (1.0 + 2.0 * scale) * imgSize.width;
+        framedSize.height = framedSize.width / aspectRatio;
     } else {
-        borderSize.height = imgSize.height * scale;
-        double totalHeight = length(imgSize.height, borderSize.height);
-        borderSize.width = evalBorder(totalHeight, aspectRatio, imgSize.width);
+        framedSize.height = (1.0 + 2.0 * scale) * imgSize.height;
+        framedSize.width = framedSize.height * aspectRatio;
     }
-
-    if (framing.minSizeEnabled) {
-        Dimensions minSize(static_cast<double>(framing.minWidth),
-                           static_cast<double>(framing.minHeight));
-        borderSize = clampToBBox(borderSize, minSize, OUTSIDE_BBOX);
-    }
-
-    Dimensions framedSize(length(imgSize.width, borderSize.width),
-                          length(imgSize.height, borderSize.height));
 
     // Check if the computed frame size satsifies the requested aspect ratio
     // without cutting off the original image. If the image is cut off, use
@@ -1059,7 +1048,7 @@ ImProcFunctions::FramingData ImProcFunctions::framing(const FramingArgs& args) c
     result.enabled = true;
     result.imgWidth = std::round(adjusted.size.width);
     result.imgHeight = std::round(adjusted.size.height);
-    result.scale = adjusted.scale;
+    result.scale = result.scale * adjusted.scale;
     result.framedWidth = std::round(framedSize.width);
     result.framedHeight = std::round(framedSize.height);
 

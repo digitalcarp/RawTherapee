@@ -243,7 +243,7 @@ public:
     static constexpr int INDEX_CURRENT = 0;
 
     AspectRatios() :
-        ratios{{M("GENERAL_CURRENT")}}
+        ratios{{M("GENERAL_ASIMAGE")}}
     {
         fillAspectRatios(ratios);
     }
