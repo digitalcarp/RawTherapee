@@ -3091,7 +3091,6 @@ Camera constants:
         // "raw_crop": [ 8, 8, 6008, 4008 ], // full raw frame 6048x4024 Dcraw auto identify 6024x4024, jpeg 12,12,6000x4000
         // "ranges": { "black": 512, "white": 16300 }
         "ranges": {
-            "black": 512,
             "white": [
                 { "iso": [ 50, 64 ], "levels": 16100 }, // typical compressed 16372, non compressed 16383, LongEx iso50,16150 , 16275
                 { "iso": [ 80, 100, 125, 160 ], "levels": 16200 }, // typical compressed 16372, non compressed 16383, LongEx iso50,16150 , 16275
