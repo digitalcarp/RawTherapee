@@ -32,11 +32,11 @@
 #include "procparams.h"
 #include "utils.h"
 
-#include "../rtgui/multilangmgr.h"
-#include "../rtgui/options.h"
-#include "../rtgui/paramsedited.h"
-#include "../rtgui/ppversion.h"
-#include "../rtgui/version.h"
+#include "rtgui/multilangmgr.h"
+#include "rtgui/options.h"
+#include "rtgui/paramsedited.h"
+#include "rtgui/ppversion.h"
+#include "rtgui/version.h"
 
 using namespace std;
 

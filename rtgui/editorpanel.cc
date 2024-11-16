@@ -21,9 +21,9 @@
 
 #include <iostream>
 
-#include "../rtengine/array2D.h"
-#include "../rtengine/imagesource.h"
-#include "../rtengine/iccstore.h"
+#include "rtengine/array2D.h"
+#include "rtengine/imagesource.h"
+#include "rtengine/iccstore.h"
 #include "batchqueue.h"
 #include "batchqueueentry.h"
 #include "soundman.h"
@@ -46,7 +46,7 @@
 #ifdef _WIN32
 #include "windows.h"
 
-#include "../rtengine/winutils.h"
+#include "rtengine/winutils.h"
 #endif
 
 using namespace rtengine::procparams;

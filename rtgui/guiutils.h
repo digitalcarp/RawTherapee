@@ -28,8 +28,8 @@
 
 #include "threadutils.h"
 
-#include "../rtengine/coord.h"
-#include "../rtengine/noncopyable.h"
+#include "rtengine/coord.h"
+#include "rtengine/noncopyable.h"
 
 namespace rtengine
 {

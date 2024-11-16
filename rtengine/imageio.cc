@@ -52,8 +52,8 @@
 #include "settings.h"
 #include "utils.h"
 
-#include "../rtgui/options.h"
-#include "../rtgui/version.h"
+#include "rtgui/options.h"
+#include "rtgui/version.h"
 
 
 using namespace std;

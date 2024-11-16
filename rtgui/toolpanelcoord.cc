@@ -24,13 +24,13 @@
 #include "options.h"
 #include "rtimage.h"
 
-#include "../rtengine/imagesource.h"
-#include "../rtengine/dfmanager.h"
-#include "../rtengine/ffmanager.h"
-#include "../rtengine/improcfun.h"
-#include "../rtengine/perspectivecorrection.h"
-#include "../rtengine/procevents.h"
-#include "../rtengine/refreshmap.h"
+#include "rtengine/imagesource.h"
+#include "rtengine/dfmanager.h"
+#include "rtengine/ffmanager.h"
+#include "rtengine/improcfun.h"
+#include "rtengine/perspectivecorrection.h"
+#include "rtengine/procevents.h"
+#include "rtengine/refreshmap.h"
 
 using namespace rtengine::procparams;
 

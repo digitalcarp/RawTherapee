@@ -32,9 +32,9 @@
 #include "pathutils.h"
 #include "version.h"
 
-#include "../rtengine/procparams.h"
-#include "../rtengine/rtengine.h"
-#include "../rtengine/utils.h"
+#include "rtengine/procparams.h"
+#include "rtengine/rtengine.h"
+#include "rtengine/utils.h"
 
 #ifdef _OPENMP
 #include <omp.h>

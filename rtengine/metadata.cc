@@ -27,8 +27,8 @@
 #include "metadata.h"
 #include "settings.h"
 #include "imagedata.h"
-#include "../rtgui/version.h"
-#include "../rtgui/pathutils.h"
+#include "rtgui/version.h"
+#include "rtgui/pathutils.h"
 #include <ctime>
 
 
