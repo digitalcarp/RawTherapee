@@ -10747,7 +10747,7 @@ canon_a5:
     } else if (!strncmp(model,"ALPHA",5) ||
 	       !strncmp(model,"DYNAX",5) ||
 	       !strncmp(model,"MAXXUM",6)) {
-      sprintf (model+20, "DYNAX %-10s", model+6+(model[0]=='M'));
+      snprintf (model+20, 20-(model[0]=='M'), "DYNAX %-10s", model+6+(model[0]=='M'));
       adobe_coeff (make, model+20);
       load_raw = &CLASS packed_load_raw;
     } else if (!strncmp(model,"DiMAGE G",8)) {

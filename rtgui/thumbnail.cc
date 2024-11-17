@@ -66,7 +66,7 @@ bool CPBDump(
     }
 
     // open the file in write mode
-    const std::unique_ptr<FILE, decltype(&std::fclose)> f(g_fopen(commFName.c_str (), "wt"), &std::fclose);
+    const std::unique_ptr<FILE, int (*)(FILE *)> f(g_fopen(commFName.c_str(), "wt"), &std::fclose);
 
     if (!f) {
         printf ("CPBDump(\"%s\") >>> Error: unable to open file with write access!\n", commFName.c_str());
