@@ -220,7 +220,7 @@ Cairo::RefPtr<Cairo::ImageSurface> RTScalable::loadSurfaceFromSVG(const Glib::us
             return surf;
         }
 
-        rsvg_handle_free(handle);
+        g_object_unref(handle);
 
         // Set device scale to avoid blur effect
         cairo_surface_set_device_scale(surf->cobj(),
