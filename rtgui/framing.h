@@ -15,7 +15,7 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
- * 
+ *
  *  2024-2024 Daniel Gao <daniel.gao.work@gmail.com>
  */
 
@@ -26,6 +26,8 @@
 #include "toolpanel.h"
 
 #include <memory>
+
+class ColorPreview;
 
 class Framing final :
     public ToolParamBlock,
@@ -106,6 +108,7 @@ private:
     void setDimensions();
     void updateFramingMethodGui();
     void updateBorderSizeGui();
+    void updateBorderColorGui();
 
     // Framing method
     MyComboBoxText* framingMethod;
@@ -141,6 +144,7 @@ private:
     Adjuster* redAdj;
     Adjuster* greenAdj;
     Adjuster* blueAdj;
+    ColorPreview* colorPreview;
 
     IdleRegister idleRegister;
     std::unique_ptr<AspectRatios> aspectRatioData;

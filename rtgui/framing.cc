@@ -15,16 +15,18 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
- * 
+ *
  *  2024-2024 Daniel Gao <daniel.gao.work@gmail.com>
  */
 
 #include "framing.h"
 
 #include "aspectratios.h"
+#include "colorpreview.h"
 #include "paramsedited.h"
 #include "resize.h"
 
+#include "../rtengine/color.h"
 #include "../rtengine/procparams.h"
 
 #include <array>
@@ -211,6 +213,7 @@ FramingParams::Basis mapBasis(int comboIndex)
 
 constexpr int INITIAL_IMG_WIDTH = 100000;
 constexpr int INITIAL_IMG_HEIGHT = 100000;
+constexpr int MAX_COLOR_VAL = 255;
 
 constexpr int ROW_SPACING = 4;
 constexpr float FRAME_LABEL_ALIGN_X = 0.025;
@@ -457,15 +460,22 @@ void Framing::setupBorderColorsGui()
     frame->set_label_widget(*label);
 
     Gtk::Box* const box = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
-    redAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_RED"), 0, 65535, 1, 65535));
+    redAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_RED"), 0, MAX_COLOR_VAL, 1, MAX_COLOR_VAL));
     box->add(*redAdj);
-    greenAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_GREEN"), 0, 65535, 1, 65535));
+    greenAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_GREEN"), 0, MAX_COLOR_VAL, 1, MAX_COLOR_VAL));
     box->add(*greenAdj);
-    blueAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_BLUE"), 0, 65535, 1, 65535));
+    blueAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_BLUE"), 0, MAX_COLOR_VAL, 1, MAX_COLOR_VAL));
     box->add(*blueAdj);
+
+    Gtk::Frame* const colorFrame = Gtk::manage(new Gtk::Frame());
+    colorPreview = Gtk::manage(new ColorPreview());
+    colorFrame->add(*colorPreview);
+    box->add(*colorFrame);
 
     frame->add(*box);
     pack_start(*frame);
+
+    updateBorderColorGui();
 
     redAdj->setAdjusterListener(this);
     greenAdj->setAdjusterListener(this);
@@ -502,6 +512,7 @@ void Framing::read(const rtengine::procparams::ProcParams* pp, const ParamsEdite
 
     updateFramingMethodGui();
     updateBorderSizeGui();
+    updateBorderColorGui();
     setDimensions();
 }
 
@@ -827,8 +838,26 @@ void Framing::updateBorderSizeGui()
     minSizeFrameContent->set_sensitive(minSizeEnabled->get_active());
 }
 
+void Framing::updateBorderColorGui()
+{
+    auto gamma = [](double val) {
+        // adjuster is [0.0, 255.0]
+        // gamma2curve expects [0, 65535]
+        // setRgb expects [0.0, 1.0]
+        return Color::gamma2curve[val * (MAX_COLOR_VAL + 1)] / 65535.0;
+    };
+    double r = gamma(redAdj->getValue());
+    double g = gamma(greenAdj->getValue());
+    double b = gamma(blueAdj->getValue());
+    colorPreview->setRgb(r, g, b);
+}
+
 void Framing::adjusterChanged(Adjuster* adj, double newVal)
 {
+    if (adj == redAdj || adj == greenAdj || adj == blueAdj) {
+        updateBorderColorGui();
+    }
+
     if (listener && (getEnabled() || batchMode)) {
         Glib::ustring costr;
         if (adj == relativeBorderSize) {
