@@ -11685,6 +11685,7 @@ bool ProcParams::operator ==(const ProcParams& other) const
         && chmixer == other.chmixer
         && blackwhite == other.blackwhite
         && resize == other.resize
+        && framing == other.framing
         && spot == other.spot
         && raw == other.raw
         && icm == other.icm
