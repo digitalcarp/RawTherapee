@@ -125,10 +125,12 @@ FramingParams::Orientation mapOrientation(int comboIndex)
 
 // Border sizing method combo box data
 constexpr int INDEX_SIZE_RELATIVE = 0;
-constexpr int INDEX_SIZE_ABSOLUTE = 1;
-constexpr int INDEX_SIZE_UNCHANGED = 2;
-constexpr std::array<const char*, 2> BORDER_SIZE_METHODS = {
+constexpr int INDEX_SIZE_UNIFORM_RELATIVE = 1;
+constexpr int INDEX_SIZE_ABSOLUTE = 2;
+constexpr int INDEX_SIZE_UNCHANGED = 3;
+constexpr std::array<const char*, 3> BORDER_SIZE_METHODS = {
     "TP_FRAMING_BORDER_SIZE_RELATIVE",
+    "TP_FRAMING_BORDER_SIZE_UNIFORM_RELATIVE",
     "TP_FRAMING_BORDER_SIZE_ABSOLUTE"
 };
 
@@ -138,6 +140,8 @@ int mapBorderSizeMethod(FramingParams::BorderSizing sizing)
     switch (sizing) {
         case BorderSizing::PERCENTAGE:
             return INDEX_SIZE_RELATIVE;
+        case BorderSizing::UNIFORM_PERCENTAGE:
+            return INDEX_SIZE_UNIFORM_RELATIVE;
         case BorderSizing::FIXED_SIZE:
             return INDEX_SIZE_ABSOLUTE;
         default:
@@ -151,6 +155,8 @@ FramingParams::BorderSizing mapBorderSizeMethod(int comboIndex)
     switch (comboIndex) {
         case INDEX_SIZE_RELATIVE:
             return BorderSizing::PERCENTAGE;
+        case INDEX_SIZE_UNIFORM_RELATIVE:
+            return BorderSizing::UNIFORM_PERCENTAGE;
         case INDEX_SIZE_ABSOLUTE:
             return BorderSizing::FIXED_SIZE;
         default:
@@ -823,6 +829,16 @@ void Framing::updateBorderSizeGui()
 
         aspectRatio->set_sensitive(true);
         orientation->set_sensitive(true);
+    } else if (activeRow == INDEX_SIZE_UNIFORM_RELATIVE) {
+        basisLabel->show();
+        basis->show();
+        relativeBorderSize->show();
+        minSizeFrame->show();
+        absWidth.hide();
+        absHeight.hide();
+
+        aspectRatio->set_sensitive(false);
+        orientation->set_sensitive(false);
     } else if (activeRow == INDEX_SIZE_ABSOLUTE) {
         basisLabel->hide();
         basis->hide();
@@ -949,6 +965,12 @@ void Framing::onAllowUpscalingToggled()
 
 void Framing::onBorderSizeMethodChanged()
 {
+    if (borderSizeMethod->get_active_row_number() == INDEX_SIZE_UNIFORM_RELATIVE) {
+        ConnectionBlocker block(minHeight.connection);
+        minHeight.isDirty = true;
+        minHeight.value->set_value(minWidth.value->get_value_as_int());
+    }
+
     updateBorderSizeGui();
 
     if (listener && (getEnabled() || batchMode)) {
@@ -993,20 +1015,32 @@ void Framing::onMinSizeToggled()
 void Framing::onMinWidthChanged()
 {
     minWidth.isDirty = true;
+    int value = minWidth.value->get_value_as_int();
+
+    if (borderSizeMethod->get_active_row_number() == INDEX_SIZE_UNIFORM_RELATIVE) {
+        ConnectionBlocker block(minHeight.connection);
+        minHeight.isDirty = true;
+        minHeight.value->set_value(value);
+    }
 
     if (listener && (getEnabled() || batchMode)) {
-        listener->panelChanged(EvFramingMinWidth,
-                               Glib::ustring::format(minWidth.value->get_value_as_int()));
+        listener->panelChanged(EvFramingMinWidth, Glib::ustring::format(value));
     }
 }
 
 void Framing::onMinHeightChanged()
 {
     minHeight.isDirty = true;
+    int value = minHeight.value->get_value_as_int();
+
+    if (borderSizeMethod->get_active_row_number() == INDEX_SIZE_UNIFORM_RELATIVE) {
+        ConnectionBlocker block(minWidth.connection);
+        minWidth.isDirty = true;
+        minWidth.value->set_value(value);
+    }
 
     if (listener && (getEnabled() || batchMode)) {
-        listener->panelChanged(EvFramingMinHeight,
-                               Glib::ustring::format(minHeight.value->get_value_as_int()));
+        listener->panelChanged(EvFramingMinHeight, Glib::ustring::format(value));
     }
 }
 

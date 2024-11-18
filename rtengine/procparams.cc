@@ -467,6 +467,7 @@ namespace Framing
     DEFINE_KEY(ORIENT_LANDSCAPE, "Landscape");
     DEFINE_KEY(ORIENT_PORTRAIT, "Portait");
     DEFINE_KEY(BORDER_SIZING_PERCENTAGE, "Percentage");
+    DEFINE_KEY(BORDER_SIZING_UNIFORM_PERCENTAGE, "UniformPercentage");
     DEFINE_KEY(BORDER_SIZING_FIXED_SIZE, "FixedSize");
     DEFINE_KEY(BASIS_AUTO, "Auto");
     DEFINE_KEY(BASIS_WIDTH, "Width");
@@ -514,6 +515,7 @@ void loadFramingParams(
     using BorderSizing = FramingParams::BorderSizing;
     const std::map<std::string, BorderSizing> borderSizingMapping = {
         {BORDER_SIZING_PERCENTAGE, BorderSizing::PERCENTAGE},
+        {BORDER_SIZING_UNIFORM_PERCENTAGE, BorderSizing::UNIFORM_PERCENTAGE},
         {BORDER_SIZING_FIXED_SIZE, BorderSizing::FIXED_SIZE}
     };
     assignFromKeyfile(keyFile, group, BORDER_SIZING_METHOD, borderSizingMapping, params.borderSizingMethod, edited.borderSizingMethod);
@@ -576,6 +578,7 @@ void saveFramingParams(
     using BorderSizing = FramingParams::BorderSizing;
     const std::map<BorderSizing, const char*> borderSizingMapping = {
         {BorderSizing::PERCENTAGE, BORDER_SIZING_PERCENTAGE},
+        {BorderSizing::UNIFORM_PERCENTAGE, BORDER_SIZING_UNIFORM_PERCENTAGE},
         {BorderSizing::FIXED_SIZE, BORDER_SIZING_FIXED_SIZE}
     };
     saveToKeyfile(!pedited || edited.borderSizingMethod, group, BORDER_SIZING_METHOD, borderSizingMapping, params.borderSizingMethod, keyFile);

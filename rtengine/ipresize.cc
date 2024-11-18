@@ -108,6 +108,8 @@ private:
     ResizeArgs adjustResize(const ResizeArgs& resize, const Dimensions& newSize) const;
     Dimensions computeRelativeImageBBoxInFrame(const Dimensions& imgSize,
                                                const Dimensions& framedSize) const;
+    Dimensions computeUniformRelativeImageBBox(const Dimensions& imgSize,
+                                               const Dimensions& framedSize) const;
     ResizeArgs resizeForFixedFrame(const ResizeArgs& resize) const;
     ResizeArgs resizeForBBox(const ResizeArgs& resize) const;
     Dimensions computeSizeWithBorders(const Dimensions& imgSize) const;
@@ -456,6 +458,37 @@ Dimensions Framing::computeRelativeImageBBoxInFrame(const Dimensions& imgSize,
     }
 }
 
+Dimensions Framing::computeUniformRelativeImageBBox(const Dimensions& imgSize,
+                                                    const Dimensions& framedSize) const
+{
+    auto length = [](double frame, double border) {
+        return std::max(0.0, frame - 2.0 * border);
+    };
+
+    Side side = pickReferenceSide(framing, imgSize);
+    double scale = framing.relativeBorderSize;
+
+    double minBorderWidth = 0;
+    double minBorderHeight = 0;
+    if (side == Side::WIDTH) {
+        minBorderWidth = scale * framedSize.width;
+        if (framing.minSizeEnabled && minBorderWidth < framing.minWidth) {
+            minBorderWidth = framing.minWidth;
+        }
+    } else {
+        minBorderHeight = scale * framedSize.height;
+        if (framing.minSizeEnabled && minBorderHeight < framing.minHeight) {
+            minBorderHeight = framing.minHeight;
+        }
+    }
+
+    Dimensions bbox = {
+        length(framedSize.width, minBorderWidth),
+        length(framedSize.height, minBorderHeight)
+    };
+    return bbox;
+}
+
 ResizeArgs Framing::adjustResizeForFraming(const ResizeArgs& resize) const
 {
     if (!framing.enabled) return resize;
@@ -488,6 +521,8 @@ ResizeArgs Framing::resizeForFixedFrame(const ResizeArgs& args) const
             length(framedWidth, framing.absWidth),
             length(framedHeight, framing.absHeight)
         };
+    } else if (framing.borderSizingMethod == BorderSizing::UNIFORM_PERCENTAGE) {
+        bbox = computeUniformRelativeImageBBox(args.size, frameSize);
     } else {
         bbox = computeRelativeImageBBoxInFrame(args.size, frameSize);
     }
@@ -509,6 +544,8 @@ ResizeArgs Framing::resizeForBBox(const ResizeArgs& args) const
             length(boundary.width, framing.absWidth),
             length(boundary.height, framing.absHeight)
         };
+    } else if (framing.borderSizingMethod == BorderSizing::UNIFORM_PERCENTAGE) {
+        bbox = computeUniformRelativeImageBBox(args.size, boundary);
     } else {
         // For the requested aspect ratio, it must fit inside the requested
         // bounding box
@@ -567,9 +604,27 @@ Dimensions Framing::computeSizeWithBorders(const Dimensions& imgSize) const
     }
 
     Side side = pickReferenceSide(framing, imgSize);
-    double aspectRatio = orientAspectRatio(framing, imgSize);
     double scale = framing.relativeBorderSize;
 
+    if (framing.borderSizingMethod == BorderSizing::UNIFORM_PERCENTAGE) {
+        double borderSize = 0;
+        if (side == Side::WIDTH) {
+            borderSize = scale * imgSize.width;
+            if (framing.minSizeEnabled && borderSize < framing.minWidth) {
+                borderSize = framing.minWidth;
+            }
+        } else {
+            borderSize = scale * imgSize.width;
+            if (framing.minSizeEnabled && borderSize < framing.minHeight) {
+                borderSize = framing.minHeight;
+            }
+        }
+
+        return Dimensions(imgSize.width + 2.0 * borderSize,
+                          imgSize.height + 2.0 * borderSize);
+    }
+
+    double aspectRatio = orientAspectRatio(framing, imgSize);
     Dimensions framedSize;
     if (side == Side::WIDTH) {
         framedSize.width = (1.0 + 2.0 * scale) * imgSize.width;

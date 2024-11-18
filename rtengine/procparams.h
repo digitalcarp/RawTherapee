@@ -2001,8 +2001,9 @@ struct FramingParams {
 
     // How to size border?
     enum class BorderSizing {
-        PERCENTAGE,  // Percentage of image size
-        FIXED_SIZE   // Fixed pixel dimensions
+        PERCENTAGE,          // Percentage of image size
+        UNIFORM_PERCENTAGE,  // Percentage of image size (ignore aspect ratio)
+        FIXED_SIZE           // Fixed pixel dimensions
     };
 
     // Which dimension to use for percentage based border sizing?
