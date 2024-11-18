@@ -368,7 +368,7 @@ Dimensions Framing::clampResize(const Dimensions& imgSize, const Dimensions& bou
 ResizeArgs Framing::adjustResize(const ResizeArgs& resize, const Dimensions& bbox) const
 {
     Dimensions newSize = clampResize(resize.size, bbox);
-    double newScale = newSize.width / resize.size.width;
+    double newScale = newSize.width / postCropImageSize.width;
     return ResizeArgs(newSize, newScale);
 }
 
@@ -1048,7 +1048,7 @@ ImProcFunctions::FramingData ImProcFunctions::framing(const FramingArgs& args) c
     result.enabled = true;
     result.imgWidth = std::round(adjusted.size.width);
     result.imgHeight = std::round(adjusted.size.height);
-    result.scale = result.scale * adjusted.scale;
+    result.scale = adjusted.scale;
     result.framedWidth = std::round(framedSize.width);
     result.framedHeight = std::round(framedSize.height);
 
