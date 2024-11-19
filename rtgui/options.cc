@@ -370,7 +370,7 @@ void Options::setDefaults()
     maxZoomLimit = MaxZoom::PERCENTS_1600;
 #ifdef _WIN32
     // use windows setting for visibility of hidden files/folders
-    SHELLFLAGSTATE sft = { 0 };
+    SHELLFLAGSTATE sft = { };
     SHGetSettings(&sft, SSF_SHOWALLOBJECTS);
     fbShowHidden = sft.fShowAllObjects;
 #else

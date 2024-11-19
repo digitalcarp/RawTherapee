@@ -299,6 +299,7 @@ void setUserOnlyPermission(const Glib::RefPtr<Gio::File> file, bool execute)
         .grfAccessPermissions = FILE_ALL_ACCESS,
         .grfAccessMode = GRANT_ACCESS,
         .grfInheritance = NO_INHERITANCE,
+        .Trustee = {},
     };
     BuildTrusteeWithSid(&(ea.Trustee), user_sid);
     PACL new_dacl_raw = nullptr;

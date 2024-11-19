@@ -87,7 +87,7 @@ Cairo::RefPtr<Cairo::ImageSurface> RTScalable::loadSurfaceFromIcon(const Glib::u
     // Create surface from corresponding icon
     const auto pos = iconPath.find_last_of('.');
 
-    if (pos >= 0 && pos < iconPath.length()) {
+    if (pos < iconPath.length()) {
         const auto fext = iconPath.substr(pos + 1, iconPath.length()).lowercase();
 
         // Case where iconPath is a PNG file

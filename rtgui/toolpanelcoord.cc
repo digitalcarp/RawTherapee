@@ -40,126 +40,161 @@ using ToolTree = ToolPanelCoordinator::ToolTree;
 const std::vector<ToolTree> EXPOSURE_PANEL_TOOLS = {
     {
         .id = Tool::TONE_CURVE,
+        .children = {},
     },
     {
         .id = Tool::SHADOWS_HIGHLIGHTS,
+        .children = {},
     },
     {
         .id = Tool::TONE_EQUALIZER,
+        .children = {},
     },
     {
         .id = Tool::EPD,
+        .children = {},
     },
     {
         .id = Tool::FATTAL,
+        .children = {},
     },
     {
         .id = Tool::PC_VIGNETTE,
+        .children = {},
     },
     {
         .id = Tool::GRADIENT,
+        .children = {},
     },
     {
         .id = Tool::L_CURVE,
+        .children = {},
     },
 };
 
 const std::vector<ToolTree> DETAILS_PANEL_TOOLS = {
     {
         .id = Tool::SPOT,
+        .children = {},
     },
     {
         .id = Tool::SHARPENING_TOOL,
+        .children = {},
     },
     {
         .id = Tool::LOCAL_CONTRAST,
+        .children = {},
     },
     {
         .id = Tool::SHARPEN_EDGE,
+        .children = {},
     },
     {
         .id = Tool::SHARPEN_MICRO,
+        .children = {},
     },
     {
         .id = Tool::IMPULSE_DENOISE,
+        .children = {},
     },
     {
         .id = Tool::DIR_PYR_DENOISE,
+        .children = {},
     },
     {
         .id = Tool::DEFRINGE_TOOL,
+        .children = {},
     },
     {
         .id = Tool::DIR_PYR_EQUALIZER,
+        .children = {},
     },
     {
         .id = Tool::DEHAZE,
+        .children = {},
     },
 };
 
 const std::vector<ToolTree> COLOR_PANEL_TOOLS = {
     {
         .id = Tool::WHITE_BALANCE,
+        .children = {},
     },
     {
         .id = Tool::VIBRANCE,
+        .children = {},
     },
     {
         .id = Tool::CH_MIXER,
+        .children = {},
     },
     {
         .id = Tool::BLACK_WHITE,
+        .children = {},
     },
     {
         .id = Tool::HSV_EQUALIZER,
+        .children = {},
     },
     {
         .id = Tool::FILM_SIMULATION,
+        .children = {},
     },
     {
         .id = Tool::FILM_NEGATIVE,
+        .children = {},
     },
     {
         .id = Tool::SOFT_LIGHT,
+        .children = {},
     },
     {
         .id = Tool::RGB_CURVES,
+        .children = {},
     },
     {
         .id = Tool::COLOR_TONING,
+        .children = {},
     },
     {
         .id = Tool::ICM,
+        .children = {},
     },
 };
 
 const std::vector<ToolTree> ADVANCED_PANEL_TOOLS = {
     {
         .id = Tool::RETINEX_TOOL,
+        .children = {},
     },
     {
         .id = Tool::COLOR_APPEARANCE,
+        .children = {},
     },
     {
         .id = Tool::WAVELET,
+        .children = {},
     },
 };
 
 const std::vector<ToolTree> LOCALLAB_PANEL_TOOLS = {
     {
         .id = Tool::LOCALLAB,
+        .children = {},
     },
 };
 
 const std::vector<ToolTree> TRANSFORM_PANEL_TOOLS = {
     {
         .id = Tool::CROP_TOOL,
+        .children = {},
     },
     {
         .id = Tool::RESIZE_TOOL,
         .children = {
             {
                 .id = Tool::PR_SHARPENING,
+                .children = {},
             },
         },
     },
@@ -168,21 +203,27 @@ const std::vector<ToolTree> TRANSFORM_PANEL_TOOLS = {
         .children = {
             {
                 .id = Tool::ROTATE,
+                .children = {},
             },
             {
                 .id = Tool::PERSPECTIVE,
+                .children = {},
             },
             {
                 .id = Tool::LENS_PROF,
+                .children = {},
             },
             {
                 .id = Tool::DISTORTION,
+                .children = {},
             },
             {
                 .id = Tool::CA_CORRECTION,
+                .children = {},
             },
             {
                 .id = Tool::VIGNETTING,
+                .children = {},
             },
         },
     },
@@ -195,15 +236,19 @@ const std::vector<ToolTree> RAW_PANEL_TOOLS = {
             {
                 {
                     .id = Tool::BAYER_PROCESS,
+                    .children = {},
                 },
                 {
                     .id = Tool::BAYER_RAW_EXPOSURE,
+                    .children = {},
                 },
                 {
                     .id = Tool::BAYER_PREPROCESS,
+                    .children = {},
                 },
                 {
                     .id = Tool::RAW_CA_CORRECTION,
+                    .children = {},
                 },
             },
         },
@@ -214,30 +259,38 @@ const std::vector<ToolTree> RAW_PANEL_TOOLS = {
             {
                 {
                     .id = Tool::XTRANS_PROCESS,
+                    .children = {},
                 },
                 {
                     .id = Tool::XTRANS_RAW_EXPOSURE,
+                    .children = {},
                 },
             },
         },
     },
     {
         .id = Tool::RAW_EXPOSURE,
+        .children = {},
     },
     {
         .id = Tool::PREPROCESS_WB,
+        .children = {},
     },
     {
         .id = Tool::PREPROCESS,
+        .children = {},
     },
     {
         .id = Tool::DARKFRAME_TOOL,
+        .children = {},
     },
     {
         .id = Tool::FLATFIELD_TOOL,
+        .children = {},
     },
     {
         .id = Tool::PD_SHARPENING,
+        .children = {},
     },
 };
 
