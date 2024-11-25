@@ -47,7 +47,8 @@ using FramingMethod = FramingParams::FramingMethod;
 enum class Orientation { LANDSCAPE, PORTRAIT };
 enum class Side { WIDTH, HEIGHT };
 
-struct Dimensions {
+struct Dimensions
+{
     double width;
     double height;
 
@@ -89,14 +90,16 @@ struct Dimensions {
     }
 };
 
-struct ResizeArgs {
+struct ResizeArgs
+{
     Dimensions size;
     double scale = 1.0;
 
     ResizeArgs(const Dimensions& aSize, double aScale) : size(aSize), scale(aScale) {}
 };
 
-class Framing {
+class Framing
+{
 public:
     Framing(const ProcParams& params, int fullWidth, int fullHeight);
 
@@ -130,7 +133,18 @@ int computeSize(int dim, double scale)
     return static_cast<int>(static_cast<double>(dim) * scale + 0.5);
 }
 
-Orientation orient(const FramingParams& params, const Dimensions& imgSize) {
+std::pair<double, double> computeImgAndBorderSize(double frameSize, double scale)
+{
+    // frame_len = img_len + 2 * scale * img_len = (1 + 2 * scale) * img_len
+    double imgFrameScale = (1.0 + 2.0 * scale);
+    double imgSize = frameSize / imgFrameScale;
+    double borderSize = scale * imgSize;
+
+    return {imgSize, borderSize};
+}
+
+Orientation orient(const FramingParams& params, const Dimensions& imgSize)
+{
     switch (params.orientation) {
         case FramingParams::Orientation::LANDSCAPE:
             return Orientation::LANDSCAPE;
@@ -198,7 +212,8 @@ Side pickReferenceSide(const FramingParams& params, const Dimensions& imgSize)
 constexpr bool INSIDE_BBOX = true;
 constexpr bool OUTSIDE_BBOX = false;
 
-Dimensions clampToBBox(const Dimensions& img, const Dimensions& bbox, bool clampInside) {
+Dimensions clampToBBox(const Dimensions& img, const Dimensions& bbox, bool clampInside)
+{
     double widthScale = 1.0;
     double heightScale = 1.0;
     if (bbox.width > 0) {
@@ -239,7 +254,8 @@ Dimensions clampToBBox(const Dimensions& img, const Dimensions& bbox, bool clamp
     return newSize;
 }
 
-Dimensions downscaleToTouchBBox(const Dimensions& img, const Dimensions& bbox) {
+Dimensions downscaleToTouchBBox(const Dimensions& img, const Dimensions& bbox)
+{
     if (bbox.isDegenerate()) return Dimensions(0, 0);
     if (!bbox.inside(img)) return img;
 
@@ -257,7 +273,8 @@ Dimensions downscaleToTouchBBox(const Dimensions& img, const Dimensions& bbox) {
     return downscaled;
 }
 
-Dimensions upscaleToBBox(const Dimensions& img, const Dimensions& bbox) {
+Dimensions upscaleToBBox(const Dimensions& img, const Dimensions& bbox)
+{
     if (bbox.isDegenerate()) return Dimensions(0, 0);
     if (!img.inside(bbox)) return img;
 
@@ -405,13 +422,10 @@ Dimensions Framing::computeRelativeImageBBoxInFrame(const Dimensions& imgSize,
     // Compute image and border lengths on basis side
     double frameBasis = side == Side::WIDTH ? framedSize.width : framedSize.height;
     double frameOther = side == Side::WIDTH ? framedSize.height : framedSize.width;
-    // frame_len = img_len + 2 * scale * img_len = (1 + 2 * scale) * img_len
-    double imgFrameScale = (1.0 + 2.0 * scale);
-    double imgBasis = frameBasis / imgFrameScale;
-    // border_len = (scale * img_len)
-    //            = frame_len / (1 / scale + 2)
-    //            = frame_len * scale / (1 + 2 * scale)
-    double borderBasis = frameBasis * scale / imgFrameScale;
+
+    auto computedSizes = computeImgAndBorderSize(frameBasis, scale);
+    double imgBasis = computedSizes.first;
+    double borderBasis = computedSizes.second;
 
     // Compute image and border lengths for the non-basis side
     double imgBasisToOther = side == Side::WIDTH ? 1.0 / imgAspectRatio : imgAspectRatio;
@@ -461,32 +475,75 @@ Dimensions Framing::computeRelativeImageBBoxInFrame(const Dimensions& imgSize,
 Dimensions Framing::computeUniformRelativeImageBBox(const Dimensions& imgSize,
                                                     const Dimensions& framedSize) const
 {
-    auto length = [](double frame, double border) {
-        return std::max(0.0, frame - 2.0 * border);
-    };
+    if (imgSize.isDegenerate() || framedSize.isDegenerate()) {
+        return Dimensions(0, 0);
+    }
 
     Side side = pickReferenceSide(framing, imgSize);
     double scale = framing.relativeBorderSize;
 
-    double minBorderWidth = 0;
-    double minBorderHeight = 0;
-    if (side == Side::WIDTH) {
-        minBorderWidth = scale * framedSize.width;
-        if (framing.minSizeEnabled && minBorderWidth < framing.minWidth) {
-            minBorderWidth = framing.minWidth;
-        }
-    } else {
-        minBorderHeight = scale * framedSize.height;
-        if (framing.minSizeEnabled && minBorderHeight < framing.minHeight) {
-            minBorderHeight = framing.minHeight;
+    // Compute image and border lengths on basis side
+    double frameBasis = side == Side::WIDTH ? framedSize.width : framedSize.height;
+    double frameOther = side == Side::WIDTH ? framedSize.height : framedSize.width;
+
+    auto computedSizes = computeImgAndBorderSize(frameBasis, scale);
+    double imgBasis = computedSizes.first;
+    double border = computedSizes.second;
+
+    // Compute image and border lengths for the non-basis side
+    double imgAspectRatio = imgSize.aspectRatio();
+    double imgBasisToOther = side == Side::WIDTH ? 1.0 / imgAspectRatio : imgAspectRatio;
+    double imgOther = imgBasis * imgBasisToOther;
+
+    // If the frame doesn't constrain the non-basis side length, we just need
+    // to check the border minimum size. However, if the non-basis side is
+    // constrained, we need to adjust the image size to fit while still
+    // maintaining the border scale w.r.t. the basis side.
+    double totalOther = imgOther + 2.0 * border;
+    if (totalOther > frameOther) {
+        // Let:
+        // imgOther = imgBasis * imgBasisToOther
+        // border = imgBasis * scale
+        //
+        // Want:
+        // frameOther = imgOther + 2 * border
+        //            = imgBasis * imgBasisToOther + 2 * scale * imgBasis
+        //            = imgBasis * (imgBasisToOther + 2 * scale)
+        //
+        // Rearrange:
+        // imgBasis = frameOther / (imgBasisToOther + 2 * scale)
+        imgBasis = frameOther / (imgBasisToOther + 2.0 * scale);
+        imgOther = imgBasis * imgBasisToOther;
+        border = imgBasis * scale;
+    }
+
+    // Find the maximum allowed image size considering min size limits
+    double maxImageBasis = frameBasis;
+    double maxImageOther = frameOther;
+    if (framing.minSizeEnabled) {
+        double minBorder = static_cast<double>(
+            side == Side::WIDTH ? framing.minWidth : framing.minHeight);
+
+        if (border < minBorder) {
+            maxImageBasis = std::floor(frameBasis - 2.0 * minBorder);
+            maxImageOther = std::floor(frameOther - 2.0 * minBorder);
         }
     }
 
-    Dimensions bbox = {
-        length(framedSize.width, minBorderWidth),
-        length(framedSize.height, minBorderHeight)
-    };
-    return bbox;
+    if (imgOther > maxImageOther) {
+        imgOther = maxImageOther;
+        imgBasis = imgOther / imgBasisToOther;
+    }
+    if (imgBasis > maxImageBasis) {
+        imgBasis = maxImageBasis;
+        imgOther = imgBasis * imgBasisToOther;
+    }
+
+    if (side == Side::WIDTH) {
+        return Dimensions(imgBasis, imgOther);
+    } else {
+        return Dimensions(imgOther, imgBasis);
+    }
 }
 
 ResizeArgs Framing::adjustResizeForFraming(const ResizeArgs& resize) const
@@ -614,7 +671,7 @@ Dimensions Framing::computeSizeWithBorders(const Dimensions& imgSize) const
                 borderSize = framing.minWidth;
             }
         } else {
-            borderSize = scale * imgSize.width;
+            borderSize = scale * imgSize.height;
             if (framing.minSizeEnabled && borderSize < framing.minHeight) {
                 borderSize = framing.minHeight;
             }
@@ -625,6 +682,7 @@ Dimensions Framing::computeSizeWithBorders(const Dimensions& imgSize) const
     }
 
     double aspectRatio = orientAspectRatio(framing, imgSize);
+
     Dimensions framedSize;
     if (side == Side::WIDTH) {
         framedSize.width = (1.0 + 2.0 * scale) * imgSize.width;
@@ -639,12 +697,12 @@ Dimensions Framing::computeSizeWithBorders(const Dimensions& imgSize) const
     // the smallest frame that preserves the original image and still
     // satisfies the requested aspect ratio.
     Dimensions minFramedSize = fromAspectRatio(imgSize, aspectRatio);
+    Dimensions limit = imgSize;
     if (framing.minSizeEnabled) {
-        Dimensions limit = imgSize;
         limit.width += 2.0 * framing.minWidth;
         limit.height += 2.0 * framing.minHeight;
-        minFramedSize = clampToBBox(minFramedSize, limit, OUTSIDE_BBOX);
     }
+    minFramedSize = clampToBBox(minFramedSize, limit, OUTSIDE_BBOX);
 
     if (minFramedSize.inside(framedSize)) {
         return framedSize;
