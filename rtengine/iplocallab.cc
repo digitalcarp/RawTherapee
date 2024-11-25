@@ -20533,7 +20533,7 @@ void ImProcFunctions::Lab_Local(
     float epsi = 0.000001f;
 
 
-    if((lp.laplacexp > 1.f && lp.exposena) || (lp.strng > 2.f && lp.sfena)){//strong Laplacian
+    if((lp.laplacexp > 1.f && lp.exposena) || (lp.strng > 2.f && lp.sfena) || (lp.exposena && lp.expcomp != 0.f && params->dirpyrequalizer.enabled)){//strong Laplacian
         notlaplacian = true;
     }
 
