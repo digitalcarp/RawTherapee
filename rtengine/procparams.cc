@@ -6244,6 +6244,12 @@ std::vector<std::string> MetaDataParams::basicExifKeys = {
 };
 
 
+const std::vector<std::string> additional_default_exif_keys = {
+    "Exif.Photo.OffsetTimeDigitized",
+    "Exif.Photo.OffsetTimeOriginal",
+};
+
+
 MetaDataParams::MetaDataParams():
     mode(MetaDataParams::EDIT),
     exifKeys{},
@@ -6251,6 +6257,7 @@ MetaDataParams::MetaDataParams():
     iptc{}
 {
     exifKeys = basicExifKeys;
+    exifKeys.insert(exifKeys.end(), additional_default_exif_keys.begin(), additional_default_exif_keys.end());
 }
 
 
