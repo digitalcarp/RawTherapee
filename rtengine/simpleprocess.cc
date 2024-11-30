@@ -1923,14 +1923,16 @@ private:
 
         // If framing is not enabled, resize values simply pass through to output
         ImProcFunctions::FramingData framingData = ipf.framing(framingArgs);
-        printf("Framing Parameters (enabled=%s)\n", framingData.enabled ? "yes" : "no");
-        printf("  Crop: w=%d h=%d\n", cw, ch);
-        printf("  Original resize: w=%d h=%d s=%f\n",
-               framingArgs.resizeWidth, framingArgs.resizeHeight, framingArgs.resizeScale);
-        printf("  Framed image size: w=%d h=%d s=%f\n",
-               framingData.imgWidth, framingData.imgHeight, framingData.scale);
-        printf("  Total size: w=%d h=%d\n",
-               framingData.framedWidth, framingData.framedHeight);
+        if (settings->verbose) {
+            printf("Framing Parameters (enabled=%s)\n", framingData.enabled ? "yes" : "no");
+            printf("  Crop: w=%d h=%d\n", cw, ch);
+            printf("  Original resize: w=%d h=%d s=%f\n",
+                   framingArgs.resizeWidth, framingArgs.resizeHeight, framingArgs.resizeScale);
+            printf("  Framed image size: w=%d h=%d s=%f\n",
+                   framingData.imgWidth, framingData.imgHeight, framingData.scale);
+            printf("  Total size: w=%d h=%d\n",
+                   framingData.framedWidth, framingData.framedHeight);
+        }
 
         bool labResize = params.resize.enabled && params.resize.method != "Nearest" &&
             (framingData.scale != 1.0 || params.prsharpening.enabled || framingData.enabled);

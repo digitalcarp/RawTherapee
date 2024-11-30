@@ -1184,7 +1184,12 @@ Imagefloat* ImProcFunctions::drawFrame(Imagefloat* rgb, const FramingParams& par
 
     // Color::gamma2curve expects a 16-bit value, but the GUI sliders are
     // using 8-bit values. Step up the user value to 16-bits.
-    auto clip = [](int v) { return std::max(0, std::min(v, 255)) * 256; };
+    auto clip = [](int v) -> int {
+        int sanitized = std::max(0, std::min(v, 255));
+
+        double normalized = static_cast<double>(sanitized) / 255.0;
+        return normalized * 65535.0;
+    };
 
     float r = Color::gamma2curve[clip(params.borderRed)];
     float g = Color::gamma2curve[clip(params.borderGreen)];
@@ -1223,6 +1228,7 @@ Imagefloat* ImProcFunctions::drawFrame(Imagefloat* rgb, const FramingParams& par
         }
     }
 
+    delete rgb;
     return framed;
 }
 
