@@ -23,6 +23,7 @@
 
 #include "aspectratios.h"
 #include "colorpreview.h"
+#include "eventmapper.h"
 #include "paramsedited.h"
 #include "resize.h"
 
@@ -312,6 +313,7 @@ Framing::Framing() :
     lastAllowUpscaling(false),
     lastMinSizeEnabled(false)
 {
+    setupEvents();
     setupFramingMethodGui();
     pack_start(*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)));
     setupBorderSizeGui();
@@ -321,6 +323,32 @@ Framing::Framing() :
 
 Framing::~Framing() {
     idleRegister.destroy();
+}
+
+void Framing::setupEvents()
+{
+    auto m = ProcEventMapper::getInstance();
+
+    // clang-format off
+    EvFramingEnabled            = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_ENABLED");
+    EvFramingMethod             = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_METHOD");
+    EvFramingAspectRatio        = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_ASPECT_RATIO");
+    EvFramingOrientation        = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_ORIENTATION");
+    EvFramingFramedWidth        = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_FRAMED_WIDTH");
+    EvFramingFramedHeight       = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_FRAMED_HEIGHT");
+    EvFramingAllowUpscaling     = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_ALLOW_UPSCALING");
+    EvFramingBorderSizingMethod = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_BORDER_SIZE_METHOD");
+    EvFramingBasis              = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_BASIS");
+    EvFramingRelativeBorderSize = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_BORDER_SIZE");
+    EvFramingMinSizeEnabled     = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_MIN_SIZE_ENABLED");
+    EvFramingMinWidth           = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_MIN_WIDTH");
+    EvFramingMinHeight          = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_MIN_HEIGHT");
+    EvFramingAbsWidth           = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_ABSOLUTE_WIDTH");
+    EvFramingAbsHeight          = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_ABSOLUTE_HEIGHT");
+    EvFramingBorderRed          = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_BORDER_RED");
+    EvFramingBorderGreen        = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_BORDER_GREEN");
+    EvFramingBorderBlue         = m->newEvent(RESIZE, "HISTORY_MSG_FRAMING_BORDER_BLUE");
+    // clang-format on
 }
 
 void Framing::setupFramingMethodGui()

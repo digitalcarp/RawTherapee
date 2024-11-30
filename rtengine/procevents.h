@@ -1177,25 +1177,6 @@ enum ProcEventCode {
     Evlocallabsigjz = 1147,
     Evlocallabsigq = 1148,
     Evlocallablogcie = 1149,
-    EvFramingEnabled = 1150,
-    EvFramingMethod = 1151,
-    EvFramingAspectRatio = 1152,
-    EvFramingOrientation = 1153,
-    EvFramingFramedWidth = 1154,
-    EvFramingFramedHeight = 1155,
-    EvFramingAllowUpscaling = 1156,
-    EvFramingBorderSizingMethod = 1157,
-    EvFramingBasis = 1158,
-    EvFramingRelativeBorderSize = 1159,
-    EvFramingMinSizeEnabled = 1160,
-    EvFramingMinWidth = 1161,
-    EvFramingMinHeight = 1162,
-    EvFramingAbsWidth = 1163,
-    EvFramingAbsHeight = 1164,
-    EvFramingBorderRed = 1165,
-    EvFramingBorderGreen = 1166,
-    EvFramingBorderBlue = 1167,
-
     NUMOFEVENTS
 };
 

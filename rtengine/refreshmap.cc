@@ -1185,25 +1185,7 @@ int refreshmap[rtengine::NUMOFEVENTS] = {
     AUTOEXP,    //Evlocallabforcebw
     AUTOEXP,    //Evlocallabsigjz
     AUTOEXP,    //Evlocallabsigq
-    AUTOEXP,    //Evlocallablogcie
-    RESIZE,     // EvFramingEnabled
-    RESIZE,     // EvFramingFramingMethod
-    RESIZE,     // EvFramingAspectRatio
-    RESIZE,     // EvFramingOrientation
-    RESIZE,     // EvFramingFramedWidth
-    RESIZE,     // EvFramingFramedHeight
-    RESIZE,     // EvFramingAllowUpscaling
-    RESIZE,     // EvFramingBorderSizingMethod
-    RESIZE,     // EvFramingBasis
-    RESIZE,     // EvFramingRelativeBorderSize
-    RESIZE,     // EvFramingMinSizeEnabled
-    RESIZE,     // EvFramingMinWidth
-    RESIZE,     // EvFramingMinHeight
-    RESIZE,     // EvFramingAbsWidth
-    RESIZE,     // EvFramingAbsHeight
-    RESIZE,     // EvFramingBorderRed
-    RESIZE,     // EvFramingBorderGreen
-    RESIZE      // EvFramingBorderBlue
+    AUTOEXP     //Evlocallablogcie
 };
 
 

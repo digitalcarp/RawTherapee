@@ -25,6 +25,8 @@
 #include "guiutils.h"
 #include "toolpanel.h"
 
+#include "../rtengine/procevents.h"
+
 #include <memory>
 
 class ColorPreview;
@@ -96,6 +98,7 @@ private:
         bool isDirty;
     };
 
+    void setupEvents();
     void setupFramingMethodGui();
     void setupBorderSizeGui();
     void setupBorderColorsGui();
@@ -145,6 +148,26 @@ private:
     Adjuster* greenAdj;
     Adjuster* blueAdj;
     ColorPreview* colorPreview;
+
+    // Events
+    rtengine::ProcEvent EvFramingEnabled;
+    rtengine::ProcEvent EvFramingMethod;
+    rtengine::ProcEvent EvFramingAspectRatio;
+    rtengine::ProcEvent EvFramingOrientation;
+    rtengine::ProcEvent EvFramingFramedWidth;
+    rtengine::ProcEvent EvFramingFramedHeight;
+    rtengine::ProcEvent EvFramingAllowUpscaling;
+    rtengine::ProcEvent EvFramingBorderSizingMethod;
+    rtengine::ProcEvent EvFramingBasis;
+    rtengine::ProcEvent EvFramingRelativeBorderSize;
+    rtengine::ProcEvent EvFramingMinSizeEnabled;
+    rtengine::ProcEvent EvFramingMinWidth;
+    rtengine::ProcEvent EvFramingMinHeight;
+    rtengine::ProcEvent EvFramingAbsWidth;
+    rtengine::ProcEvent EvFramingAbsHeight;
+    rtengine::ProcEvent EvFramingBorderRed;
+    rtengine::ProcEvent EvFramingBorderGreen;
+    rtengine::ProcEvent EvFramingBorderBlue;
 
     IdleRegister idleRegister;
     std::unique_ptr<AspectRatios> aspectRatioData;
