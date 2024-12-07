@@ -442,12 +442,8 @@ Dimensions Framing::computeRelativeImageBBoxInFrame(const Dimensions& imgSize,
         double minBorderOther = static_cast<double>(
             side == Side::WIDTH ? framing.minHeight : framing.minWidth);
 
-        if (borderOther < minBorderOther) {
-            maxImageOther = std::floor(frameOther - 2.0 * minBorderOther);
-        }
-        if (borderBasis < minBorderBasis) {
-            maxImageBasis = std::floor(frameBasis - 2.0 * minBorderBasis);
-        }
+        maxImageOther = std::floor(frameOther - 2.0 * minBorderOther);
+        maxImageBasis = std::floor(frameBasis - 2.0 * minBorderBasis);
     }
 
     // Image is too large to satisfy requirements:
@@ -524,10 +520,8 @@ Dimensions Framing::computeUniformRelativeImageBBox(const Dimensions& imgSize,
         double minBorder = static_cast<double>(
             side == Side::WIDTH ? framing.minWidth : framing.minHeight);
 
-        if (border < minBorder) {
-            maxImageBasis = std::floor(frameBasis - 2.0 * minBorder);
-            maxImageOther = std::floor(frameOther - 2.0 * minBorder);
-        }
+        maxImageBasis = std::floor(frameBasis - 2.0 * minBorder);
+        maxImageOther = std::floor(frameOther - 2.0 * minBorder);
     }
 
     if (imgOther > maxImageOther) {
