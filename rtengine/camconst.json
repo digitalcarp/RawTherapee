@@ -1292,7 +1292,8 @@ Camera constants:
             {"frame": [3936, 2612], "crop": [156, 96, 3780, 2516]}
         ],
         "masked_areas": [
-            {"frame": [6188, 4120], "areas": [4, 4, 4116, 150, 4, 150, 92, 6184]},
+            // With electronic shutter, top masked area is not good (#7214).
+            {"frame": [6188, 4120], "areas": [40, 4, 4116, 150]},
             {"frame": [3936, 2612], "areas": [4, 4, 2608, 150, 4, 150, 92, 3932]}
         ]
     },
