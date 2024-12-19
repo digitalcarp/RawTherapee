@@ -365,6 +365,13 @@ Gtk::Widget* Preferences::getBatchProcPanel()
     appendBehavList(mi, M("TP_RESIZE_SCALE"), ADDSET_RESIZE_SCALE, true);
 
     mi = behModel->append();
+    mi->set_value(behavColumns.label, M("TP_FRAMING_LABEL"));
+    appendBehavList(mi, M("TP_FRAMING_BORDER_SIZE"), ADDSET_FRAMING_RELATIVE_SCALE, false);
+    appendBehavList(mi, M("TP_FRAMING_RED"), ADDSET_FRAMING_BORDER_RED, false);
+    appendBehavList(mi, M("TP_FRAMING_GREEN"), ADDSET_FRAMING_BORDER_GREEN, false);
+    appendBehavList(mi, M("TP_FRAMING_BLUE"), ADDSET_FRAMING_BORDER_BLUE, false);
+
+    mi = behModel->append();
     mi->set_value(behavColumns.label, M("TP_LENSGEOM_SCALE"));
     appendBehavList(mi, M("TP_LENSGEOM_SCALE"), ADDSET_LENSGEOM_SCALE, true);
 

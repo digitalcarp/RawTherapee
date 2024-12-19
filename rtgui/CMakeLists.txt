@@ -13,6 +13,7 @@ set(CLISOURCEFILES
 set(NONCLISOURCEFILES
     adjuster.cc
     alignedmalloc.cc
+    aspectratios.cc
     batchqueue.cc
     batchqueuebuttonset.cc
     batchqueueentry.cc
@@ -34,6 +35,7 @@ set(NONCLISOURCEFILES
     colorappearance.cc
     coloredbar.cc
     colortoning.cc
+    colorpreview.cc
     controllines.cc
     controlspotpanel.cc
     coordinateadjuster.cc
@@ -76,6 +78,7 @@ set(NONCLISOURCEFILES
     filterpanel.cc
     flatcurveeditorsubgroup.cc
     flatfield.cc
+    framing.cc
     gradient.cc
     guiutils.cc
     histogrampanel.cc
