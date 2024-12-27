@@ -23,7 +23,7 @@
 #include <iostream>
 #include <librsvg/rsvg.h>
 
-#include "../rtengine/settings.h"
+#include "rtengine/settings.h"
 #include "guiutils.h"
 
 extern Glib::ustring argv0;

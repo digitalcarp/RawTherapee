@@ -26,17 +26,17 @@
 #include <iomanip>
 #include <cstdio>
 #include <cstdlib>
-#include "../rtengine/colortemp.h"
-#include "../rtengine/imagedata.h"
-#include "../rtengine/procparams.h"
-#include "../rtengine/rtthumbnail.h"
+#include "rtengine/colortemp.h"
+#include "rtengine/imagedata.h"
+#include "rtengine/procparams.h"
+#include "rtengine/rtthumbnail.h"
 #include <glib/gstdio.h>
 #include <glibmm/timezone.h>
 
-#include "../rtengine/dynamicprofile.h"
-#include "../rtengine/metadata.h"
-#include "../rtengine/profilestore.h"
-#include "../rtengine/settings.h"
+#include "rtengine/dynamicprofile.h"
+#include "rtengine/metadata.h"
+#include "rtengine/profilestore.h"
+#include "rtengine/settings.h"
 #include "guiutils.h"
 #include "batchqueue.h"
 #include "extprog.h"

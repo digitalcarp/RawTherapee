@@ -91,8 +91,8 @@
 #include "xtransprocess.h"
 #include "xtransrawexposure.h"
 
-#include "../rtengine/noncopyable.h"
-#include "../rtengine/rtengine.h"
+#include "rtengine/noncopyable.h"
+#include "rtengine/rtengine.h"
 
 class ImageEditorCoordinator;
 class MetaDataPanel;

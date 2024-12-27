@@ -31,9 +31,9 @@
 #include <cstring>
 #include <cstdlib>
 #include <locale.h>
-#include "../rtengine/procparams.h"
-#include "../rtengine/profilestore.h"
-#include "../rtengine/rtengine.h"
+#include "rtengine/procparams.h"
+#include "rtengine/profilestore.h"
+#include "rtengine/rtengine.h"
 #include "options.h"
 #include "soundman.h"
 #include "rtimage.h"

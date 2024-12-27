@@ -23,7 +23,7 @@
 #include "addsetids.h"
 #include "options.h"
 
-#include "../rtengine/procparams.h"
+#include "rtengine/procparams.h"
 
 namespace
 {

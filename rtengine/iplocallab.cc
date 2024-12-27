@@ -35,13 +35,13 @@
 #include "jaggedarray.h"
 #include "rt_algo.h"
 #include "settings.h"
-#include "../rtgui/options.h"
+#include "rtgui/options.h"
 #include "utils.h"
 #include "iccmatrices.h"
 #ifdef _OPENMP
 #include <omp.h>
 #endif
-#include "../rtgui/thresholdselector.h"
+#include "rtgui/thresholdselector.h"
 #include "imagesource.h"
 
 #include "cplx_wavelet_dec.h"

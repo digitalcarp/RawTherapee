@@ -43,7 +43,7 @@
 #include "rt_math.h"
 #include "rtengine.h"
 #include "sleef.h"
-#include "../rtgui/options.h"
+#include "rtgui/options.h"
 #include "guidedfilter.h"
 #ifdef _OPENMP
 #include <omp.h>

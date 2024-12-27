@@ -16,12 +16,12 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <cairomm/cairomm.h>
-#include "../rtengine/rt_math.h"
+#include "rtengine/rt_math.h"
 
 #include "guiutils.h"
 #include "options.h"
-#include "../rtengine/utils.h"
-#include "../rtengine/procparams.h"
+#include "rtengine/utils.h"
+#include "rtengine/procparams.h"
 #include "rtimage.h"
 #include "rtscalable.h"
 #include "multilangmgr.h"

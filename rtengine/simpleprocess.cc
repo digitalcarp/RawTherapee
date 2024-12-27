@@ -40,8 +40,8 @@
 #include "rtengine.h"
 #include "utils.h"
 
-#include "../rtgui/multilangmgr.h"
-#include "../rtgui/options.h"
+#include "rtgui/multilangmgr.h"
+#include "rtgui/options.h"
 
 #undef THREAD_PRIORITY_NORMAL
 
