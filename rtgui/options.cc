@@ -370,7 +370,7 @@ void Options::setDefaults()
     maxZoomLimit = MaxZoom::PERCENTS_1600;
 #ifdef _WIN32
     // use windows setting for visibility of hidden files/folders
-    SHELLFLAGSTATE sft = { 0 };
+    SHELLFLAGSTATE sft = { };
     SHGetSettings(&sft, SSF_SHOWALLOBJECTS);
     fbShowHidden = sft.fShowAllObjects;
 #else
@@ -1273,7 +1273,7 @@ void Options::readFromFile(Glib::ustring fname)
                 std::map<std::string, int> checkedExtensions;
 
                 if (parseExtensions.size() == parseExtensionsEnabled.size()) {
-                    for (auto i = 0; i < parseExtensions.size(); ++i) {
+                    for (unsigned i = 0; i < parseExtensions.size(); ++i) {
                         checkedExtensions[parseExtensions[i]] = parseExtensionsEnabled[i];
                     }
                 }

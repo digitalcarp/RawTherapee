@@ -6728,7 +6728,8 @@ void ImProcFunctions::maskcalccol(bool invmask, bool pde, int bfw, int bfh, int 
                 bdecomp.reconstruct(tmpab.b[0]);
             }
 
-            float meanfab1, fab1, maxfab1;
+            float meanfab1, fab1;
+            float maxfab1 = 0.f;
             std::unique_ptr<LabImage> buforig;
             buforig.reset(new LabImage(bfw, bfh));
 #ifdef _OPENMP
