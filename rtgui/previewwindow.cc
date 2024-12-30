@@ -17,12 +17,13 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "previewwindow.h"
-#include "guiutils.h"
-#include "imagearea.h"
+
 #include "cursormanager.h"
+#include "guiutils.h"
+#include "hidpi.h"
+#include "imagearea.h"
 #include "options.h"
 #include "rtscalable.h"
-#include "hidpi.h"
 
 #include "rtengine/procparams.h"
 
@@ -65,52 +66,51 @@ void PreviewWindow::updatePreviewImage ()
         return;
     }
 
-    int W = get_width();
-    int H = get_height();
     backBuffer.clear();
+    if (!previewHandler) return;
 
-    if (previewHandler) {
-        // This should account for HiDPI scaling and is sized to physical pixels.
-        Glib::RefPtr<Gdk::Pixbuf> resPixbuf = previewHandler->getRoughImage (W, H, zoom);
-        int scale = RTScalable::getScale();
+    int scale = RTScalable::getScaleForWindow(get_window());
+    auto logicalSize = hidpi::LogicalSize::forWidget(this);
 
-        if (resPixbuf) {
-            imgW = resPixbuf->get_width();
-            imgH = resPixbuf->get_height();
+    hidpi::DevicePixbuf result = previewHandler->getRoughImage(logicalSize, scale, zoom);
+    if (!result.pixbuf()) return;
+    
+    hidpi::DeviceSize physicalSize = result.size();
+    imgW = physicalSize.width;
+    imgH = physicalSize.height;
 
-            backBuffer = Cairo::RefPtr<BackBuffer> ( new BackBuffer(imgW, imgH, Cairo::FORMAT_ARGB32) );
-            Cairo::RefPtr<Cairo::ImageSurface> surface = backBuffer->getSurface();
-            setDeviceScale(surface, scale);
+    backBuffer = Cairo::RefPtr<BackBuffer> ( new BackBuffer(
+        physicalSize.width, physicalSize.height, Cairo::FORMAT_ARGB32) );
+    Cairo::RefPtr<Cairo::ImageSurface> surface = backBuffer->getSurface();
+    hidpi::setDeviceScale(surface, physicalSize.device_scale);
 
-            Cairo::RefPtr<Cairo::Context> cc = Cairo::Context::create(surface);
-            cc->set_source_rgba (0., 0., 0., 0.);
-            cc->set_operator (Cairo::OPERATOR_CLEAR);
-            cc->paint ();
-            cc->set_operator (Cairo::OPERATOR_OVER);
-            cc->set_antialias(Cairo::ANTIALIAS_NONE);
-            cc->set_line_join(Cairo::LINE_JOIN_MITER);
+    Cairo::RefPtr<Cairo::Context> cc = Cairo::Context::create(surface);
+    cc->set_source_rgba (0., 0., 0., 0.);
+    cc->set_operator (Cairo::OPERATOR_CLEAR);
+    cc->paint ();
+    cc->set_operator (Cairo::OPERATOR_OVER);
+    cc->set_antialias(Cairo::ANTIALIAS_NONE);
+    cc->set_line_join(Cairo::LINE_JOIN_MITER);
 
-            Gdk::Cairo::set_source_pixbuf(cc, resPixbuf, 0, 0);
-            auto pattern = cc->get_source_for_surface();
-            setDeviceScale(pattern->get_surface(), scale);
-            cc->rectangle(0, 0, imgW, imgH);
-            cc->fill();
+    Gdk::Cairo::set_source_pixbuf(cc, result.pixbuf(), 0, 0);
+    auto pattern = cc->get_source_for_surface();
+    hidpi::setDeviceScale(pattern->get_surface(), physicalSize.device_scale);
+    cc->rectangle(0, 0, physicalSize.width, physicalSize.height);
+    cc->fill();
 
-            if (previewHandler->getCropParams().enabled) {
-                rtengine::procparams::CropParams cparams = previewHandler->getCropParams();
-                switch (options.cropGuides) {
-                case Options::CROP_GUIDE_NONE:
-                    cparams.guide = rtengine::procparams::CropParams::Guide::NONE;
-                    break;
-                case Options::CROP_GUIDE_FRAME:
-                    cparams.guide = rtengine::procparams::CropParams::Guide::FRAME;
-                    break;
-                default:
-                    break;
-                }
-                drawCrop (cc, imgX, imgY, imgW, imgH, 0, 0, zoom, cparams, true, false);
-            }
+    if (previewHandler->getCropParams().enabled) {
+        rtengine::procparams::CropParams cparams = previewHandler->getCropParams();
+        switch (options.cropGuides) {
+        case Options::CROP_GUIDE_NONE:
+            cparams.guide = rtengine::procparams::CropParams::Guide::NONE;
+            break;
+        case Options::CROP_GUIDE_FRAME:
+            cparams.guide = rtengine::procparams::CropParams::Guide::FRAME;
+            break;
+        default:
+            break;
         }
+        drawCrop (cc, imgX, imgY, imgW, imgH, 0, 0, zoom, cparams, true, false);
     }
 }
 
@@ -152,19 +152,18 @@ bool PreviewWindow::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
         }
     }
 
-    int scale = RTScalable::getScale();
-    int physicalWidth = get_width() * scale;
-    int physicalHeight = get_height() * scale;
+    auto deviceSize = hidpi::DeviceSize::forWidget(this);
+    const int scale = deviceSize.device_scale;
 
-    if ((physicalWidth != bufferW && physicalHeight != bufferH) || needsUpdate) {
+    if ((deviceSize.width != bufferW && deviceSize.height != bufferH) || needsUpdate) {
         needsUpdate = false;
         updatePreviewImage ();
     }
 
     cr->save();
 
-    int x_offset = (physicalWidth - bufferW) / 2 / 2;
-    int y_offset = (physicalHeight - bufferH) / 2 / 2;
+    int x_offset = static_cast<double>(deviceSize.width - bufferW) / scale / 2;
+    int y_offset = static_cast<double>(deviceSize.height - bufferH) / scale / 2;
     cr->translate(x_offset, y_offset);
 
     backBuffer->copySurface(cr, nullptr);
@@ -173,17 +172,17 @@ bool PreviewWindow::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
         int x, y, w, h;
         getObservedFrameArea (x, y, w, h);
         if (x>imgX || y>imgY || w < imgW || h < imgH) {
-            const double s = RTScalable::scalePixelSize(1.);
-            double rectX = x + 0.5;
-            double rectY = y + 0.5;
-            double rectW = std::min(w, (int)(imgW - (x - imgX) - 1));
-            double rectH = std::min(h, (int)(imgH - (y - imgY) - 1));
+            const double s = scale;
+            double rectX = x + 0.5 * s;
+            double rectY = y + 0.5 * s;
+            double rectW = std::min(w, (int)(imgW - (x - imgX))) - 1 * s;
+            double rectH = std::min(h, (int)(imgH - (y - imgY))) - 1 * s;
 
             // draw a black "shadow" line
             cr->set_source_rgba (0.0, 0.0, 0.0, 0.65);
-            cr->set_line_width (1. * s);
+            cr->set_line_width (1 * s);
             cr->set_line_join(Cairo::LINE_JOIN_MITER);
-            cr->rectangle (rectX + 1. * s, rectY + 1. * s, rectW - 2. * s, rectH - 2. * s);
+            cr->rectangle (rectX + 1 * s, rectY + 1 * s, rectW - 2 * s, rectH - 2 * s);
             cr->stroke ();
 
             // draw a "frame" line. Color of frame line can be set in preferences

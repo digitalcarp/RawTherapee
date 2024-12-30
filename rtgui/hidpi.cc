@@ -21,6 +21,68 @@
 #include "hidpi.h"
 
 #include <cairomm/surface.h>
+#include <gdkmm/pixbuf.h>
+
+#include <utility>
+
+namespace hidpi {
+
+LogicalSize LogicalSize::forWidget(const Gtk::Widget* widget) {
+    LogicalSize result = {};
+    result.width = widget->get_width();
+    result.height = widget->get_height();
+    return result;
+}
+
+DeviceSize DeviceSize::forWidget(const Gtk::Widget* widget) {
+    int scale = RTScalable::getScaleForWindow(widget->get_window());
+
+    DeviceSize result = {};
+    result.width = widget->get_width() * scale;
+    result.height = widget->get_height() * scale;
+    result.device_scale = scale;
+    return result;
+}
+
+DevicePixbuf::DevicePixbuf() : m_device_scale(1) {}
+
+DevicePixbuf::DevicePixbuf(const Glib::RefPtr<Gdk::Pixbuf>& ptr, int device_scale)
+        : m_pixbuf(ptr), m_device_scale(device_scale) {}
+
+DevicePixbuf::DevicePixbuf(const DevicePixbuf& other)
+        : m_pixbuf(other.m_pixbuf), m_device_scale(other.m_device_scale) {}
+
+DevicePixbuf& DevicePixbuf::operator=(const DevicePixbuf& other) {
+    m_pixbuf = other.m_pixbuf;
+    m_device_scale = other.m_device_scale;
+    return *this;
+}
+
+DevicePixbuf::DevicePixbuf(DevicePixbuf&& other) : m_device_scale(1) { swap(*this, other); }
+
+DevicePixbuf& DevicePixbuf::operator=(DevicePixbuf&& other) {
+    swap(*this, other);
+    return *this;
+}
+
+DeviceSize DevicePixbuf::size() const {
+    DeviceSize size = {};
+    if (m_pixbuf) {
+        size.width = m_pixbuf->get_width();
+        size.height = m_pixbuf->get_height();
+    } else {
+        size.width = 0;
+        size.height = 0;
+    }
+    size.device_scale = m_device_scale;
+    return size;
+}
+
+void swap(DevicePixbuf& lhs, DevicePixbuf& rhs) {
+    using std::swap;
+    swap(lhs.m_pixbuf, rhs.m_pixbuf);
+    swap(lhs.m_device_scale, rhs.m_device_scale);
+}
 
 void getDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,
                     double& x_scale, double& y_scale) {
@@ -29,7 +91,7 @@ void getDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,
 }
 
 void setDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,
-                    double x_scale, double y_scale) {
+                    int x_scale, int y_scale) {
     cairo_surface_t* cobj = surface->cobj();
     cairo_surface_set_device_scale(cobj, x_scale, y_scale);
 }
@@ -41,11 +103,9 @@ void getDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface,
 }
 
 void setDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface,
-                    double x_scale, double y_scale) {
+                    int x_scale, int y_scale) {
     cairo_surface_t* cobj = surface->cobj();
     cairo_surface_set_device_scale(cobj, x_scale, y_scale);
 }
 
-void setDeviceScaleToGlobal(const Cairo::RefPtr<Cairo::ImageSurface>& surface) {
-    setDeviceScale(surface, RTScalable::getScale());
-}
+}  // namespace hidpi

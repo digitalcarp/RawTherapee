@@ -33,18 +33,35 @@ double RTScalable::s_dpi = 96.;
 int RTScalable::s_scale = 1;
 sigc::signal<void(double, int)> RTScalable::s_signal_changed;
 
+int RTScalable::getScaleForWindow(const Gtk::Window* window)
+{
+    int scale = window->get_scale_factor();
+    // Default minimum value of 1 as scale is used to scale surface
+    return scale > 0 ? scale : 1;
+}
+
+int RTScalable::getScaleForWindow(const Glib::RefPtr<Gdk::Window>& window)
+{
+    int scale = window->get_scale_factor();
+    // Default minimum value of 1 as scale is used to scale surface
+    return scale > 0 ? scale : 1;
+}
+
+int RTScalable::getScaleForWindow(const Glib::RefPtr<const Gdk::Window>& window)
+{
+    int scale = window->get_scale_factor();
+    // Default minimum value of 1 as scale is used to scale surface
+    return scale > 0 ? scale : 1;
+}
+
 void RTScalable::getDPInScale(const Gtk::Window* window, double &newDPI, int &newScale)
 {
     if (window) {
         const auto screen = window->get_screen();
         newDPI = screen->get_resolution(); // Get DPI retrieved from the OS
 
-        if (window->get_scale_factor() > 0) {
-             // Get scale factor associated to the window
-            newScale = window->get_scale_factor();
-        } else {
-            newScale = 1; // Default minimum value of 1 as scale is used to scale surface
-        }
+        // Get scale factor associated to the window
+        newScale = getScaleForWindow(window);
     }
 }
 

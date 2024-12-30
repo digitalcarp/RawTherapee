@@ -73,6 +73,9 @@ public:
     static void setDPInScale(const Gtk::Window* window);
     static void setDPInScale(const double newDPI, const int newScale);
     static double getDPI();
+    static int getScaleForWindow(const Gtk::Window* window);
+    static int getScaleForWindow(const Glib::RefPtr<Gdk::Window>& window);
+    static int getScaleForWindow(const Glib::RefPtr<const Gdk::Window>& window);
     static int getScale();
     static double getGlobalScale();
     static int scalePixelSize(const int pixel_size);

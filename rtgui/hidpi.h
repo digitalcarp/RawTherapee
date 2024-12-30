@@ -20,10 +20,15 @@
 #pragma once
 
 #include <cairomm/refptr.h>
+#include <glibmm/refptr.h>
 
 namespace Cairo {
 class ImageSurface;
 class Surface;
+}
+
+namespace Gdk {
+class Pixbuf;
 }
 
 namespace Gtk {
@@ -31,33 +36,80 @@ class Widget;
 class Window;
 }
 
-struct DevicePixelDimensions {
-    int width;
-    int height;
-    int scale;
+namespace hidpi {
 
-    DevicePixelDimensions() : width(0), height(0), scale(1) {}
-    DevicePixelDimensions(int phys_width, int phys_height, int hidpi_scale)
-            : width(phys_width), height(phys_height), scale(hidpi_scale) {}
+enum class PixelSpace { LOGICAL, PHYSICAL };
 
-    static DevicePixelDimensions for_widget(const Gtk::Widget* widget, const Gtk::Window* window);
-    static DevicePixelDimensions for_surface(const Cairo::RefPtr<Cairo::Surface>& surface);
+struct LogicalCoord {
+    int x = 0;
+    int y = 0;
+
+    constexpr PixelSpace pixelSpace() const { return PixelSpace::LOGICAL; }
+};
+
+struct DeviceCoord {
+    int x = 0;
+    int y = 0;
+    int device_scale = 1;
+
+    constexpr PixelSpace pixelSpace() const { return PixelSpace::PHYSICAL; }
+};
+
+struct LogicalSize {
+    int width = 0;
+    int height = 0;
+
+    static LogicalSize forWidget(const Gtk::Widget* widget);
+
+    constexpr PixelSpace pixelSpace() const { return PixelSpace::LOGICAL; }
+};
+
+struct DeviceSize {
+    int width = 0;
+    int height = 0;
+    int device_scale = 1;
+
+    static DeviceSize forWidget(const Gtk::Widget* widget);
+
+    constexpr PixelSpace pixelSpace() const { return PixelSpace::PHYSICAL; }
+};
+
+class DevicePixbuf {
+public:
+    DevicePixbuf();
+    DevicePixbuf(const Glib::RefPtr<Gdk::Pixbuf>& ptr, int device_scale);
+
+    DevicePixbuf(const DevicePixbuf& other);
+    DevicePixbuf& operator=(const DevicePixbuf& other);
+    DevicePixbuf(DevicePixbuf&& other);
+    DevicePixbuf& operator=(DevicePixbuf&& other);
+
+    operator bool() const { return static_cast<bool>(m_pixbuf); }
+
+    const Glib::RefPtr<Gdk::Pixbuf>& pixbuf() const { return m_pixbuf; }
+    DeviceSize size() const;
+
+    friend void swap(DevicePixbuf& lhs, DevicePixbuf& rhs);
+
+private:
+    Glib::RefPtr<Gdk::Pixbuf> m_pixbuf;
+    int m_device_scale;
 };
 
 void getDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,
                     double& x_scale, double& y_scale);
 void setDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,
-                    double x_scale, double y_scale);
-inline void setDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface, double scale) {
+                    int x_scale, int y_scale);
+inline void setDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface, int scale) {
     setDeviceScale(surface, scale, scale);
 }
 
 void getDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface,
                     double& x_scale, double& y_scale);
 void setDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface,
-                    double x_scale, double y_scale);
-inline void setDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface, double scale) {
+                    int x_scale, int y_scale);
+inline void setDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface, int scale) {
     setDeviceScale(surface, scale, scale);
 }
 
-void setDeviceScaleToGlobal(const Cairo::RefPtr<Cairo::ImageSurface>& surface);
+}  // namespace hidpi
