@@ -27,10 +27,26 @@
 
 namespace hidpi {
 
+DeviceCoord LogicalCoord::scaleToDevice(int device_scale) const {
+    DeviceCoord device = {};
+    device.x = x * device_scale;
+    device.y = y * device_scale;
+    device.device_scale = device_scale;
+    return device;
+}
+
 LogicalSize LogicalSize::forWidget(const Gtk::Widget* widget) {
     LogicalSize result = {};
     result.width = widget->get_width();
     result.height = widget->get_height();
+    return result;
+}
+
+DeviceSize LogicalSize::scaleToDevice(int device_scale) const {
+    DeviceSize result = {};
+    result.width = width * device_scale;
+    result.height = height * device_scale;
+    result.device_scale = device_scale;
     return result;
 }
 

@@ -27,7 +27,7 @@
 
 #include "rtengine/procparams.h"
 
-PreviewWindow::PreviewWindow () : previewHandler(nullptr), mainCropWin(nullptr), imageArea(nullptr), imgX(0), imgY(0), imgW(0), imgH(0),
+PreviewWindow::PreviewWindow () : previewHandler(nullptr), mainCropWin(nullptr), imageArea(nullptr), imgW(0), imgH(0),
     zoom(0.0), press_x(0), press_y(0), isMoving(false), needsUpdate(false), cursor_type(CSUndefined)
 
 {
@@ -50,8 +50,8 @@ void PreviewWindow::getObservedFrameArea (int& x, int& y, int& w, int& h)
         int cropX, cropY, cropW, cropH;
         mainCropWin->getCropRectangle (cropX, cropY, cropW, cropH);
         // translate it to screen coordinates
-        x = imgX + round(cropX * zoom);
-        y = imgY + round(cropY * zoom);
+        x = round(cropX * zoom);
+        y = round(cropY * zoom);
         w = round(cropW * zoom);
         h = round(cropH * zoom);
     }
@@ -70,19 +70,19 @@ void PreviewWindow::updatePreviewImage ()
     if (!previewHandler) return;
 
     int scale = RTScalable::getScaleForWindow(get_window());
-    auto logicalSize = hidpi::LogicalSize::forWidget(this);
+    auto logical = hidpi::LogicalSize::forWidget(this);
 
-    hidpi::DevicePixbuf result = previewHandler->getRoughImage(logicalSize, scale, zoom);
+    hidpi::DevicePixbuf result = previewHandler->getRoughImage(logical, scale, zoom);
     if (!result.pixbuf()) return;
     
-    hidpi::DeviceSize physicalSize = result.size();
-    imgW = physicalSize.width;
-    imgH = physicalSize.height;
+    hidpi::DeviceSize device = result.size();
+    imgW = device.width;
+    imgH = device.height;
 
     backBuffer = Cairo::RefPtr<BackBuffer> ( new BackBuffer(
-        physicalSize.width, physicalSize.height, Cairo::FORMAT_ARGB32) );
+        device.width, device.height, Cairo::FORMAT_ARGB32) );
     Cairo::RefPtr<Cairo::ImageSurface> surface = backBuffer->getSurface();
-    hidpi::setDeviceScale(surface, physicalSize.device_scale);
+    hidpi::setDeviceScale(surface, device.device_scale);
 
     Cairo::RefPtr<Cairo::Context> cc = Cairo::Context::create(surface);
     cc->set_source_rgba (0., 0., 0., 0.);
@@ -94,8 +94,8 @@ void PreviewWindow::updatePreviewImage ()
 
     Gdk::Cairo::set_source_pixbuf(cc, result.pixbuf(), 0, 0);
     auto pattern = cc->get_source_for_surface();
-    hidpi::setDeviceScale(pattern->get_surface(), physicalSize.device_scale);
-    cc->rectangle(0, 0, physicalSize.width, physicalSize.height);
+    hidpi::setDeviceScale(pattern->get_surface(), device.device_scale);
+    cc->rectangle(0, 0, device.width, device.height);
     cc->fill();
 
     if (previewHandler->getCropParams().enabled) {
@@ -110,7 +110,7 @@ void PreviewWindow::updatePreviewImage ()
         default:
             break;
         }
-        drawCrop (cc, imgX, imgY, imgW, imgH, 0, 0, zoom, cparams, true, false);
+        drawCrop (cc, 0, 0, imgW, imgH, 0, 0, zoom, cparams, true, false);
     }
 }
 
@@ -171,12 +171,12 @@ bool PreviewWindow::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
     if (mainCropWin && zoom > 0.0) {
         int x, y, w, h;
         getObservedFrameArea (x, y, w, h);
-        if (x>imgX || y>imgY || w < imgW || h < imgH) {
+        if (x>0 || y>0 || w < imgW || h < imgH) {
             const double s = scale;
             double rectX = x + 0.5 * s;
             double rectY = y + 0.5 * s;
-            double rectW = std::min(w, (int)(imgW - (x - imgX))) - 1 * s;
-            double rectH = std::min(h, (int)(imgH - (y - imgY))) - 1 * s;
+            double rectW = std::min(w, (int)(imgW - x)) - 1 * s;
+            double rectH = std::min(h, (int)(imgH - y)) - 1 * s;
 
             // draw a black "shadow" line
             cr->set_source_rgba (0.0, 0.0, 0.0, 0.65);
@@ -245,7 +245,7 @@ bool PreviewWindow::on_motion_notify_event (GdkEventMotion* event)
 
     int x, y, w, h;
     getObservedFrameArea (x, y, w, h);
-    if (x>imgX || y>imgY || w < imgW || h < imgH) {
+    if (x>0 || y>0 || w < imgW || h < imgH) {
         bool inside =     event->x > x - 6 && event->x < x + w - 1 + 6 && event->y > y - 6 && event->y < y + h - 1 + 6;
 
         CursorShape newType;
@@ -279,7 +279,7 @@ bool PreviewWindow::on_button_press_event (GdkEventButton* event)
 
     int x, y, w, h;
     getObservedFrameArea (x, y, w, h);
-    if (x>imgX || y>imgY || w < imgW || h < imgH) {
+    if (x>0 || y>0 || w < imgW || h < imgH) {
 
         if (!isMoving) {
             isMoving = true;

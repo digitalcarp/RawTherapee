@@ -38,11 +38,19 @@ class Window;
 
 namespace hidpi {
 
+class DeviceCoord;
+class DeviceSize;
+
 enum class PixelSpace { LOGICAL, PHYSICAL };
 
 struct LogicalCoord {
     int x = 0;
     int y = 0;
+
+    LogicalCoord() = default;
+    LogicalCoord(int logical_x, int logical_y) : x(logical_x), y(logical_y) {}
+
+    DeviceCoord scaleToDevice(int device_scale) const;
 
     constexpr PixelSpace pixelSpace() const { return PixelSpace::LOGICAL; }
 };
@@ -61,7 +69,17 @@ struct LogicalSize {
 
     static LogicalSize forWidget(const Gtk::Widget* widget);
 
+    LogicalSize() = default;
+    LogicalSize(int logical_width, int logical_height)
+            : width(logical_width), height(logical_height) {}
+
+    DeviceSize scaleToDevice(int device_scale) const;
+
     constexpr PixelSpace pixelSpace() const { return PixelSpace::LOGICAL; }
+
+    bool operator==(const LogicalSize& other) const {
+        return width == other.width && height == other.height;
+    }
 };
 
 struct DeviceSize {

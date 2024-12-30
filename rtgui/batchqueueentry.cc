@@ -98,20 +98,20 @@ void BatchQueueEntry::refreshThumbnailImage ()
         // creating the image buffer first
         //if (!opreview) opreview = new guint8[(origpw+1) * origph * 3];
         // this will asynchronously compute the original preview and land at this.updateImage
-        batchQueueEntryUpdater.process (nullptr, origpw, origph, preh, this, params.get(), thumbnail);
+        batchQueueEntryUpdater.process (nullptr, origpw, origph, previewSize.height, this, params.get(), thumbnail);
     } else {
         // this will asynchronously land at this.updateImage
-        batchQueueEntryUpdater.process (opreview, origpw, origph, preh, this);
+        batchQueueEntryUpdater.process (opreview, origpw, origph, previewSize.height, this);
     }
 }
 
 void BatchQueueEntry::calcThumbnailSize ()
 {
-    prew = preh * origpw / origph;
-    if (prew > options.maxThumbnailWidth) {
-        const float s = static_cast<float>(options.maxThumbnailWidth) / prew;
-        prew = options.maxThumbnailWidth;
-        preh = std::max<int>(preh * s, 1);
+    previewSize.width = previewSize.height * origpw / origph;
+    if (previewSize.width > options.maxThumbnailWidth) {
+        const float s = static_cast<float>(options.maxThumbnailWidth) / previewSize.width;
+        previewSize.width = options.maxThumbnailWidth;
+        previewSize.height = std::max<int>(previewSize.height * s, 1);
     }
 }
 
@@ -265,11 +265,11 @@ void BatchQueueEntry::updateImage (guint8* img, int w, int h, int origw, int ori
 void BatchQueueEntry::_updateImage (guint8* img, int w, int h)
 {
 
-    if (preh == h) {
+    if (previewSize.height == h) {
         MYWRITERLOCK(l, lockRW);
 
-        prew = w;
-        preview.resize(prew * preh * 3);
+        previewSize.width = w;
+        preview.resize(previewSize.width * previewSize.height * 3);
         std::copy(img, img + preview.size(), preview.begin());
 
         if (parent) {
