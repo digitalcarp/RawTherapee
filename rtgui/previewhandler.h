@@ -82,6 +82,6 @@ public:
 
     // with this function it is possible to ask for a rough approximation of a (possibly zoomed) crop of the image
     Glib::RefPtr<Gdk::Pixbuf>           getRoughImage (int x, int y, int w, int h, double zoom);
-    Glib::RefPtr<Gdk::Pixbuf>           getRoughImage (int desiredW, int desiredH, double& zoom);
+    Glib::RefPtr<Gdk::Pixbuf>           getRoughImage (int desiredW, int desiredH, double& out_zoom);
     rtengine::procparams::CropParams    getCropParams ();
 };

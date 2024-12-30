@@ -81,6 +81,7 @@ set(NONCLISOURCEFILES
     framing.cc
     gradient.cc
     guiutils.cc
+    hidpi.cc
     histogrampanel.cc
     history.cc
     hsvequalizer.cc

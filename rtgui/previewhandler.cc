@@ -20,6 +20,7 @@
 #include <gtkmm.h>
 #include "rtengine/rtengine.h"
 #include "rtengine/procparams.h"
+#include "rtscalable.h"
 
 using namespace rtengine;
 using namespace rtengine::procparams;
@@ -182,7 +183,7 @@ Glib::RefPtr<Gdk::Pixbuf> PreviewHandler::getRoughImage (int x, int y, int w, in
     return resPixbuf;
 }
 
-Glib::RefPtr<Gdk::Pixbuf> PreviewHandler::getRoughImage (int desiredW, int desiredH, double& zoom_)
+Glib::RefPtr<Gdk::Pixbuf> PreviewHandler::getRoughImage (int desiredW, int desiredH, double& out_zoom)
 {
     MyMutex::MyLock lock(previewImgMutex);
 
@@ -190,12 +191,14 @@ Glib::RefPtr<Gdk::Pixbuf> PreviewHandler::getRoughImage (int desiredW, int desir
 
     if (previewImg) {
         double zoom1 = (double)max(desiredW, 20) / previewImg->get_width(); // too small values lead to extremely increased processing time in scale function, Issue 2783
-        double zoom2 = (double)max(desiredH, 20) / previewImg->get_height(); // ""
+        double zoom2 = (double)max(desiredH, 20) / previewImg->get_height();
         double zoom = zoom1 < zoom2 ? zoom1 : zoom2;
+
+        out_zoom = zoom / previewScale;
+        zoom = zoom * RTScalable::getScale();
 
         resPixbuf = Gdk::Pixbuf::create (Gdk::COLORSPACE_RGB, false, 8, image->getWidth() * zoom, image->getHeight() * zoom);
         previewImg->scale (resPixbuf, 0, 0, previewImg->get_width()*zoom, previewImg->get_height()*zoom, 0, 0, zoom, zoom, Gdk::INTERP_BILINEAR);
-        zoom_ = zoom / previewScale;
     }
 
     return resPixbuf;

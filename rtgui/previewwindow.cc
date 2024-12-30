@@ -22,6 +22,7 @@
 #include "cursormanager.h"
 #include "options.h"
 #include "rtscalable.h"
+#include "hidpi.h"
 
 #include "rtengine/procparams.h"
 
@@ -57,8 +58,6 @@ void PreviewWindow::getObservedFrameArea (int& x, int& y, int& w, int& h)
 
 void PreviewWindow::updatePreviewImage ()
 {
-
-    int W = get_width(), H = get_height();
     Glib::RefPtr<Gdk::Window> wind = get_window();
 
     if( ! wind ) {
@@ -66,27 +65,35 @@ void PreviewWindow::updatePreviewImage ()
         return;
     }
 
-    backBuffer = Cairo::RefPtr<BackBuffer> ( new BackBuffer(W, H, Cairo::FORMAT_ARGB32) );
-    Cairo::RefPtr<Cairo::ImageSurface> surface = backBuffer->getSurface();
-    Glib::RefPtr<Gtk::StyleContext> style = get_style_context();
-    Cairo::RefPtr<Cairo::Context> cc = Cairo::Context::create(surface);
-    cc->set_source_rgba (0., 0., 0., 0.);
-    cc->set_operator (Cairo::OPERATOR_CLEAR);
-    cc->paint ();
-    cc->set_operator (Cairo::OPERATOR_OVER);
-    cc->set_antialias(Cairo::ANTIALIAS_NONE);
-    cc->set_line_join(Cairo::LINE_JOIN_MITER);
+    int W = get_width();
+    int H = get_height();
+    backBuffer.clear();
 
     if (previewHandler) {
+        // This should account for HiDPI scaling and is sized to physical pixels.
         Glib::RefPtr<Gdk::Pixbuf> resPixbuf = previewHandler->getRoughImage (W, H, zoom);
+        int scale = RTScalable::getScale();
 
         if (resPixbuf) {
             imgW = resPixbuf->get_width();
             imgH = resPixbuf->get_height();
-            imgX = (W - imgW) / 2;
-            imgY = (H - imgH) / 2;
-            Gdk::Cairo::set_source_pixbuf(cc, resPixbuf, imgX, imgY);
-            cc->rectangle(imgX, imgY, imgW, imgH);
+
+            backBuffer = Cairo::RefPtr<BackBuffer> ( new BackBuffer(imgW, imgH, Cairo::FORMAT_ARGB32) );
+            Cairo::RefPtr<Cairo::ImageSurface> surface = backBuffer->getSurface();
+            setDeviceScale(surface, scale);
+
+            Cairo::RefPtr<Cairo::Context> cc = Cairo::Context::create(surface);
+            cc->set_source_rgba (0., 0., 0., 0.);
+            cc->set_operator (Cairo::OPERATOR_CLEAR);
+            cc->paint ();
+            cc->set_operator (Cairo::OPERATOR_OVER);
+            cc->set_antialias(Cairo::ANTIALIAS_NONE);
+            cc->set_line_join(Cairo::LINE_JOIN_MITER);
+
+            Gdk::Cairo::set_source_pixbuf(cc, resPixbuf, 0, 0);
+            auto pattern = cc->get_source_for_surface();
+            setDeviceScale(pattern->get_surface(), scale);
+            cc->rectangle(0, 0, imgW, imgH);
             cc->fill();
 
             if (previewHandler->getCropParams().enabled) {
@@ -145,12 +152,22 @@ bool PreviewWindow::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
         }
     }
 
-    if ((get_width() != bufferW && get_height() != bufferH) || needsUpdate) {
+    int scale = RTScalable::getScale();
+    int physicalWidth = get_width() * scale;
+    int physicalHeight = get_height() * scale;
+
+    if ((physicalWidth != bufferW && physicalHeight != bufferH) || needsUpdate) {
         needsUpdate = false;
         updatePreviewImage ();
     }
 
-    backBuffer->copySurface(cr, NULL);
+    cr->save();
+
+    int x_offset = (physicalWidth - bufferW) / 2 / 2;
+    int y_offset = (physicalHeight - bufferH) / 2 / 2;
+    cr->translate(x_offset, y_offset);
+
+    backBuffer->copySurface(cr, nullptr);
 
     if (mainCropWin && zoom > 0.0) {
         int x, y, w, h;
@@ -175,6 +192,8 @@ bool PreviewWindow::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
             cr->stroke ();
         }
     }
+
+    cr->restore();
 
     style->render_frame (cr, 0, 0, get_width(), get_height());
 
