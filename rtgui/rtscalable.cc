@@ -29,8 +29,9 @@
 extern Glib::ustring argv0;
 
 // Default static parameter values
-double RTScalable::dpi = 96.;
-int RTScalable::scale = 1;
+double RTScalable::s_dpi = 96.;
+int RTScalable::s_scale = 1;
+sigc::signal<void(double, int)> RTScalable::s_signal_changed;
 
 void RTScalable::getDPInScale(const Gtk::Window* window, double &newDPI, int &newScale)
 {
@@ -236,28 +237,37 @@ Cairo::RefPtr<Cairo::ImageSurface> RTScalable::loadSurfaceFromSVG(const Glib::us
 void RTScalable::init(const Gtk::Window* window)
 {
     // Retrieve DPI and Scale paremeters from OS
+    double dpi = s_dpi;
+    int scale = s_scale;
     getDPInScale(window, dpi, scale);
+    setDPInScale(dpi, scale);
 }
 
 void RTScalable::setDPInScale (const Gtk::Window* window)
 {
+    double dpi = s_dpi;
+    int scale = s_scale;
     getDPInScale(window, dpi, scale);
+    setDPInScale(dpi, scale);
 }
 
 void RTScalable::setDPInScale (const double newDPI, const int newScale)
 {
-    dpi = newDPI;
-    scale = newScale;
+    if (s_dpi != newDPI || s_scale != newScale) {
+        s_dpi = newDPI;
+        s_scale = newScale;
+        s_signal_changed.emit(newDPI, newScale);
+    }
 }
 
 double RTScalable::getDPI ()
 {
-    return dpi;
+    return s_dpi;
 }
 
 int RTScalable::getScale ()
 {
-    return scale;
+    return s_scale;
 }
 
 double RTScalable::getGlobalScale()
@@ -275,4 +285,9 @@ double RTScalable::scalePixelSize(const double pixel_size)
 {
     const double s = getGlobalScale();
     return (pixel_size * s);
+}
+
+RtScopedConnection RTScalable::connectToChanged(sigc::slot<void(double, int)>&& slot)
+{
+    return RtScopedConnection(s_signal_changed.connect(std::move(slot)));
 }
