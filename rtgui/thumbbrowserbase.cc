@@ -562,7 +562,7 @@ void ThumbBrowserBase::internalAreaResized (Gtk::Allocation& req)
 
 void ThumbBrowserBase::onInternalAreaDraw()
 {
-    int deviceScale = RTScalable::getScaleForWindow(get_window());
+    int deviceScale = RTScalable::getScaleForWidget(this);
     if (deviceScale == lastDeviceScale) return;
 
     lastDeviceScale = deviceScale;

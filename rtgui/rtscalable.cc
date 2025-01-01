@@ -40,16 +40,9 @@ int RTScalable::getScaleForWindow(const Gtk::Window* window)
     return scale > 0 ? scale : 1;
 }
 
-int RTScalable::getScaleForWindow(const Glib::RefPtr<Gdk::Window>& window)
+int RTScalable::getScaleForWidget(const Gtk::Widget* widget)
 {
-    int scale = window->get_scale_factor();
-    // Default minimum value of 1 as scale is used to scale surface
-    return scale > 0 ? scale : 1;
-}
-
-int RTScalable::getScaleForWindow(const Glib::RefPtr<const Gdk::Window>& window)
-{
-    int scale = window->get_scale_factor();
+    int scale = widget->get_scale_factor();
     // Default minimum value of 1 as scale is used to scale surface
     return scale > 0 ? scale : 1;
 }

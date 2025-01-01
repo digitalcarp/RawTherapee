@@ -69,7 +69,7 @@ void PreviewWindow::updatePreviewImage ()
     backBuffer.clear();
     if (!previewHandler) return;
 
-    int scale = RTScalable::getScaleForWindow(get_window());
+    int scale = RTScalable::getScaleForWidget(this);
     auto logical = hidpi::LogicalSize::forWidget(this);
 
     hidpi::DevicePixbuf result = previewHandler->getRoughImage(logical, scale, zoom);

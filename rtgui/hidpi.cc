@@ -51,7 +51,7 @@ DeviceSize LogicalSize::scaleToDevice(int device_scale) const {
 }
 
 DeviceSize DeviceSize::forWidget(const Gtk::Widget* widget) {
-    int scale = RTScalable::getScaleForWindow(widget->get_window());
+    int scale = RTScalable::getScaleForWidget(widget);
 
     DeviceSize result = {};
     result.width = widget->get_width() * scale;

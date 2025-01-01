@@ -17,13 +17,16 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "imagearea.h"
+
 #include <ctime>
 #include <cmath>
-#include "options.h"
-#include "multilangmgr.h"
-#include "cropwindow.h"
+
 #include "rtengine/refreshmap.h"
 #include "rtengine/procparams.h"
+
+#include "cropwindow.h"
+#include "hidpi.h"
+#include "multilangmgr.h"
 #include "options.h"
 #include "rtscalable.h"
 
@@ -145,10 +148,15 @@ void ImageArea::on_style_updated ()
     queue_draw ();
 }
 
-void ImageArea::setInfoText (Glib::ustring text)
+void ImageArea::setInfoText (Glib::ustring&& text)
 {
-
     infotext = std::move(text);
+    updateInfoTextBackBuffer();
+}
+
+void ImageArea::updateInfoTextBackBuffer()
+{
+    backBufferDeviceScale = RTScalable::getScaleForWidget(this);
 
     Glib::RefPtr<Pango::Context> context = get_pango_context () ;
     Pango::FontDescription fontd(get_style_context()->get_font());
@@ -169,9 +177,14 @@ void ImageArea::setInfoText (Glib::ustring text)
     int iw, ih;
     ilayout->get_pixel_size (iw, ih);
 
+    int bufferWidth = (iw + 16) * backBufferDeviceScale;
+    int bufferHeight = (ih + 16) * backBufferDeviceScale;
+    int bufferOffset = 8 * backBufferDeviceScale;
+
     // create BackBuffer
-    iBackBuffer.setDrawRectangle(Cairo::FORMAT_ARGB32, 0, 0, iw + 16, ih + 16, true);
-    iBackBuffer.setDestPosition(8, 8);
+    iBackBuffer.setDrawRectangle(Cairo::FORMAT_ARGB32, 0, 0, bufferWidth, bufferHeight, true);
+    iBackBuffer.setDestPosition(bufferOffset, bufferOffset);
+    hidpi::setDeviceScale(iBackBuffer.getSurface(), backBufferDeviceScale);
 
     Cairo::RefPtr<Cairo::Context> cr = iBackBuffer.getContext();
 
@@ -251,6 +264,9 @@ bool ImageArea::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
     }
 
     if (options.showInfo && !infotext.empty()) {
+        if (RTScalable::getScaleForWidget(this) != backBufferDeviceScale) {
+            updateInfoTextBackBuffer();
+        }
         iBackBuffer.copySurface(cr);
     }
 
