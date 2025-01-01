@@ -153,14 +153,17 @@ void PreviewHandler::imageReady(const rtengine::procparams::CropParams& cp)
     );
 }
 
-Glib::RefPtr<Gdk::Pixbuf> PreviewHandler::getRoughImage (int x, int y, int w, int h, double zoom)
+hidpi::DevicePixbuf PreviewHandler::getRoughImage (int x, int y, hidpi::DeviceSize desiredSize, double zoom)
 {
     MyMutex::MyLock lock(previewImgMutex);
 
-    Glib::RefPtr<Gdk::Pixbuf> resPixbuf;
+    hidpi::DevicePixbuf result;
 
     if (previewImg) {
-        double totalZoom = zoom * previewScale;
+        double totalZoom = zoom * previewScale * desiredSize.device_scale;
+
+        int w = desiredSize.width;
+        int h = desiredSize.height;
 
         if (w > previewImg->get_width()*totalZoom) {
             w = image->getWidth() * totalZoom;
@@ -170,17 +173,19 @@ Glib::RefPtr<Gdk::Pixbuf> PreviewHandler::getRoughImage (int x, int y, int w, in
             h = image->getHeight() * totalZoom;
         }
 
-        x *= zoom;
-        y *= zoom;
+        x *= zoom * desiredSize.device_scale;
+        y *= zoom * desiredSize.device_scale;
 
         w = rtengine::LIM<int>(w, 0, int(previewImg->get_width() * totalZoom) - x);
         h = rtengine::LIM<int>(h, 0, int(previewImg->get_height() * totalZoom) - y);
 
-        resPixbuf = Gdk::Pixbuf::create (Gdk::COLORSPACE_RGB, false, 8, w, h);
-        previewImg->scale (resPixbuf, 0, 0, w, h, -x, -y, totalZoom, totalZoom, Gdk::INTERP_NEAREST);
+        auto pixbuf = Gdk::Pixbuf::create (Gdk::COLORSPACE_RGB, false, 8, w, h);
+        previewImg->scale (pixbuf, 0, 0, w, h, -x, -y, totalZoom, totalZoom, Gdk::INTERP_NEAREST);
+
+        result = hidpi::DevicePixbuf(pixbuf, desiredSize.device_scale);
     }
 
-    return resPixbuf;
+    return result;
 }
 
 hidpi::DevicePixbuf PreviewHandler::getRoughImage (hidpi::LogicalSize desiredSize,

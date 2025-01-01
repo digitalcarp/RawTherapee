@@ -82,7 +82,7 @@ public:
     void previewImageChanged ();
 
     // with this function it is possible to ask for a rough approximation of a (possibly zoomed) crop of the image
-    Glib::RefPtr<Gdk::Pixbuf>           getRoughImage (int x, int y, int w, int h, double zoom);
+    hidpi::DevicePixbuf getRoughImage (int x, int y, hidpi::DeviceSize desiredSize, double zoom);
     hidpi::DevicePixbuf getRoughImage(hidpi::LogicalSize desiredSize, int deviceScale, double& outLogicalZoom);
 
     rtengine::procparams::CropParams    getCropParams ();

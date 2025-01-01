@@ -28,6 +28,7 @@
 #include "editbuffer.h"
 #include "editcoordsys.h"
 #include "editenums.h"
+#include "hidpi.h"
 #include "lwbutton.h"
 #include "lwbuttonset.h"
 
@@ -95,7 +96,8 @@ class CropWindow final : public LWButtonListener, public CropDisplayHandler, pub
     // of the main preview area
     int xpos, ypos, width, height;
     // size & pos of the drawable area relative to the top left corner of the crop
-    int imgAreaX, imgAreaY, imgAreaW, imgAreaH;
+    int imgAreaX, imgAreaY;
+    hidpi::LogicalSize imgAreaSize;
     // size & pos of the piece of preview image relative to the top left corner of the crop
     int imgX, imgY, imgW, imgH;
 

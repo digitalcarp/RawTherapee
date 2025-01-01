@@ -80,7 +80,7 @@ CropWindow::CropWindow (ImageArea* parent, bool isLowUpdatePriority_, bool isDet
     : ObjectMOBuffer(parent), state(SNormal), press_x(0), press_y(0), action_x(0), action_y(0), pickedObject(-1), pickModifierKey(0), rot_deg(0), onResizeArea(false), deleted(false),
       fitZoomEnabled(true), fitZoom(false), cursor_type(CSArrow), /*isLowUpdatePriority(isLowUpdatePriority_),*/ hoveredPicker(nullptr), cropLabel(Glib::ustring("100%")),
       backColor(options.bgcolor), decorated(true), isFlawnOver(false), titleHeight(30), sideBorderWidth(3), lowerBorderWidth(3),
-      upperBorderWidth(1), sepWidth(2), xpos(30), ypos(30), width(0), height(0), imgAreaX(0), imgAreaY(0), imgAreaW(0), imgAreaH(0),
+      upperBorderWidth(1), sepWidth(2), xpos(30), ypos(30), width(0), height(0), imgAreaX(0), imgAreaY(0), imgAreaSize(0, 0),
       imgX(-1), imgY(-1), imgW(1), imgH(1), iarea(parent), cropZoom(0), zoomVersion(0), exposeVersion(0), cropgl(nullptr),
       pmlistener(nullptr), pmhlistener(nullptr), scrollAccum(0.0), observedCropWin(nullptr),
       crop_custom_ratio(0.f)
@@ -254,18 +254,18 @@ void CropWindow::setSize (int w, int h, bool norefresh)
     if (decorated) {
         imgAreaX = sideBorderWidth;
         imgAreaY = upperBorderWidth + titleHeight + sepWidth;
-        imgAreaW = width - 2 * sideBorderWidth;
-        imgAreaH = height - lowerBorderWidth - titleHeight - sepWidth - upperBorderWidth;
+        imgAreaSize.width = width - 2 * sideBorderWidth;
+        imgAreaSize.height = height - lowerBorderWidth - titleHeight - sepWidth - upperBorderWidth;
         buttonSet.arrangeButtons (xpos + sideBorderWidth, ypos + upperBorderWidth, width - 2 * sideBorderWidth, titleHeight);
     } else {
         imgAreaX = imgAreaY = 0;
-        imgAreaW = width;
-        imgAreaH = height;
+        imgAreaSize.width = width;
+        imgAreaSize.height = height;
     }
 
     if (!norefresh) {
-        ObjectMOBuffer::resize(imgAreaW, imgAreaH);
-        cropHandler.setWSize (imgAreaW, imgAreaH);
+        ObjectMOBuffer::resize(imgAreaSize.width, imgAreaSize.height);
+        cropHandler.setWSize (imgAreaSize.width, imgAreaSize.height);
     }
 
     //iarea->redraw ();
@@ -281,8 +281,8 @@ void CropWindow::getSize (int& w, int& h)
 void CropWindow::getCropSize (int& w, int& h)
 {
 
-    w = imgAreaW;
-    h = imgAreaH;
+    w = imgAreaSize.width;
+    h = imgAreaSize.height;
 }
 
 void CropWindow::getCropAnchorPosition (int& x, int& y)
@@ -1213,7 +1213,7 @@ bool CropWindow::onArea (CursorArea a, int x, int y)
 
     case CropBorder:
         return
-            (x >= xpos + imgAreaX && y >= ypos + imgAreaY && x < xpos + imgAreaX + imgAreaW && y < ypos + imgAreaY + imgAreaH) &&
+            (x >= xpos + imgAreaX && y >= ypos + imgAreaY && x < xpos + imgAreaX + imgAreaSize.width && y < ypos + imgAreaY + imgAreaSize.height) &&
             !(x >= xpos + imgX && y >= ypos + imgY && x < xpos + imgX + imgW && y < ypos + imgY + imgH);
 
     case CropTopLeft:
@@ -1457,7 +1457,7 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
     options.bgcolor = backColor;
 
     if (backColor == 0) {
-        style->render_background(cr, x + imgAreaX, y + imgAreaY, imgAreaW, imgAreaH);
+        style->render_background(cr, x + imgAreaX, y + imgAreaY, imgAreaSize.width, imgAreaSize.height);
     } else {
         if (backColor == 1) {
             cr->set_source_rgb (0, 0, 0);
@@ -1468,7 +1468,7 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
         }
 
         cr->set_line_width (0.);
-        cr->rectangle (x + imgAreaX, y + imgAreaY, imgAreaW, imgAreaH);
+        cr->rectangle (x + imgAreaX, y + imgAreaY, imgAreaSize.width, imgAreaSize.height);
         cr->stroke_preserve ();
         cr->fill ();
     }
@@ -1479,16 +1479,17 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
         int cropX, cropY;
         cropHandler.getPosition (cropX, cropY);
 
-        Glib::RefPtr<Gdk::Pixbuf> rough = iarea->getPreviewHandler()->getRoughImage (cropX, cropY, imgAreaW, imgAreaH, zoomSteps[cropZoom].zoom);
+        hidpi::DeviceSize deviceImageAreaSize =
+            imgAreaSize.scaleToDevice(RTScalable::getScaleForWidget(iarea));
+        hidpi::DevicePixbuf rough = iarea->getPreviewHandler()->getRoughImage (cropX, cropY, deviceImageAreaSize, zoomSteps[cropZoom].zoom);
 
         if (rough) {
             int posX = x + imgAreaX + imgX;
             int posY = y + imgAreaY + imgY;
-            Gdk::Cairo::set_source_pixbuf(cr, rough, posX, posY);
-            cr->rectangle(posX, posY, rtengine::min (rough->get_width (), imgAreaW-imgX), rtengine::min (rough->get_height (), imgAreaH-imgY));
-            cr->fill();
-//            if (cropHandler.cropParams->enabled)
-//                drawCrop (cr, x+imgX, y+imgY, imgW, imgH, cropX, cropY, zoomSteps[cropZoom].zoom, cropHandler.cropParams);
+            Gdk::Cairo::set_source_pixbuf(cr, rough.pixbuf(), posX, posY);
+            auto pattern = cr->get_source_for_surface();
+            hidpi::setDeviceScale(pattern->get_surface(), deviceImageAreaSize.device_scale);
+            cr->paint();
         }
 
         if (observedCropWin) {
@@ -1915,13 +1916,13 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
                 int posX = x + imgAreaX + imgX;
                 int posY = y + imgAreaY + imgY;
                 Gdk::Cairo::set_source_pixbuf(cr, tmp, posX, posY);
-                cr->rectangle(posX, posY, rtengine::min (tmp->get_width (), imgAreaW-imgX), rtengine::min (tmp->get_height (), imgAreaH-imgY));
+                cr->rectangle(posX, posY, rtengine::min (tmp->get_width (), imgAreaSize.width-imgX), rtengine::min (tmp->get_height (), imgAreaSize.height-imgY));
                 cr->fill();
             } else {
                 int posX = x + imgAreaX + imgX;
                 int posY = y + imgAreaY + imgY;
                 Gdk::Cairo::set_source_pixbuf(cr, cropHandler.cropPixbuf, posX, posY);
-                cr->rectangle(posX, posY, rtengine::min (cropHandler.cropPixbuf->get_width (), imgAreaW-imgX), rtengine::min (cropHandler.cropPixbuf->get_height (), imgAreaH-imgY));
+                cr->rectangle(posX, posY, rtengine::min (cropHandler.cropPixbuf->get_width (), imgAreaSize.width-imgX), rtengine::min (cropHandler.cropPixbuf->get_height (), imgAreaSize.height-imgY));
                 cr->fill();
             }
 
@@ -1939,7 +1940,7 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
             if (editSubscriber && editSubscriber->getEditingType() == ET_OBJECTS && bufferCreated()) {
 
                 cr->set_line_width (0.);
-                cr->rectangle (x + imgAreaX, y + imgAreaY, imgAreaW, imgAreaH);
+                cr->rectangle (x + imgAreaX, y + imgAreaY, imgAreaSize.width, imgAreaSize.height);
                 cr->clip();
 
                 // drawing Subscriber's visible geometry
@@ -1997,17 +1998,35 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
             // cropHandler.cropPixbuf is null
             int cropX, cropY;
             cropHandler.getPosition (cropX, cropY);
-            Glib::RefPtr<Gdk::Pixbuf> rough = iarea->getPreviewHandler()->getRoughImage (cropX, cropY, imgAreaW, imgAreaH, zoomSteps[cropZoom].zoom);
 
-            if (rough) {
+            hidpi::DeviceSize deviceImageAreaSize =
+                imgAreaSize.scaleToDevice(RTScalable::getScaleForWidget(iarea));
+            hidpi::DevicePixbuf rough = iarea->getPreviewHandler()->getRoughImage (cropX, cropY, deviceImageAreaSize, zoomSteps[cropZoom].zoom);
+
+            if (rough.pixbuf()) {
                 int posX = x + imgAreaX + imgX;
                 int posY = y + imgAreaY + imgY;
-                Gdk::Cairo::set_source_pixbuf(cr, rough, posX, posY);
-                cr->rectangle(posX, posY, rtengine::min (rough->get_width (), imgAreaW-imgX), rtengine::min (rough->get_height (), imgAreaH-imgY));
-                cr->fill();
+                Gdk::Cairo::set_source_pixbuf(cr, rough.pixbuf(), posX, posY);
+                auto pattern = cr->get_source_for_surface();
+                hidpi::setDeviceScale(pattern->get_surface(), deviceImageAreaSize.device_scale);
+                cr->paint();
 
                 if (cropHandler.cropParams->enabled) {
-                    drawCrop (cr, x + imgAreaX + imgX, y + imgAreaY + imgY, rough->get_width(), rough->get_height(), cropX, cropY, zoomSteps[cropZoom].zoom, cropParams, (this == iarea->mainCropWindow), useBgColor, cropHandler.isFullDisplay ());
+                    hidpi::DeviceSize previewDeviceSize = rough.size();
+                    double logicalImgWidth = std::ceil(
+                        static_cast<double>(previewDeviceSize.width) /
+                        previewDeviceSize.device_scale);
+                    double logicalImgHeight = std::ceil(
+                        static_cast<double>(previewDeviceSize.height) /
+                        previewDeviceSize.device_scale);
+
+                    drawCrop (cr,
+                              x + imgAreaX + imgX, y + imgAreaY + imgY,
+                              logicalImgWidth, logicalImgHeight,
+                              cropX, cropY,
+                              zoomSteps[cropZoom].zoom, cropParams,
+                              (this == iarea->mainCropWindow), useBgColor,
+                              cropHandler.isFullDisplay ());
                 }
 
                 if (observedCropWin) {
@@ -2031,7 +2050,7 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
         }
     }
 
-    style->render_frame (cr, x + imgAreaX, y + imgAreaY, imgAreaW, imgAreaH);
+    style->render_frame (cr, x + imgAreaX, y + imgAreaY, imgAreaSize.width, imgAreaSize.height);
 
     if ((state == SNormal || state == SDragPicker) && isPreviewImg && iarea->showColorPickers()) {
         for (auto colorPicker : colorPickers) {
@@ -2046,7 +2065,7 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
 void CropWindow::setEditSubscriber (EditSubscriber* newSubscriber) {
     // Delete, create, update all buffers based upon newSubscriber's type
     if (newSubscriber) {
-        ObjectMOBuffer::resize (imgAreaW, imgAreaH);
+        ObjectMOBuffer::resize (imgAreaSize.width, imgAreaSize.height);
     } else {
         ObjectMOBuffer::flush ();
     }
@@ -2613,7 +2632,7 @@ void CropWindow::drawScaledSpotRectangle (Cairo::RefPtr<Cairo::Context> cr, int 
     int x2 = action_x / zoomSteps[cropZoom].zoom + rectSize;
 
     cr->set_line_width (1.0);
-    cr->rectangle (xpos + imgX + imgAreaX - 0.5, ypos + imgY + imgAreaY - 0.5, imgAreaW, imgAreaH);
+    cr->rectangle (xpos + imgX + imgAreaX - 0.5, ypos + imgY + imgAreaY - 0.5, imgAreaSize.width, imgAreaSize.height);
     cr->clip ();
 
     cr->set_source_rgb (1.0, 1.0, 1.0);
@@ -2635,7 +2654,7 @@ void CropWindow::drawUnscaledSpotRectangle (Cairo::RefPtr<Cairo::Context> cr, in
     int x2 = action_x + rectSize;
 
     cr->set_line_width (1.0);
-    cr->rectangle (xpos + imgX + imgAreaX - 0.5, ypos + imgY + imgAreaY - 0.5, imgAreaW, imgAreaH);
+    cr->rectangle (xpos + imgX + imgAreaX - 0.5, ypos + imgY + imgAreaY - 0.5, imgAreaSize.width, imgAreaSize.height);
     cr->clip ();
 
     cr->set_source_rgb (1.0, 1.0, 1.0);
@@ -2658,8 +2677,8 @@ void CropWindow::getObservedFrameArea (int& x, int& y, int& w, int& h, int rw, i
 
     // translate it to screen coordinates
     if (rw) {  // rw and rh are the rough image's dimension
-        x = xpos + imgAreaX + (imgAreaW - rw) / 2 + (observedCropX - mainCropX) * zoomSteps[cropZoom].zoom;
-        y = ypos + imgAreaY + (imgAreaH - rh) / 2 + (observedCropY - mainCropY) * zoomSteps[cropZoom].zoom;
+        x = xpos + imgAreaX + (imgAreaSize.width - rw) / 2 + (observedCropX - mainCropX) * zoomSteps[cropZoom].zoom;
+        y = ypos + imgAreaY + (imgAreaSize.height - rh) / 2 + (observedCropY - mainCropY) * zoomSteps[cropZoom].zoom;
     } else {
         x = xpos + imgX + (observedCropX - mainCropX) * zoomSteps[cropZoom].zoom;
         y = ypos + imgY + (observedCropY - mainCropY) * zoomSteps[cropZoom].zoom;
