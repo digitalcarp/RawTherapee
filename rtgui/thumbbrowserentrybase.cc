@@ -187,7 +187,7 @@ void ThumbBrowserEntryBase::updateBackBuffer ()
     }
 
     Gtk::Widget* w = parent->getDrawingArea ();
-    const hidpi::DeviceSize expectedDeviceSize = expected.scaleToDevice(activeDeviceScale);
+    const hidpi::ScaledDeviceSize expectedDeviceSize = expected.scaleToDevice(activeDeviceScale);
 
     if (backBuffer && (backBuffer->getWidth() != expectedDeviceSize.width || backBuffer->getHeight() != expectedDeviceSize.height)) {
         // deleting the existing BackBuffer
@@ -633,7 +633,7 @@ void ThumbBrowserEntryBase::draw (Cairo::RefPtr<Cairo::Context> cc)
 
         int bbWidth = backBuffer->getWidth();
         int bbHeight = backBuffer->getHeight();
-        hidpi::DeviceSize device = expected.scaleToDevice(activeDeviceScale);
+        hidpi::ScaledDeviceSize device = expected.scaleToDevice(activeDeviceScale);
         if (preview.data() != bbPreview
                 || device.width != bbWidth
                 || device.height != bbHeight) return true;

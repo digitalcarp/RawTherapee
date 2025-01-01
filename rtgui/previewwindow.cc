@@ -75,7 +75,7 @@ void PreviewWindow::updatePreviewImage ()
     hidpi::DevicePixbuf result = previewHandler->getRoughImage(logical, scale, zoom);
     if (!result.pixbuf()) return;
     
-    hidpi::DeviceSize device = result.size();
+    hidpi::ScaledDeviceSize device = result.size();
     imgW = device.width;
     imgH = device.height;
 
@@ -152,7 +152,7 @@ bool PreviewWindow::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
         }
     }
 
-    auto deviceSize = hidpi::DeviceSize::forWidget(this);
+    auto deviceSize = hidpi::ScaledDeviceSize::forWidget(this);
     const int scale = deviceSize.device_scale;
 
     if ((deviceSize.width != bufferW && deviceSize.height != bufferH) || needsUpdate) {

@@ -31,7 +31,6 @@ DeviceCoord LogicalCoord::scaleToDevice(int device_scale) const {
     DeviceCoord device = {};
     device.x = x * device_scale;
     device.y = y * device_scale;
-    device.device_scale = device_scale;
     return device;
 }
 
@@ -42,18 +41,18 @@ LogicalSize LogicalSize::forWidget(const Gtk::Widget* widget) {
     return result;
 }
 
-DeviceSize LogicalSize::scaleToDevice(int device_scale) const {
-    DeviceSize result = {};
+ScaledDeviceSize LogicalSize::scaleToDevice(int device_scale) const {
+    ScaledDeviceSize result = {};
     result.width = width * device_scale;
     result.height = height * device_scale;
     result.device_scale = device_scale;
     return result;
 }
 
-DeviceSize DeviceSize::forWidget(const Gtk::Widget* widget) {
+ScaledDeviceSize ScaledDeviceSize::forWidget(const Gtk::Widget* widget) {
     int scale = RTScalable::getScaleForWidget(widget);
 
-    DeviceSize result = {};
+    ScaledDeviceSize result = {};
     result.width = widget->get_width() * scale;
     result.height = widget->get_height() * scale;
     result.device_scale = scale;
@@ -81,8 +80,8 @@ DevicePixbuf& DevicePixbuf::operator=(DevicePixbuf&& other) {
     return *this;
 }
 
-DeviceSize DevicePixbuf::size() const {
-    DeviceSize size = {};
+ScaledDeviceSize DevicePixbuf::size() const {
+    ScaledDeviceSize size = {};
     if (m_pixbuf) {
         size.width = m_pixbuf->get_width();
         size.height = m_pixbuf->get_height();

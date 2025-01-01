@@ -40,6 +40,7 @@ namespace hidpi {
 
 class DeviceCoord;
 class DeviceSize;
+class ScaledDeviceSize;
 
 enum class PixelSpace { LOGICAL, PHYSICAL };
 
@@ -53,12 +54,15 @@ struct LogicalCoord {
     DeviceCoord scaleToDevice(int device_scale) const;
 
     constexpr PixelSpace pixelSpace() const { return PixelSpace::LOGICAL; }
+
+    LogicalCoord operator+(const LogicalCoord& other) const {
+        return LogicalCoord(x + other.x, y + other.y);
+    }
 };
 
 struct DeviceCoord {
     int x = 0;
     int y = 0;
-    int device_scale = 1;
 
     constexpr PixelSpace pixelSpace() const { return PixelSpace::PHYSICAL; }
 };
@@ -73,7 +77,7 @@ struct LogicalSize {
     LogicalSize(int logical_width, int logical_height)
             : width(logical_width), height(logical_height) {}
 
-    DeviceSize scaleToDevice(int device_scale) const;
+    ScaledDeviceSize scaleToDevice(int device_scale) const;
 
     constexpr PixelSpace pixelSpace() const { return PixelSpace::LOGICAL; }
 
@@ -85,9 +89,20 @@ struct LogicalSize {
 struct DeviceSize {
     int width = 0;
     int height = 0;
+
+    DeviceSize() : width(0), height(0) {}
+    DeviceSize(int device_width, int device_height)
+            : width(device_width), height(device_height) {}
+
+    constexpr PixelSpace pixelSpace() const { return PixelSpace::PHYSICAL; }
+};
+
+struct ScaledDeviceSize {
+    int width = 0;
+    int height = 0;
     int device_scale = 1;
 
-    static DeviceSize forWidget(const Gtk::Widget* widget);
+    static ScaledDeviceSize forWidget(const Gtk::Widget* widget);
 
     constexpr PixelSpace pixelSpace() const { return PixelSpace::PHYSICAL; }
 };
@@ -105,7 +120,7 @@ public:
     operator bool() const { return static_cast<bool>(m_pixbuf); }
 
     const Glib::RefPtr<Gdk::Pixbuf>& pixbuf() const { return m_pixbuf; }
-    DeviceSize size() const;
+    ScaledDeviceSize size() const;
 
     friend void swap(DevicePixbuf& lhs, DevicePixbuf& rhs);
 
@@ -131,3 +146,21 @@ inline void setDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface, in
 }
 
 }  // namespace hidpi
+
+// Position in image pixel coordinates
+struct ImageCoord {
+    int x = 0;
+    int y = 0;
+
+    ImageCoord() = default;
+    ImageCoord(int pos_x, int pos_y) : x(pos_x), y(pos_y) {}
+};
+
+// Pixel aligned size in image pixels
+struct ImageSize {
+    int width = 0;
+    int height = 0;
+
+    ImageSize() = default;
+    ImageSize(int w, int h) : width(w), height(h) {}
+};

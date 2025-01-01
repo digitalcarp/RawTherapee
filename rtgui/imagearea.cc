@@ -247,13 +247,13 @@ bool ImageArea::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
 {
     dirty = false;
 
-    /* HOMBRE: How do we replace that??
+    int deviceScale = RTScalable::getScaleForWidget(this);
 
-    if (event->count) {
-        return true;
+    for (const auto& win : cropWins) {
+        if (deviceScale != win->cropHandler.getDeviceScale()) {
+            win->cropHandler.setDeviceScale(deviceScale);
+        }
     }
-
-     */
 
     if (mainCropWindow) {
         mainCropWindow->expose (cr);
@@ -264,7 +264,7 @@ bool ImageArea::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
     }
 
     if (options.showInfo && !infotext.empty()) {
-        if (RTScalable::getScaleForWidget(this) != backBufferDeviceScale) {
+        if (deviceScale != backBufferDeviceScale) {
             updateInfoTextBackBuffer();
         }
         iBackBuffer.copySurface(cr);
@@ -697,11 +697,10 @@ void ImageArea::setZoom (double zoom)
 
 void ImageArea::initialImageArrived ()
 {
-
     if (mainCropWindow) {
-        int w, h;
-        mainCropWindow->cropHandler.getFullImageSize(w, h);
-        if(options.prevdemo != PD_Sidecar || !options.rememberZoomAndPan || w != fullImageWidth || h != fullImageHeight) {
+        ImageSize size = mainCropWindow->cropHandler.getFullImageSize();
+        if(options.prevdemo != PD_Sidecar || !options.rememberZoomAndPan ||
+                size.width != fullImageWidth || size.height != fullImageHeight) {
             if (options.cropAutoFit || options.bgcolor != 0) {
                 mainCropWindow->zoomFitCrop();
             } else {
@@ -710,8 +709,8 @@ void ImageArea::initialImageArrived ()
         } else if ((options.cropAutoFit || options.bgcolor != 0) && mainCropWindow->cropHandler.cropParams->enabled) {
             mainCropWindow->zoomFitCrop();
         }
-        fullImageWidth = w;
-        fullImageHeight = h;
+        fullImageWidth = size.width;
+        fullImageHeight = size.height;
     }
 }
 

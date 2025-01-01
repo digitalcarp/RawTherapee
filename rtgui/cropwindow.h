@@ -94,12 +94,14 @@ class CropWindow final : public LWButtonListener, public CropDisplayHandler, pub
     int titleHeight, sideBorderWidth, lowerBorderWidth, upperBorderWidth, sepWidth, minWidth;
     // size & position of the crop relative to the top left corner
     // of the main preview area
-    int xpos, ypos, width, height;
+    hidpi::LogicalCoord cropPos;
+    hidpi::LogicalSize windowSize;
     // size & pos of the drawable area relative to the top left corner of the crop
-    int imgAreaX, imgAreaY;
+    hidpi::LogicalCoord imgAreaPos;
     hidpi::LogicalSize imgAreaSize;
     // size & pos of the piece of preview image relative to the top left corner of the crop
-    int imgX, imgY, imgW, imgH;
+    hidpi::LogicalCoord imgPos;
+    hidpi::DeviceSize imgSize;
 
     // image handling
 
@@ -242,7 +244,7 @@ public:
     void cropImageUpdated () override;
     void cropWindowChanged () override;
     void initialImageArrived () override;
-    void setDisplayPosition (int x, int y) override;
+    void setDisplayPosition (hidpi::LogicalCoord pos) override;
 
     void remoteMove      (int deltaX, int deltaY);
     void remoteMoveReady ();
