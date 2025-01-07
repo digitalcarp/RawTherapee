@@ -1911,13 +1911,18 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
             if (cropHandler.cropParams->enabled) {
                 hidpi::LogicalCoord offset = cropPos + imgAreaPos + imgPos;
                 ImageCoord handlerPos = cropHandler.getPosition();
-                drawCrop (cr,
-                          offset.x, offset.y,
-                          imgSize.width, imgSize.height,
-                          handlerPos.x, handlerPos.y,
-                          zoomSteps[cropZoom].zoom, cropParams,
-                          (this == iarea->mainCropWindow), useBgColor,
-                          cropHandler.isFullDisplay ());
+                double deviceScale = RTScalable::getScaleForWidget(iarea);
+
+                double clipWidth = std::ceil(imgSize.width / deviceScale);
+                double clipHeight = std::ceil(imgSize.height / deviceScale);
+
+                drawCrop(cr, offset.x, offset.y,
+                         imgSize.width, imgSize.height,
+                         clipWidth, clipHeight,
+                         handlerPos.x, handlerPos.y,
+                         zoomSteps[cropZoom].zoom / deviceScale, cropParams,
+                         (this == iarea->mainCropWindow), useBgColor,
+                         cropHandler.isFullDisplay());
             }
 
             if (observedCropWin) {
@@ -1994,19 +1999,25 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
 
             if (rough) {
                 hidpi::LogicalCoord offset = cropPos + imgAreaPos + imgPos;
+                double deviceScale = desiredSize.device_scale;
                 Gdk::Cairo::set_source_pixbuf(cr, rough, offset.x, offset.y);
                 auto pattern = cr->get_source_for_surface();
-                hidpi::setDeviceScale(pattern->get_surface(), desiredSize.device_scale);
+                hidpi::setDeviceScale(pattern->get_surface(), deviceScale);
                 cr->paint();
 
                 if (cropHandler.cropParams->enabled) {
-                    drawCrop (cr,
-                              offset.x, offset.y,
-                              imgSize.width, imgSize.height,
+                    double roughW = rough->get_width();
+                    double roughH = rough->get_height();
+                    double clipWidth = std::ceil(roughW / deviceScale);
+                    double clipHeight = std::ceil(roughH / deviceScale);
+
+                    drawCrop (cr, offset.x, offset.y,
+                              roughW, roughH,
+                              clipWidth, clipHeight,
                               handlerPos.x, handlerPos.y,
-                              zoomSteps[cropZoom].zoom, cropParams,
+                              zoomSteps[cropZoom].zoom / deviceScale, cropParams,
                               (this == iarea->mainCropWindow), useBgColor,
-                              cropHandler.isFullDisplay ());
+                              cropHandler.isFullDisplay());
                 }
 
                 if (observedCropWin) {
@@ -2210,7 +2221,6 @@ double CropWindow::getZoomFitVal ()
 void CropWindow::zoomFit ()
 {
     double z = cropHandler.getFitZoom ();
-    printf("zoom fit = %f\n", z);
     int cz = int(zoomSteps.size())-1;
 
     if (z < zoomSteps[0].zoom) {

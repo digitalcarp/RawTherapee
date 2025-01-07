@@ -183,6 +183,7 @@ void FileBrowserEntry::customBackBufferUpdate (Cairo::RefPtr<Cairo::Context> c)
     auto drawScaled = [&](const rtengine::procparams::CropParams& crop) {
         double zoom = scale / activeDeviceScale;
         drawCrop(c, prex, prey, previewSize.width, previewSize.height,
+                 previewSize.width, previewSize.height,
                  0, 0, zoom, crop, true, false);
     };
 

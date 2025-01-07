@@ -248,11 +248,11 @@ bool ImageArea::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
     dirty = false;
 
     int deviceScale = RTScalable::getScaleForWidget(this);
-
-    for (const auto& win : cropWins) {
-        if (deviceScale != win->cropHandler.getDeviceScale()) {
+    if (deviceScale != mainCropWindow->cropHandler.getDeviceScale()) {
+        for (const auto& win : cropWins) {
             win->cropHandler.setDeviceScale(deviceScale);
         }
+        mainCropWindow->setSize(get_width(), get_height());
     }
 
     if (mainCropWindow) {

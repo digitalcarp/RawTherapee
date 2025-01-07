@@ -110,7 +110,7 @@ void PreviewWindow::updatePreviewImage ()
         default:
             break;
         }
-        drawCrop (cc, 0, 0, imgW, imgH, 0, 0, zoom, cparams, true, false);
+        drawCrop (cc, 0, 0, imgW, imgH, imgW, imgH, 0, 0, zoom, cparams, true, false);
     }
 }
 
