@@ -94,7 +94,7 @@ class CropWindow final : public LWButtonListener, public CropDisplayHandler, pub
     int titleHeight, sideBorderWidth, lowerBorderWidth, upperBorderWidth, sepWidth, minWidth;
     // size & position of the crop relative to the top left corner
     // of the main preview area
-    hidpi::LogicalCoord cropPos;
+    hidpi::LogicalCoord windowPos;
     hidpi::LogicalSize windowSize;
     // size & pos of the drawable area relative to the top left corner of the crop
     hidpi::LogicalCoord imgAreaPos;
