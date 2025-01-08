@@ -100,6 +100,11 @@ void ImageArea::on_resized (Gtk::Allocation& req)
             mainCropWindow->setCropGUIListener (cropgl);
             mainCropWindow->setPointerMotionListener (pmlistener);
             mainCropWindow->setPointerMotionHListener (pmhlistener);
+
+            int deviceScale = RTScalable::getScaleForWidget(this);
+            // Needs to be before setSize()
+            mainCropWindow->cropHandler.setDeviceScale(deviceScale);
+
             mainCropWindow->setPosition (0, 0);
             mainCropWindow->setSize (get_width(), get_height());  // this execute the refresh itself
             mainCropWindow->enable();  // start processing !
@@ -179,7 +184,7 @@ void ImageArea::updateInfoTextBackBuffer()
 
     int bufferWidth = (iw + 16) * backBufferDeviceScale;
     int bufferHeight = (ih + 16) * backBufferDeviceScale;
-    int bufferOffset = 8 * backBufferDeviceScale;
+    int bufferOffset = 8;
 
     // create BackBuffer
     iBackBuffer.setDrawRectangle(Cairo::FORMAT_ARGB32, 0, 0, bufferWidth, bufferHeight, true);
@@ -248,14 +253,15 @@ bool ImageArea::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
     dirty = false;
 
     int deviceScale = RTScalable::getScaleForWidget(this);
-    if (deviceScale != mainCropWindow->cropHandler.getDeviceScale()) {
-        for (const auto& win : cropWins) {
-            win->cropHandler.setDeviceScale(deviceScale);
-        }
-        mainCropWindow->setSize(get_width(), get_height());
-    }
 
     if (mainCropWindow) {
+        if (deviceScale != mainCropWindow->cropHandler.getDeviceScale()) {
+            for (const auto& win : cropWins) {
+                win->cropHandler.setDeviceScale(deviceScale);
+            }
+            mainCropWindow->setSize(get_width(), get_height());
+        }
+
         mainCropWindow->expose (cr);
     }
 
@@ -516,6 +522,10 @@ void ImageArea::addCropWindow ()
         cropwidth = lastWidth;
         cropheight = lastHeight;
     }
+
+    int deviceScale = RTScalable::getScaleForWidget(this);
+    // Needs to be before setSize()
+    cw->cropHandler.setDeviceScale(deviceScale);
 
     cw->setSize (cropwidth, cropheight);
     int x, y;
