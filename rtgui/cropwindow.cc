@@ -927,56 +927,65 @@ void CropWindow::pointerMoved (int bstate, int x, int y)
         action_y = y;
         iarea->redraw ();
     } else if (state == SResizeH1 && cropgl) {
+        int deviceScale = cropHandler.getDeviceScale();
         int oy = cropHandler.cropParams->y;
-        cropHandler.cropParams->y = action_y + (y - press_y) / zoomSteps[cropZoom].zoom;
+        cropHandler.cropParams->y = action_y + (y - press_y) / zoomSteps[cropZoom].zoom * deviceScale;
         cropHandler.cropParams->h += oy - cropHandler.cropParams->y;
         cropgl->cropHeight1Resized (cropHandler.cropParams->x, cropHandler.cropParams->y, cropHandler.cropParams->w, cropHandler.cropParams->h, crop_custom_ratio);
         iarea->redraw ();
     } else if (state == SResizeH2 && cropgl) {
-        cropHandler.cropParams->h = action_y + (y - press_y) / zoomSteps[cropZoom].zoom;
+        int deviceScale = cropHandler.getDeviceScale();
+        cropHandler.cropParams->h = action_y + (y - press_y) / zoomSteps[cropZoom].zoom * deviceScale;
         cropgl->cropHeight2Resized (cropHandler.cropParams->x, cropHandler.cropParams->y, cropHandler.cropParams->w, cropHandler.cropParams->h, crop_custom_ratio);
         iarea->redraw ();
     } else if (state == SResizeW1 && cropgl) {
+        int deviceScale = cropHandler.getDeviceScale();
         int ox = cropHandler.cropParams->x;
-        cropHandler.cropParams->x = action_x + (x - press_x) / zoomSteps[cropZoom].zoom;
+        cropHandler.cropParams->x = action_x + (x - press_x) / zoomSteps[cropZoom].zoom * deviceScale;
         cropHandler.cropParams->w += ox - cropHandler.cropParams->x;
         cropgl->cropWidth1Resized (cropHandler.cropParams->x, cropHandler.cropParams->y, cropHandler.cropParams->w, cropHandler.cropParams->h, crop_custom_ratio);
         iarea->redraw ();
     } else if (state == SResizeW2 && cropgl) {
-        cropHandler.cropParams->w = action_x + (x - press_x) / zoomSteps[cropZoom].zoom;
+        int deviceScale = cropHandler.getDeviceScale();
+        cropHandler.cropParams->w = action_x + (x - press_x) / zoomSteps[cropZoom].zoom * deviceScale;
         cropgl->cropWidth2Resized (cropHandler.cropParams->x, cropHandler.cropParams->y, cropHandler.cropParams->w, cropHandler.cropParams->h, crop_custom_ratio);
         iarea->redraw ();
     } else if (state == SResizeTL && cropgl) {
+        int deviceScale = cropHandler.getDeviceScale();
         int ox = cropHandler.cropParams->x;
-        cropHandler.cropParams->x = action_x + (x - press_x) / zoomSteps[cropZoom].zoom;
+        cropHandler.cropParams->x = action_x + (x - press_x) / zoomSteps[cropZoom].zoom * deviceScale;
         cropHandler.cropParams->w += ox - cropHandler.cropParams->x;
         int oy = cropHandler.cropParams->y;
-        cropHandler.cropParams->y = action_y + (y - press_y) / zoomSteps[cropZoom].zoom;
+        cropHandler.cropParams->y = action_y + (y - press_y) / zoomSteps[cropZoom].zoom * deviceScale;
         cropHandler.cropParams->h += oy - cropHandler.cropParams->y;
         cropgl->cropTopLeftResized (cropHandler.cropParams->x, cropHandler.cropParams->y, cropHandler.cropParams->w, cropHandler.cropParams->h, crop_custom_ratio);
         iarea->redraw ();
     } else if (state == SResizeTR && cropgl) {
-        cropHandler.cropParams->w = action_x + (x - press_x) / zoomSteps[cropZoom].zoom;
+        int deviceScale = cropHandler.getDeviceScale();
+        cropHandler.cropParams->w = action_x + (x - press_x) / zoomSteps[cropZoom].zoom * deviceScale;
         int oy = cropHandler.cropParams->y;
-        cropHandler.cropParams->y = action_y + (y - press_y) / zoomSteps[cropZoom].zoom;
+        cropHandler.cropParams->y = action_y + (y - press_y) / zoomSteps[cropZoom].zoom * deviceScale;
         cropHandler.cropParams->h += oy - cropHandler.cropParams->y;
         cropgl->cropTopRightResized (cropHandler.cropParams->x, cropHandler.cropParams->y, cropHandler.cropParams->w, cropHandler.cropParams->h, crop_custom_ratio);
         iarea->redraw ();
     } else if (state == SResizeBL && cropgl) {
+        int deviceScale = cropHandler.getDeviceScale();
         int ox = cropHandler.cropParams->x;
-        cropHandler.cropParams->x = action_x + (x - press_x) / zoomSteps[cropZoom].zoom;
+        cropHandler.cropParams->x = action_x + (x - press_x) / zoomSteps[cropZoom].zoom * deviceScale;
         cropHandler.cropParams->w += ox - cropHandler.cropParams->x;
-        cropHandler.cropParams->h = action_y + (y - press_y) / zoomSteps[cropZoom].zoom;
+        cropHandler.cropParams->h = action_y + (y - press_y) / zoomSteps[cropZoom].zoom * deviceScale;
         cropgl->cropBottomLeftResized (cropHandler.cropParams->x, cropHandler.cropParams->y, cropHandler.cropParams->w, cropHandler.cropParams->h, crop_custom_ratio);
         iarea->redraw ();
     } else if (state == SResizeBR && cropgl) {
-        cropHandler.cropParams->w = action_x + (x - press_x) / zoomSteps[cropZoom].zoom;
-        cropHandler.cropParams->h = action_y + (y - press_y) / zoomSteps[cropZoom].zoom;
+        int deviceScale = cropHandler.getDeviceScale();
+        cropHandler.cropParams->w = action_x + (x - press_x) / zoomSteps[cropZoom].zoom * deviceScale;
+        cropHandler.cropParams->h = action_y + (y - press_y) / zoomSteps[cropZoom].zoom * deviceScale;
         cropgl->cropBottomRightResized (cropHandler.cropParams->x, cropHandler.cropParams->y, cropHandler.cropParams->w, cropHandler.cropParams->h, crop_custom_ratio);
         iarea->redraw ();
     } else if (state == SCropMove && cropgl) {
-        cropHandler.cropParams->x = action_x + (x - press_x) / zoomSteps[cropZoom].zoom;
-        cropHandler.cropParams->y = action_y + (y - press_y) / zoomSteps[cropZoom].zoom;
+        int deviceScale = cropHandler.getDeviceScale();
+        cropHandler.cropParams->x = action_x + (x - press_x) / zoomSteps[cropZoom].zoom * deviceScale;
+        cropHandler.cropParams->y = action_y + (y - press_y) / zoomSteps[cropZoom].zoom * deviceScale;
         cropgl->cropMoved (cropHandler.cropParams->x, cropHandler.cropParams->y, cropHandler.cropParams->w, cropHandler.cropParams->h);
         iarea->redraw ();
     } else if (state == SCropSelecting && cropgl) {
@@ -1005,7 +1014,9 @@ void CropWindow::pointerMoved (int bstate, int x, int y)
     } else if (state == SObservedMove) {
         int new_action_x = x - press_x;
         int new_action_y = y - press_y;
-        observedCropWin->remoteMove ((new_action_x - action_x) / zoomSteps[cropZoom].zoom, (new_action_y - action_y) / zoomSteps[cropZoom].zoom);
+        int deviceScale = cropHandler.getDeviceScale();
+        observedCropWin->remoteMove ((new_action_x - action_x) / zoomSteps[cropZoom].zoom * deviceScale,
+                                     (new_action_y - action_y) / zoomSteps[cropZoom].zoom * deviceScale);
         action_x = new_action_x;
         action_y = new_action_y;
         iarea->redraw ();
