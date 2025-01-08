@@ -122,8 +122,7 @@ void FileBrowserEntry::calcThumbnailSize ()
         int ow = previewSize.width, oh = previewSize.height;
         thumbnail->getThumbnailSize(previewSize.width, previewSize.height);
 
-        hidpi::LogicalSize logical(previewSize.width, previewSize.height);
-        hidpi::ScaledDeviceSize device = logical.scaleToDevice(activeDeviceScale);
+        hidpi::ScaledDeviceSize device = previewSize.scaleToDevice(activeDeviceScale);
         size_t expected_size = device.width * device.height * 3;
 
         if (ow != previewSize.width || oh != previewSize.height || preview.size() != expected_size) {

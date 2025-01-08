@@ -51,14 +51,6 @@ BatchQueueEntry::BatchQueueEntry (rtengine::ProcessingJob* pjob, const rtengine:
 
     thumbnail = thm;
 
-#if 1 //ndef _WIN32
-    // The BatchQueueEntryIdleHelper tracks if an entry has been deleted while it was sitting waiting for "idle"
-    bqih = new BatchQueueEntryIdleHelper;
-    bqih->bqentry = this;
-    bqih->destroyed = false;
-    bqih->pending = 0;
-#endif
-
     if (!iconsLoaded) {
         savedAsIcon = std::shared_ptr<RTSurface>(new RTSurface("save-small", Gtk::ICON_SIZE_SMALL_TOOLBAR));
         iconsLoaded = true;
@@ -83,25 +75,18 @@ BatchQueueEntry::~BatchQueueEntry ()
     if (thumbnail) {
         thumbnail->decreaseRef ();
     }
-
-    if (bqih->pending) {
-        bqih->destroyed = true;
-    } else {
-        delete bqih;
-    }
 }
 
 void BatchQueueEntry::refreshThumbnailImage ()
 {
-
     if (!opreviewDone) {
-        // creating the image buffer first
-        //if (!opreview) opreview = new guint8[(origpw+1) * origph * 3];
         // this will asynchronously compute the original preview and land at this.updateImage
-        batchQueueEntryUpdater.process (nullptr, origpw, origph, previewSize.height, this, params.get(), thumbnail);
+        batchQueueEntryUpdater.process (nullptr, origpw, origph, previewSize.height,
+                                        pendingDeviceScale, this, params.get(), thumbnail);
     } else {
         // this will asynchronously land at this.updateImage
-        batchQueueEntryUpdater.process (opreview, origpw, origph, previewSize.height, this);
+        batchQueueEntryUpdater.process (opreview, origpw, origph, previewSize.height,
+                                        pendingDeviceScale, this);
     }
 }
 
@@ -213,63 +198,29 @@ std::tuple<Glib::ustring, bool> BatchQueueEntry::getToolTip (int x, int y) const
 
 }
 
-struct BQUpdateParam {
-    BatchQueueEntryIdleHelper* bqih;
-    guint8* img;
-    int w, h;
-};
-
-int updateImageUIThread (void* data)
-{
-
-    BQUpdateParam* params = static_cast<BQUpdateParam*>(data);
-
-    BatchQueueEntryIdleHelper* bqih = params->bqih;
-
-    GThreadLock tLock; // Acquire the GUI
-
-    // If the BQEntry was destroyed meanwhile, remove all the IdleHelper if all entries came through
-    if (bqih->destroyed) {
-        if (bqih->pending == 1) {
-            delete bqih;
-        } else {
-            bqih->pending--;
-        }
-
-        delete [] params->img;
-        delete params;
-
-        return 0;
-    }
-
-    bqih->bqentry->_updateImage (params->img, params->w, params->h);
-    bqih->pending--;
-
-    delete params;
-    return 0;
-}
-
 // Starts a copy of img->preview via GTK thread
-void BatchQueueEntry::updateImage (guint8* img, int w, int h, int origw, int origh, guint8* newOPreview)
+void BatchQueueEntry::updateImage (guint8* img, hidpi::LogicalSize size, int deviceScale,
+                                   int origw, int origh, guint8* newOPreview)
 {
-
     // since the update itself is already called in an async thread and there are problem with accessing opreview in thumbbrowserbase,
     // it's safer to do this synchronously
     {
         GThreadLock lock;
 
-        _updateImage(img, w, h);
+        _updateImage(img, size, deviceScale);
     }
 }
 
-void BatchQueueEntry::_updateImage (guint8* img, int w, int h)
+void BatchQueueEntry::_updateImage (guint8* img, hidpi::LogicalSize size, int deviceScale)
 {
-
-    if (previewSize.height == h) {
+    if (previewSize.height == size.height && pendingDeviceScale == deviceScale) {
         MYWRITERLOCK(l, lockRW);
 
-        previewSize.width = w;
-        preview.resize(previewSize.width * previewSize.height * 3);
+        previewSize.width = size.width;
+        activeDeviceScale = pendingDeviceScale;
+        previewDataLayout.width = size.width * deviceScale;
+        previewDataLayout.height = size.height * deviceScale;
+        preview.resize(previewDataLayout.width * previewDataLayout.height * 3);
         std::copy(img, img + preview.size(), preview.begin());
 
         if (parent) {
