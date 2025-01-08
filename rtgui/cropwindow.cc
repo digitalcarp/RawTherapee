@@ -1499,7 +1499,13 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
             Gdk::Cairo::set_source_pixbuf(cr, rough, offset.x, offset.y);
             auto pattern = cr->get_source_for_surface();
             hidpi::setDeviceScale(pattern->get_surface(), desiredSize.device_scale);
-            cr->paint();
+            // Contain blitting area within crop window
+            cr->rectangle(offset.x, offset.y,
+                          std::min(rough->get_width() / desiredSize.device_scale,
+                                   imgAreaSize.width - imgPos.x),
+                          std::min(rough->get_height() / desiredSize.device_scale,
+                                   imgAreaSize.height - imgPos.y));
+            cr->fill();
         }
 
         if (observedCropWin) {
@@ -1928,14 +1934,26 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
                 auto pattern = cr->get_source_for_surface();
                 int deviceScale = RTScalable::getScaleForWidget(iarea);
                 hidpi::setDeviceScale(pattern->get_surface(), deviceScale);
-                cr->paint();
+                // Contain blitting area within crop window
+                cr->rectangle(offset.x, offset.y,
+                              std::min(tmp->get_width() / deviceScale,
+                                       imgAreaSize.width - imgPos.x),
+                              std::min(tmp->get_height() / deviceScale,
+                                       imgAreaSize.height - imgPos.y));
+                cr->fill();
             } else {
                 hidpi::LogicalCoord offset = cropPos + imgAreaPos + imgPos;
                 Gdk::Cairo::set_source_pixbuf(cr, cropHandler.cropPixbuf, offset.x, offset.y);
                 auto pattern = cr->get_source_for_surface();
                 int deviceScale = RTScalable::getScaleForWidget(iarea);
                 hidpi::setDeviceScale(pattern->get_surface(), deviceScale);
-                cr->paint();
+                // Contain blitting area within crop window
+                cr->rectangle(offset.x, offset.y,
+                              std::min(cropHandler.cropPixbuf->get_width() / deviceScale,
+                                       imgAreaSize.width - imgPos.x),
+                              std::min(cropHandler.cropPixbuf->get_height() / deviceScale,
+                                       imgAreaSize.height - imgPos.y));
+                cr->fill();
             }
 
             if (cropHandler.cropParams->enabled) {
@@ -1943,8 +1961,12 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
                 ImageCoord handlerPos = cropHandler.getPosition();
                 double deviceScale = RTScalable::getScaleForWidget(iarea);
 
-                double clipWidth = std::ceil(imgSize.width / deviceScale);
-                double clipHeight = std::ceil(imgSize.height / deviceScale);
+                double clipWidth =
+                    std::min<double>(std::ceil(imgSize.width / deviceScale),
+                                     imgAreaSize.width - imgPos.x);
+                double clipHeight =
+                    std::min<double>(std::ceil(imgSize.height / deviceScale),
+                                     imgAreaSize.height - imgPos.y);
 
                 drawCrop(cr, offset.x, offset.y,
                          imgSize.width, imgSize.height,
@@ -2033,13 +2055,23 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
                 Gdk::Cairo::set_source_pixbuf(cr, rough, offset.x, offset.y);
                 auto pattern = cr->get_source_for_surface();
                 hidpi::setDeviceScale(pattern->get_surface(), deviceScale);
-                cr->paint();
+                // Contain blitting area within crop window
+                cr->rectangle(offset.x, offset.y,
+                              std::min(rough->get_width() / desiredSize.device_scale,
+                                       imgAreaSize.width - imgPos.x),
+                              std::min(rough->get_height() / desiredSize.device_scale,
+                                       imgAreaSize.height - imgPos.y));
+                cr->fill();
 
                 if (cropHandler.cropParams->enabled) {
                     double roughW = rough->get_width();
                     double roughH = rough->get_height();
-                    double clipWidth = std::ceil(roughW / deviceScale);
-                    double clipHeight = std::ceil(roughH / deviceScale);
+                    double clipWidth =
+                        std::min<double>(std::ceil(roughW / deviceScale),
+                                         imgAreaSize.width - imgPos.x);
+                    double clipHeight =
+                        std::min<double>(std::ceil(roughH / deviceScale),
+                                         imgAreaSize.height - imgPos.y);
 
                     drawCrop (cr, offset.x, offset.y,
                               roughW, roughH,
