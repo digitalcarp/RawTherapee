@@ -126,7 +126,7 @@ class CropWindow final : public LWButtonListener, public CropDisplayHandler, pub
     void drawStraightenGuide       (Cairo::RefPtr<Cairo::Context> cr);
     void drawScaledSpotRectangle   (Cairo::RefPtr<Cairo::Context> cr, int rectSize);
     void drawUnscaledSpotRectangle (Cairo::RefPtr<Cairo::Context> cr, int rectSize);
-    void drawObservedFrame         (Cairo::RefPtr<Cairo::Context> cr, int rw = 0, int rh = 0);
+    void drawObservedFrame         (const Cairo::RefPtr<Cairo::Context>& cr);
     void changeZoom                (int zoom, bool notify = true, int centerx = -1, int centery = -1, bool needsRedraw = true);
     void updateHoveredPicker       (rtengine::Coord *imgPos = nullptr);
     void cycleRGB                  ();
@@ -135,7 +135,7 @@ class CropWindow final : public LWButtonListener, public CropDisplayHandler, pub
     LockableColorPicker::Validity checkValidity (LockableColorPicker*  picker, const rtengine::Coord &pos);
 
     // Used by the mainCropWindow only
-    void getObservedFrameArea      (int& x, int& y, int& w, int& h, int rw = 0, int rh = 0);
+    void getObservedFrameArea      (int& x, int& y, int& w, int& h) const;
 
     struct ZoomStep {
         Glib::ustring label;
@@ -222,7 +222,7 @@ public:
     void redrawNeeded  (LWButton* button) override;
 
     // crop handling
-    void getCropRectangle      (int& x, int& y, int& w, int& h);
+    void getCropRectangle      (int& x, int& y, int& w, int& h) const;
     void getCropPosition       (int& x, int& y);
     void setCropPosition       (int x, int y, bool update = true);
     void centerCrop            (bool update = true);

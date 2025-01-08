@@ -206,7 +206,7 @@ void CropWindow::getCropPosition (int& x, int& y)
     }
 }
 
-void CropWindow::getCropRectangle (int& x, int& y, int& w, int& h)
+void CropWindow::getCropRectangle (int& x, int& y, int& w, int& h) const
 {
     ImageCoord pos = cropHandler.getPosition();
     x = pos.x;
@@ -2733,32 +2733,30 @@ void CropWindow::drawUnscaledSpotRectangle (Cairo::RefPtr<Cairo::Context> cr, in
     cr->reset_clip ();
 }
 
-void CropWindow::getObservedFrameArea (int& x, int& y, int& w, int& h, int rw, int rh)
+void CropWindow::getObservedFrameArea (int& x, int& y, int& w, int& h) const
 {
+    ImageCoord observedPos;
+    ImageSize observedSize;
+    observedCropWin->getCropRectangle(observedPos.x, observedPos.y,
+                                      observedSize.width, observedSize.height);
+    ImageCoord mainPos;
+    ImageSize mainSize;
+    getCropRectangle(mainPos.x, mainPos.y, mainSize.width, mainSize.height);
 
-    int observedCropX, observedCropY, observedCropW, observedCropH;
-    observedCropWin->getCropRectangle (observedCropX, observedCropY, observedCropW, observedCropH);
-    int mainCropX, mainCropY, mainCropW, mainCropH;
-    getCropRectangle (mainCropX, mainCropY, mainCropW, mainCropH);
+    // Translate to screen coordinates
+    const int deviceScale = cropHandler.getDeviceScale();
 
-    // translate it to screen coordinates
-    if (rw) {  // rw and rh are the rough image's dimension
-        x = cropPos.x + imgAreaPos.x + (imgAreaSize.width - rw) / 2 + (observedCropX - mainCropX) * zoomSteps[cropZoom].zoom;
-        y = cropPos.y + imgAreaPos.y + (imgAreaSize.height - rh) / 2 + (observedCropY - mainCropY) * zoomSteps[cropZoom].zoom;
-    } else {
-        x = cropPos.x + imgPos.x + (observedCropX - mainCropX) * zoomSteps[cropZoom].zoom;
-        y = cropPos.y + imgPos.y + (observedCropY - mainCropY) * zoomSteps[cropZoom].zoom;
-    }
+    x = cropPos.x + imgPos.x + (observedPos.x - mainPos.x) * zoomSteps[cropZoom].zoom / deviceScale;
+    y = cropPos.y + imgPos.y + (observedPos.y - mainPos.y) * zoomSteps[cropZoom].zoom / deviceScale;
 
-    w = observedCropW * zoomSteps[cropZoom].zoom;
-    h = observedCropH * zoomSteps[cropZoom].zoom;
+    w = observedSize.width * zoomSteps[cropZoom].zoom / deviceScale;
+    h = observedSize.height * zoomSteps[cropZoom].zoom / deviceScale;
 }
 
-void CropWindow::drawObservedFrame (Cairo::RefPtr<Cairo::Context> cr, int rw, int rh)
+void CropWindow::drawObservedFrame (const Cairo::RefPtr<Cairo::Context>& cr)
 {
-
     int x, y, w, h;
-    getObservedFrameArea (x, y, w, h, rw, rh);
+    getObservedFrameArea (x, y, w, h);
 
     // draw a black "shadow" line
     cr->set_source_rgba( 0, 0, 0, 0.65);
