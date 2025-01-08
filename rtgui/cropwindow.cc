@@ -265,9 +265,11 @@ void CropWindow::setSize (int w, int h, bool norefresh)
     }
 
     if (!norefresh) {
-        ObjectMOBuffer::resize(imgAreaSize.width, imgAreaSize.height);
+        int deviceScale = RTScalable::getScaleForWidget(iarea);
+        hidpi::ScaledDeviceSize deviceSize = imgAreaSize.scaleToDevice(deviceScale);
+        ObjectMOBuffer::resize(deviceSize.width, deviceSize.height);
         cropHandler.setWSize(imgAreaSize);
-        cropHandler.setDeviceScale(RTScalable::getScaleForWidget(iarea));
+        cropHandler.setDeviceScale(deviceScale);
     }
 }
 
@@ -2026,6 +2028,9 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
                         setObjectMode(OM_65535);
                     }
 
+                    int deviceScale = RTScalable::getScaleForWidget(iarea);
+                    hidpi::setDeviceScale(ObjectMOBuffer::getObjectMap(), deviceScale);
+
                     Cairo::RefPtr<Cairo::Context> crMO = Cairo::Context::create(ObjectMOBuffer::getObjectMap());
                     crMO->set_antialias(Cairo::ANTIALIAS_NONE);
                     crMO->set_line_cap(Cairo::LINE_CAP_SQUARE);
@@ -2034,9 +2039,7 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
 
                     // clear the bitmap
                     crMO->set_source_rgba(0., 0., 0., 0.);
-                    crMO->rectangle(0., 0., ObjectMOBuffer::getObjectMap()->get_width(), ObjectMOBuffer::getObjectMap()->get_height());
-                    crMO->set_line_width(0.);
-                    crMO->fill();
+                    crMO->paint();
 
                     int a=0;
                     for (auto moGeom : mouseOverGeom) {
@@ -2047,7 +2050,6 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
                 if (this != iarea->mainCropWindow) {
                     cr->reset_clip();
                 }
-
             }
 
             isPreviewImg = true;
@@ -2129,7 +2131,9 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
 void CropWindow::setEditSubscriber (EditSubscriber* newSubscriber) {
     // Delete, create, update all buffers based upon newSubscriber's type
     if (newSubscriber) {
-        ObjectMOBuffer::resize (imgAreaSize.width, imgAreaSize.height);
+        int deviceScale = RTScalable::getScaleForWidget(iarea);
+        hidpi::ScaledDeviceSize deviceSize = imgAreaSize.scaleToDevice(deviceScale);
+        ObjectMOBuffer::resize (deviceSize.width, deviceSize.height);
     } else {
         ObjectMOBuffer::flush ();
     }
@@ -2487,9 +2491,8 @@ void CropWindow::screenCoordToCropBuffer (double phyx, double phyy, int& cropx, 
     x += crop->getLeftBorder();
     y += crop->getUpperBorder();
 
-    int deviceScale = cropHandler.getDeviceScale();
-    cropx = std::floor(x * deviceScale);
-    cropy = std::floor(y * deviceScale);
+    cropx = x;
+    cropy = y;
 }
 
 void CropWindow::screenCoordToImage (double phyx, double phyy, int& imgx, int& imgy)
@@ -2525,8 +2528,9 @@ void CropWindow::imageCoordToScreen (int imgx, int imgy, int& phyx, int& phyy)
 void CropWindow::imageCoordToCropCanvas (int imgx, int imgy, int& phyx, int& phyy)
 {
     ImageCoord cropPos = cropHandler.getPosition();
-    phyx = (imgx - cropPos.x) * zoomSteps[cropZoom].zoom + imgPos.x;
-    phyy = (imgy - cropPos.y) * zoomSteps[cropZoom].zoom + imgPos.y;
+    int deviceScale = cropHandler.getDeviceScale();
+    phyx = (imgx - cropPos.x) * zoomSteps[cropZoom].zoom / deviceScale + imgPos.x;
+    phyy = (imgy - cropPos.y) * zoomSteps[cropZoom].zoom / deviceScale + imgPos.y;
 }
 
 void CropWindow::imageCoordToCropBuffer (int imgx, int imgy, int& phyx, int& phyy)

@@ -27,8 +27,6 @@
   */
 #pragma once
 
-#include "hidpi.h"
-
 class EditCoordSystem
 {
 public:
