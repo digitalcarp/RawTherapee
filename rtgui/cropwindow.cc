@@ -2518,33 +2518,30 @@ void CropWindow::imageCoordToScreen (int imgx, int imgy, int& phyx, int& phyy)
 {
     ImageCoord cropPos = cropHandler.getPosition();
     int deviceScale = cropHandler.getDeviceScale();
-    phyx = (imgx - cropPos.x) * zoomSteps[cropZoom].zoom / deviceScale + cropPos.x + imgPos.x + imgAreaPos.x;
-    phyy = (imgy - cropPos.y) * zoomSteps[cropZoom].zoom / deviceScale + cropPos.y + imgPos.y + imgAreaPos.y;
+    phyx = (imgx - cropPos.x) * zoomSteps[cropZoom].zoom / deviceScale + windowPos.x + imgPos.x + imgAreaPos.x;
+    phyy = (imgy - cropPos.y) * zoomSteps[cropZoom].zoom / deviceScale + windowPos.y + imgPos.y + imgAreaPos.y;
 }
 
 void CropWindow::imageCoordToCropCanvas (int imgx, int imgy, int& phyx, int& phyy)
 {
     ImageCoord cropPos = cropHandler.getPosition();
-    int deviceScale = cropHandler.getDeviceScale();
-    phyx = (imgx - cropPos.x) * zoomSteps[cropZoom].zoom / deviceScale + imgPos.x;
-    phyy = (imgy - cropPos.y) * zoomSteps[cropZoom].zoom / deviceScale + imgPos.y;
+    phyx = (imgx - cropPos.x) * zoomSteps[cropZoom].zoom + imgPos.x;
+    phyy = (imgy - cropPos.y) * zoomSteps[cropZoom].zoom + imgPos.y;
 }
 
 void CropWindow::imageCoordToCropBuffer (int imgx, int imgy, int& phyx, int& phyy)
 {
     ImageCoord cropPos = cropHandler.getPosition();
-    int deviceScale = cropHandler.getDeviceScale();
     rtengine::Crop* crop = static_cast<rtengine::Crop*>(cropHandler.getCrop());
-    phyx = (imgx - cropPos.x) * zoomSteps[cropZoom].zoom / deviceScale + crop->getLeftBorder();
-    phyy = (imgy - cropPos.y) * zoomSteps[cropZoom].zoom / deviceScale + crop->getUpperBorder();
+    phyx = (imgx - cropPos.x) * zoomSteps[cropZoom].zoom + crop->getLeftBorder();
+    phyy = (imgy - cropPos.y) * zoomSteps[cropZoom].zoom + crop->getUpperBorder();
 }
 
 void CropWindow::imageCoordToCropImage (int imgx, int imgy, int& phyx, int& phyy)
 {
     ImageCoord cropPos = cropHandler.getPosition();
-    int deviceScale = cropHandler.getDeviceScale();
-    phyx = (imgx - cropPos.x) * zoomSteps[cropZoom].zoom / deviceScale ;
-    phyy = (imgy - cropPos.y) * zoomSteps[cropZoom].zoom / deviceScale ;
+    phyx = (imgx - cropPos.x) * zoomSteps[cropZoom].zoom;
+    phyy = (imgy - cropPos.y) * zoomSteps[cropZoom].zoom;
 }
 
 int CropWindow::scaleValueToImage (int value)
