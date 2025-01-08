@@ -1148,6 +1148,10 @@ void CropWindow::pointerMoved (int bstate, int x, int y)
                 vy -= (titleHeight + upperBorderWidth + sepWidth);
             }
 
+            int deviceScale = cropHandler.getDeviceScale();
+            vx *= deviceScale;
+            vy *= deviceScale;
+
             int imwidth = cropHandler.cropPixbuftrue->get_width();
             int imheight = cropHandler.cropPixbuftrue->get_height();
 
@@ -2486,6 +2490,9 @@ void CropWindow::screenCoordToCropBuffer (double phyx, double phyy, int& cropx, 
         x = x / czoom;
         y = y / czoom;
     }
+    int deviceScale = cropHandler.getDeviceScale();
+    x *= deviceScale;
+    y *= deviceScale;
 
     rtengine::Crop* crop = static_cast<rtengine::Crop*>(cropHandler.getCrop());
     x += crop->getLeftBorder();

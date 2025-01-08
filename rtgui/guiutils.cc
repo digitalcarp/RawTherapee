@@ -491,6 +491,8 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
     cr->rectangle (round(imx + c2x) + 0.5, round(imy + c1y) + 0.5, round(imw - c2x) + 0.5, round(c2y - c1y + 1) + 0.5);
     cr->fill ();
 
+    cr->restore();
+
     // rectangle around the cropped area and guides
     if (cparams.guide != rtengine::procparams::CropParams::Guide::NONE && drawGuide) {
         double rectx1 = round(c1x) + imx + 0.5;
@@ -505,8 +507,6 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
 
         drawCropGuides(cr, rectx1, recty1, rectx2, recty2, cparams);
     }
-
-    cr->restore();
 }
 
 /*
