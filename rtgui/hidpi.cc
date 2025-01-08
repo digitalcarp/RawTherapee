@@ -34,6 +34,22 @@ DeviceCoord LogicalCoord::scaleToDevice(int device_scale) const {
     return device;
 }
 
+LogicalCoord LogicalCoord::operator+(const LogicalCoord& other) const {
+    return LogicalCoord(x + other.x, y + other.y);
+}
+
+LogicalCoord LogicalCoord::operator-(const LogicalCoord& other) const {
+    return LogicalCoord(x - other.x, y - other.y);
+}
+
+DeviceCoord DeviceCoord::operator+(const DeviceSize& other) const {
+    return DeviceCoord(x + other.width, y + other.height);
+}
+
+DeviceCoord DeviceCoord::operator-(const DeviceSize& other) const {
+    return DeviceCoord(x - other.width, y - other.height);
+}
+
 LogicalSize LogicalSize::forWidget(const Gtk::Widget* widget) {
     LogicalSize result = {};
     result.width = widget->get_width();

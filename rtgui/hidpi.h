@@ -55,16 +55,21 @@ struct LogicalCoord {
 
     constexpr PixelSpace pixelSpace() const { return PixelSpace::LOGICAL; }
 
-    LogicalCoord operator+(const LogicalCoord& other) const {
-        return LogicalCoord(x + other.x, y + other.y);
-    }
+    LogicalCoord operator+(const LogicalCoord& other) const;
+    LogicalCoord operator-(const LogicalCoord& other) const;
 };
 
 struct DeviceCoord {
     int x = 0;
     int y = 0;
 
+    DeviceCoord() = default;
+    DeviceCoord(int device_x, int device_y) : x(device_x), y(device_y) {}
+
     constexpr PixelSpace pixelSpace() const { return PixelSpace::PHYSICAL; }
+
+    DeviceCoord operator+(const DeviceSize& other) const;
+    DeviceCoord operator-(const DeviceSize& other) const;
 };
 
 struct LogicalSize {

@@ -35,9 +35,9 @@ public:
     virtual ~EditCoordSystem() {}
 
     /// Convert the widget's DrawingArea (i.e. preview area) coords to the edit buffer coords
-    virtual void screenCoordToCropBuffer (int phyx, int phyy, int& cropx, int& cropy) = 0;
+    virtual void screenCoordToCropBuffer (double phyx, double phyy, int& cropx, int& cropy) = 0;
     /// Convert the widget's DrawingArea (i.e. preview area) coords to the full image coords
-    virtual void screenCoordToImage (int phyx, int phyy, int& imgx, int& imgy) = 0;
+    virtual void screenCoordToImage (double phyx, double phyy, int& imgx, int& imgy) = 0;
     /// Convert the image coords to the widget's DrawingArea (i.e. preview area) coords
     virtual void imageCoordToScreen (int imgx, int imgy, int& phyx, int& phyy) = 0;
     /// Convert the image coords to the crop's canvas coords (full image + padding)

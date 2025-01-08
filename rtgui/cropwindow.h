@@ -171,9 +171,9 @@ public:
     }
     void deleteColorPickers ();
 
-    void screenCoordToCropBuffer (int phyx, int phyy, int& cropx, int& cropy) override;
-    void screenCoordToImage (int phyx, int phyy, int& imgx, int& imgy) override;
-    void screenCoordToCropCanvas (int phyx, int phyy, int& prevx, int& prevy);
+    void screenCoordToCropBuffer (double phyx, double phyy, int& cropx, int& cropy) override;
+    void screenCoordToImage (double phyx, double phyy, int& imgx, int& imgy) override;
+    void screenCoordToCropCanvas (double phyx, double phyy, int& prevx, int& prevy);
     void imageCoordToCropCanvas (int imgx, int imgy, int& phyx, int& phyy) override;
     void imageCoordToScreen (int imgx, int imgy, int& phyx, int& phyy) override;
     void imageCoordToCropBuffer (int imgx, int imgy, int& phyx, int& phyy) override;
