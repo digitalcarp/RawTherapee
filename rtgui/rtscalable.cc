@@ -76,7 +76,7 @@ Cairo::RefPtr<Cairo::ImageSurface> RTScalable::loadSurfaceFromIcon(const Glib::u
 
     // Get scale based on DPI and scale
     // Note: hSize not used because icon are considered squared
-    const int size = wSize;
+    const int size = RTScalable::scalePixelSize(wSize);
 
     // Looking for corresponding icon (if existing)
     const auto iconInfo = theme->lookup_icon(iconName, size);
