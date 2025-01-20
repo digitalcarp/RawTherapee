@@ -156,36 +156,29 @@ Gtk::SizeRequestMode ThresholdSelector::get_request_mode_vfunc () const
     return Gtk::SIZE_REQUEST_CONSTANT_SIZE;
 }
 
-void ThresholdSelector::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const
+void ThresholdSelector::measure_vfunc(Gtk::Orientation orientation, int /*for_size*/,
+                                      int& minimum, int& natural,
+                                      int& minimum_baseline, int& natural_baseline) const
 {
-    int minimumWidth = 0;
-    int naturalWidth = 0;
-    get_preferred_width_vfunc (minimumWidth, naturalWidth);
-    get_preferred_height_for_width_vfunc (minimumWidth, minimum_height, natural_height);
-}
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        const int s = RTScalable::scalePixelSize(1);
+        Glib::RefPtr<Gtk::StyleContext> style = get_style_context();
+        Gtk::Border padding = getPadding(style);  // already scaled
+        int margins = padding.get_left() + padding.get_right();
+        minimum = 60 * s + margins;
+        natural = 150 * s + margins;
+    } else {
+        const int s = RTScalable::scalePixelSize(1);
+        Glib::RefPtr<Gtk::StyleContext> style = get_style_context();
+        Gtk::Border padding = getPadding(style);  // already scaled
+        int margins = padding.get_left() + padding.get_right();
+        minimum = 26 * s + margins;
+        natural = 26 * s + margins;
+    }
 
-void ThresholdSelector::get_preferred_width_vfunc (int &minimum_width, int &natural_width) const
-{
-    const int s = RTScalable::scalePixelSize(1);
-    Glib::RefPtr<Gtk::StyleContext> style = get_style_context();
-    Gtk::Border padding = getPadding(style);  // already scaled
-    int margins = padding.get_left() + padding.get_right();
-    minimum_width = 60 * s + margins;
-    natural_width = 150 * s + margins;
-}
-
-void ThresholdSelector::get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const
-{
-    const int s = RTScalable::scalePixelSize(1);
-    Glib::RefPtr<Gtk::StyleContext> style = get_style_context();
-    Gtk::Border padding = getPadding(style);  // already scaled
-    int margins = padding.get_left() + padding.get_right();
-    natural_height = minimum_height = 26 * s + margins;
-}
-
-void ThresholdSelector::get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const
-{
-    get_preferred_width_vfunc (minimum_width, natural_width);
+    // Don't use baseline alignment
+    minimum_baseline = -1;
+    natural_baseline = -1;
 }
 
 /*

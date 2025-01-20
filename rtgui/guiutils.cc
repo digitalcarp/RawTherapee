@@ -998,19 +998,23 @@ bool MyScrolledWindow::on_scroll_event (GdkEventScroll* event)
     return true;
 }
 
-void MyScrolledWindow::get_preferred_width_vfunc (int &minimum_width, int &natural_width) const
+void MyScrolledWindow::measure_vfunc(Gtk::Orientation orientation, int /*for_size*/,
+                                     int& minimum, int& natural,
+                                     int& minimum_baseline, int& natural_baseline) const
 {
-    natural_width = minimum_width = RTScalable::scalePixelSize(100);
-}
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        int width = RTScalable::scalePixelSize(100);
+        minimum = width;
+        natural = width;
+    } else {
+        int height = RTScalable::scalePixelSize(50);
+        minimum = height;
+        natural = height;
+    }
 
-void MyScrolledWindow::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const
-{
-    natural_height = minimum_height = RTScalable::scalePixelSize(50);
-}
-
-void MyScrolledWindow::get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const
-{
-    natural_height = minimum_height = RTScalable::scalePixelSize(50);
+    // Don't use baseline alignment
+    minimum_baseline = -1;
+    natural_baseline = -1;
 }
 
 /*
@@ -1070,21 +1074,28 @@ bool MyScrolledToolbar::on_scroll_event (GdkEventScroll* event)
     return true;
 }
 
-void MyScrolledToolbar::get_preferred_height_vfunc (int &minimumHeight, int &naturalHeight) const
+void MyScrolledToolbar::measure_vfunc(Gtk::Orientation orientation, int /*for_size*/,
+                                      int& minimum, int& natural,
+                                      int& minimum_baseline, int& natural_baseline) const
 {
-    int currMinHeight = 0;
-    int currNatHeight = 0;
-    std::vector<const Widget*> childs = get_children();
-    minimumHeight = naturalHeight = 0;
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        int width = RTScalable::scalePixelSize(100);
+        minimum = width;
+        natural = width;
+    } else {
+        minimum = 0;
+        natural = 0;
 
-    for (auto child : childs)
-    {
-        if(child->is_visible()) {
-            child->get_preferred_height(currMinHeight, currNatHeight);
-            minimumHeight = rtengine::max(currMinHeight, minimumHeight);
-            naturalHeight = rtengine::max(currNatHeight, naturalHeight);
+        for (const auto& child : get_children()) {
+            PreferredSize size = child->get_preferred_size();
+            minimum = std::max(minimum, size.minimum.get_height());
+            natural = std::max(natural, size.natural.get_height());
         }
     }
+
+    // Don't use baseline alignment
+    minimum_baseline = -1;
+    natural_baseline = -1;
 }
 
 MyComboBoxText::MyComboBoxText (bool has_entry) : Gtk::ComboBoxText(has_entry)
@@ -1126,18 +1137,21 @@ void MyComboBoxText::setPreferredWidth (int minimum_width, int natural_width)
     }
 }
 
-void MyComboBoxText::get_preferred_width_vfunc (int &minimum_width, int &natural_width) const
+void MyComboBoxText::measure_vfunc(Gtk::Orientation orientation, int /*for_size*/,
+                                   int& minimum, int& natural,
+                                   int& minimum_baseline, int& natural_baseline) const
 {
-    natural_width = rtengine::max(naturalWidth, RTScalable::scalePixelSize(10));
-    minimum_width = rtengine::max(minimumWidth, RTScalable::scalePixelSize(10));
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        minimum = std::max(minimumWidth, RTScalable::scalePixelSize(10));
+        natural = std::max(naturalWidth, RTScalable::scalePixelSize(10));
+        // Don't use baseline alignment
+        minimum_baseline = -1;
+        natural_baseline = -1;
+    } else {
+        Gtk::ComboBox::measure_vfunc(orientation, minimum, natural,
+                                     minimum_baseline, natural_baseline);
+    }
 }
-
-void MyComboBoxText::get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const
-{
-    natural_width = rtengine::max(naturalWidth, RTScalable::scalePixelSize(10));
-    minimum_width = rtengine::max(minimumWidth, RTScalable::scalePixelSize(10));
-}
-
 
 MyComboBox::MyComboBox ()
 {
@@ -1173,16 +1187,20 @@ void MyComboBox::setPreferredWidth (int minimum_width, int natural_width)
     }
 }
 
-void MyComboBox::get_preferred_width_vfunc (int &minimum_width, int &natural_width) const
+void MyComboBox::measure_vfunc(Gtk::Orientation orientation, int /*for_size*/,
+                               int& minimum, int& natural,
+                               int& minimum_baseline, int& natural_baseline) const
 {
-    natural_width = rtengine::max(naturalWidth, RTScalable::scalePixelSize(10));
-    minimum_width = rtengine::max(minimumWidth, RTScalable::scalePixelSize(10));
-}
-
-void MyComboBox::get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const
-{
-    natural_width = rtengine::max(naturalWidth, RTScalable::scalePixelSize(10));
-    minimum_width = rtengine::max(minimumWidth, RTScalable::scalePixelSize(10));
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        minimum = std::max(minimumWidth, RTScalable::scalePixelSize(10));
+        natural = std::max(naturalWidth, RTScalable::scalePixelSize(10));
+        // Don't use baseline alignment
+        minimum_baseline = -1;
+        natural_baseline = -1;
+    } else {
+        Gtk::ComboBox::measure_vfunc(orientation, minimum, natural,
+                                     minimum_baseline, natural_baseline);
+    }
 }
 
 MySpinButton::MySpinButton ()
@@ -1509,16 +1527,22 @@ bool MyFileChooserButton::on_scroll_event (GdkEventScroll* event)
     return false;
 }
 
-void MyFileChooserButton::get_preferred_width_vfunc (int &minimum_width, int &natural_width) const
+void MyFileChooseButton::measure_vfunc(Gtk::Orientation orientation, /*int for_size*/,
+                                       int& minimum, int& natural,
+                                       int& minimum_baseline, int& natural_baseline) const
 {
-    minimum_width = natural_width = RTScalable::scalePixelSize(35);
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        int width = RTScalable::scalePixelSize(35);
+        minimum = width;
+        natural = width;
+        // Don't use baseline alignment
+        minimum_baseline = -1;
+        natural_baseline = -1;
+    } else {
+        Gtk::ComboBox::measure_vfunc(orientation, minimum, natural,
+                                     minimum_baseline, natural_baseline);
+    }
 }
-
-void MyFileChooserButton::get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const
-{
-    minimum_width = natural_width = RTScalable::scalePixelSize(35);
-}
-
 
 class MyFileChooserEntry::Impl
 {
@@ -1698,15 +1722,21 @@ void MyProgressBar::setPreferredWidth(int width)
     w = rtengine::max(width, RTScalable::scalePixelSize(10));
 }
 
-void MyProgressBar::get_preferred_width_vfunc (int &minimum_width, int &natural_width) const
+void MyProgressBar::measure_vfunc(Gtk::Orientation orientation, /*int for_size*/,
+                                  int& minimum, int& natural,
+                                  int& minimum_baseline, int& natural_baseline) const
 {
-    minimum_width = rtengine::max(w / 2, RTScalable::scalePixelSize(50));
-    natural_width = rtengine::max(w, RTScalable::scalePixelSize(50));
-}
-
-void MyProgressBar::get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const
-{
-    get_preferred_width_vfunc (minimum_width, natural_width);
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        int scaled = RTScalable::scalePixelSize(50);
+        minimum = std::max(w / 2, scaled);
+        natural = std::max(w, scaled);
+        // Don't use baseline alignment
+        minimum_baseline = -1;
+        natural_baseline = -1;
+    } else {
+        Gtk::ComboBox::measure_vfunc(orientation, minimum, natural,
+                                     minimum_baseline, natural_baseline);
+    }
 }
 
 BackBuffer::BackBuffer() : x(0), y(0), w(0), h(0), offset(0, 0), dirty(true) {}

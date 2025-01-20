@@ -334,9 +334,8 @@ class MyScrolledWindow final : public Gtk::ScrolledWindow
 {
 
     bool on_scroll_event (GdkEventScroll* event) override;
-    void get_preferred_width_vfunc (int& minimum_width, int& natural_width) const override;
-    void get_preferred_height_vfunc (int& minimum_height, int& natural_height) const override;
-    void get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const override;
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
 
 public:
     MyScrolledWindow();
@@ -349,7 +348,8 @@ class MyScrolledToolbar final : public Gtk::ScrolledWindow
 {
 
     bool on_scroll_event (GdkEventScroll* event) override;
-    void get_preferred_height_vfunc (int& minimum_height, int& natural_height) const override;
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
 
 public:
     MyScrolledToolbar();
@@ -363,8 +363,8 @@ class MyComboBox : public Gtk::ComboBox
     int naturalWidth, minimumWidth;
 
     bool on_scroll_event (GdkEventScroll* event) override;
-    void get_preferred_width_vfunc (int &minimum_width, int &natural_width) const override;
-    void get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const override;
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
 
 public:
     MyComboBox ();
@@ -381,8 +381,8 @@ class MyComboBoxText final : public Gtk::ComboBoxText
     sigc::connection myConnection;
 
     bool on_scroll_event (GdkEventScroll* event) override;
-    void get_preferred_width_vfunc (int &minimum_width, int &natural_width) const override;
-    void get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const override;
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
 
 public:
     explicit MyComboBoxText (bool has_entry = false);
@@ -472,8 +472,8 @@ private:
 
 protected:
     bool on_scroll_event (GdkEventScroll* event) override;
-    void get_preferred_width_vfunc (int &minimum_width, int &natural_width) const override;
-    void get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const override;
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
 
     void on_filename_set() override;
 
@@ -601,8 +601,8 @@ class MyProgressBar final : public Gtk::ProgressBar
 private:
     int w;
 
-    void get_preferred_width_vfunc (int &minimum_width, int &natural_width) const override;
-    void get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const override;
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
 
 public:
     explicit MyProgressBar(int width);
