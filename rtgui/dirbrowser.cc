@@ -42,7 +42,7 @@ std::vector<Glib::ustring> listSubDirs (const Glib::RefPtr<Gio::File>& dir, bool
     try {
 
         // CD-ROM with no disc inserted are reported, but do not exist.
-        if (!Glib::file_test (dir->get_path (), Glib::FILE_TEST_EXISTS)) {
+        if (!Glib::file_test (dir->get_path (), Glib::FileTest::EXISTS)) {
             return subDirs;
         }
 
@@ -54,7 +54,7 @@ std::vector<Glib::ustring> listSubDirs (const Glib::RefPtr<Gio::File>& dir, bool
                 if (!file) {
                     break;
                 }
-                if (file->get_file_type () != Gio::FILE_TYPE_DIRECTORY) {
+                if (file->get_file_type () != Gio::FileType::DIRECTORY) {
                     continue;
                 }
                 if (!addHidden && file->is_hidden ()) {
@@ -342,7 +342,7 @@ void DirBrowser::updateDir (const Gtk::TreeModel::iterator& iter)
         change = false;
 
         for (Gtk::TreeModel::iterator it = iter->children().begin(); it != iter->children().end(); ++it)
-            if (!Glib::file_test (it->get_value (dtColumns.dirname), Glib::FILE_TEST_EXISTS)
+            if (!Glib::file_test (it->get_value (dtColumns.dirname), Glib::FileTest::EXISTS)
                     || !Glib::file_test (it->get_value (dtColumns.dirname), Glib::FILE_TEST_IS_DIR)) {
                 GThreadLock lock;
                 dirTreeModel->erase (it);

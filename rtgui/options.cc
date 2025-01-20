@@ -77,18 +77,18 @@ inline bool Options::checkProfilePath(Glib::ustring &path)
 
     Glib::ustring p = getUserProfilePath();
 
-    if (!p.empty() && Glib::file_test(path + paramFileExtension, Glib::FILE_TEST_EXISTS)) {
+    if (!p.empty() && Glib::file_test(path + paramFileExtension, Glib::FileTest::EXISTS)) {
         return true;
     }
 
     p = getGlobalProfilePath();
 
-    return !p.empty() && Glib::file_test(path + paramFileExtension, Glib::FILE_TEST_EXISTS);
+    return !p.empty() && Glib::file_test(path + paramFileExtension, Glib::FileTest::EXISTS);
 }
 
 bool Options::checkDirPath(Glib::ustring &path, Glib::ustring errString)
 {
-    if (Glib::file_test(path, Glib::FILE_TEST_EXISTS) && Glib::file_test(path, Glib::FILE_TEST_IS_DIR)) {
+    if (Glib::file_test(path, Glib::FileTest::EXISTS) && Glib::file_test(path, Glib::FileTest::IS_DIR)) {
         return true;
     } else {
         if (!errString.empty()) {
@@ -161,59 +161,59 @@ void Options::updatePaths()
     Glib::ustring preferredPath = getPreferredProfilePath();
 
     // Paths are updated only if the user or global profile path is set
-    if (lastRgbCurvesDir.empty() || !Glib::file_test(lastRgbCurvesDir, Glib::FILE_TEST_EXISTS) || !Glib::file_test(lastRgbCurvesDir, Glib::FILE_TEST_IS_DIR)) {
+    if (lastRgbCurvesDir.empty() || !Glib::file_test(lastRgbCurvesDir, Glib::FileTest::EXISTS) || !Glib::file_test(lastRgbCurvesDir, Glib::FileTest::IS_DIR)) {
         lastRgbCurvesDir = preferredPath;
     }
 
-    if (lastLabCurvesDir.empty() || !Glib::file_test(lastLabCurvesDir, Glib::FILE_TEST_EXISTS) || !Glib::file_test(lastLabCurvesDir, Glib::FILE_TEST_IS_DIR)) {
+    if (lastLabCurvesDir.empty() || !Glib::file_test(lastLabCurvesDir, Glib::FileTest::EXISTS) || !Glib::file_test(lastLabCurvesDir, Glib::FileTest::IS_DIR)) {
         lastLabCurvesDir = preferredPath;
     }
 
-    if (lastRetinexDir.empty() || !Glib::file_test(lastRetinexDir, Glib::FILE_TEST_EXISTS) || !Glib::file_test(lastLabCurvesDir, Glib::FILE_TEST_IS_DIR)) {
+    if (lastRetinexDir.empty() || !Glib::file_test(lastRetinexDir, Glib::FileTest::EXISTS) || !Glib::file_test(lastLabCurvesDir, Glib::FileTest::IS_DIR)) {
         lastRetinexDir = preferredPath;
     }
 
-    if (lastDenoiseCurvesDir.empty() || !Glib::file_test(lastDenoiseCurvesDir, Glib::FILE_TEST_EXISTS) || !Glib::file_test(lastDenoiseCurvesDir, Glib::FILE_TEST_IS_DIR)) {
+    if (lastDenoiseCurvesDir.empty() || !Glib::file_test(lastDenoiseCurvesDir, Glib::FileTest::EXISTS) || !Glib::file_test(lastDenoiseCurvesDir, Glib::FileTest::IS_DIR)) {
         lastDenoiseCurvesDir = preferredPath;
     }
 
-    if (lastWaveletCurvesDir.empty() || !Glib::file_test(lastWaveletCurvesDir, Glib::FILE_TEST_EXISTS) || !Glib::file_test(lastWaveletCurvesDir, Glib::FILE_TEST_IS_DIR)) {
+    if (lastWaveletCurvesDir.empty() || !Glib::file_test(lastWaveletCurvesDir, Glib::FileTest::EXISTS) || !Glib::file_test(lastWaveletCurvesDir, Glib::FileTest::IS_DIR)) {
         lastWaveletCurvesDir = preferredPath;
     }
 
-    if (lastlocalCurvesDir.empty() || !Glib::file_test(lastlocalCurvesDir, Glib::FILE_TEST_EXISTS) || !Glib::file_test(lastlocalCurvesDir, Glib::FILE_TEST_IS_DIR)) {
+    if (lastlocalCurvesDir.empty() || !Glib::file_test(lastlocalCurvesDir, Glib::FileTest::EXISTS) || !Glib::file_test(lastlocalCurvesDir, Glib::FileTest::IS_DIR)) {
         lastlocalCurvesDir = preferredPath;
     }
 
-    if (lastPFCurvesDir.empty() || !Glib::file_test(lastPFCurvesDir, Glib::FILE_TEST_EXISTS) || !Glib::file_test(lastPFCurvesDir, Glib::FILE_TEST_IS_DIR)) {
+    if (lastPFCurvesDir.empty() || !Glib::file_test(lastPFCurvesDir, Glib::FileTest::EXISTS) || !Glib::file_test(lastPFCurvesDir, Glib::FileTest::IS_DIR)) {
         lastPFCurvesDir = preferredPath;
     }
 
-    if (lastHsvCurvesDir.empty() || !Glib::file_test(lastHsvCurvesDir, Glib::FILE_TEST_EXISTS) || !Glib::file_test(lastHsvCurvesDir, Glib::FILE_TEST_IS_DIR)) {
+    if (lastHsvCurvesDir.empty() || !Glib::file_test(lastHsvCurvesDir, Glib::FileTest::EXISTS) || !Glib::file_test(lastHsvCurvesDir, Glib::FileTest::IS_DIR)) {
         lastHsvCurvesDir = preferredPath;
     }
 
-    if (lastToneCurvesDir.empty() || !Glib::file_test(lastToneCurvesDir, Glib::FILE_TEST_EXISTS) || !Glib::file_test(lastToneCurvesDir, Glib::FILE_TEST_IS_DIR)) {
+    if (lastToneCurvesDir.empty() || !Glib::file_test(lastToneCurvesDir, Glib::FileTest::EXISTS) || !Glib::file_test(lastToneCurvesDir, Glib::FileTest::IS_DIR)) {
         lastToneCurvesDir = preferredPath;
     }
 
-    if (lastProfilingReferenceDir.empty() || !Glib::file_test(lastProfilingReferenceDir, Glib::FILE_TEST_EXISTS) || !Glib::file_test(lastProfilingReferenceDir, Glib::FILE_TEST_IS_DIR)) {
+    if (lastProfilingReferenceDir.empty() || !Glib::file_test(lastProfilingReferenceDir, Glib::FileTest::EXISTS) || !Glib::file_test(lastProfilingReferenceDir, Glib::FileTest::IS_DIR)) {
         lastProfilingReferenceDir = preferredPath;
     }
 
-    if (lastVibranceCurvesDir.empty() || !Glib::file_test(lastVibranceCurvesDir, Glib::FILE_TEST_EXISTS) || !Glib::file_test(lastVibranceCurvesDir, Glib::FILE_TEST_IS_DIR)) {
+    if (lastVibranceCurvesDir.empty() || !Glib::file_test(lastVibranceCurvesDir, Glib::FileTest::EXISTS) || !Glib::file_test(lastVibranceCurvesDir, Glib::FileTest::IS_DIR)) {
         lastVibranceCurvesDir = preferredPath;
     }
 
-    if (loadSaveProfilePath.empty() || !Glib::file_test(loadSaveProfilePath, Glib::FILE_TEST_EXISTS) || !Glib::file_test(loadSaveProfilePath, Glib::FILE_TEST_IS_DIR)) {
+    if (loadSaveProfilePath.empty() || !Glib::file_test(loadSaveProfilePath, Glib::FileTest::EXISTS) || !Glib::file_test(loadSaveProfilePath, Glib::FileTest::IS_DIR)) {
         loadSaveProfilePath = preferredPath;
     }
 
-    if (lastBWCurvesDir.empty() || !Glib::file_test(lastBWCurvesDir, Glib::FILE_TEST_EXISTS) || !Glib::file_test(lastBWCurvesDir, Glib::FILE_TEST_IS_DIR)) {
+    if (lastBWCurvesDir.empty() || !Glib::file_test(lastBWCurvesDir, Glib::FileTest::EXISTS) || !Glib::file_test(lastBWCurvesDir, Glib::FileTest::IS_DIR)) {
         lastBWCurvesDir = preferredPath;
     }
 
-    if (lastICCProfCreatorDir.empty() || !Glib::file_test(lastICCProfCreatorDir, Glib::FILE_TEST_EXISTS) || !Glib::file_test(lastICCProfCreatorDir, Glib::FILE_TEST_IS_DIR)) {
+    if (lastICCProfCreatorDir.empty() || !Glib::file_test(lastICCProfCreatorDir, Glib::FileTest::EXISTS) || !Glib::file_test(lastICCProfCreatorDir, Glib::FileTest::IS_DIR)) {
         lastICCProfCreatorDir = preferredPath;
     }
 }
@@ -257,7 +257,7 @@ Glib::ustring Options::findProfilePath(Glib::ustring &profName)
         p = getUserProfilePath();
         Glib::ustring fullPath = Glib::build_filename(p, profName.substr(5) + paramFileExtension);
 
-        if (!p.empty() && Glib::file_test(fullPath, Glib::FILE_TEST_EXISTS)) {
+        if (!p.empty() && Glib::file_test(fullPath, Glib::FileTest::EXISTS)) {
             return Glib::path_get_dirname(fullPath);
         }
     } else if (p == "${G}") {
@@ -265,7 +265,7 @@ Glib::ustring Options::findProfilePath(Glib::ustring &profName)
         p = getGlobalProfilePath();
         Glib::ustring fullPath = Glib::build_filename(p, profName.substr(5) + paramFileExtension);
 
-        if (!p.empty() && Glib::file_test(fullPath, Glib::FILE_TEST_EXISTS)) {
+        if (!p.empty() && Glib::file_test(fullPath, Glib::FileTest::EXISTS)) {
             return Glib::path_get_dirname(fullPath);
         }
     } else {
@@ -273,7 +273,7 @@ Glib::ustring Options::findProfilePath(Glib::ustring &profName)
         p = getUserProfilePath();
         Glib::ustring fullPath = Glib::build_filename(p, profName + paramFileExtension);
 
-        if (!p.empty() && Glib::file_test(fullPath, Glib::FILE_TEST_EXISTS)) {
+        if (!p.empty() && Glib::file_test(fullPath, Glib::FileTest::EXISTS)) {
             // update the profile path
             profName = Glib::build_filename("${U}", profName);
             return Glib::path_get_dirname(fullPath);
@@ -282,7 +282,7 @@ Glib::ustring Options::findProfilePath(Glib::ustring &profName)
         p = getGlobalProfilePath();
         fullPath = Glib::build_filename(p, profName + paramFileExtension);
 
-        if (!p.empty() && Glib::file_test(fullPath, Glib::FILE_TEST_EXISTS)) {
+        if (!p.empty() && Glib::file_test(fullPath, Glib::FileTest::EXISTS)) {
             profName = Glib::build_filename("${G}", profName);
             return Glib::path_get_dirname(fullPath);
         }
@@ -735,7 +735,7 @@ void Options::readFromFile(Glib::ustring fname)
 
     Glib::KeyFile keyFile;
 
-    if (!Glib::file_test(fname, Glib::FILE_TEST_EXISTS)) {
+    if (!Glib::file_test(fname, Glib::FileTest::EXISTS)) {
         Glib::ustring msg = Glib::ustring::compose("Options file %1 does not exist", fname);
         throw Error(msg);
     }

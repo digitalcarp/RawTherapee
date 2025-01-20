@@ -8516,7 +8516,7 @@ int ProcParams::load(const Glib::ustring& fname, ParamsEdited* pedited)
             pedited = dummy_pedited.get();
         }
 
-        if (!Glib::file_test(fname, Glib::FILE_TEST_EXISTS) ||
+        if (!Glib::file_test(fname, Glib::FileTest::EXISTS) ||
                 !keyFile.load_from_file(fname)) {
             return 1;
         }

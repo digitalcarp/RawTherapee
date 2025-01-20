@@ -45,7 +45,7 @@ bool ExtProgAction::execute (const std::vector<Glib::ustring>& fileNames) const
     // Check if they all exists as they may not be processed yet.
     for (const auto& fileName : fileNames) {
 
-        if (Glib::file_test (fileName, Glib::FILE_TEST_EXISTS)) {
+        if (Glib::file_test (fileName, Glib::FileTest::EXISTS)) {
             continue;
         }
 
@@ -145,7 +145,7 @@ bool ExtProgStore::searchProgram (const Glib::ustring& name,
 
             filePath = progFilesDir + "\\" + Glib::ustring::compose(exePath, ver);
 
-            if (Glib::file_test(filePath, Glib::FILE_TEST_EXISTS)) {
+            if (Glib::file_test(filePath, Glib::FileTest::EXISTS)) {
                 break;
             }
 
@@ -153,7 +153,7 @@ bool ExtProgStore::searchProgram (const Glib::ustring& name,
 
                 filePath = progFilesDirx86 + "\\" + Glib::ustring::compose(exePath86, ver);
 
-                if (Glib::file_test(filePath, Glib::FILE_TEST_EXISTS)) {
+                if (Glib::file_test(filePath, Glib::FileTest::EXISTS)) {
                     break;
                 }
             }
@@ -165,7 +165,7 @@ bool ExtProgStore::searchProgram (const Glib::ustring& name,
 
             filePath = progFilesDir + "\\" + exePath;
 
-            if (Glib::file_test(filePath, Glib::FILE_TEST_EXISTS)) {
+            if (Glib::file_test(filePath, Glib::FileTest::EXISTS)) {
                 break;
             }
 
@@ -173,7 +173,7 @@ bool ExtProgStore::searchProgram (const Glib::ustring& name,
 
                 filePath = progFilesDirx86 + "\\" + exePath86;
 
-                if (Glib::file_test(filePath, Glib::FILE_TEST_EXISTS)) {
+                if (Glib::file_test(filePath, Glib::FileTest::EXISTS)) {
                     break;
                 }
             }

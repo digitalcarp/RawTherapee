@@ -127,7 +127,7 @@ public:
         try {
             Thumbnail* tmb = nullptr;
             {
-                if (Glib::file_test(j.dir_entry_, Glib::FILE_TEST_EXISTS)) {
+                if (Glib::file_test(j.dir_entry_, Glib::FileTest::EXISTS)) {
                     tmb = cacheMgr->getEntry(j.dir_entry_);
                 }
             }

@@ -206,9 +206,9 @@ void FilePanel::init ()
     dirBrowser->fillDirTree ();
     placesBrowser->refreshPlacesList ();
 
-    if (!argv1.empty() && Glib::file_test (argv1, Glib::FILE_TEST_EXISTS)) {
+    if (!argv1.empty() && Glib::file_test (argv1, Glib::FileTest::EXISTS)) {
         Glib::ustring d(argv1);
-        if (!Glib::file_test(d, Glib::FILE_TEST_IS_DIR)) {
+        if (!Glib::file_test(d, Glib::FileTest::IS_DIR)) {
             d = Glib::path_get_dirname(d);
         }
         dirBrowser->open(d);
@@ -218,7 +218,7 @@ void FilePanel::init ()
         } else if (options.startupDir == STARTUPDIR_CURRENT) {
             dirBrowser->open (argv0);
         } else if (options.startupDir == STARTUPDIR_CUSTOM || options.startupDir == STARTUPDIR_LAST) {
-            if (options.startupPath.length() && Glib::file_test(options.startupPath, Glib::FILE_TEST_EXISTS) && Glib::file_test(options.startupPath, Glib::FILE_TEST_IS_DIR)) {
+            if (options.startupPath.length() && Glib::file_test(options.startupPath, Glib::FileTest::EXISTS) && Glib::file_test(options.startupPath, Glib::FileTest::IS_DIR)) {
                 dirBrowser->open (options.startupPath);
             } else {
                 // Fallback option if the path is empty or the folder doesn't exist
@@ -381,9 +381,9 @@ void FilePanel::saveOptions ()
 void FilePanel::open (const Glib::ustring& d)
 {
 
-    if (Glib::file_test (d, Glib::FILE_TEST_IS_DIR)) {
+    if (Glib::file_test (d, Glib::FileTest::IS_DIR)) {
         dirBrowser->open (d.c_str());
-    } else if (Glib::file_test (d, Glib::FILE_TEST_EXISTS)) {
+    } else if (Glib::file_test (d, Glib::FileTest::EXISTS)) {
         dirBrowser->open (Glib::path_get_dirname(d), Glib::path_get_basename(d));
     }
 }

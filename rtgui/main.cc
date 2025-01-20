@@ -422,7 +422,7 @@ int main (int argc, char **argv)
     SetErrorMode (SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
 
     if (argc > 1) {
-        if (!remote && !Glib::file_test (argv1, Glib::FILE_TEST_EXISTS ) && !Glib::file_test (argv1, Glib::FILE_TEST_IS_DIR)) {
+        if (!remote && !Glib::file_test (argv1, Glib::FileTest::EXISTS ) && !Glib::file_test (argv1, Glib::FILE_TEST_IS_DIR)) {
             const bool stdoutRedirecttoConsole = (GetFileType (GetStdHandle (STD_OUTPUT_HANDLE)) == 0x0000);
             // open console, if stdout is invalid
             if (stdoutRedirecttoConsole) {
@@ -500,7 +500,7 @@ int main (int argc, char **argv)
     }
 
     if (gimpPlugin) {
-        if (!Glib::file_test (argv1, Glib::FILE_TEST_EXISTS) || Glib::file_test (argv1, Glib::FILE_TEST_IS_DIR)) {
+        if (!Glib::file_test (argv1, Glib::FileTest::EXISTS) || Glib::file_test (argv1, Glib::FILE_TEST_IS_DIR)) {
             printf ("Error: argv1 doesn't exist\n");
             return 1;
         }
@@ -509,7 +509,7 @@ int main (int argc, char **argv)
             printf ("Error: -gimp requires two arguments\n");
             return 1;
         }
-    } else if (!remote && Glib::file_test(argv1, Glib::FILE_TEST_EXISTS) && !Glib::file_test(argv1, Glib::FILE_TEST_IS_DIR)) {
+    } else if (!remote && Glib::file_test(argv1, Glib::FileTest::EXISTS) && !Glib::file_test(argv1, Glib::FILE_TEST_IS_DIR)) {
         simpleEditor = true;
     }
 

@@ -1078,7 +1078,7 @@ void FileCatalog::copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe, b
     Gtk::FileChooserDialog fc (getToplevelWindow (this), fc_title, Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER );
     fc.add_button( M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
     fc.add_button( M("GENERAL_OK"), Gtk::RESPONSE_OK);
-    if (!options.lastCopyMovePath.empty() && Glib::file_test(options.lastCopyMovePath, Glib::FILE_TEST_IS_DIR)) {
+    if (!options.lastCopyMovePath.empty() && Glib::file_test(options.lastCopyMovePath, Glib::FileTest::IS_DIR)) {
         fc.set_current_folder(options.lastCopyMovePath);
     } else {
         // open dialog at the 1-st file's path
@@ -1119,7 +1119,7 @@ void FileCatalog::copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe, b
 
             while(!filecopymovecomplete) {
                 // check for filename conflicts at destination - prevent overwriting (actually RT will crash on overwriting attempt)
-                if (!Glib::file_test(dest_fPath, Glib::FILE_TEST_EXISTS) && !Glib::file_test(dest_fPath_param, Glib::FILE_TEST_EXISTS)) {
+                if (!Glib::file_test(dest_fPath, Glib::FileTest::EXISTS) && !Glib::file_test(dest_fPath_param, Glib::FileTest::EXISTS)) {
                     // copy/move file to destination
                     Glib::RefPtr<Gio::File> dest_file = Gio::File::create_for_path ( dest_fPath );
 
@@ -1140,12 +1140,12 @@ void FileCatalog::copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe, b
                     // attempt to copy/move paramFile only if it exist next to the src
                     Glib::RefPtr<Gio::File> scr_param = Gio::File::create_for_path (  src_fPath + paramFileExtension );
 
-                    if (Glib::file_test( src_fPath + paramFileExtension, Glib::FILE_TEST_EXISTS)) {
+                    if (Glib::file_test( src_fPath + paramFileExtension, Glib::FileTest::EXISTS)) {
                         Glib::RefPtr<Gio::File> dest_param = Gio::File::create_for_path ( dest_fPath_param);
 
                         // copy/move paramFile to destination
                         if (moveRequested) {
-                            if (Glib::file_test( dest_fPath + paramFileExtension, Glib::FILE_TEST_EXISTS)) {
+                            if (Glib::file_test( dest_fPath + paramFileExtension, Glib::FileTest::EXISTS)) {
                                 // profile already got copied to destination from cache after cacheMgr->renameEntry
                                 // delete source profile as cleanup
                                 ::g_remove ((src_fPath + paramFileExtension).c_str ());
@@ -1343,7 +1343,7 @@ void FileCatalog::renameRequested(const std::vector<FileBrowserEntry*>& tbe)
                 Glib::ustring nfname = Glib::build_filename (dirName, nBaseName);
 
                 /* check if filename already exists*/
-                if (Glib::file_test (nfname, Glib::FILE_TEST_EXISTS)) {
+                if (Glib::file_test (nfname, Glib::FileTest::EXISTS)) {
                     Glib::ustring msg_ = Glib::ustring("<b>") + escapeHtmlChars(nfname) + ": " + M("MAIN_MSG_ALREADYEXISTS") + "</b>";
                     Gtk::MessageDialog msgd (msg_, true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
                     msgd.run ();
@@ -1776,7 +1776,7 @@ void FileCatalog::reparseDirectory ()
         return;
     }
 
-    if (!Glib::file_test(selectedDirectory, Glib::FILE_TEST_IS_DIR)) {
+    if (!Glib::file_test(selectedDirectory, Glib::FileTest::IS_DIR)) {
         closeDir();
         return;
     }
@@ -1787,7 +1787,7 @@ void FileCatalog::reparseDirectory ()
     std::vector<Glib::ustring> fileNamesToRemove;
 
     for (const auto& entry : t) {
-        if (!Glib::file_test(entry->filename, Glib::FILE_TEST_EXISTS)) {
+        if (!Glib::file_test(entry->filename, Glib::FileTest::EXISTS)) {
             fileNamesToDel.push_back(entry->filename);
             fileNamesToRemove.push_back(entry->filename);
         }
@@ -1832,7 +1832,7 @@ void FileCatalog::on_dir_changed (const Glib::RefPtr<Gio::File>& file, const Gli
 
     if ((options.has_retained_extention(file->get_parse_name())
             && (event_type == Gio::FILE_MONITOR_EVENT_CREATED || event_type == Gio::FILE_MONITOR_EVENT_DELETED || event_type == Gio::FILE_MONITOR_EVENT_CHANGED))
-             || (event_type == Gio::FILE_MONITOR_EVENT_CREATED && Glib::file_test(file->get_path(), Glib::FileTest::FILE_TEST_IS_DIR))
+             || (event_type == Gio::FILE_MONITOR_EVENT_CREATED && Glib::file_test(file->get_path(), Glib::FileTest::IS_DIR))
              || (event_type == Gio::FILE_MONITOR_EVENT_DELETED && std::find_if(dirMonitors.cbegin(), dirMonitors.cend(), [&file](const FileMonitorInfo &monitor) { return monitor.filePath == file->get_path(); }) != dirMonitors.cend())) {
         if (!internal) {
             GThreadLock lock;
@@ -2097,7 +2097,7 @@ void FileCatalog::buttonBrowsePathPressed ()
     // handle shortcuts in the BrowsePath -- END
 
     // validate the path
-    if (Glib::file_test(BrowsePathValue, Glib::FILE_TEST_IS_DIR) && selectDir) {
+    if (Glib::file_test(BrowsePathValue, Glib::FileTest::IS_DIR) && selectDir) {
         selectDir (BrowsePathValue);
     } else
         // error, likely path not found: show red arrow

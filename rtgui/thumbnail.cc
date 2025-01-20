@@ -1167,7 +1167,7 @@ bool Thumbnail::openDefaultViewer(int destination)
     if (destination == 1) {
         openFName = Glib::ustring::compose ("%1.%2", BatchQueue::calcAutoFileNameBase(fname), options.saveFormatBatch.format);
 
-        if (Glib::file_test (openFName, Glib::FILE_TEST_EXISTS)) {
+        if (Glib::file_test (openFName, Glib::FileTest::EXISTS)) {
             wchar_t *wfilename = (wchar_t*)g_utf8_to_utf16 (openFName.c_str(), -1, NULL, NULL, NULL);
             ShellExecuteW(NULL, L"open", wfilename, NULL, NULL, SW_SHOWMAXIMIZED );
             g_free(wfilename);
@@ -1181,7 +1181,7 @@ bool Thumbnail::openDefaultViewer(int destination)
 
         printf("Opening %s\n", openFName.c_str());
 
-        if (Glib::file_test (openFName, Glib::FILE_TEST_EXISTS)) {
+        if (Glib::file_test (openFName, Glib::FileTest::EXISTS)) {
             // Output file exists, so open explorer and select output file
             wchar_t* org = (wchar_t*)g_utf8_to_utf16 (Glib::ustring::compose("/select,\"%1\"", openFName).c_str(), -1, NULL, NULL, NULL);
             wchar_t* par = new wchar_t[wcslen(org) + 1];
@@ -1202,7 +1202,7 @@ bool Thumbnail::openDefaultViewer(int destination)
 
             delete[] par;
             g_free(org);
-        } else if (Glib::file_test (Glib::path_get_dirname(openFName), Glib::FILE_TEST_EXISTS)) {
+        } else if (Glib::file_test (Glib::path_get_dirname(openFName), Glib::FileTest::EXISTS)) {
             // Out file does not exist, but directory
             wchar_t *wfilename = (wchar_t*)g_utf8_to_utf16 (Glib::path_get_dirname(openFName).c_str(), -1, NULL, NULL, NULL);
             ShellExecuteW(NULL, L"explore", wfilename, NULL, NULL, SW_SHOWNORMAL );

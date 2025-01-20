@@ -122,7 +122,7 @@ Splash::Splash (Gtk::Window& parent) : Gtk::Dialog(M("GENERAL_ABOUT"), parent, t
     // Tab 2: the information about the current version
     std::string buildFileName = Glib::build_filename (creditsPath, "AboutThisBuild.txt");
 
-    if ( Glib::file_test(buildFileName, (Glib::FILE_TEST_EXISTS)) ) {
+    if ( Glib::file_test(buildFileName, (Glib::FileTest::EXISTS)) ) {
         FILE *f = g_fopen (buildFileName.c_str (), "rt");
 
         if (f != nullptr) {
@@ -153,7 +153,7 @@ Splash::Splash (Gtk::Window& parent) : Gtk::Dialog(M("GENERAL_ABOUT"), parent, t
     // Tab 3: the credits
     std::string creditsFileName = Glib::build_filename (creditsPath, "AUTHORS.txt");
 
-    if ( Glib::file_test(creditsFileName, (Glib::FILE_TEST_EXISTS)) ) {
+    if ( Glib::file_test(creditsFileName, (Glib::FileTest::EXISTS)) ) {
         FILE *f = g_fopen (creditsFileName.c_str (), "rt");
 
         if (f != nullptr) {
@@ -185,7 +185,7 @@ Splash::Splash (Gtk::Window& parent) : Gtk::Dialog(M("GENERAL_ABOUT"), parent, t
     // Tab 4: the license
     std::string licenseFileName = Glib::build_filename (licensePath, "LICENSE");
 
-    if ( Glib::file_test(licenseFileName, (Glib::FILE_TEST_EXISTS)) ) {
+    if ( Glib::file_test(licenseFileName, (Glib::FileTest::EXISTS)) ) {
         FILE *f = g_fopen (licenseFileName.c_str (), "rt");
 
         if (f != nullptr) {
@@ -218,7 +218,7 @@ Splash::Splash (Gtk::Window& parent) : Gtk::Dialog(M("GENERAL_ABOUT"), parent, t
     // Tab 5: the Release Notes
     std::string releaseNotesFileName = Glib::build_filename (creditsPath, "RELEASE_NOTES.txt");
 
-    if ( Glib::file_test(releaseNotesFileName, (Glib::FILE_TEST_EXISTS)) ) {
+    if ( Glib::file_test(releaseNotesFileName, (Glib::FileTest::EXISTS)) ) {
         FILE *f = g_fopen (releaseNotesFileName.c_str (), "rt");
 
         if (f != nullptr) {

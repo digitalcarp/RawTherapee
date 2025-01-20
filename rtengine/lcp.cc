@@ -874,7 +874,7 @@ rtengine::LCPStore* rtengine::LCPStore::getInstance()
 
 bool rtengine::LCPStore::isValidLCPFileName(const Glib::ustring& filename) const
 {
-    if (!Glib::file_test(filename, Glib::FILE_TEST_EXISTS) || Glib::file_test (filename, Glib::FILE_TEST_IS_DIR)) {
+    if (!Glib::file_test(filename, Glib::FileTest::EXISTS) || Glib::file_test (filename, Glib::FileTest::IS_DIR)) {
         return false;
     }
 
@@ -914,7 +914,7 @@ Glib::ustring rtengine::LCPStore::getDefaultCommonDirectory() const
         WideCharToMultiByte(CP_UTF8, 0, pathW, -1, pathA, MAX_PATH, 0, 0);
         Glib::ustring fullDir = Glib::ustring(pathA) + Glib::ustring("\\Adobe\\CameraRaw\\LensProfiles\\1.0");
 
-        if (Glib::file_test (fullDir, Glib::FILE_TEST_IS_DIR)) {
+        if (Glib::file_test (fullDir, Glib::FileTest::IS_DIR)) {
             dir = fullDir;
         }
     }

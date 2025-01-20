@@ -1289,7 +1289,7 @@ void ICMPanel::write(ProcParams* pp, ParamsEdited* pedited)
     } else if (icameraICC->get_active()) {
         pp->icm.inputProfile = "(cameraICC)";
     } else {
-        if (Glib::file_test(ipDialog->get_filename(), Glib::FILE_TEST_EXISTS) && !Glib::file_test(ipDialog->get_filename(), Glib::FILE_TEST_IS_DIR)) {
+        if (Glib::file_test(ipDialog->get_filename(), Glib::FileTest::EXISTS) && !Glib::file_test(ipDialog->get_filename(), Glib::FileTest::IS_DIR)) {
             pp->icm.inputProfile = "file:" + ipDialog->get_filename();
         } else {
             pp->icm.inputProfile = "";    // just a directory

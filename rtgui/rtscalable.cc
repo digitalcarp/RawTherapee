@@ -135,7 +135,7 @@ Cairo::RefPtr<Cairo::ImageSurface> RTScalable::loadSurfaceFromPNG(const Glib::us
     }
 
     // Create surface from PNG file if file exist
-    if (Glib::file_test(path.c_str(), Glib::FILE_TEST_EXISTS)) {
+    if (Glib::file_test(path.c_str(), Glib::FileTest::EXISTS)) {
         surf = Cairo::ImageSurface::create_from_png(path);
     } else {
         std::cerr << "Failed to load PNG file \"" << fname << "\"" << std::endl;
@@ -162,7 +162,7 @@ Cairo::RefPtr<Cairo::ImageSurface> RTScalable::loadSurfaceFromSVG(const Glib::us
     }
 
     // Create surface from SVG file if file exist
-    if (Glib::file_test(path.c_str(), Glib::FILE_TEST_EXISTS)) {
+    if (Glib::file_test(path.c_str(), Glib::FileTest::EXISTS)) {
         // Read content of SVG file
         std::string svgFile;
         try {

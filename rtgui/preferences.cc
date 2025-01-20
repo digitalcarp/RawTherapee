@@ -1787,7 +1787,7 @@ void Preferences::parseDir(Glib::ustring dirname, std::vector<Glib::ustring>& it
         Glib::ustring sname = *i;
 
         // ignore directories
-        if (!Glib::file_test(fname, Glib::FILE_TEST_IS_DIR) && sname.size() >= ext.size() && sname.substr(sname.size() - ext.size(), ext.size()).casefold() == ext) {
+        if (!Glib::file_test(fname, Glib::FileTest::IS_DIR) && sname.size() >= ext.size() && sname.substr(sname.size() - ext.size(), ext.size()).casefold() == ext) {
             items.push_back(sname.substr(0, sname.size() - ext.size()));
         }
     }
@@ -1816,7 +1816,7 @@ void Preferences::parseThemeDir(Glib::ustring dirname)
         Glib::ustring fname = *i;
 
         // Ignore directories and filter to keep css files only
-        if (regex->match(fname, matchInfo) && !Glib::file_test(fname, Glib::FILE_TEST_IS_DIR) && fname.size() >= 4) {
+        if (regex->match(fname, matchInfo) && !Glib::file_test(fname, Glib::FileTest::IS_DIR) && fname.size() >= 4) {
             themeNames.push_back(fname.substr(0, fname.size() - 4));
         }
     }
@@ -2152,7 +2152,7 @@ void Preferences::fillPreferences()
     cbAutoMonProfile->set_active(moptions.rtSettings.autoMonitorProfile);
 #endif
 
-    if (Glib::file_test(moptions.rtSettings.iccDirectory, Glib::FILE_TEST_IS_DIR)) {
+    if (Glib::file_test(moptions.rtSettings.iccDirectory, Glib::FileTest::IS_DIR)) {
         iccDir->set_current_folder(moptions.rtSettings.iccDirectory);
     }
 
@@ -2209,7 +2209,7 @@ void Preferences::fillPreferences()
     editor_dir_temp->set_active(moptions.editor_out_dir == Options::EDITOR_OUT_DIR_TEMP);
     editor_dir_current->set_active(moptions.editor_out_dir == Options::EDITOR_OUT_DIR_CURRENT);
     editor_dir_custom->set_active(moptions.editor_out_dir == Options::EDITOR_OUT_DIR_CUSTOM);
-    if (Glib::file_test(moptions.editor_custom_out_dir, Glib::FILE_TEST_IS_DIR)) {
+    if (Glib::file_test(moptions.editor_custom_out_dir, Glib::FileTest::IS_DIR)) {
         editor_dir_custom_path->set_current_folder(moptions.editor_custom_out_dir);
     } else {
         editor_dir_custom_path->set_current_folder(Glib::get_tmp_dir());

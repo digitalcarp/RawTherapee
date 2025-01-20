@@ -541,7 +541,7 @@ Glib::ustring CurveEditorSubGroup::inputFile ()
     if (result == Gtk::RESPONSE_APPLY) {
         fname = dialog.get_filename();
 
-        if (Glib::file_test (fname, Glib::FILE_TEST_EXISTS)) {
+        if (Glib::file_test (fname, Glib::FileTest::EXISTS)) {
             return fname;
         }
     }

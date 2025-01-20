@@ -120,7 +120,7 @@ RTWindow::RTWindow ()
         // Look for theme and set it
         // Check if the current theme name in options exists, otherwise set it to default one (i.e. "RawTherapee.css")
         auto filename = Glib::build_filename(argv0, "themes", options.theme + ".css");
-        if (!Glib::file_test(filename, Glib::FILE_TEST_EXISTS)) {
+        if (!Glib::file_test(filename, Glib::FileTest::EXISTS)) {
             options.theme = "RawTherapee";
             filename = Glib::build_filename(argv0, "themes", options.theme + ".css");
         }

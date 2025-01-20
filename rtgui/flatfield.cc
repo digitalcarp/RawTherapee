@@ -155,7 +155,7 @@ void FlatField::read(const rtengine::procparams::ProcParams* pp, const ParamsEdi
         }
     }
 
-    if (Glib::file_test (pp->raw.ff_file, Glib::FILE_TEST_EXISTS)) {
+    if (Glib::file_test (pp->raw.ff_file, Glib::FileTest::EXISTS)) {
         flatFieldFile->set_filename (pp->raw.ff_file);
     } else {
         flatFieldFile_Reset();

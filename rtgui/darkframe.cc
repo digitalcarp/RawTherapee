@@ -87,7 +87,7 @@ void DarkFrame::read(const rtengine::procparams::ProcParams* pp, const ParamsEdi
         dfAuto->set_inconsistent(!pedited->raw.df_autoselect );
     }
 
-    if (Glib::file_test (pp->raw.dark_frame, Glib::FILE_TEST_EXISTS)) {
+    if (Glib::file_test (pp->raw.dark_frame, Glib::FileTest::EXISTS)) {
         darkFrameFile->set_filename (pp->raw.dark_frame);
     } else {
         darkFrameReset();

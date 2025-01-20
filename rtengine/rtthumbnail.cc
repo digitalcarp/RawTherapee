@@ -2141,7 +2141,7 @@ bool Thumbnail::readImage (const Glib::ustring& fname)
 
     Glib::ustring fullFName = fname + ".rtti";
 
-    if (!Glib::file_test(fullFName, Glib::FILE_TEST_EXISTS)) {
+    if (!Glib::file_test(fullFName, Glib::FileTest::EXISTS)) {
         return false;
     }
 

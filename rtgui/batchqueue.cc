@@ -1094,7 +1094,7 @@ Glib::ustring BatchQueue::autoCompleteFileName (const Glib::ustring& fileName, c
             fname = Glib::ustring::compose ("%1-%2.%3", Glib::build_filename (dstdir,  dstfname), tries, format);
         }
 
-        int fileExists = Glib::file_test (fname, Glib::FILE_TEST_EXISTS);
+        int fileExists = Glib::file_test (fname, Glib::FileTest::EXISTS);
 
         if (inOverwriteMode && fileExists) {
             if (::g_remove (fname.c_str ()) != 0) {

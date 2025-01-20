@@ -882,14 +882,14 @@ void CameraConstantsStore::init(const Glib::ustring& baseDir, const Glib::ustrin
     };
     for (size_t i = 0; i < sizeof(builtin_files)/sizeof(const char *); ++i) {
         Glib::ustring f(Glib::build_filename(baseDir, builtin_files[i]));
-        if (Glib::file_test(f, Glib::FILE_TEST_EXISTS)) {
+        if (Glib::file_test(f, Glib::FileTest::EXISTS)) {
             parse_camera_constants_file(f);
         }
     }
 
     const Glib::ustring userFile(Glib::build_filename(userSettingsDir, "camconst.json"));
 
-    if (Glib::file_test(userFile, Glib::FILE_TEST_EXISTS)) {
+    if (Glib::file_test(userFile, Glib::FileTest::EXISTS)) {
         parse_camera_constants_file(userFile);
     }
 }

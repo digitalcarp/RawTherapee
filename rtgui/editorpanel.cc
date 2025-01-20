@@ -334,7 +334,7 @@ Glib::ustring getTmpDirectory()
 
     // Returns true if the directory doesn't exist or has the right permissions.
     auto is_usable_dir = [](const Glib::ustring &dir_path) {
-        return !Glib::file_test(dir_path, Glib::FILE_TEST_EXISTS) || (Glib::file_test(dir_path, Glib::FILE_TEST_IS_DIR) && hasUserOnlyPermission(dir_path));
+        return !Glib::file_test(dir_path, Glib::FileTest::EXISTS) || (Glib::file_test(dir_path, Glib::FILE_TEST_IS_DIR) && hasUserOnlyPermission(dir_path));
     };
 
     if (!(is_usable_dir(dir) || recent_dir.empty())) {
@@ -352,7 +352,7 @@ Glib::ustring getTmpDirectory()
         g_free(rand_dir);
         Glib::RefPtr<Gio::File> file = Gio::File::create_for_path(dir);
         setUserOnlyPermission(file, true);
-    } else if (!Glib::file_test(dir, Glib::FILE_TEST_EXISTS)) {
+    } else if (!Glib::file_test(dir, Glib::FileTest::EXISTS)) {
         // Create the directory.
         Glib::RefPtr<Gio::File> file = Gio::File::create_for_path(dir);
         bool dir_created = file->make_directory();
@@ -1343,7 +1343,7 @@ void EditorPanel::close ()
         navigator->previewWindow->setPreviewHandler (nullptr);
 
         // If the file was deleted somewhere, the openThm.descreaseRef delete the object, but we don't know here
-        if (Glib::file_test (fname, Glib::FILE_TEST_EXISTS)) {
+        if (Glib::file_test (fname, Glib::FileTest::EXISTS)) {
             openThm->removeThumbnailListener (this);
             openThm->decreaseRef ();
         }
@@ -1357,7 +1357,7 @@ void EditorPanel::saveProfile ()
     }
 
     // If the file was deleted, do not generate ghost entries
-    if (Glib::file_test (fname, Glib::FILE_TEST_EXISTS)) {
+    if (Glib::file_test (fname, Glib::FileTest::EXISTS)) {
         ProcParams params;
         ipc->getParams (&params);
 
@@ -2154,7 +2154,7 @@ void EditorPanel::saveAsPressed ()
                         fnameTemp = Glib::ustring::compose ("%1-%2.%3", Glib::build_filename (dstdir,  dstfname), tries, dstext);
                     }
 
-                    if (!Glib::file_test (fnameTemp, Glib::FILE_TEST_EXISTS)) {
+                    if (!Glib::file_test (fnameTemp, Glib::FileTest::EXISTS)) {
                         fnameOut = fnameTemp;
                         fnameOK = true;
                         break;
@@ -2380,7 +2380,7 @@ bool EditorPanel::idle_sendToGimp ( ProgressConnector<rtengine::IImagefloat*> *p
 
         // TODO: Just list all file with a suitable name instead of brute force...
         int tries = 1;
-        while (Glib::file_test (fileName, Glib::FILE_TEST_EXISTS) && tries < 1000) {
+        while (Glib::file_test (fileName, Glib::FileTest::EXISTS) && tries < 1000) {
             fileName = Glib::ustring::compose ("%1-%2.%3", fullFileName, tries, sf.format);
             tries++;
         }

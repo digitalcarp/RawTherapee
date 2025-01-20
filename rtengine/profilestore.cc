@@ -183,7 +183,7 @@ bool ProfileStore::parseDir (Glib::ustring& realPath, Glib::ustring& virtualPath
     bool fileFound = false;
 
     // reload the available profiles from the profile dir
-    if (!realPath.empty() && Glib::file_test (realPath, Glib::FILE_TEST_EXISTS) && Glib::file_test (realPath, Glib::FILE_TEST_IS_DIR)) {
+    if (!realPath.empty() && Glib::file_test (realPath, Glib::FileTest::EXISTS) && Glib::file_test (realPath, Glib::FileTest::IS_DIR)) {
         unsigned int folder = 0; // folder's own Id
 
         // add this entry to the folder list
@@ -214,7 +214,7 @@ bool ProfileStore::parseDir (Glib::ustring& realPath, Glib::ustring& virtualPath
 
             Glib::ustring fname = Glib::build_filename (realPath, currDir);
 
-            if (Glib::file_test (fname, Glib::FILE_TEST_IS_DIR)) {
+            if (Glib::file_test (fname, Glib::FileTest::IS_DIR)) {
                 Glib::ustring vp (Glib::build_filename (virtualPath, currDir));
                 Glib::ustring rp (Glib::build_filename (realPath,    currDir));
                 fileFound = parseDir (rp, vp, currDir, folder, level + 1, 0);

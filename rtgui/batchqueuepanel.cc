@@ -25,7 +25,7 @@
 
 static Glib::ustring makeFolderLabel(Glib::ustring path)
 {
-    if (!Glib::file_test (path, Glib::FILE_TEST_IS_DIR)) {
+    if (!Glib::file_test (path, Glib::FileTest::IS_DIR)) {
         return "(" + M("GENERAL_NONE") + ")";
     }
 
@@ -101,7 +101,7 @@ BatchQueuePanel::BatchQueuePanel (FileCatalog* aFileCatalog) : parent(nullptr)
     hb3->pack_start (*outdirFolder);
     outdirFolder->signal_selection_changed().connect (sigc::mem_fun(*this, &BatchQueuePanel::pathFolderChanged));
 
-    if (Glib::file_test (options.savePathFolder, Glib::FILE_TEST_IS_DIR)) {
+    if (Glib::file_test (options.savePathFolder, Glib::FileTest::IS_DIR)) {
         outdirFolder->set_current_folder (options.savePathFolder);
     } else {
         outdirFolder->set_current_folder (Glib::get_home_dir());
@@ -515,7 +515,7 @@ void BatchQueuePanel::pathFolderButtonPressed ()
     int result = fc.run();
 
     if (result == Gtk::RESPONSE_OK) {
-        if (Glib::file_test(fc.get_current_folder(), Glib::FILE_TEST_IS_DIR)) {
+        if (Glib::file_test(fc.get_current_folder(), Glib::FileTest::IS_DIR)) {
             options.savePathFolder = fc.get_filename ();
             outdirFolderButton->set_label(makeFolderLabel(options.savePathFolder));
         }

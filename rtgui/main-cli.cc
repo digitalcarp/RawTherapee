@@ -185,7 +185,7 @@ int main (int argc, char **argv)
 #ifndef _WIN32
 
     // Move the old path to the new one if the new does not exist
-    if (Glib::file_test (Glib::build_filename (options.rtdir, "cache"), Glib::FILE_TEST_IS_DIR) && !Glib::file_test (options.cacheBaseDir, Glib::FILE_TEST_IS_DIR)) {
+    if (Glib::file_test (Glib::build_filename (options.rtdir, "cache"), Glib::FileTest::IS_DIR) && !Glib::file_test (options.cacheBaseDir, Glib::FileTest::IS_DIR)) {
         if (g_rename (Glib::build_filename (options.rtdir, "cache").c_str (), options.cacheBaseDir.c_str ()) == -1) {
             std::cout << "g_rename " <<  Glib::build_filename (options.rtdir, "cache").c_str () << " => " << options.cacheBaseDir.c_str () << " failed." << std::endl;
         }
@@ -287,7 +287,7 @@ int processLineParams ( int argc, char **argv )
                             outputPath.assign ("/dev/null"); // removing any useless chars or filename
                             outputDirectory = false;
                             leaveUntouched = true;
-                        } else if (Glib::file_test (outputPath, Glib::FILE_TEST_IS_DIR)) {
+                        } else if (Glib::file_test (outputPath, Glib::FileTest::IS_DIR)) {
                             outputDirectory = true;
                         }
                     }
@@ -425,7 +425,7 @@ int processLineParams ( int argc, char **argv )
                         argument = argument.substr (1, argument.length() - 2);
 #endif
 
-                        if (!Glib::file_test (argument, Glib::FILE_TEST_EXISTS)) {
+                        if (!Glib::file_test (argument, Glib::FileTest::EXISTS)) {
                             std::cout << "\"" << argument << "\"  doesn't exist!" << std::endl;
                             continue;
                         }
@@ -448,7 +448,7 @@ int processLineParams ( int argc, char **argv )
 
                         }
 
-                        if (Glib::file_test (argument, Glib::FILE_TEST_IS_DIR)) {
+                        if (Glib::file_test (argument, Glib::FileTest::IS_DIR)) {
 
                             auto dir = Gio::File::create_for_path (argument);
 
@@ -463,7 +463,7 @@ int processLineParams ( int argc, char **argv )
                                 while (auto file = enumerator->next_file()) {
 
                                     const auto fileName = Glib::build_filename (argument, file->get_name());
-                                    bool isDir = file->get_file_type() == Gio::FILE_TYPE_DIRECTORY;
+                                    bool isDir = file->get_file_type() == Gio::FileType::DIRECTORY;
                                     bool notAll = allExtensions && !options.is_parse_extention (fileName);
                                     bool notRetained = !allExtensions && !options.has_retained_extention (fileName);
 
@@ -482,7 +482,7 @@ int processLineParams ( int argc, char **argv )
 
                                     if (sideProcParams && skipIfNoSidecar) {
                                         // look for the sidecar proc params
-                                        if (!Glib::file_test (fileName + paramFileExtension, Glib::FILE_TEST_EXISTS)) {
+                                        if (!Glib::file_test (fileName + paramFileExtension, Glib::FileTest::EXISTS)) {
                                             std::cout << "\"" << fileName << "\"  has no side-car file. Image skipped." << std::endl;
                                             continue;
                                         }
@@ -700,7 +700,7 @@ int processLineParams ( int argc, char **argv )
             continue;
         }
 
-        if ( !overwriteFiles && Glib::file_test ( outputFile, Glib::FILE_TEST_EXISTS ) ) {
+        if ( !overwriteFiles && Glib::file_test ( outputFile, Glib::FileTest::EXISTS ) ) {
             std::cerr << outputFile  << " already exists: use -Y option to overwrite. This image has been skipped." << std::endl;
             continue;
         }
@@ -753,7 +753,7 @@ int processLineParams ( int argc, char **argv )
                 Glib::ustring sideProcessingParams = inputFile + paramFileExtension;
 
                 // the "load" method don't reset the procparams values anymore, so values found in the procparam file override the one of currentParams
-                if ( !Glib::file_test ( sideProcessingParams, Glib::FILE_TEST_EXISTS ) || currentParams.load ( sideProcessingParams )) {
+                if ( !Glib::file_test ( sideProcessingParams, Glib::FileTest::EXISTS ) || currentParams.load ( sideProcessingParams )) {
                     std::cerr << "Warning: sidecar file requested but not found for: " << sideProcessingParams << std::endl;
                 } else {
                     sideCarFound = true;

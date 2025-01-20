@@ -178,7 +178,7 @@ bool DynamicProfileRules::loadRules()
     const Glib::ustring fileName = Glib::build_filename (Options::rtdir, "dynamicprofile.cfg");
 
     try {
-        if (!(Glib::file_test(fileName, Glib::FILE_TEST_EXISTS) && kf.load_from_file (fileName))) {
+        if (!(Glib::file_test(fileName, Glib::FileTest::EXISTS) && kf.load_from_file (fileName))) {
             return false;
         }
     } catch (Glib::Error &e) {

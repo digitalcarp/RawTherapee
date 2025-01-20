@@ -279,7 +279,7 @@ int CacheImageData::save (const Glib::ustring& fname)
     Glib::KeyFile keyFile;
 
     try {
-        if (Glib::file_test(fname, Glib::FILE_TEST_EXISTS)) {
+        if (Glib::file_test(fname, Glib::FileTest::EXISTS)) {
             keyFile.load_from_file (fname);
         }
     } catch (Glib::Error&) {}
