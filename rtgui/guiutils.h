@@ -332,8 +332,8 @@ public:
  */
 class MyScrolledWindow final : public Gtk::ScrolledWindow
 {
+    bool onScroll(double dx, double dy);
 
-    bool on_scroll_event (GdkEventScroll* event) override;
     void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
                        int& minimum_baseline, int& natural_baseline) const override;
 
@@ -346,8 +346,8 @@ public:
  */
 class MyScrolledToolbar final : public Gtk::ScrolledWindow
 {
+    bool onScroll(double dx, double dy);
 
-    bool on_scroll_event (GdkEventScroll* event) override;
     void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
                        int& minimum_baseline, int& natural_baseline) const override;
 
@@ -361,8 +361,10 @@ public:
 class MyComboBox : public Gtk::ComboBox
 {
     int naturalWidth, minimumWidth;
+    Glib::RefPtr<Gtk::EventControllerScroll> controller;
 
-    bool on_scroll_event (GdkEventScroll* event) override;
+    bool onScroll(double dx, double dy);
+
     void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
                        int& minimum_baseline, int& natural_baseline) const override;
 
@@ -379,8 +381,10 @@ class MyComboBoxText final : public Gtk::ComboBoxText
 {
     int naturalWidth, minimumWidth;
     sigc::connection myConnection;
+    Glib::RefPtr<Gtk::EventControllerScroll> controller;
 
-    bool on_scroll_event (GdkEventScroll* event) override;
+    bool onScroll(double dx, double dy);
+
     void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
                        int& minimum_baseline, int& natural_baseline) const override;
 
@@ -397,9 +401,11 @@ public:
  */
 class MySpinButton final : public Gtk::SpinButton
 {
+    Glib::RefPtr<Gtk::EventControllerScroll> m_controller;
+
+    bool onScroll(double dx, double dy);
 
 protected:
-    bool on_scroll_event (GdkEventScroll* event) override;
     bool on_key_press_event (GdkEventKey* event) override;
 
 public:
@@ -412,11 +418,15 @@ public:
  */
 class MyHScale final : public Gtk::Scale
 {
+    Glib::RefPtr<Gtk::EventControllerScroll> m_controller;
+
+    bool onScroll(double dx, double dy);
 
 protected:
-    bool on_scroll_event (GdkEventScroll* event) override;
     bool on_key_press_event (GdkEventKey* event) override;
 
+public:
+    MyHScale();
 };
 
 class MyFileChooserWidget
@@ -470,9 +480,11 @@ private:
     class Impl;
 
     std::unique_ptr<Impl> pimpl;
+    Glib::RefPtr<Gtk::EventControllerScroll> m_controller;
+
+    bool onScroll(double dx, double dy);
 
 protected:
-    bool on_scroll_event (GdkEventScroll* event) override;
     void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
                        int& minimum_baseline, int& natural_baseline) const override;
 

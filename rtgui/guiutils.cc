@@ -954,44 +954,36 @@ bool MyExpander::on_enabled_change(GdkEventButton* event)
  * otherwise the mouse wheel will scroll the editor's tabs content.
  *
  */
-MyScrolledWindow::MyScrolledWindow ()
+MyScrolledWindow::MyScrolledWindow()
 {
+    auto controller = Gtk::EventControllerScroll::create();
+    controller->set_flags(Gtk::EventControllerScroll::Flags::VERTICAL);
+    controller->signal_scroll().connect(
+        sigc::mem_fun(*this, &MyScrolledWindow::onScroll), false);
+    add_controller(controller);
 }
 
-bool MyScrolledWindow::on_scroll_event (GdkEventScroll* event)
+bool MyScrolledWindow::onScroll(double /*dx*/, double dy)
 {
     if (!options.hideTPVScrollbar) {
-        Gtk::ScrolledWindow::on_scroll_event (event);
-        return true;
+        // Let Gtk::ScrolledWindow handle it
+        return false;
     }
 
     Glib::RefPtr<Gtk::Adjustment> adjust = get_vadjustment();
-    Gtk::Scrollbar *scroll = get_vscrollbar();
+    Gtk::Scrollbar* vscroll = get_vscrollbar();
 
-    if (adjust && scroll) {
+    if (adjust && vscroll) {
         const double upperBound = adjust->get_upper();
         const double lowerBound = adjust->get_lower();
-        double value = adjust->get_value();
-        double step  = adjust->get_step_increment();
+        const double value = adjust->get_value();
+        const double step = adjust->get_step_increment();
 
-        if (event->direction == GDK_SCROLL_DOWN) {
-            const double value2 = rtengine::min<double>(value + step, upperBound);
+        double newValue = value + step * dy;
+        newValue = std::clamp(newValue, lowerBound, upperBound);
 
-            if (value2 != value) {
-                scroll->set_value(value2);
-            }
-        } else if (event->direction == GDK_SCROLL_UP) {
-            const double value2 = rtengine::max<double>(value - step, lowerBound);
-
-            if (value2 != value) {
-                scroll->set_value(value2);
-            }
-        } else if (event->direction == GDK_SCROLL_SMOOTH) {
-            const double value2 = rtengine::LIM<double>(value + event->delta_y * step, lowerBound, upperBound);
-
-            if (value2 != value) {
-                scroll->set_value(value2);
-            }
+        if (newValue != value) {
+            vscroll->set_value(newValue);
         }
     }
 
@@ -1024,50 +1016,34 @@ void MyScrolledWindow::measure_vfunc(Gtk::Orientation orientation, int /*for_siz
  * otherwise the mouse wheel will scroll the toolbar.
  *
  */
-MyScrolledToolbar::MyScrolledToolbar ()
+MyScrolledToolbar::MyScrolledToolbar()
 {
     set_policy (Gtk::POLICY_EXTERNAL, Gtk::POLICY_NEVER);
     get_style_context()->add_class("scrollableToolbar");
 
-    // Works fine with Gtk 3.22, but a custom made get_preferred_height had to be created as a workaround
-    // taken from the official Gtk3.22 source code
-    //set_propagate_natural_height(true);
+    auto controller = Gtk::EventControllerScroll::create();
+    controller->set_flags(Gtk::EventControllerScroll::Flags::HORIZONTAL);
+    controller->signal_scroll().connect(
+        sigc::mem_fun(*this, &MyScrolledToolbar::onScroll), false);
+    add_controller(controller);
 }
 
-bool MyScrolledToolbar::on_scroll_event (GdkEventScroll* event)
+bool MyScrolledToolbar::onScroll(double dx, double /*dy*/)
 {
     Glib::RefPtr<Gtk::Adjustment> adjust = get_hadjustment();
-    Gtk::Scrollbar *scroll = get_hscrollbar();
+    Gtk::Scrollbar* hscroll = get_hscrollbar();
 
-    if (adjust && scroll) {
+    if (adjust && hscroll) {
         const double upperBound = adjust->get_upper();
         const double lowerBound = adjust->get_lower();
-        double value = adjust->get_value();
-        double step  = adjust->get_step_increment() * 2;
-        double value2 = 0.;
+        const double value = adjust->get_value();
+        const double step = adjust->get_step_increment() * 2;
 
-//        printf("MyScrolledToolbar::on_scroll_event / delta_x=%.5f, delta_y=%.5f, direction=%d, type=%d, send_event=%d\n",
-//                event->delta_x, event->delta_y, (int)event->direction, (int)event->type, event->send_event);
+        double newValue = value + step * dx;
+        newValue = std::clamp(newValue, lowerBound, upperBound);
 
-        if (event->direction == GDK_SCROLL_DOWN) {
-            value2 = rtengine::min<double>(value + step, upperBound);
-            if (value2 != value) {
-                scroll->set_value(value2);
-            }
-        } else if (event->direction == GDK_SCROLL_UP) {
-            value2 = rtengine::max<double>(value - step, lowerBound);
-            if (value2 != value) {
-                scroll->set_value(value2);
-            }
-        } else if (event->direction == GDK_SCROLL_SMOOTH) {
-            if (event->delta_x) {  // if the user use a pad, it can scroll horizontally
-                value2 = rtengine::LIM<double>(value + (event->delta_x > 0 ? 30 : -30), lowerBound, upperBound);
-            } else if (event->delta_y) {
-                value2 = rtengine::LIM<double>(value + (event->delta_y > 0 ? 30 : -30), lowerBound, upperBound);
-            }
-            if (value2 != value) {
-                scroll->set_value(value2);
-            }
+        if (newValue != value) {
+            hscroll->set_value(newValue);
         }
     }
 
@@ -1103,16 +1079,19 @@ MyComboBoxText::MyComboBoxText (bool has_entry) : Gtk::ComboBoxText(has_entry)
     minimumWidth = naturalWidth = RTScalable::scalePixelSize(70);
     Gtk::CellRendererText* cellRenderer = dynamic_cast<Gtk::CellRendererText*>(get_first_cell());
     cellRenderer->property_ellipsize() = Pango::ELLIPSIZE_MIDDLE;
-    add_events(Gdk::SCROLL_MASK|Gdk::SMOOTH_SCROLL_MASK);
+
+    controller = Gtk::EventControllerScroll::create();
+    using Flags = Gtk::EventControllerScroll::Flags;
+    controller->set_flags(Flags::VERTICAL | Flags::DISCRETE);
+    controller->signal_scroll().connect(
+        sigc::mem_fun(*this, &MyComboBoxText::onScroll), false);
+    add_controller(controller);
 }
 
-bool MyComboBoxText::on_scroll_event (GdkEventScroll* event)
+bool MyComboBoxText::onScroll(double /*dx*/, double /*dy*/)
 {
-
-//    printf("MyComboboxText::on_scroll_event / delta_x=%.5f, delta_y=%.5f, direction=%d, type=%d, send_event=%d\n",
-//            event->delta_x, event->delta_y, (int)event->direction, (int)event->type, event->send_event);
     // If Shift is pressed, the widget is modified
-    if (event->state & GDK_SHIFT_MASK) {
+    if (controller->get_current_event_state() & GDK_SHIFT_MASK) {
         Gtk::ComboBoxText::on_scroll_event(event);
         return true;
     }
@@ -1156,13 +1135,19 @@ void MyComboBoxText::measure_vfunc(Gtk::Orientation orientation, int /*for_size*
 MyComboBox::MyComboBox ()
 {
     minimumWidth = naturalWidth = RTScalable::scalePixelSize(70);
+
+    controller = Gtk::EventControllerScroll::create();
+    using Flags = Gtk::EventControllerScroll::Flags;
+    controller->set_flags(Flags::VERTICAL | Flags::DISCRETE);
+    controller->signal_scroll().connect(
+        sigc::mem_fun(*this, &MyComboBox::onScroll), false);
+    add_controller(controller);
 }
 
-bool MyComboBox::on_scroll_event (GdkEventScroll* event)
+bool MyComboBox::onScroll(double /*dx*/, double /*dy*/)
 {
-
     // If Shift is pressed, the widget is modified
-    if (event->state & GDK_SHIFT_MASK) {
+    if (controller->get_current_event_state() & GDK_SHIFT_MASK) {
         Gtk::ComboBox::on_scroll_event(event);
         return true;
     }
@@ -1215,6 +1200,13 @@ MySpinButton::MySpinButton ()
     set_wrap(false);
     set_alignment(Gtk::ALIGN_END);
     set_update_policy(Gtk::SpinButtonUpdatePolicy::UPDATE_IF_VALID); // Avoid updating text if input is not a numeric
+
+    m_controller = Gtk::EventControllerScroll::create();
+    using Flags = Gtk::EventControllerScroll::Flags;
+    m_controller->set_flags(Flags::VERTICAL);
+    m_controller->signal_scroll().connect(
+        sigc::mem_fun(*this, &MySpinButton::onScroll), false);
+    add_controller(m_controller);
 }
 
 void MySpinButton::updateSize()
@@ -1263,10 +1255,10 @@ bool MySpinButton::on_key_press_event (GdkEventKey* event)
     }
 }
 
-bool MySpinButton::on_scroll_event (GdkEventScroll* event)
+bool MySpinButton::onScroll(double /*dx*/, double /*dy*/)
 {
     // If Shift is pressed, the widget is modified
-    if (event->state & GDK_SHIFT_MASK) {
+    if (m_controller->get_current_event_state() & GDK_SHIFT_MASK) {
         Gtk::SpinButton::on_scroll_event(event);
         return true;
     }
@@ -1275,13 +1267,20 @@ bool MySpinButton::on_scroll_event (GdkEventScroll* event)
     return false;
 }
 
-bool MyHScale::on_scroll_event (GdkEventScroll* event)
+MyHScale::MyHScale()
 {
+    m_controller = Gtk::EventControllerScroll::create();
+    using Flags = Gtk::EventControllerScroll::Flags;
+    m_controller->set_flags(Flags::VERTICAL);
+    m_controller->signal_scroll().connect(
+        sigc::mem_fun(*this, &MyHScale::onScroll), false);
+    add_controller(m_controller);
+}
 
-//    printf("MyHScale::on_scroll_event / delta_x=%.5f, delta_y=%.5f, direction=%d, type=%d, send_event=%d\n",
-//            event->delta_x, event->delta_y, (int)event->direction, (int)event->type, event->send_event);
+bool MyHScale::onScroll(double /*dx*/, double /*dy*/)
+{
     // If Shift is pressed, the widget is modified
-    if (event->state & GDK_SHIFT_MASK) {
+    if (m_controller->get_current_event_state() & GDK_SHIFT_MASK) {
         Gtk::Scale::on_scroll_event(event);
         return true;
     }
@@ -1501,6 +1500,13 @@ MyFileChooserButton::MyFileChooserButton(const Glib::ustring &title, Gtk::FileCh
     }
 
     set_name("MyFileChooserButton");
+
+    m_controller = Gtk::EventControllerScroll::create();
+    using Flags = Gtk::EventControllerScroll::Flags;
+    m_controller->set_flags(Flags::VERTICAL | Flags::DISCRETE);
+    m_controller->signal_scroll().connect(
+        sigc::mem_fun(*this, &MyFileChooserButton::onScroll), false);
+    add_controller(m_controller);
 }
 
 void MyFileChooserButton::on_filename_set()
@@ -1512,13 +1518,11 @@ void MyFileChooserButton::on_filename_set()
     }
 }
 
-
 // For an unknown reason (a bug ?), it doesn't work when action = FILE_CHOOSER_ACTION_SELECT_FOLDER !
-bool MyFileChooserButton::on_scroll_event (GdkEventScroll* event)
+bool MyFileChooserButton::onScroll(double /*dx*/, double /*dy*/)
 {
-
     // If Shift is pressed, the widget is modified
-    if (event->state & GDK_SHIFT_MASK) {
+    if (m_controller->get_current_event_state() & GDK_SHIFT_MASK) {
         Gtk::Button::on_scroll_event(event);
         return true;
     }
