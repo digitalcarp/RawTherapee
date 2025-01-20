@@ -35,6 +35,8 @@ using namespace rtengine::procparams;
 namespace
 {
 
+using KeyFile = std::shared_ptr<Glib::KeyFile>;
+
 const int ISO_MAX = 819200;
 const double FNUMBER_MAX = 100.0;
 const double FOCALLEN_MAX = 10000.0;
@@ -96,12 +98,12 @@ namespace
 {
 
 void get_int_range (DynamicProfileRule::Range<int> &dest,
-                    const Glib::KeyFile &kf, const Glib::ustring &group,
+                    const KeyFile &kf, const Glib::ustring &group,
                     const Glib::ustring &key)
 {
     try {
-        int min = kf.get_integer (group, key + "_min");
-        int max = kf.get_integer (group, key + "_max");
+        int min = kf->get_integer (group, key + "_min");
+        int max = kf->get_integer (group, key + "_max");
 
         if (min <= max) {
             dest.min = min;
@@ -113,12 +115,12 @@ void get_int_range (DynamicProfileRule::Range<int> &dest,
 
 
 void get_double_range (DynamicProfileRule::Range<double> &dest,
-                       const Glib::KeyFile &kf, const Glib::ustring &group,
+                       const KeyFile &kf, const Glib::ustring &group,
                        const Glib::ustring &key)
 {
     try {
-        double min = kf.get_double (group, key + "_min");
-        double max = kf.get_double (group, key + "_max");
+        double min = kf->get_double (group, key + "_min");
+        double max = kf->get_double (group, key + "_max");
 
         if (min <= max) {
             dest.min = min;
@@ -130,14 +132,14 @@ void get_double_range (DynamicProfileRule::Range<double> &dest,
 
 
 void get_optional (DynamicProfileRule::Optional &dest,
-                   const Glib::KeyFile &kf, const Glib::ustring &group,
+                   const KeyFile &kf, const Glib::ustring &group,
                    const Glib::ustring &key)
 {
     try {
-        bool e = kf.get_boolean (group, key + "_enabled");
+        bool e = kf->get_boolean (group, key + "_enabled");
 
         if (e) {
-            Glib::ustring s = kf.get_string (group, key + "_value");
+            Glib::ustring s = kf->get_string (group, key + "_value");
             dest.enabled = e;
             dest.value = s;
         }
@@ -145,28 +147,28 @@ void get_optional (DynamicProfileRule::Optional &dest,
     }
 }
 
-void set_int_range (Glib::KeyFile &kf, const Glib::ustring &group,
+void set_int_range (const KeyFile &kf, const Glib::ustring &group,
                     const Glib::ustring &key,
                     const DynamicProfileRule::Range<int> &val)
 {
-    kf.set_integer (group, key + "_min", val.min);
-    kf.set_integer (group, key + "_max", val.max);
+    kf->set_integer (group, key + "_min", val.min);
+    kf->set_integer (group, key + "_max", val.max);
 }
 
-void set_double_range (Glib::KeyFile &kf, const Glib::ustring &group,
+void set_double_range (const KeyFile &kf, const Glib::ustring &group,
                        const Glib::ustring &key,
                        const DynamicProfileRule::Range<double> &val)
 {
-    kf.set_double (group, key + "_min", val.min);
-    kf.set_double (group, key + "_max", val.max);
+    kf->set_double (group, key + "_min", val.min);
+    kf->set_double (group, key + "_max", val.max);
 }
 
-void set_optional (Glib::KeyFile &kf, const Glib::ustring &group,
+void set_optional (const KeyFile &kf, const Glib::ustring &group,
                    const Glib::ustring &key,
                    const DynamicProfileRule::Optional &val)
 {
-    kf.set_boolean (group, key + "_enabled", val.enabled);
-    kf.set_string (group, key + "_value", val.value);
+    kf->set_boolean (group, key + "_enabled", val.enabled);
+    kf->set_string (group, key + "_value", val.value);
 }
 
 } // namespace
@@ -174,11 +176,11 @@ void set_optional (Glib::KeyFile &kf, const Glib::ustring &group,
 bool DynamicProfileRules::loadRules()
 {
     dynamicRules.clear();
-    Glib::KeyFile kf;
+    auto kf = Glib::KeyFile::create();
     const Glib::ustring fileName = Glib::build_filename (Options::rtdir, "dynamicprofile.cfg");
 
     try {
-        if (!(Glib::file_test(fileName, Glib::FileTest::EXISTS) && kf.load_from_file (fileName))) {
+        if (!(Glib::file_test(fileName, Glib::FileTest::EXISTS) && kf->load_from_file (fileName))) {
             return false;
         }
     } catch (Glib::Error &e) {
@@ -189,7 +191,7 @@ bool DynamicProfileRules::loadRules()
         printf ("loading dynamic profiles...\n");
     }
 
-    auto groups = kf.get_groups();
+    auto groups = kf->get_groups();
 
     for (auto group : groups) {
         // groups are of the form "rule N", where N is a positive integer
@@ -222,7 +224,7 @@ bool DynamicProfileRules::loadRules()
         get_optional (rule.imagetype, kf, group, "imagetype");
 
         try {
-            rule.profilepath = kf.get_string (group, "profilepath");
+            rule.profilepath = kf->get_string (group, "profilepath");
 			#if defined (_WIN32)
 			// if this is Windows, replace any "/" in the path with "\\"
 			size_t pos = rule.profilepath.find("/");
@@ -255,7 +257,7 @@ bool DynamicProfileRules::storeRules()
         printf ("saving dynamic profiles...\n");
     }
 
-    Glib::KeyFile kf;
+    auto kf = Glib::KeyFile::create();
 
     for (auto &rule : dynamicRules) {
         std::ostringstream buf;
@@ -270,16 +272,16 @@ bool DynamicProfileRules::storeRules()
         set_optional (kf, group, "lens", rule.lens);
         set_optional (kf, group, "path", rule.path);
         set_optional (kf, group, "imagetype", rule.imagetype);
-        kf.set_string (group, "profilepath", rule.profilepath);
+        kf->set_string (group, "profilepath", rule.profilepath);
     }
 
 	std::string fn = Glib::build_filename (Options::rtdir, "dynamicprofile.cfg");
-	if (Glib::file_test(fn, Glib::FILE_TEST_IS_SYMLINK)) {
+	if (Glib::file_test(fn, Glib::FileTest::IS_SYMLINK)) {
 		// file is symlink; use target instead
 		// symlinks apparently are not recognízed on Windows
-		return kf.save_to_file (g_file_read_link (fn.c_str(), NULL));
+		return kf->save_to_file (g_file_read_link (fn.c_str(), NULL));
 	} else {
-		return kf.save_to_file (fn);
+		return kf->save_to_file (fn);
 	}
 }
 

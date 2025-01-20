@@ -2194,108 +2194,108 @@ bool Thumbnail::readImage (const Glib::ustring& fname)
 bool Thumbnail::readData  (const Glib::ustring& fname)
 {
     setlocale (LC_NUMERIC, "C"); // to set decimal point to "."
-    Glib::KeyFile keyFile;
+    auto keyFile = Glib::KeyFile::create();
 
     try {
         MyMutex::MyLock thmbLock (thumbMutex);
 
         try {
-            keyFile.load_from_file (fname);
+            keyFile->load_from_file (fname);
         } catch (Glib::Error&) {
             return false;
         }
 
-        if (keyFile.has_group ("LiveThumbData")) {
-            if (keyFile.has_key ("LiveThumbData", "CamWBRed")) {
-                camwbRed            = keyFile.get_double ("LiveThumbData", "CamWBRed");
+        if (keyFile->has_group ("LiveThumbData")) {
+            if (keyFile->has_key ("LiveThumbData", "CamWBRed")) {
+                camwbRed            = keyFile->get_double ("LiveThumbData", "CamWBRed");
             }
 
-            if (keyFile.has_key ("LiveThumbData", "CamWBGreen")) {
-                camwbGreen          = keyFile.get_double ("LiveThumbData", "CamWBGreen");
+            if (keyFile->has_key ("LiveThumbData", "CamWBGreen")) {
+                camwbGreen          = keyFile->get_double ("LiveThumbData", "CamWBGreen");
             }
 
-            if (keyFile.has_key ("LiveThumbData", "CamWBBlue")) {
-                camwbBlue           = keyFile.get_double ("LiveThumbData", "CamWBBlue");
+            if (keyFile->has_key ("LiveThumbData", "CamWBBlue")) {
+                camwbBlue           = keyFile->get_double ("LiveThumbData", "CamWBBlue");
             }
 
-            if (keyFile.has_key ("LiveThumbData", "RedAWBMul")) {
-                redAWBMul           = keyFile.get_double ("LiveThumbData", "RedAWBMul");
+            if (keyFile->has_key ("LiveThumbData", "RedAWBMul")) {
+                redAWBMul           = keyFile->get_double ("LiveThumbData", "RedAWBMul");
             }
 
-            if (keyFile.has_key ("LiveThumbData", "GreenAWBMul")) {
-                greenAWBMul         = keyFile.get_double ("LiveThumbData", "GreenAWBMul");
+            if (keyFile->has_key ("LiveThumbData", "GreenAWBMul")) {
+                greenAWBMul         = keyFile->get_double ("LiveThumbData", "GreenAWBMul");
             }
 
-            if (keyFile.has_key ("LiveThumbData", "BlueAWBMul")) {
-                blueAWBMul          = keyFile.get_double ("LiveThumbData", "BlueAWBMul");
+            if (keyFile->has_key ("LiveThumbData", "BlueAWBMul")) {
+                blueAWBMul          = keyFile->get_double ("LiveThumbData", "BlueAWBMul");
             }
 
-            if (keyFile.has_key ("LiveThumbData", "AEHistCompression")) {
-                aeHistCompression   = keyFile.get_integer ("LiveThumbData", "AEHistCompression");
+            if (keyFile->has_key ("LiveThumbData", "AEHistCompression")) {
+                aeHistCompression   = keyFile->get_integer ("LiveThumbData", "AEHistCompression");
             }
 
             aeValid = true;
-            if (keyFile.has_key ("LiveThumbData", "AEExposureCompensation")) {
-                aeExposureCompensation = keyFile.get_double ("LiveThumbData", "AEExposureCompensation");
+            if (keyFile->has_key ("LiveThumbData", "AEExposureCompensation")) {
+                aeExposureCompensation = keyFile->get_double ("LiveThumbData", "AEExposureCompensation");
             } else {
                 aeValid = false;
             }
-            if (keyFile.has_key ("LiveThumbData", "AELightness")) {
-                aeLightness   = keyFile.get_integer ("LiveThumbData", "AELightness");
+            if (keyFile->has_key ("LiveThumbData", "AELightness")) {
+                aeLightness   = keyFile->get_integer ("LiveThumbData", "AELightness");
             } else {
                 aeValid = false;
             }
-            if (keyFile.has_key ("LiveThumbData", "AEContrast")) {
-                aeContrast   = keyFile.get_integer ("LiveThumbData", "AEContrast");
+            if (keyFile->has_key ("LiveThumbData", "AEContrast")) {
+                aeContrast   = keyFile->get_integer ("LiveThumbData", "AEContrast");
             } else {
                 aeValid = false;
             }
-            if (keyFile.has_key ("LiveThumbData", "AEBlack")) {
-                aeBlack   = keyFile.get_integer ("LiveThumbData", "AEBlack");
+            if (keyFile->has_key ("LiveThumbData", "AEBlack")) {
+                aeBlack   = keyFile->get_integer ("LiveThumbData", "AEBlack");
             } else {
                 aeValid = false;
             }
-            if (keyFile.has_key ("LiveThumbData", "AEHighlightCompression")) {
-                aeHighlightCompression   = keyFile.get_integer ("LiveThumbData", "AEHighlightCompression");
+            if (keyFile->has_key ("LiveThumbData", "AEHighlightCompression")) {
+                aeHighlightCompression   = keyFile->get_integer ("LiveThumbData", "AEHighlightCompression");
             } else {
                 aeValid = false;
             }
-            if (keyFile.has_key ("LiveThumbData", "AEHighlightCompressionThreshold")) {
-                aeHighlightCompressionThreshold   = keyFile.get_integer ("LiveThumbData", "AEHighlightCompressionThreshold");
+            if (keyFile->has_key ("LiveThumbData", "AEHighlightCompressionThreshold")) {
+                aeHighlightCompressionThreshold   = keyFile->get_integer ("LiveThumbData", "AEHighlightCompressionThreshold");
             } else {
                 aeValid = false;
             }
 
-            if (keyFile.has_key ("LiveThumbData", "RedMultiplier")) {
-                redMultiplier       = keyFile.get_double ("LiveThumbData", "RedMultiplier");
+            if (keyFile->has_key ("LiveThumbData", "RedMultiplier")) {
+                redMultiplier       = keyFile->get_double ("LiveThumbData", "RedMultiplier");
             }
 
-            if (keyFile.has_key ("LiveThumbData", "GreenMultiplier")) {
-                greenMultiplier     = keyFile.get_double ("LiveThumbData", "GreenMultiplier");
+            if (keyFile->has_key ("LiveThumbData", "GreenMultiplier")) {
+                greenMultiplier     = keyFile->get_double ("LiveThumbData", "GreenMultiplier");
             }
 
-            if (keyFile.has_key ("LiveThumbData", "BlueMultiplier")) {
-                blueMultiplier      = keyFile.get_double ("LiveThumbData", "BlueMultiplier");
+            if (keyFile->has_key ("LiveThumbData", "BlueMultiplier")) {
+                blueMultiplier      = keyFile->get_double ("LiveThumbData", "BlueMultiplier");
             }
 
-            if (keyFile.has_key ("LiveThumbData", "Scale")) {
-                scale               = keyFile.get_double ("LiveThumbData", "Scale");
+            if (keyFile->has_key ("LiveThumbData", "Scale")) {
+                scale               = keyFile->get_double ("LiveThumbData", "Scale");
             }
 
-            if (keyFile.has_key ("LiveThumbData", "DefaultGain")) {
-                defGain             = keyFile.get_double ("LiveThumbData", "DefaultGain");
+            if (keyFile->has_key ("LiveThumbData", "DefaultGain")) {
+                defGain             = keyFile->get_double ("LiveThumbData", "DefaultGain");
             }
 
-            if (keyFile.has_key ("LiveThumbData", "ScaleForSave")) {
-                scaleForSave        = keyFile.get_integer ("LiveThumbData", "ScaleForSave");
+            if (keyFile->has_key ("LiveThumbData", "ScaleForSave")) {
+                scaleForSave        = keyFile->get_integer ("LiveThumbData", "ScaleForSave");
             }
 
-            if (keyFile.has_key ("LiveThumbData", "GammaCorrected")) {
-                gammaCorrected      = keyFile.get_boolean ("LiveThumbData", "GammaCorrected");
+            if (keyFile->has_key ("LiveThumbData", "GammaCorrected")) {
+                gammaCorrected      = keyFile->get_boolean ("LiveThumbData", "GammaCorrected");
             }
 
-            if (keyFile.has_key ("LiveThumbData", "ColorMatrix")) {
-                std::vector<double> cm = keyFile.get_double_list ("LiveThumbData", "ColorMatrix");
+            if (keyFile->has_key ("LiveThumbData", "ColorMatrix")) {
+                std::vector<double> cm = keyFile->get_double_list ("LiveThumbData", "ColorMatrix");
                 int ix = 0;
 
                 for (int i = 0; i < 3; i++)
