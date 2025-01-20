@@ -2309,7 +2309,7 @@ struct MetaDataParams {
         STRIP
     };
     Mode mode;
-    std::vector<Glib::ustring> exifKeys;
+    std::vector<std::string> exifKeys;
     ExifPairs exif;
     IPTCPairs iptc;
 
@@ -2318,7 +2318,7 @@ struct MetaDataParams {
     bool operator ==(const MetaDataParams &other) const;
     bool operator !=(const MetaDataParams &other) const;
 
-    static std::vector<Glib::ustring> basicExifKeys;
+    static std::vector<std::string> basicExifKeys;
 };
 
 

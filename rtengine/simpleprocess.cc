@@ -17,7 +17,6 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <glibmm/thread.h>
 #include <glibmm/ustring.h>
 
 #include "cieimage.h"
@@ -42,8 +41,6 @@
 
 #include "rtgui/multilangmgr.h"
 #include "rtgui/options.h"
-
-#undef THREAD_PRIORITY_NORMAL
 
 namespace rtengine
 {
@@ -2350,11 +2347,11 @@ void batchProcessingThread(ProcessingJob* job, BatchProcessingListener* bpl)
 
 void startBatchProcessing(ProcessingJob* job, BatchProcessingListener* bpl)
 {
-
     if (bpl) {
-        Glib::Thread::create(sigc::bind(sigc::ptr_fun(batchProcessingThread), job, bpl), 0, true, true, Glib::THREAD_PRIORITY_LOW);
+        // TODO: Set THREAD_PRIORITY_LOW using native API
+        std::thread thread([job, bpl]() { batchProcessingThread(job, bpl); });
+        thread.detach();
     }
-
 }
 
 }

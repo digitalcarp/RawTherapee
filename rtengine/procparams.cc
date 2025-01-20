@@ -238,11 +238,14 @@ void getFromKeyfile(
     const KeyFile& keyfile,
     const Glib::ustring& group_name,
     const Glib::ustring& key,
-    std::vector<Glib::ustring>& value
+    std::vector<std::string>& value
 )
 {
     auto tmpval = keyfile->get_string_list(group_name, key);
-    value.assign(tmpval.begin(), tmpval.end());
+    value.reserve(tmpval.size());
+    for (const auto& entry : tmpval) {
+        value.push_back(entry.c_str());
+    }
 }
 
 template<typename T>
@@ -368,11 +371,16 @@ void putToKeyfile(
 void putToKeyfile(
     const Glib::ustring& group_name,
     const Glib::ustring& key,
-    const std::vector<Glib::ustring>& value,
+    const std::vector<std::string>& value,
     KeyFile& keyfile
 )
 {
-    keyfile->set_string_list(group_name, key, value);
+    std::vector<Glib::ustring> converted;
+    converted.reserve(value.size());
+    for (const auto& entry : value) {
+        converted.push_back(entry.c_str());
+    }
+    keyfile->set_string_list(group_name, key, converted);
 }
 
 void putToKeyfile(
@@ -6448,7 +6456,7 @@ const std::map<std::string, std::string> iptc_keys = {
 } // namespace
 
 
-std::vector<Glib::ustring> MetaDataParams::basicExifKeys = {
+std::vector<std::string> MetaDataParams::basicExifKeys = {
     "Exif.Image.Copyright",
     "Exif.Image.Artist",
     "Exif.Image.ImageDescription",
@@ -6468,7 +6476,7 @@ std::vector<Glib::ustring> MetaDataParams::basicExifKeys = {
 };
 
 
-const std::vector<Glib::ustring> additional_default_exif_keys = {
+const std::vector<std::string> additional_default_exif_keys = {
     "Exif.Photo.OffsetTimeDigitized",
     "Exif.Photo.OffsetTimeOriginal",
 };

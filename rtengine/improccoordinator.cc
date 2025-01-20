@@ -3173,9 +3173,6 @@ void ImProcCoordinator::stopProcessing()
 
 void ImProcCoordinator::startProcessing()
 {
-
-#undef THREAD_PRIORITY_NORMAL
-
     if (!destroying) {
         if (!updaterRunning) {
             updaterThreadStart.lock();
@@ -3183,10 +3180,7 @@ void ImProcCoordinator::startProcessing()
             updaterRunning = true;
             updaterThreadStart.unlock();
 
-            //batchThread->yield(); //the running batch should wait other threads to avoid conflict
-
-            thread = Glib::Thread::create(sigc::mem_fun(*this, &ImProcCoordinator::process), 0, true, true, Glib::THREAD_PRIORITY_NORMAL);
-
+            thread = std::thread(&ImProcCoordinator::process, this);
         }
     }
 }
