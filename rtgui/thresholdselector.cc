@@ -142,13 +142,28 @@ void ThresholdSelector::initValues ()
 
     style->add_class("drawingarea");
     style->add_class(GTK_STYLE_CLASS_TROUGH);
-    //style->add_class(GTK_STYLE_CLASS_SCALE);
     style->add_class(GTK_STYLE_CLASS_SLIDER);
 
     set_name("ThresholdSelector");
     set_can_focus(false);
     set_app_paintable(true);
     updateTooltip();
+
+    set_draw_func(sigc::mem_fun(*this, &ThresholdSelector::onDraw));
+
+    auto clickController = Gtk::GestureClick::create();
+    clickController->signal_pressed().connect(
+        sigc::mem_fun(*this, &ThresholdSelector::onButtonPress));
+    clickController->signal_released().connect(
+        sigc::mem_fun(*this, &ThresholdSelector::onButtonRelease));
+    add_controller(clickController);
+
+    auto motionController = Gtk::EventControllerMotion::create();
+    motionController->signal_motion().connect(
+        sigc::mem_fun(*this, &ThresholdSelector::onMotion));
+    motionController->signal_leave().connect(
+        sigc::mem_fun(*this, &ThresholdSelector::onLeave));
+    add_controller(motionController);
 }
 
 Gtk::SizeRequestMode ThresholdSelector::get_request_mode_vfunc () const
@@ -239,10 +254,11 @@ void ThresholdSelector::on_realize()
     add_events(Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK | Gdk::LEAVE_NOTIFY_MASK);
 }
 
-void ThresholdSelector::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cr)
+void ThresholdSelector::updateDrawingArea(const Cairo::RefPtr<Cairo::Context>& cr,
+                                          int width, int height)
 {
     // on_realize has to be called before
-    if (!get_realized() || !get_allocated_width() || !get_allocated_height())  {
+    if (!get_realized() || !width || !height) {
         return;
     }
 
@@ -254,8 +270,8 @@ void ThresholdSelector::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context
     cr->set_operator (Cairo::OPERATOR_OVER);
 
     // Get widget size
-    const int w = get_allocated_width ();
-    const int h = get_allocated_height ();
+    const int w = width;
+    const int h = height;
 
     // Compute slider parameters
     const double wslider = sliderWidth; // constant must be an odd value
@@ -408,44 +424,38 @@ void ThresholdSelector::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context
     style->set_state(currState);
 }
 
-bool ThresholdSelector::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
+bool ThresholdSelector::onDraw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height)
 {
     // Draw drawing area
-    // Note: As drawing area surface is updated inside on_draw function, hidpi is automatically supported
-    updateDrawingArea(cr);
+    // Note: As drawing area surface is updated inside this function, hidpi is automatically supported
+    updateDrawingArea(cr, width, height);
 
     return true;
 }
 
-bool ThresholdSelector::on_button_press_event (GdkEventButton* event)
+void ThresholdSelector::onButtonPress(int n_press, double x, double y)
 {
-
-    if (event->button == 1)  {
-        movedCursor = litCursor;
-        findSecondaryMovedCursor(event->state);
-        tmpX = event->x;
-
-        queue_draw ();
-    }
+    movedCursor = litCursor;
+    findSecondaryMovedCursor(clickController->get_current_event_state());
+    tmpX = x;
 
     grab_focus();
+    queue_draw();
+
     return true;
 }
 
-bool ThresholdSelector::on_button_release_event (GdkEventButton* event)
+void ThresholdSelector::onButtonRelease(int n_press, double x, double y)
 {
-
-    if (event->button == 1)  {
-        findLitCursor(event->x, event->y);
-        movedCursor = TS_UNDEFINED;
-        secondaryMovedCursor = TS_UNDEFINED;
-        queue_draw ();
-    }
+    findLitCursor(x, y);
+    movedCursor = TS_UNDEFINED;
+    secondaryMovedCursor = TS_UNDEFINED;
+    queue_draw();
 
     return true;
 }
 
-bool ThresholdSelector::on_leave_notify_event (GdkEventCrossing* event)
+void ThresholdSelector::onLeave()
 {
     if (movedCursor == TS_UNDEFINED) {
         litCursor = TS_UNDEFINED;
@@ -456,7 +466,7 @@ bool ThresholdSelector::on_leave_notify_event (GdkEventCrossing* event)
     return true;
 }
 
-bool ThresholdSelector::on_motion_notify_event (GdkEventMotion* event)
+void ThresholdSelector::onMotion(double x, double y)
 {
     const int w = get_allocated_width ();
     const Glib::RefPtr<Gtk::StyleContext> style = get_style_context();
@@ -472,13 +482,13 @@ bool ThresholdSelector::on_motion_notify_event (GdkEventMotion* event)
     const double xEnd   = innerBarX + innerBarW - 0.5;
     const double iw = xEnd - xStart;
 
-    findLitCursor(event->x, event->y);
+    findLitCursor(x, y);
 
     if (movedCursor != TS_UNDEFINED) {
         // user is moving a cursor or two
         double minBound, maxBound, dRange;
 
-        findSecondaryMovedCursor(event->state);
+        findSecondaryMovedCursor(motionController->get_current_event_state());
 
         // computing the boundaries
         findBoundaries(minBound, maxBound);
@@ -489,10 +499,10 @@ bool ThresholdSelector::on_motion_notify_event (GdkEventMotion* event)
             dRange = maxValTop - minValTop;
         }
 
-        double dX = ( (event->x - tmpX) * dRange ) / iw;
+        double dX = ( (x - tmpX) * dRange ) / iw;
 
         // slow motion if CTRL is pressed
-        if (event->state & Gdk::CONTROL_MASK) {
+        if (controller & Gdk::CONTROL_MASK) {
             dX *= 0.05;
         }
 
@@ -516,12 +526,12 @@ bool ThresholdSelector::on_motion_notify_event (GdkEventMotion* event)
         }
 
         // set the new reference value for the next move
-        tmpX = event->x;
+        tmpX = x;
 
         // update the tooltip
         updateTooltip();
 
-        queue_draw ();
+        queue_draw();
 
         sig_val_changed.emit();
     } else {
@@ -531,7 +541,6 @@ bool ThresholdSelector::on_motion_notify_event (GdkEventMotion* event)
 
         oldLitCursor = litCursor;
     }
-
 
     return true;
 }

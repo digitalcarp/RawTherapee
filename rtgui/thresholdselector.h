@@ -73,6 +73,15 @@ public:
         TS_TOPRIGHT
     };
 
+    Glib::RefPtr<Gtk::GestureClick> clickController;
+    Glib::RefPtr<Gtk::EventControllerMotion> motionController;
+
+    bool onDraw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height);
+
+    void onButtonPress(int n_press, double x, double y);
+    void onButtonRelease(int n_press, double x, double y);
+    void onMotion(double x, double y);
+    void onLeave();
 
 protected:
 
@@ -115,16 +124,10 @@ protected:
 
     // GtkDrawingArea override functions
     void on_realize () override;
-    bool on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr) override;
 
     Gtk::SizeRequestMode get_request_mode_vfunc () const override;
     void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
                        int& minimum_baseline, int& natural_baseline) const override;
-
-    bool on_button_press_event (GdkEventButton* event) override;
-    bool on_button_release_event (GdkEventButton* event) override;
-    bool on_motion_notify_event (GdkEventMotion* event) override;
-    bool on_leave_notify_event (GdkEventCrossing* event) override;
 
 public:
 

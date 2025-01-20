@@ -404,12 +404,10 @@ class MySpinButton final : public Gtk::SpinButton
     Glib::RefPtr<Gtk::EventControllerScroll> m_controller;
 
     bool onScroll(double dx, double dy);
-
-protected:
-    bool on_key_press_event (GdkEventKey* event) override;
+    bool onKeyPress(guint keyval, guint keycode, Gdk::ModifierType state);
 
 public:
-    MySpinButton ();
+    MySpinButton();
     void updateSize();
 };
 
@@ -421,9 +419,7 @@ class MyHScale final : public Gtk::Scale
     Glib::RefPtr<Gtk::EventControllerScroll> m_controller;
 
     bool onScroll(double dx, double dy);
-
-protected:
-    bool on_key_press_event (GdkEventKey* event) override;
+    bool onKeyPress(guint keyval, guint keycode, Gdk::ModifierType state);
 
 public:
     MyHScale();

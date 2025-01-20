@@ -1201,6 +1201,11 @@ MySpinButton::MySpinButton ()
     set_alignment(Gtk::ALIGN_END);
     set_update_policy(Gtk::SpinButtonUpdatePolicy::UPDATE_IF_VALID); // Avoid updating text if input is not a numeric
 
+    auto keyPress = Gtk::EventControllerKey::create();
+    keyPress->signal_key_pressed().connect(
+        sigc::mem_fun(*this, &MySpinButton::onKeyPress), false);
+    add_controller(keyPress);
+
     m_controller = Gtk::EventControllerScroll::create();
     using Flags = Gtk::EventControllerScroll::Flags;
     m_controller->set_flags(Flags::VERTICAL);
@@ -1234,18 +1239,18 @@ void MySpinButton::updateSize()
     set_max_width_chars(maxLen);
 }
 
-bool MySpinButton::on_key_press_event (GdkEventKey* event)
+bool MySpinButton::onKeyPress(guint keyval, guint /*keycode*/, Gdk::ModifierType /*state*/)
 {
     double vMin, vMax;
     get_range(vMin, vMax);
 
-    if ((event->keyval >= GDK_KEY_a && event->keyval <= GDK_KEY_z)
-            || (event->keyval >= GDK_KEY_A && event->keyval <= GDK_KEY_Z)
-            || event->keyval == GDK_KEY_equal || event->keyval == GDK_KEY_underscore
-            || event->keyval == GDK_KEY_plus || (event->keyval == GDK_KEY_minus && vMin >= 0)) {
+    if ((keyval >= GDK_KEY_a && keyval <= GDK_KEY_z)
+            || (keyval >= GDK_KEY_A && keyval <= GDK_KEY_Z)
+            || keyval == GDK_KEY_equal || keyval == GDK_KEY_underscore
+            || keyval == GDK_KEY_plus || (keyval == GDK_KEY_minus && vMin >= 0)) {
         return false; // Event is propagated further
     } else {
-        if (event->keyval == GDK_KEY_comma || event->keyval == GDK_KEY_KP_Decimal) {
+        if (keyval == GDK_KEY_comma || keyval == GDK_KEY_KP_Decimal) {
             set_text(get_text() + ".");
             set_position(get_text().length()); // When setting text, cursor position is reset at text start. Avoiding this with this code
             return true; // Event is not propagated further
@@ -1269,6 +1274,11 @@ bool MySpinButton::onScroll(double /*dx*/, double /*dy*/)
 
 MyHScale::MyHScale()
 {
+    auto keyPress = Gtk::EventControllerKey::create();
+    keyPress->signal_key_pressed().connect(
+        sigc::mem_fun(*this, &MyHScale::onKeyPress), false);
+    add_controller(keyPress);
+
     m_controller = Gtk::EventControllerScroll::create();
     using Flags = Gtk::EventControllerScroll::Flags;
     m_controller->set_flags(Flags::VERTICAL);
@@ -1289,10 +1299,9 @@ bool MyHScale::onScroll(double /*dx*/, double /*dy*/)
     return false;
 }
 
-bool MyHScale::on_key_press_event (GdkEventKey* event)
+bool MyHScale::onKeyPress(guint keyval, guint /*keycode*/, Gdk::ModifierType /*state*/)
 {
-
-    if ( event->string[0] == '+' || event->string[0] == '-' ) {
+    if (keyval == GDK_KEY_plus || keyval == GDK_KEY_minus) {
         return false;
     } else {
         return Gtk::Widget::on_key_press_event(event);
