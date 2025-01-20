@@ -2175,7 +2175,7 @@ void DCPStore::init(const Glib::ustring& rt_profile_dir, bool loadAll)
             }
 
             dir.reset(new Glib::Dir(dirname));
-        } catch (Glib::Exception& exception) {
+        } catch (const Glib::Error& e) {
             return;
         }
 

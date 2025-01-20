@@ -208,7 +208,7 @@ bool ExtProgStore::spawnCommandAsync (const Glib::ustring& cmd)
 
         return true;
 
-    } catch (const Glib::Exception& exception) {
+    } catch (const Glib::Error& exception) {
 
         if (rtengine::settings->verbose) {
             std::cerr << "Failed to execute \"" << cmd << "\": " << exception.what() << std::endl;
@@ -227,7 +227,7 @@ bool ExtProgStore::spawnCommandSync (const Glib::ustring& cmd)
 
         Glib::spawn_command_line_sync (cmd, nullptr, nullptr, &exitStatus);
 
-    } catch (const Glib::Exception& exception) {
+    } catch (const Glib::Error& exception) {
 
         if (rtengine::settings->verbose) {
             std::cerr << "Failed to execute \"" << cmd << "\": " << exception.what() << std::endl;

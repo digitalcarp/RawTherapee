@@ -107,7 +107,7 @@ void loadProfiles(
                 profileNames->emplace(name, filePath);
             }
         }
-    } catch (Glib::Exception&) {
+    } catch (const Glib::Error&) {
     }
 }
 
@@ -162,7 +162,7 @@ bool loadProfile(
                 }
             }
         }
-    } catch (Glib::Exception&) {
+    } catch (const Glib::Error&) {
     }
 
     return false;

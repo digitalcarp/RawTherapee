@@ -633,14 +633,14 @@ std::vector<Glib::ustring> FileCatalog::getFileList(std::vector<Glib::RefPtr<Gio
                     }
 
                     file_names.emplace_back(Glib::build_filename(dir_path, fname));
-                } catch (Glib::Exception& exception) {
+                } catch (const Glib::Error& exception) {
                     if (rtengine::settings->verbose) {
                         std::cerr << exception.what() << std::endl;
                     }
                 }
             }
 
-        } catch (Glib::Exception& exception) {
+        } catch (const Glib::Error& exception) {
 
             if (rtengine::settings->verbose) {
                 std::cerr << "Failed to list directory \"" << dir_path << "\": " << exception.what() << std::endl;
@@ -696,7 +696,7 @@ void FileCatalog::dirSelected (const Glib::ustring& dirname, const Glib::ustring
         }
 
         refreshDirectoryMonitors(allDirs);
-    } catch (Glib::Exception& ex) {
+    } catch (const Glib::Error& ex) {
         std::cout << ex.what();
     }
 }

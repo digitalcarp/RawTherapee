@@ -168,7 +168,7 @@ Cairo::RefPtr<Cairo::ImageSurface> RTScalable::loadSurfaceFromSVG(const Glib::us
         try {
             svgFile = Glib::file_get_contents(path);
         }
-        catch (Glib::FileError &err) {
+        catch (const Glib::Error &err) {
             std::cerr << "Failed to load SVG file \"" << fname << "\": " << err.what() << std::endl;
             return surf;
         }

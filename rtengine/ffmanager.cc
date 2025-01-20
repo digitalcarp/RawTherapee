@@ -262,7 +262,7 @@ void FFManager::init(const Glib::ustring& pathname)
             names.emplace_back (Glib::build_filename (pathname, file->get_name ()));
         }
 
-    } catch (Glib::Exception&) {}
+    } catch (const Glib::Error&) {}
 
     ffList.clear();
 

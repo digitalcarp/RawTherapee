@@ -2340,7 +2340,7 @@ void batchProcessingThread(ProcessingJob* job, BatchProcessingListener* bpl)
         } else {
             try {
                 currentJob = bpl->imageReady(img);
-            } catch (Glib::Exception& ex) {
+            } catch (const Glib::Error& ex) {
                 bpl->error(ex.what());
                 currentJob = nullptr;
             }

@@ -351,7 +351,7 @@ int ClutComboBox::ClutModel::parseDir(const Glib::ustring& path)
 
                         nextDirs.emplace_back(entry.second, newRow);
                     }
-                } catch (Glib::Exception&) {}
+                } catch (const Glib::Error&) {}
 
                 dirs.push_back(std::move(dir));
 
@@ -387,7 +387,7 @@ int ClutComboBox::ClutModel::parseDir(const Glib::ustring& path)
 
                 entries.insert(entryPath);
             }
-        } catch (Glib::Exception&) {}
+        } catch (const Glib::Error&) {}
 
         for (const auto& entry : entries) {
             Glib::ustring name;

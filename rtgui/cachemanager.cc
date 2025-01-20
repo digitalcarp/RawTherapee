@@ -393,7 +393,7 @@ void CacheManager::applyCacheSizeLimitation () const
             }
         }
 
-    } catch (Glib::Exception&) {}
+    } catch (const Glib::Error&) {}
 
     if (files.size() <= options.maxCacheEntries) {
         // limit not reached

@@ -194,7 +194,7 @@ RTWindow::RTWindow ()
 #ifndef _WIN32
     try {
         set_default_icon_name("rawtherapee");
-    } catch (Glib::Exception& ex) {
+    } catch (const Glib::Error& ex) {
         printf ("%s\n", ex.what().c_str());
     }
 #endif

@@ -491,7 +491,7 @@ int processLineParams ( int argc, char **argv )
                                     inputFiles.emplace_back (fileName);
                                 }
 
-                            } catch (Glib::Exception&) {}
+                            } catch (const Glib::Error&) {}
 
                             continue;
                         }

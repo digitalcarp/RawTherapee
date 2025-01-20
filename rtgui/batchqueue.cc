@@ -881,7 +881,7 @@ rtengine::ProcessingJob* BatchQueue::imageReady(rtengine::IImagefloat* img)
                     ::g_remove (Glib::build_filename (batchdir, file->get_name ()).c_str ());
                 }
 
-            } catch (Glib::Exception&) {}
+            } catch (const Glib::Error&) {}
         }
     }
 
