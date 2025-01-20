@@ -56,7 +56,7 @@ bool DynamicProfileRule::Optional::operator() (const Glib::ustring &val) const
 
     if (value.find ("re:") == 0) {
         // this is a regexp
-        return Glib::Regex::match_simple (value.substr (3), val, Glib::REGEX_CASELESS);
+        return Glib::Regex::match_simple (value.substr (3), val, Glib::Regex::CompileFlags::CASELESS);
     } else {
         // normal string comparison
         return value.casefold() == val.casefold();

@@ -2304,15 +2304,15 @@ bool Thumbnail::readData  (const Glib::ustring& fname)
                     }
             }
 
-            if (keyFile.has_key ("LiveThumbData", "ScaleGain")) {
-                scaleGain           = keyFile.get_double ("LiveThumbData", "ScaleGain");
+            if (keyFile->has_key ("LiveThumbData", "ScaleGain")) {
+                scaleGain           = keyFile->get_double ("LiveThumbData", "ScaleGain");
             }
         }
 
         return true;
     } catch (Glib::Error &err) {
         if (settings->verbose) {
-            printf ("Thumbnail::readData / Error code %d while reading values from \"%s\":\n%s\n", err.code(), fname.c_str(), err.what().c_str());
+            printf ("Thumbnail::readData / Error code %d while reading values from \"%s\":\n%s\n", err.code(), fname.c_str(), err.what());
         }
     } catch (...) {
         if (settings->verbose) {
@@ -2330,41 +2330,44 @@ bool Thumbnail::writeData  (const Glib::ustring& fname)
     Glib::ustring keyData;
 
     try {
-
-        Glib::KeyFile keyFile;
+        auto keyFile = Glib::KeyFile::create();
 
         try {
-            keyFile.load_from_file (fname);
+            keyFile->load_from_file (fname);
         } catch (Glib::Error&) {}
 
-        keyFile.set_double  ("LiveThumbData", "CamWBRed", camwbRed);
-        keyFile.set_double  ("LiveThumbData", "CamWBGreen", camwbGreen);
-        keyFile.set_double  ("LiveThumbData", "CamWBBlue", camwbBlue);
-        keyFile.set_double  ("LiveThumbData", "RedAWBMul", redAWBMul);
-        keyFile.set_double  ("LiveThumbData", "GreenAWBMul", greenAWBMul);
-        keyFile.set_double  ("LiveThumbData", "BlueAWBMul", blueAWBMul);
-        keyFile.set_double  ("LiveThumbData", "AEExposureCompensation", aeExposureCompensation);
-        keyFile.set_integer ("LiveThumbData", "AELightness", aeLightness);
-        keyFile.set_integer ("LiveThumbData", "AEContrast", aeContrast);
-        keyFile.set_integer ("LiveThumbData", "AEBlack", aeBlack);
-        keyFile.set_integer ("LiveThumbData", "AEHighlightCompression", aeHighlightCompression);
-        keyFile.set_integer ("LiveThumbData", "AEHighlightCompressionThreshold", aeHighlightCompressionThreshold);
-        keyFile.set_double  ("LiveThumbData", "RedMultiplier", redMultiplier);
-        keyFile.set_double  ("LiveThumbData", "GreenMultiplier", greenMultiplier);
-        keyFile.set_double  ("LiveThumbData", "BlueMultiplier", blueMultiplier);
-        keyFile.set_double  ("LiveThumbData", "Scale", scale);
-        keyFile.set_double  ("LiveThumbData", "DefaultGain", defGain);
-        keyFile.set_integer ("LiveThumbData", "ScaleForSave", scaleForSave);
-        keyFile.set_boolean ("LiveThumbData", "GammaCorrected", gammaCorrected);
-        Glib::ArrayHandle<double> cm ((double*)colorMatrix, 9, Glib::OWNERSHIP_NONE);
-        keyFile.set_double_list ("LiveThumbData", "ColorMatrix", cm);
-        keyFile.set_double  ("LiveThumbData", "ScaleGain", scaleGain);
+        keyFile->set_double  ("LiveThumbData", "CamWBRed", camwbRed);
+        keyFile->set_double  ("LiveThumbData", "CamWBGreen", camwbGreen);
+        keyFile->set_double  ("LiveThumbData", "CamWBBlue", camwbBlue);
+        keyFile->set_double  ("LiveThumbData", "RedAWBMul", redAWBMul);
+        keyFile->set_double  ("LiveThumbData", "GreenAWBMul", greenAWBMul);
+        keyFile->set_double  ("LiveThumbData", "BlueAWBMul", blueAWBMul);
+        keyFile->set_double  ("LiveThumbData", "AEExposureCompensation", aeExposureCompensation);
+        keyFile->set_integer ("LiveThumbData", "AELightness", aeLightness);
+        keyFile->set_integer ("LiveThumbData", "AEContrast", aeContrast);
+        keyFile->set_integer ("LiveThumbData", "AEBlack", aeBlack);
+        keyFile->set_integer ("LiveThumbData", "AEHighlightCompression", aeHighlightCompression);
+        keyFile->set_integer ("LiveThumbData", "AEHighlightCompressionThreshold", aeHighlightCompressionThreshold);
+        keyFile->set_double  ("LiveThumbData", "RedMultiplier", redMultiplier);
+        keyFile->set_double  ("LiveThumbData", "GreenMultiplier", greenMultiplier);
+        keyFile->set_double  ("LiveThumbData", "BlueMultiplier", blueMultiplier);
+        keyFile->set_double  ("LiveThumbData", "Scale", scale);
+        keyFile->set_double  ("LiveThumbData", "DefaultGain", defGain);
+        keyFile->set_integer ("LiveThumbData", "ScaleForSave", scaleForSave);
+        keyFile->set_boolean ("LiveThumbData", "GammaCorrected", gammaCorrected);
+        std::vector<double> cm = {
+            colorMatrix[0][0], colorMatrix[0][1], colorMatrix[0][2],
+            colorMatrix[1][0], colorMatrix[1][1], colorMatrix[1][2],
+            colorMatrix[2][0], colorMatrix[2][1], colorMatrix[2][2],
+        };
+        keyFile->set_double_list ("LiveThumbData", "ColorMatrix", cm);
+        keyFile->set_double  ("LiveThumbData", "ScaleGain", scaleGain);
 
-        keyData = keyFile.to_data ();
+        keyData = keyFile->to_data ();
 
     } catch (Glib::Error& err) {
         if (settings->verbose) {
-            printf ("Thumbnail::writeData / Error code %d while reading values from \"%s\":\n%s\n", err.code(), fname.c_str(), err.what().c_str());
+            printf ("Thumbnail::writeData / Error code %d while reading values from \"%s\":\n%s\n", err.code(), fname.c_str(), err.what());
         }
     } catch (...) {
         if (settings->verbose) {

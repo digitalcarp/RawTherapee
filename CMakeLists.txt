@@ -470,7 +470,7 @@ pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk4>=4.16)
 pkg_check_modules(GTKMM REQUIRED IMPORTED_TARGET gtkmm-4.0>=4.16)
 pkg_check_modules(GLIB2 REQUIRED IMPORTED_TARGET glib-2.0>=2.82)
 pkg_check_modules(GLIBMM REQUIRED IMPORTED_TARGET glibmm-2.68>=2.68)
-pkg_check_modules(CAIROMM REQUIRED IMPORTED_TARGET cairomm-1.0)
+pkg_check_modules(CAIROMM REQUIRED IMPORTED_TARGET cairomm-1.16)
 pkg_check_modules(SIGC REQUIRED IMPORTED_TARGET sigc++-3.0>=3.6)
 
 pkg_check_modules(LENSFUN REQUIRED IMPORTED_TARGET lensfun>=0.2)

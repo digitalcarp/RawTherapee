@@ -47,7 +47,7 @@ using KeyFile = std::shared_ptr<Glib::KeyFile>;
 
 Glib::ustring expandRelativePath(const Glib::ustring &procparams_fname, const Glib::ustring &prefix, Glib::ustring embedded_fname)
 {
-    if (embedded_fname.empty() || !Glib::path_is_absolute(procparams_fname)) {
+    if (embedded_fname.empty() || !Glib::path_is_absolute(procparams_fname.c_str())) {
         return embedded_fname;
     }
 
@@ -59,11 +59,11 @@ Glib::ustring expandRelativePath(const Glib::ustring &procparams_fname, const Gl
         embedded_fname = embedded_fname.substr(prefix.length());
     }
 
-    if (Glib::path_is_absolute(embedded_fname)) {
+    if (Glib::path_is_absolute(embedded_fname.c_str())) {
         return prefix + embedded_fname;
     }
 
-    Glib::ustring absPath = prefix + Glib::path_get_dirname(procparams_fname) + G_DIR_SEPARATOR_S + embedded_fname;
+    Glib::ustring absPath = prefix + Glib::path_get_dirname(procparams_fname.c_str()) + G_DIR_SEPARATOR_S + embedded_fname;
     return absPath;
 }
 
@@ -90,9 +90,9 @@ Glib::ustring expandRelativePath2(const Glib::ustring &procparams_fname, const G
 	// try to convert it using procparams_fname (the directory of the raw file) as prefix
 	Glib::ustring rPath = expandRelativePath(procparams_fname, prefix, embedded_fname);
 	if (rPath.length() >= prefix.length()
-		&& !Glib::file_test(rPath.substr(prefix.length()), Glib::FILE_TEST_IS_REGULAR)
+		&& !Glib::file_test(rPath.substr(prefix.length()), Glib::FileTest::IS_REGULAR)
 		&& !procparams_fname2.empty()
-		&& Glib::path_is_absolute(procparams_fname2)) {
+		&& Glib::path_is_absolute(procparams_fname2.c_str())) {
 		// embedded_fname is not a valid path;
 		// try with procparams_fname2 (the path defined in Preferences) as a prefix 
 		rPath = expandRelativePath(procparams_fname2 + G_DIR_SEPARATOR_S, prefix, embedded_fname);
@@ -103,7 +103,7 @@ Glib::ustring expandRelativePath2(const Glib::ustring &procparams_fname, const G
 
 Glib::ustring relativePathIfInside(const Glib::ustring &procparams_fname, bool fnameAbsolute, Glib::ustring embedded_fname)
 {
-    if (fnameAbsolute || embedded_fname.empty() || !Glib::path_is_absolute(procparams_fname)) {
+    if (fnameAbsolute || embedded_fname.empty() || !Glib::path_is_absolute(procparams_fname.c_str())) {
         return embedded_fname;
     }
 
@@ -114,12 +114,12 @@ Glib::ustring relativePathIfInside(const Glib::ustring &procparams_fname, bool f
         prefix = "file:";
     }
 
-    if (!Glib::path_is_absolute(embedded_fname)) {
+    if (!Glib::path_is_absolute(embedded_fname.c_str())) {
         return prefix + embedded_fname;
     }
 
-    Glib::ustring dir1 = Glib::path_get_dirname(procparams_fname) + G_DIR_SEPARATOR_S;
-    Glib::ustring dir2 = Glib::path_get_dirname(embedded_fname) + G_DIR_SEPARATOR_S;
+    Glib::ustring dir1 = Glib::path_get_dirname(procparams_fname.c_str()) + G_DIR_SEPARATOR_S;
+    Glib::ustring dir2 = Glib::path_get_dirname(embedded_fname.c_str()) + G_DIR_SEPARATOR_S;
 
     if (dir2.substr(0, dir1.length()) != dir1) {
         // it's in a different directory, ie not inside
@@ -135,10 +135,10 @@ Glib::ustring relativePathIfInside2(const Glib::ustring &procparams_fname, const
 	// (the directory of the raw file)
 	// (note: fnameAbsolute seems to be always true, so this will never return a relative path)
 	Glib::ustring rPath = relativePathIfInside(procparams_fname, fnameAbsolute, embedded_fname);
-	if ((Glib::path_is_absolute(rPath)
-		 ||	(rPath.length() >= 5 && rPath.substr(0, 5) == "file:" && Glib::path_is_absolute(rPath.substr(5))))
+	if ((Glib::path_is_absolute(rPath.c_str())
+		 ||	(rPath.length() >= 5 && rPath.substr(0, 5) == "file:" && Glib::path_is_absolute(rPath.substr(5).c_str())))
 		&& !procparams_fname2.empty()
-		&& Glib::path_is_absolute(procparams_fname2)) {
+		&& Glib::path_is_absolute(procparams_fname2.c_str())) {
 		// if path is not relative to the directory of the raw file,
 		// try to convert embedded_fname to a path relative to procparams_fname2
 		// (the path defined in Preferences)
@@ -11670,7 +11670,7 @@ int ProcParams::load(const Glib::ustring& fname, ParamsEdited* pedited)
 
         return 0;
     } catch (const Glib::Error& e) {
-        printf("-->%s\n", e.what().c_str());
+        printf("-->%s\n", e.what());
         setDefaults();
         return 1;
     } catch (...) {

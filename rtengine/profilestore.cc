@@ -320,7 +320,7 @@ const ProfileStoreEntry* ProfileStore::findEntryFromFullPathU (Glib::ustring pat
     }
 
     // removing the filename
-    Glib::ustring fName = Glib::path_get_basename (path);
+    Glib::ustring fName = Glib::path_get_basename (path.c_str());
 
     if (!fName.empty()) {
         path = path.substr (0, path.length() - fName.length());
@@ -329,7 +329,7 @@ const ProfileStoreEntry* ProfileStore::findEntryFromFullPathU (Glib::ustring pat
         return nullptr;
     }
 
-    path = Glib::path_get_dirname (path);
+    path = Glib::path_get_dirname (path.c_str());
 
     // 1. find the path in the folder list
     int parentFolderId = findFolderId (path);

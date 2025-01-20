@@ -63,14 +63,14 @@ int init (const Settings* s, const Glib::ustring& baseDir, const Glib::ustring& 
 {
     bool ok;
 
-    if (s->lensfunDbDirectory.empty() || Glib::path_is_absolute(s->lensfunDbDirectory)) {
+    if (s->lensfunDbDirectory.empty() || Glib::path_is_absolute(s->lensfunDbDirectory.c_str())) {
         ok = LFDatabase::init(s->lensfunDbDirectory);
     } else {
         ok = LFDatabase::init(Glib::build_filename(baseDir, s->lensfunDbDirectory));
     }
 
     if (!ok && !s->lensfunDbBundleDirectory.empty() && s->lensfunDbBundleDirectory != s->lensfunDbDirectory) {
-        if (Glib::path_is_absolute(s->lensfunDbBundleDirectory)) {
+        if (Glib::path_is_absolute(s->lensfunDbBundleDirectory.c_str())) {
             LFDatabase::init(s->lensfunDbBundleDirectory);
         } else {
             LFDatabase::init(Glib::build_filename(baseDir, s->lensfunDbBundleDirectory));

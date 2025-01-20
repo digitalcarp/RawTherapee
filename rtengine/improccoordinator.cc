@@ -18,8 +18,6 @@
  */
 #include <fstream>
 
-#include <glibmm/thread.h>
-
 #include "improccoordinator.h"
 
 #include "array2D.h"

@@ -76,7 +76,7 @@ PreviewImage::PreviewImage (const Glib::ustring &fname, const Glib::ustring &ext
 
                 tpp->getDimensions(w, h, scale);
 
-                previewImage = Cairo::ImageSurface::create(Cairo::FORMAT_RGB24, w, h);
+                previewImage = Cairo::ImageSurface::create(Cairo::Surface::Format::RGB24, w, h);
                 previewImage->flush();
 
 #ifdef _OPENMP
@@ -145,7 +145,7 @@ PreviewImage::PreviewImage (const Glib::ustring &fname, const Glib::ustring &ext
                 int w, h;
                 w = output.getWidth();
                 h = output.getHeight();
-                previewImage = Cairo::ImageSurface::create(Cairo::FORMAT_RGB24, w, h);
+                previewImage = Cairo::ImageSurface::create(Cairo::Surface::Format::RGB24, w, h);
                 previewImage->flush();
 
 #ifdef _OPENMP
