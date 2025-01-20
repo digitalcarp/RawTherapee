@@ -92,58 +92,6 @@ struct ScopedEnumHash {
     }
 };
 
-
-// TODO: The documentation says gdk_threads_enter and gdk_threads_leave should be replaced
-// by g_main_context_invoke(), g_idle_add() and related functions, but this will require more extensive changes.
-// We silence those warnings until then so that we notice the others.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-
-/**
- * @brief Lock GTK for critical section.
- *
- * Will unlock on destruction. To use:
- *
- *   <code>
- *     {
- *       GThreadLock lock;
- *       // critical code
- *     }
- *   </code>
- */
-class GThreadLock final
-{
-public:
-    GThreadLock()
-    {
-        gdk_threads_enter();
-    }
-    ~GThreadLock()
-    {
-        gdk_threads_leave();
-    }
-};
-
-/**
- * @brief Unlock GTK critical section.
- *
- * Will relock on destruction.
- */
-class GThreadUnLock final
-{
-public:
-    GThreadUnLock()
-    {
-        gdk_threads_leave();
-    }
-    ~GThreadUnLock()
-    {
-        gdk_threads_enter();
-    }
-};
-
-#pragma GCC diagnostic pop
-
 class ConnectionBlocker final
 {
 public:
