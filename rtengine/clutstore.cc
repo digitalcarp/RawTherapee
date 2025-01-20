@@ -278,7 +278,7 @@ void rtengine::HaldCLUT::splitClutFilename(
     bool checkProfile
 )
 {
-    Glib::ustring basename = Glib::path_get_basename(filename);
+    Glib::ustring basename = Glib::path_get_basename(filename.c_str());
 
     const Glib::ustring::size_type last_dot_pos = basename.rfind('.');
 
@@ -318,7 +318,7 @@ std::shared_ptr<rtengine::HaldCLUT> rtengine::CLUTStore::getClut(const Glib::ust
     std::shared_ptr<rtengine::HaldCLUT> result;
 
     const Glib::ustring full_filename =
-        !Glib::path_is_absolute(filename)
+        !Glib::path_is_absolute(filename.c_str())
             ? Glib::ustring(Glib::build_filename(options.clutsDir, filename))
             : filename;
 
