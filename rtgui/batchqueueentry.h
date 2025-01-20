@@ -73,7 +73,7 @@ public:
     void refreshThumbnailImage () override;
     void calcThumbnailSize () override;
 
-    void drawProgressBar (Glib::RefPtr<Gdk::Window> win, const Gdk::RGBA& foregr, const Gdk::RGBA& backgr, int x, int w, int y, int h) override;
+    void drawProgressBar (Glib::RefPtr<Gtk::Window> win, const Gdk::RGBA& foregr, const Gdk::RGBA& backgr, int x, int w, int y, int h) override;
 
     void removeButtonSet ();
 

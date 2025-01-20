@@ -366,7 +366,7 @@ void Inspector::beginZoom(double x, double y)
     // store center and current position for zooming
     double cur_scale = zoomScale;
     if (scaled) {
-        Glib::RefPtr<Gdk::Window> win = get_window();
+        Glib::RefPtr<Gtk::Window> win = get_window();
         double winW = win->get_width() * deviceScale;
         double winH = win->get_height() * deviceScale;
         int imW = rtengine::max<int>(currImage->imgBuffer.getWidth(), 1);
@@ -408,7 +408,7 @@ bool Inspector::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
 {
     dirty = false;
 
-    Glib::RefPtr<Gdk::Window> win = get_window();
+    Glib::RefPtr<Gtk::Window> win = get_window();
 
     if (!win) {
         return false;

@@ -715,7 +715,7 @@ void FileBrowserEntry::updateCursor (int x, int y)
     CursorShape newCursor = CSUndefined;
 
     ToolMode tm = iatlistener->getToolBar()->getTool ();
-    Glib::RefPtr<Gdk::Window> w = parent->getDrawingArea ()->get_window();
+    Glib::RefPtr<Gtk::Window> w = parent->getDrawingArea ()->get_window();
 
     if (!selected) {
         newCursor = CSArrow;

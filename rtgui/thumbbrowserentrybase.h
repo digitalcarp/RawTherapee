@@ -219,7 +219,7 @@ public:
     virtual void refreshQuickThumbnailImage () {}
     virtual void calcThumbnailSize () = 0;
 
-    virtual void drawProgressBar (Glib::RefPtr<Gdk::Window> win, const Gdk::RGBA& foregr, const Gdk::RGBA& backgr, int x, int w, int y, int h) {}
+    virtual void drawProgressBar (Glib::RefPtr<Gtk::Window> win, const Gdk::RGBA& foregr, const Gdk::RGBA& backgr, int x, int w, int y, int h) {}
 
     virtual std::vector<std::shared_ptr<RTSurface>> getIconsOnImageArea ();
     virtual std::vector<std::shared_ptr<RTSurface>> getSpecificityIconsOnImageArea ();

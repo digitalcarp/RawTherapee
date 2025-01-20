@@ -59,7 +59,7 @@ void PreviewWindow::getObservedFrameArea (int& x, int& y, int& w, int& h)
 
 void PreviewWindow::updatePreviewImage ()
 {
-    Glib::RefPtr<Gdk::Window> wind = get_window();
+    Glib::RefPtr<Gtk::Window> wind = get_window();
 
     if( ! wind ) {
         needsUpdate = true;

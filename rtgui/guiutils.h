@@ -674,8 +674,8 @@ public:
 
     // set the destination drawing rectangle; return true if the dimensions are different
     // Note: newW & newH must be > 0
-    bool setDrawRectangle(Glib::RefPtr<Gdk::Window> window, Gdk::Rectangle &rectangle, bool updateBackBufferSize = true);
-    bool setDrawRectangle(Glib::RefPtr<Gdk::Window> window, int newX, int newY, int newW, int newH, bool updateBackBufferSize = true);
+    bool setDrawRectangle(Glib::RefPtr<Gtk::Window> window, Gdk::Rectangle &rectangle, bool updateBackBufferSize = true);
+    bool setDrawRectangle(Glib::RefPtr<Gtk::Window> window, int newX, int newY, int newW, int newH, bool updateBackBufferSize = true);
     bool setDrawRectangle(Cairo::Format format, Gdk::Rectangle &rectangle, bool updateBackBufferSize = true);
     bool setDrawRectangle(Cairo::Format format, int newX, int newY, int newW, int newH, bool updateBackBufferSize = true);
     // set the destination drawing location, do not modify other parameters like size and offset. Use setDrawRectangle to set all parameters at the same time
@@ -686,7 +686,7 @@ public:
     void getSrcOffset(rtengine::Coord &offset);
 
     void copyRGBCharData(const unsigned char *srcData, int srcX, int srcY, int srcW, int srcH, int srcRowStride, int dstX, int dstY);
-    void copySurface(Glib::RefPtr<Gdk::Window> window, Gdk::Rectangle *rectangle = nullptr);
+    void copySurface(Glib::RefPtr<Gtk::Window> window, Gdk::Rectangle *rectangle = nullptr);
     void copySurface(BackBuffer *destBackBuffer, Gdk::Rectangle *rectangle = nullptr);
     void copySurface(Cairo::RefPtr<Cairo::ImageSurface> destSurface, Gdk::Rectangle *rectangle = nullptr);
     void copySurface(Cairo::RefPtr<Cairo::Context> crDest, Gdk::Rectangle *destRectangle = nullptr);

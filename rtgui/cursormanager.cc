@@ -22,7 +22,7 @@
 CursorManager mainWindowCursorManager;
 CursorManager editWindowCursorManager;
 
-void CursorManager::init (Glib::RefPtr<Gdk::Window> mainWindow)
+void CursorManager::init (Glib::RefPtr<Gtk::Window> mainWindow)
 {
 
     display = Gdk::Display::get_default ();
@@ -79,7 +79,7 @@ void CursorManager::init (Glib::RefPtr<Gdk::Window> mainWindow)
 }
 
 /* Set the cursor of the given window */
-void CursorManager::setCursor (Glib::RefPtr<Gdk::Window> window, CursorShape shape)
+void CursorManager::setCursor (Glib::RefPtr<Gtk::Window> window, CursorShape shape)
 {
     switch (shape)
     {
@@ -165,7 +165,7 @@ void CursorManager::setCursor (Glib::RefPtr<Gdk::Window> window, CursorShape sha
     }
 }
 
-void CursorManager::setWidgetCursor (Glib::RefPtr<Gdk::Window> window, CursorShape shape)
+void CursorManager::setWidgetCursor (Glib::RefPtr<Gtk::Window> window, CursorShape shape)
 {
     if (window->get_display() == mainWindowCursorManager.display) {
         mainWindowCursorManager.setCursor(window, shape);
@@ -181,7 +181,7 @@ void CursorManager::setWidgetCursor (Glib::RefPtr<Gdk::Window> window, CursorSha
 #endif
 }
 
-void CursorManager::setCursorOfMainWindow (Glib::RefPtr<Gdk::Window> window, CursorShape shape)
+void CursorManager::setCursorOfMainWindow (Glib::RefPtr<Gtk::Window> window, CursorShape shape)
 {
     if (window->get_display() == mainWindowCursorManager.display) {
         mainWindowCursorManager.setCursor(shape);

@@ -513,7 +513,7 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
 bool ExpanderBox::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr) {
 
     if (!options.useSystemTheme) {
-        Glib::RefPtr<Gdk::Window> window = get_window();
+        Glib::RefPtr<Gtk::Window> window = get_window();
         Glib::RefPtr<Gtk::StyleContext> style = get_style_context ();
 
         int x_, y_, w_, h_;
@@ -1751,13 +1751,13 @@ void BackBuffer::getSrcOffset(rtengine::Coord &offset)
 }
 
 // Note: newW & newH must be > 0
-bool BackBuffer::setDrawRectangle(Glib::RefPtr<Gdk::Window> window, Gdk::Rectangle &rectangle, bool updateBackBufferSize)
+bool BackBuffer::setDrawRectangle(Glib::RefPtr<Gtk::Window> window, Gdk::Rectangle &rectangle, bool updateBackBufferSize)
 {
     return setDrawRectangle(window, rectangle.get_x(), rectangle.get_y(), rectangle.get_width(), rectangle.get_height(), updateBackBufferSize);
 }
 
 // Note: newW & newH must be > 0
-bool BackBuffer::setDrawRectangle(Glib::RefPtr<Gdk::Window> window, int newX, int newY, int newW, int newH, bool updateBackBufferSize)
+bool BackBuffer::setDrawRectangle(Glib::RefPtr<Gtk::Window> window, int newX, int newY, int newW, int newH, bool updateBackBufferSize)
 {
     assert(newW && newH);
 
@@ -1863,9 +1863,9 @@ void BackBuffer::copyRGBCharData(const unsigned char *srcData, int srcX, int src
 }
 
 /*
- * Copy the backbuffer to a Gdk::Window
+ * Copy the backbuffer to a Gtk::Window
  */
-void BackBuffer::copySurface(Glib::RefPtr<Gdk::Window> window, Gdk::Rectangle *destRectangle)
+void BackBuffer::copySurface(Glib::RefPtr<Gtk::Window> window, Gdk::Rectangle *destRectangle)
 {
     if (surface && window) {
         // TODO: look out if window can be different on each call, and if not, store a reference to the window

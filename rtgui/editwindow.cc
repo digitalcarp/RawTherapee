@@ -101,7 +101,7 @@ void EditWindow::restoreWindow()
             if (options.meowMonitor >= 0) { // Use display from last session if available
                 meowMonitor = std::max(0, std::min(options.meowMonitor, display->get_n_monitors() - 1));
             } else { // Determine the main RT window display
-                const Glib::RefPtr<Gdk::Window> &wnd = parent->get_window();
+                const Glib::RefPtr<Gtk::Window> &wnd = parent->get_window();
 
                 // Retrieve window monitor ID
                 const int monitor_nb = display->get_n_monitors();

@@ -934,7 +934,7 @@ bool ThumbBrowserBase::Internal::on_button_press_event (GdkEventButton* event)
     parent->eventTime = event->time;
 
     parent->buttonPressed ((int)event->x, (int)event->y, event->button, event->type, event->state, 0, 0, get_width(), get_height());
-    Glib::RefPtr<Gdk::Window> window = get_window();
+    Glib::RefPtr<Gtk::Window> window = get_window();
 
     GdkRectangle rect;
     rect.x = 0;

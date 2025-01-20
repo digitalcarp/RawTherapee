@@ -101,7 +101,7 @@ void BatchQueueEntry::calcThumbnailSize ()
 }
 
 
-void BatchQueueEntry::drawProgressBar (Glib::RefPtr<Gdk::Window> win, const Gdk::RGBA& foregr, const Gdk::RGBA& backgr, int x, int w, int y, int h)
+void BatchQueueEntry::drawProgressBar (Glib::RefPtr<Gtk::Window> win, const Gdk::RGBA& foregr, const Gdk::RGBA& backgr, int x, int w, int y, int h)
 {
 
     if (processing) {

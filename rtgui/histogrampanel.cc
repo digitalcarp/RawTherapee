@@ -824,7 +824,7 @@ void HistogramRGBArea::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context>
     // Note: updateDrawingArea is called by the on_draw function so its call does not need to be protected
     // GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
 
-    Glib::RefPtr<Gdk::Window> window = get_window();
+    Glib::RefPtr<Gtk::Window> window = get_window();
     int winx, winy, winw, winh;
     window->get_geometry(winx, winy, winw, winh);
 
@@ -1212,7 +1212,7 @@ void HistogramArea::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &c
     // Note: updateDrawingArea is called by the on_draw function so its call does not need to be protected
     // GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
 
-    Glib::RefPtr<Gdk::Window> window = get_window();
+    Glib::RefPtr<Gtk::Window> window = get_window();
     int winx, winy, winw, winh;
     window->get_geometry(winx, winy, winw, winh);
 

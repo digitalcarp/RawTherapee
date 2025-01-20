@@ -321,7 +321,7 @@ bool SHCSelector::reset ()      //  : movingPosition(-1), cl(NULL) {
 
 void SHCSelector::refresh()
 {
-    Glib::RefPtr<Gdk::Window> win = get_window();
+    Glib::RefPtr<Gtk::Window> win = get_window();
     if (win) {
         win->invalidate(true);
     }

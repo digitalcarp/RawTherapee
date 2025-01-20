@@ -74,15 +74,15 @@ private:
     Glib::RefPtr<Gdk::Cursor> cWait;
 
     Glib::RefPtr<Gdk::Display> display;
-    Glib::RefPtr<Gdk::Window> window;
+    Glib::RefPtr<Gtk::Window> window;
 
     void setCursor (CursorShape shape);
-    void setCursor (Glib::RefPtr<Gdk::Window> window, CursorShape shape);
+    void setCursor (Glib::RefPtr<Gtk::Window> window, CursorShape shape);
 
 public:
-    void init                         (Glib::RefPtr<Gdk::Window> mainWindow);
-    static void setWidgetCursor       (Glib::RefPtr<Gdk::Window> window, CursorShape shape);
-    static void setCursorOfMainWindow (Glib::RefPtr<Gdk::Window> window, CursorShape shape);
+    void init                         (Glib::RefPtr<Gtk::Window> mainWindow);
+    static void setWidgetCursor       (Glib::RefPtr<Gtk::Window> window, CursorShape shape);
+    static void setCursorOfMainWindow (Glib::RefPtr<Gtk::Window> window, CursorShape shape);
 };
 
 extern CursorManager mainWindowCursorManager;
