@@ -176,7 +176,6 @@ ImProcCoordinator::ImProcCoordinator() :
     lastOutputProfile("BADFOOD"),
     lastOutputIntent(RI__COUNT),
     lastOutputBPC(false),
-    thread(nullptr),
     changeSinceLast(0),
     updaterRunning(false),
     nextParams(new procparams::ProcParams),
@@ -254,8 +253,8 @@ ImProcCoordinator::~ImProcCoordinator()
     destroying = true;
     updaterThreadStart.lock();
 
-    if (updaterRunning && thread) {
-        thread->join();
+    if (updaterRunning && thread.joinable()) {
+        thread.join();
     }
 
     mProcessing.lock();
@@ -3166,9 +3165,9 @@ void ImProcCoordinator::stopProcessing()
 
     updaterThreadStart.lock();
 
-    if (updaterRunning && thread) {
+    if (updaterRunning && thread.joinable()) {
         changeSinceLast = 0;
-        thread->join();
+        thread.join();
     }
 
     updaterThreadStart.unlock();
@@ -3182,7 +3181,7 @@ void ImProcCoordinator::startProcessing()
     if (!destroying) {
         if (!updaterRunning) {
             updaterThreadStart.lock();
-            thread = nullptr;
+            thread = std::thread();
             updaterRunning = true;
             updaterThreadStart.unlock();
 
