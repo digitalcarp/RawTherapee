@@ -227,7 +227,7 @@ public:
 class MyExpander final : public Gtk::Box
 {
 public:
-    typedef sigc::signal<void> type_signal_enabled_toggled;
+    typedef sigc::signal<void()> type_signal_enabled_toggled;
 private:
     type_signal_enabled_toggled message;
     const Glib::ustring inconsistentImage; /// "inconsistent" image, displayed when useEnabled is true ; in this case, nothing will tell that an expander is opened/closed
@@ -277,10 +277,10 @@ public:
      */
     MyExpander(bool useEnabled, Gtk::Widget* titleWidget);
 
-    Glib::SignalProxy1< bool, GdkEventButton* > signal_button_release_event()
+    Glib::SignalProxy<bool, GdkEventButton*> signal_button_release_event()
     {
         return titleEvBox->signal_button_release_event();
-    };
+    }
     type_signal_enabled_toggled signal_enabled_toggled();
 
     /// Set the nesting level of the Expander to adapt its style accordingly
@@ -447,7 +447,8 @@ public:
     void set_show_hidden(bool yes);
 
 protected:
-    explicit MyFileChooserWidget(const Glib::ustring &title, Gtk::FileChooserAction action=Gtk::FILE_CHOOSER_ACTION_OPEN);
+    explicit MyFileChooserWidget(const Glib::ustring &title,
+                                 Gtk::FileChooser::Action action = Gtk::FileChooser::Action::OPEN);
 
     static std::unique_ptr<Gtk::Image> make_folder_image();
 
@@ -478,13 +479,15 @@ protected:
     void on_filename_set() override;
 
 public:
-    explicit MyFileChooserButton(const Glib::ustring &title, Gtk::FileChooserAction action=Gtk::FILE_CHOOSER_ACTION_OPEN);
+    explicit MyFileChooserButton(const Glib::ustring &title,
+                                 Gtk::FileChooser::Action action = Gtk::FileChooser::Action::OPEN);
 };
 
 class MyFileChooserEntry : public Gtk::Box, public MyFileChooserWidget
 {
 public:
-    explicit MyFileChooserEntry(const Glib::ustring &title, Gtk::FileChooserAction action = Gtk::FILE_CHOOSER_ACTION_OPEN);
+    explicit MyFileChooserEntry(const Glib::ustring &title,
+                                Gtk::FileChooser::Action action = Gtk::FileChooser::Action::OPEN);
 
     Glib::ustring get_placeholder_text() const;
     void set_placeholder_text(const Glib::ustring &text);
@@ -670,14 +673,14 @@ protected:
 
 public:
     BackBuffer();
-    BackBuffer(int w, int h, Cairo::Format format = Cairo::FORMAT_RGB24);
+    BackBuffer(int w, int h, Cairo::Surface::Format format = Cairo::Surface::Format::RGB24);
 
     // set the destination drawing rectangle; return true if the dimensions are different
     // Note: newW & newH must be > 0
     bool setDrawRectangle(Glib::RefPtr<Gtk::Window> window, Gdk::Rectangle &rectangle, bool updateBackBufferSize = true);
     bool setDrawRectangle(Glib::RefPtr<Gtk::Window> window, int newX, int newY, int newW, int newH, bool updateBackBufferSize = true);
-    bool setDrawRectangle(Cairo::Format format, Gdk::Rectangle &rectangle, bool updateBackBufferSize = true);
-    bool setDrawRectangle(Cairo::Format format, int newX, int newY, int newW, int newH, bool updateBackBufferSize = true);
+    bool setDrawRectangle(Cairo::Surface::Format format, Gdk::Rectangle &rectangle, bool updateBackBufferSize = true);
+    bool setDrawRectangle(Cairo::Surface::Format format, int newX, int newY, int newW, int newH, bool updateBackBufferSize = true);
     // set the destination drawing location, do not modify other parameters like size and offset. Use setDrawRectangle to set all parameters at the same time
     void setDestPosition(int x, int y);
     void setSrcOffset(int x, int y);
@@ -719,7 +722,7 @@ public:
     void deleteSurface()
     {
         if (surface) {
-            surface.clear();
+            surface.reset();
         }
 
         dirty = true;

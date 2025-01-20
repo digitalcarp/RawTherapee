@@ -76,7 +76,7 @@ public:
 
 protected:
 
-    sigc::signal<void> sig_val_changed;
+    sigc::signal<void()> sig_val_changed;
 
     ThresholdCurveProvider* bgCurveProvider;
 
@@ -129,7 +129,7 @@ protected:
 public:
 
     ColoredBar coloredBar;
-    sigc::signal<void> signal_value_changed();
+    sigc::signal<void()> signal_value_changed();
 
     ThresholdSelector(double minValueBottom, double maxValueBottom, double defBottom, Glib::ustring labelBottom, unsigned int precisionBottom,
                       double minValueTop,    double maxValueTop,    double defTop,    Glib::ustring labelTop,    unsigned int precisionTop,
