@@ -14,7 +14,7 @@ endif()
 # Must stay before the project() command:
 if(${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
     set(CMAKE_CXX_COMPILER_ARG1
-        "-std=c++11"
+        "-std=c++17"
         CACHE STRING "C++ version for eclipse" FORCE)
     # Users building with Eclipse should set CMAKE_ECLIPSE_VERSION through the
     # command line to their current version of Eclipse:
@@ -35,7 +35,7 @@ string(TOUPPER ${CMAKE_BUILD_TYPE} UPPER_CMAKE_BUILD_TYPE)
 
 # Set required C and C++ standards and check GCC version:
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION
                                             VERSION_LESS "4.9")
@@ -466,12 +466,12 @@ endif()
 # Check for libraries:
 find_package(PkgConfig)
 
-pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0>=3.24.3)
-pkg_check_modules(GTKMM REQUIRED IMPORTED_TARGET gtkmm-3.0>=3.24)
-pkg_check_modules(GLIB2 REQUIRED IMPORTED_TARGET glib-2.0>=2.48)
-pkg_check_modules(GLIBMM REQUIRED IMPORTED_TARGET glibmm-2.4>=2.48)
+pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk4>=4.16)
+pkg_check_modules(GTKMM REQUIRED IMPORTED_TARGET gtkmm-4.0>=4.16)
+pkg_check_modules(GLIB2 REQUIRED IMPORTED_TARGET glib-2.0>=2.82)
+pkg_check_modules(GLIBMM REQUIRED IMPORTED_TARGET glibmm-2.68>=2.68)
 pkg_check_modules(CAIROMM REQUIRED IMPORTED_TARGET cairomm-1.0)
-pkg_check_modules(SIGC REQUIRED IMPORTED_TARGET sigc++-2.0>=2.3.1)
+pkg_check_modules(SIGC REQUIRED IMPORTED_TARGET sigc++-3.0>=3.6)
 
 pkg_check_modules(LENSFUN REQUIRED IMPORTED_TARGET lensfun>=0.2)
 pkg_check_modules(RSVG REQUIRED IMPORTED_TARGET librsvg-2.0>=2.52)
