@@ -23,8 +23,10 @@
 #include <glibmm/refptr.h>
 
 namespace Cairo {
+class Context;
 class ImageSurface;
 class Surface;
+class SurfacePattern;
 }
 
 namespace Gdk {
@@ -133,6 +135,11 @@ private:
     Glib::RefPtr<Gdk::Pixbuf> m_pixbuf;
     int m_device_scale;
 };
+
+// TODO: Replace with Cairo::Context::get_source_for_surface() when cairomm
+//       dependency provides the same function.
+Cairo::RefPtr<Cairo::SurfacePattern>
+getSourceForSurface(const Cairo::RefPtr<Cairo::Context>& context);
 
 void getDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,
                     double& x_scale, double& y_scale);

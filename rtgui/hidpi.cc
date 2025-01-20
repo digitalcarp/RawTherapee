@@ -20,6 +20,7 @@
 #include "rtscalable.h"
 #include "hidpi.h"
 
+#include <cairomm/pattern.h>
 #include <cairomm/surface.h>
 #include <gdkmm/pixbuf.h>
 
@@ -113,6 +114,20 @@ void swap(DevicePixbuf& lhs, DevicePixbuf& rhs) {
     using std::swap;
     swap(lhs.m_pixbuf, rhs.m_pixbuf);
     swap(lhs.m_device_scale, rhs.m_device_scale);
+}
+
+Cairo::RefPtr<Cairo::SurfacePattern>
+getSourceForSurface(const Cairo::RefPtr<Cairo::Context>& context) {
+    Cairo::RefPtr<Cairo::SurfacePattern> result;
+
+    Cairo::RefPtr<Cairo::Pattern> src = context->get_source();
+    if (!src) return result;
+
+    auto type = src->get_type();
+    if (type != Cairo::PATTERN_TYPE_SURFACE) return result;
+
+    result = Cairo::RefPtr<Cairo::SurfacePattern>::cast_static(src);
+    return result;
 }
 
 void getDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,

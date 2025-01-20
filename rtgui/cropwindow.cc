@@ -1514,7 +1514,7 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
         if (rough) {
             hidpi::LogicalCoord offset = windowPos + imgAreaPos + imgPos;
             Gdk::Cairo::set_source_pixbuf(cr, rough, offset.x, offset.y);
-            auto pattern = cr->get_source_for_surface();
+            auto pattern = hidpi::getSourceForSurface(cr);
             hidpi::setDeviceScale(pattern->get_surface(), desiredSize.device_scale);
             // Contain blitting area within crop window
             cr->rectangle(offset.x, offset.y,
@@ -1948,7 +1948,7 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
 
                 hidpi::LogicalCoord offset = windowPos + imgAreaPos + imgPos;
                 Gdk::Cairo::set_source_pixbuf(cr, tmp, offset.x, offset.y);
-                auto pattern = cr->get_source_for_surface();
+                auto pattern = hidpi::getSourceForSurface(cr);
                 int deviceScale = RTScalable::getScaleForWidget(iarea);
                 hidpi::setDeviceScale(pattern->get_surface(), deviceScale);
                 // Contain blitting area within crop window
@@ -1961,7 +1961,7 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
             } else {
                 hidpi::LogicalCoord offset = windowPos + imgAreaPos + imgPos;
                 Gdk::Cairo::set_source_pixbuf(cr, cropHandler.cropPixbuf, offset.x, offset.y);
-                auto pattern = cr->get_source_for_surface();
+                auto pattern = hidpi::getSourceForSurface(cr);
                 int deviceScale = RTScalable::getScaleForWidget(iarea);
                 hidpi::setDeviceScale(pattern->get_surface(), deviceScale);
                 // Contain blitting area within crop window
@@ -2070,7 +2070,7 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
                 hidpi::LogicalCoord offset = windowPos + imgAreaPos + imgPos;
                 double deviceScale = desiredSize.device_scale;
                 Gdk::Cairo::set_source_pixbuf(cr, rough, offset.x, offset.y);
-                auto pattern = cr->get_source_for_surface();
+                auto pattern = hidpi::getSourceForSurface(cr);
                 hidpi::setDeviceScale(pattern->get_surface(), deviceScale);
                 // Contain blitting area within crop window
                 cr->rectangle(offset.x, offset.y,

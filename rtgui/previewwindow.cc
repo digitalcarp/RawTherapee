@@ -93,7 +93,7 @@ void PreviewWindow::updatePreviewImage ()
     cc->set_line_join(Cairo::LINE_JOIN_MITER);
 
     Gdk::Cairo::set_source_pixbuf(cc, result.pixbuf(), 0, 0);
-    auto pattern = cc->get_source_for_surface();
+    auto pattern = hidpi::getSourceForSurface(cc);
     hidpi::setDeviceScale(pattern->get_surface(), device.device_scale);
     cc->rectangle(0, 0, device.width, device.height);
     cc->fill();
