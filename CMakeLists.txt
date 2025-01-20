@@ -466,61 +466,18 @@ endif()
 # Check for libraries:
 find_package(PkgConfig)
 
-# Gtk version shall be greater than 3.24.3 for fixed Hi-DPI support
-pkg_check_modules(GTK REQUIRED gtk+-3.0>=3.24.3)
-pkg_check_modules(GTKMM REQUIRED gtkmm-3.0>=3.24)
+pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0>=3.24.3)
+pkg_check_modules(GTKMM REQUIRED IMPORTED_TARGET gtkmm-3.0>=3.24)
+pkg_check_modules(GLIB2 REQUIRED IMPORTED_TARGET glib-2.0>=2.48)
+pkg_check_modules(GLIBMM REQUIRED IMPORTED_TARGET glibmm-2.4>=2.48)
+pkg_check_modules(CAIROMM REQUIRED IMPORTED_TARGET cairomm-1.0)
+pkg_check_modules(SIGC REQUIRED IMPORTED_TARGET sigc++-2.0>=2.3.1)
 
-if(GTK_VERSION VERSION_GREATER "3.24.1" AND GTK_VERSION VERSION_LESS "3.24.7")
-    if(GTK_VERSION VERSION_EQUAL "3.24.5")
-        set(CERTAINTY "known to")
-    else()
-        set(CERTAINTY "likely to")
-    endif()
-    message(
-        WARNING
-            "\nWarning! You are using GTK+ version "
-            ${GTK_VERSION}
-            " which is "
-            ${CERTAINTY}
-            " have an issue where combobox menu scroll-arrows are missing when a Gtk::ComboBox list does not fit vertically on the screen. As a result, users of your build will not be able to select items in the following comboboxes: Processing Profiles, Film Simulation, and the camera and lens profiles in Profiled Lens Correction.\nIt is recommended that you either downgrade GTK+ to <= 3.24.1 or upgrade to >= 3.24.7."
-    )
-endif()
-
-pkg_check_modules(GLIB2 REQUIRED glib-2.0>=2.48)
-pkg_check_modules(GLIBMM REQUIRED glibmm-2.4>=2.48)
-pkg_check_modules(CAIROMM REQUIRED cairomm-1.0)
-pkg_check_modules(GIO REQUIRED gio-2.0>=2.48)
-pkg_check_modules(GIOMM REQUIRED giomm-2.4>=2.48)
-pkg_check_modules(GTHREAD REQUIRED gthread-2.0>=2.48)
-pkg_check_modules(GOBJECT REQUIRED gobject-2.0>=2.48)
-pkg_check_modules(SIGC REQUIRED sigc++-2.0>=2.3.1)
-pkg_check_modules(LENSFUN REQUIRED lensfun>=0.2)
-pkg_check_modules(RSVG REQUIRED librsvg-2.0>=2.52)
+pkg_check_modules(LENSFUN REQUIRED IMPORTED_TARGET lensfun>=0.2)
+pkg_check_modules(RSVG REQUIRED IMPORTED_TARGET librsvg-2.0>=2.52)
 
 # Require exiv2 >= 0.24 to make sure everything we need is available
-#find_package(Exiv2 0.24 REQUIRED)
-pkg_check_modules(EXIV2 REQUIRED exiv2>=0.24)
-#include_directories(SYSTEM ${Exiv2_INCLUDE_DIRS})
-#list(APPEND LIBS ${EXIV2_LIBRARIES})
-add_definitions(${EXIV2_DEFINITIONS})
-set(_exiv2_libs ${EXIV2_LIBRARIES})
-set(EXIV2_LIBRARIES "")
-foreach(l ${_exiv2_libs})
-    set(_el "_el-NOTFOUND")
-    if(EXIV2_LIBRARY_DIRS)
-        message(STATUS "searching for library ${l} in ${EXIV2_LIBRARY_DIRS}")
-        find_library(_el ${l} PATHS ${EXIV2_LIBRARY_DIRS} NO_DEFAULT_PATH)
-        if(NOT _el)
-            message(STATUS  "  NOT FOUND, searching again in default path")
-            find_library(_el ${l})
-        endif()
-    else()
-        message(STATUS "searching for library ${l}")
-        find_library(_el ${l})# PATHS ${EXIV2_LIBRARY_DIRS})
-    endif()
-    message(STATUS "  result: ${_el}")
-    set(EXIV2_LIBRARIES ${EXIV2_LIBRARIES} ${_el})
-endforeach()
+pkg_check_modules(EXIV2 REQUIRED IMPORTED_TARGET exiv2>=0.24)
 
 if(NOT WITH_SYSTEM_LIBRAW)
     set(LIBRAW_LIBRARIES "${CMAKE_CURRENT_BINARY_DIR}/rtengine/libraw/lib/.libs/libraw_r.a")
@@ -541,9 +498,10 @@ if(WIN32)
     set(EXTRA_LIB "-lws2_32 -lshlwapi")
 endif()
 
-pkg_check_modules(LCMS REQUIRED lcms2>=2.6)
-pkg_check_modules(EXPAT REQUIRED expat>=2.1)
-pkg_check_modules(FFTW3F REQUIRED fftw3f)
+pkg_check_modules(EXPAT REQUIRED IMPORTED_TARGET expat>=2.1)
+pkg_check_modules(FFTW3F REQUIRED IMPORTED_TARGET fftw3f)
+pkg_check_modules(IPTCDATA REQUIRED IMPORTED_TARGET libiptcdata)
+pkg_check_modules(LCMS REQUIRED IMPORTED_TARGET lcms2>=2.6)
 
 # By default little-cms2 uses 'register' keyword which is deprecated and removed in c++17
 # This definition forces not to use it
@@ -554,7 +512,6 @@ if(APPLE AND OPTION_OMP)
         set(EXTRA_LIB "-L${LOCAL_PREFIX}/lib -lfftw3f_omp -lfftw3f -lm")
 endif()
 
-pkg_check_modules(IPTCDATA REQUIRED libiptcdata)
 find_package(TIFF 4.0.4 REQUIRED)
 find_package(JPEG REQUIRED)
 find_package(PNG REQUIRED)
@@ -596,8 +553,8 @@ endif()
 if(UNIX AND (NOT APPLE))
     option(USE_LIBCANBERRA "Build with libcanberra" ON)
     if(USE_LIBCANBERRA)
-       pkg_check_modules(CANBERRA-GTK REQUIRED libcanberra-gtk3)
-       add_definitions(-DUSE_CANBERRA)
+        pkg_check_modules(CANBERRA-GTK REQUIRED IMPORTED_TARGET libcanberra-gtk3)
+        add_definitions(-DUSE_CANBERRA)
     endif()
 endif()
 

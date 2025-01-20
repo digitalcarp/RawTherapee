@@ -191,66 +191,11 @@ if(WIN32)
     set(EXTRA_SRC_CLI myicon.rc)
     set(EXTRA_SRC_NONCLI myicon.rc)
     set(EXTRA_LIB_RTGUI winmm)
-    include_directories(${EXTRA_INCDIR}
-        ${GIOMM_INCLUDE_DIRS}
-        ${GIO_INCLUDE_DIRS}
-        ${GLIB2_INCLUDE_DIRS}
-        ${GLIBMM_INCLUDE_DIRS}
-        ${GTKMM_INCLUDE_DIRS}
-        ${GTK_INCLUDE_DIRS}
-        ${LENSFUN_INCLUDE_DIRS}
-        ${RSVG_INCLUDE_DIRS}
-        ${TIFF_INCLUDE_DIRS}
-        )
-    link_directories(.
-        ${EXTRA_LIBDIR}
-        ${GIOMM_LIBRARY_DIRS}
-        ${GIO_LIBRARY_DIRS}
-        ${GLIB2_LIBRARY_DIRS}
-        ${GLIBMM_LIBRARY_DIRS}
-        ${GTKMM_LIBRARY_DIRS}
-        ${GTK_LIBRARY_DIRS}
-        ${LENSFUN_LIBRARY_DIRS}
-        ${RSVG_LIBRARY_DIRS}
-        ${TIFF_LIBRARY_DIRS}
-        )
+    include_directories(${EXTRA_INCDIR})
+    link_directories(. ${EXTRA_LIBDIR})
 else()
-    include_directories(${EXTRA_INCDIR}
-        ${CANBERRA-GTK_INCLUDE_DIRS}
-        ${EXPAT_INCLUDE_DIRS}
-        ${FFTW3F_LIBRARY_DIRS}
-        ${GIOMM_INCLUDE_DIRS}
-        ${GIO_INCLUDE_DIRS}
-        ${GLIB2_INCLUDE_DIRS}
-        ${GLIBMM_INCLUDE_DIRS}
-        ${GOBJECT_INCLUDE_DIRS}
-        ${GTHREAD_INCLUDE_DIRS}
-        ${GTKMM_INCLUDE_DIRS}
-        ${GTK_INCLUDE_DIRS}
-        ${IPTCDATA_INCLUDE_DIRS}
-        ${LCMS_INCLUDE_DIRS}
-        ${LENSFUN_INCLUDE_DIRS}
-        ${RSVG_INCLUDE_DIRS}
-        ${TIFF_INCLUDE_DIRS}
-        )
-    link_directories(${EXTRA_LIBDIR}
-        ${CANBERRA-GTK_LIBRARY_DIRS}
-        ${EXPAT_LIBRARY_DIRS}
-        ${FFTW3F_LIBRARY_DIRS}
-        ${GIOMM_LIBRARY_DIRS}
-        ${GIO_LIBRARY_DIRS}
-        ${GLIB2_LIBRARY_DIRS}
-        ${GLIBMM_LIBRARY_DIRS}
-        ${GOBJECT_LIBRARY_DIRS}
-        ${GTHREAD_LIBRARY_DIRS}
-        ${GTKMM_LIBRARY_DIRS}
-        ${GTK_LIBRARY_DIRS}
-        ${IPTCDATA_LIBRARY_DIRS}
-        ${LCMS_LIBRARY_DIRS}
-        ${LENSFUN_LIBRARY_DIRS}
-        ${RSVG_LIBRARY_DIRS}
-        ${TIFF_LIBRARY_DIRS}
-        )
+    include_directories(${EXTRA_INCDIR})
+    link_directories(${EXTRA_LIBDIR})
 endif()
 
 # Excluding libatomic needed by Clang/FreeBSD, #3636
@@ -292,50 +237,24 @@ set_target_properties(rth-cli PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}" OUTP
 
 # Add linked libraries dependencies to executables targets
 target_link_libraries(rth rtengine
-    ${CANBERRA-GTK_LIBRARIES}
-    ${EXPAT_LIBRARIES}
+    # GTK Libraries
+    PkgConfig::GTK
+    PkgConfig::GTKMM
+    PkgConfig::GLIB2
+    PkgConfig::GLIBMM
+    PkgConfig::CAIROMM
+    PkgConfig::SIGC
+    # Other Libraries
+    PkgConfig::CANBERRA-GTK
     ${EXTRA_LIB_RTGUI}
-    ${FFTW3F_LIBRARIES}
-    ${GIOMM_LIBRARIES}
-    ${GIO_LIBRARIES}
-    ${GLIB2_LIBRARIES}
-    ${GLIBMM_LIBRARIES}
-    ${GOBJECT_LIBRARIES}
-    ${GTHREAD_LIBRARIES}
-    ${GTKMM_LIBRARIES}
-    ${GTK_LIBRARIES}
-    ${IPTCDATA_LIBRARIES}
-    ${JPEG_LIBRARIES}
-    ${LCMS_LIBRARIES}
-    ${PNG_LIBRARIES}
-    ${TIFF_LIBRARIES}
-    ${ZLIB_LIBRARIES}
-    ${LENSFUN_LIBRARIES}
-    ${RSVG_LIBRARIES}
     ${TCMALLOC_LIBRARIES}
-    )
+)
 
 target_link_libraries(rth-cli rtengine
-    ${CAIROMM_LIBRARIES}
-    ${EXPAT_LIBRARIES}
+    PkgConfig::GTKMM  # Needed by editcallbacks.cc
     ${EXTRA_LIB_RTGUI}
-    ${FFTW3F_LIBRARIES}
-    ${GIOMM_LIBRARIES}
-    ${GIO_LIBRARIES}
-    ${GLIB2_LIBRARIES}
-    ${GLIBMM_LIBRARIES}
-    ${GOBJECT_LIBRARIES}
-    ${GTHREAD_LIBRARIES}
-    ${IPTCDATA_LIBRARIES}
-    ${JPEG_LIBRARIES}
-    ${LCMS_LIBRARIES}
-    ${PNG_LIBRARIES}
-    ${TIFF_LIBRARIES}
-    ${ZLIB_LIBRARIES}
-    ${LENSFUN_LIBRARIES}
-    ${RSVG_LIBRARIES}
     ${TCMALLOC_LIBRARIES}
-    )
+)
 
 # Install executables
 install(TARGETS rth DESTINATION "${BINDIR}")
