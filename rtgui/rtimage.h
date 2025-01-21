@@ -53,8 +53,8 @@ private:
 
 public:
     RTImage ();
-    explicit RTImage (const Glib::ustring& iconName, const Gtk::IconSize iconSize = Gtk::ICON_SIZE_SMALL_TOOLBAR);
-    explicit RTImage (const Glib::RefPtr<const Gio::Icon>& gIcon, const Gtk::IconSize iconSize = Gtk::ICON_SIZE_SMALL_TOOLBAR);
+    explicit RTImage (const Glib::ustring& iconName, const Gtk::IconSize iconSize = Gtk::IconSize::LARGE);
+    explicit RTImage (const Glib::RefPtr<const Gio::Icon>& gIcon, const Gtk::IconSize iconSize = Gtk::IconSize::LARGE);
 
     void set_from_icon_name(const Glib::ustring& iconName);
     void set_from_icon_name(const Glib::ustring& iconName, const Gtk::IconSize iconSize);

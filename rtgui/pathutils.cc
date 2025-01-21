@@ -24,8 +24,7 @@
 
 Glib::ustring removeExtension (const Glib::ustring& filename)
 {
-
-    Glib::ustring bname = Glib::path_get_basename(filename);
+    Glib::ustring bname = Glib::path_get_basename(filename.c_str());
     size_t lastdot = bname.find_last_of ('.');
     size_t lastwhitespace = bname.find_last_of (" \t\f\v\n\r");
 
@@ -38,8 +37,7 @@ Glib::ustring removeExtension (const Glib::ustring& filename)
 
 Glib::ustring getExtension (const Glib::ustring& filename)
 {
-
-    Glib::ustring bname = Glib::path_get_basename(filename);
+    Glib::ustring bname = Glib::path_get_basename(filename.c_str());
     size_t lastdot = bname.find_last_of ('.');
     size_t lastwhitespace = bname.find_last_of (" \t\f\v\n\r");
 

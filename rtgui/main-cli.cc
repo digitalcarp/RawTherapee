@@ -45,11 +45,9 @@
 #include <glibmm/fileutils.h>
 #include <glib.h>
 #include <glib/gstdio.h>
-#include <glibmm/threads.h>
 #else
 #include <windows.h>
 #include <shlobj.h>
-#include <glibmm/thread.h>
 #include "conio.h"
 #endif
 
@@ -430,7 +428,7 @@ int processLineParams ( int argc, char **argv )
                             continue;
                         }
 
-                        if (Glib::file_test (argument, Glib::FILE_TEST_IS_REGULAR)) {
+                        if (Glib::file_test (argument, Glib::FileTest::IS_REGULAR)) {
                             bool notAll = allExtensions && !options.is_parse_extention (argument);
                             bool notRetained = !allExtensions && !options.has_retained_extention (argument);
 
@@ -635,7 +633,7 @@ int processLineParams ( int argc, char **argv )
         rawParams = new rtengine::procparams::PartialProfile (true, true);
         Glib::ustring profPath = options.findProfilePath (options.defProfRaw);
 
-        if (options.is_defProfRawMissing() || profPath.empty() || (profPath != DEFPROFILE_DYNAMIC && rawParams->load (profPath == DEFPROFILE_INTERNAL ? DEFPROFILE_INTERNAL : Glib::build_filename (profPath, Glib::path_get_basename (options.defProfRaw) + paramFileExtension)))) {
+        if (options.is_defProfRawMissing() || profPath.empty() || (profPath != DEFPROFILE_DYNAMIC && rawParams->load (profPath == DEFPROFILE_INTERNAL ? DEFPROFILE_INTERNAL : Glib::build_filename (profPath, Glib::path_get_basename (options.defProfRaw.c_str()) + paramFileExtension)))) {
             std::cerr << "Error: default raw processing profile not found." << std::endl;
             rawParams->deleteInstance();
             delete rawParams;
@@ -646,7 +644,7 @@ int processLineParams ( int argc, char **argv )
         imgParams = new rtengine::procparams::PartialProfile (true);
         profPath = options.findProfilePath (options.defProfImg);
 
-        if (options.is_defProfImgMissing() || profPath.empty() || (profPath != DEFPROFILE_DYNAMIC && imgParams->load (profPath == DEFPROFILE_INTERNAL ? DEFPROFILE_INTERNAL : Glib::build_filename (profPath, Glib::path_get_basename (options.defProfImg) + paramFileExtension)))) {
+        if (options.is_defProfImgMissing() || profPath.empty() || (profPath != DEFPROFILE_DYNAMIC && imgParams->load (profPath == DEFPROFILE_INTERNAL ? DEFPROFILE_INTERNAL : Glib::build_filename (profPath, Glib::path_get_basename (options.defProfImg.c_str()) + paramFileExtension)))) {
             std::cerr << "Error: default non-raw processing profile not found." << std::endl;
             imgParams->deleteInstance();
             delete imgParams;
@@ -682,7 +680,7 @@ int processLineParams ( int argc, char **argv )
             Glib::ustring::size_type ext = s.find_last_of ('.');
             outputFile = s.substr (0, ext) + "." + outputType;
         } else if ( outputDirectory ) {
-            Glib::ustring s = Glib::path_get_basename ( inputFile );
+            Glib::ustring s = Glib::path_get_basename (inputFile.c_str());
             Glib::ustring::size_type ext = s.find_last_of ('.');
             outputFile = Glib::build_filename (outputPath, s.substr (0, ext) + "." + outputType);
         } else {

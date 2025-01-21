@@ -180,7 +180,7 @@ private:
      * @param destination destination variable to store to
      * @return @c true if @p destination was changed
      */
-    bool safeDirGet (const Glib::KeyFile& keyFile, const Glib::ustring& section,
+    bool safeDirGet (const std::shared_ptr<Glib::KeyFile>& keyFile, const Glib::ustring& section,
                      const Glib::ustring& entryName, Glib::ustring& destination);
 
 public:
