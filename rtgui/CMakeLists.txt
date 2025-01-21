@@ -56,7 +56,7 @@ set(NONCLISOURCEFILES
     # distortion.cc
     # dynamicprofilepanel.cc
     # editbuffer.cc
-    # editcallbacks.cc
+    editcallbacks.cc
     # editorpanel.cc
     # editwidgets.cc
     # editwindow.cc
@@ -66,7 +66,7 @@ set(NONCLISOURCEFILES
     # exifpanel.cc
     # exportpanel.cc
     # externaleditorpreferences.cc
-    # extprog.cc
+    extprog.cc
     # fattaltonemap.cc
     # filebrowser.cc
     # filebrowserentry.cc
@@ -106,15 +106,15 @@ set(NONCLISOURCEFILES
     # lwbuttonset.cc
     main.cc
     # metadatapanel.cc
-    # multilangmgr.cc
+    multilangmgr.cc
     # mycurve.cc
     # mydiagonalcurve.cc
     # myflatcurve.cc
     # navigator.cc
-    # options.cc
-    # paramsedited.cc
+    options.cc
+    paramsedited.cc
     # partialpastedlg.cc
-    # pathutils.cc
+    pathutils.cc
     # pcvignette.cc
     # pdsharpening.cc
     # perspective.cc

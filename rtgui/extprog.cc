@@ -49,7 +49,7 @@ bool ExtProgAction::execute (const std::vector<Glib::ustring>& fileNames) const
             continue;
         }
 
-        Gtk::MessageDialog (M("MAIN_MSG_IMAGEUNPROCESSED"), true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true).run ();
+        Gtk::MessageDialog (M("MAIN_MSG_IMAGEUNPROCESSED"), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true).present ();
         return false;
     }
 
@@ -363,7 +363,7 @@ bool ExtProgStore::openInExternalEditor(const Glib::ustring &fileName, const Edi
     try {
         Glib::RefPtr<Gio::AppInfo> appInfo =
             Gio::AppInfo::create_from_commandline(
-                editorInfo.commandline, editorInfo.name, Gio::APP_INFO_CREATE_NONE);
+                editorInfo.commandline, editorInfo.name, Gio::AppInfo::CreateFlags::NONE);
         success = appInfo->launch(Gio::File::create_for_path(fileName));
     } catch (const Glib::Error &e) {
         std::cerr
