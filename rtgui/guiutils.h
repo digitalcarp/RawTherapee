@@ -514,43 +514,6 @@ public:
     const Gtk::Label* getLabel() const;
 };
 
-/**
- * Menu item with an image and label.
- */
-class MyImageMenuItemInterface
-{
-public:
-    virtual const Gtk::Label* getLabel() const = 0;
-};
-
-/**
- * Basic image menu item.
- */
-class MyImageMenuItem final : public Gtk::MenuItem, public MyImageMenuItemInterface
-{
-    class Impl;
-    std::unique_ptr<Impl> pimpl;
-
-public:
-    MyImageMenuItem (const Glib::ustring& label, const Glib::ustring& iconName);
-    MyImageMenuItem (const Glib::ustring& label, RTImage* image);
-    const RTImage *getImage () const;
-    const Gtk::Label* getLabel() const override;
-};
-
-/**
- * Image menu item with radio selector.
- */
-class MyRadioImageMenuItem final : public Gtk::RadioMenuItem, public MyImageMenuItemInterface
-{
-    class Impl;
-    std::unique_ptr<Impl> pimpl;
-
-public:
-    MyRadioImageMenuItem(const Glib::ustring& label, RTImage* image, Gtk::RadioButton::Group& group);
-    const Gtk::Label* getLabel() const override;
-};
-
 class MyProgressBar final : public Gtk::ProgressBar
 {
 private:
@@ -775,7 +738,7 @@ inline void setActiveTextOrIndex(Gtk::ComboBoxText &comboBox, const Glib::ustrin
     }
 }
 
-inline Gtk::Window& getToplevelWindow (Gtk::Widget* widget)
+inline Gtk::Window* getToplevelWindow(Gtk::Widget* widget)
 {
-    return *static_cast<Gtk::Window*> (widget->get_toplevel ());
+    return dynamic_cast<Gtk::Window*>(widget->get_root());
 }
