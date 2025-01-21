@@ -71,7 +71,6 @@ Glib::ustring argv1;
 Glib::ustring argv2;
 bool simpleEditor = false;
 bool gimpPlugin = false;
-bool remote = false;
 
 namespace {
 
@@ -113,21 +112,10 @@ int processLineParams ( int argc, char **argv )
                     ret = 0;
                     break;
 
-#ifndef __APPLE__ // TODO agriggio - there seems to be already some "single instance app" support for OSX in rtwindow. Disabling it here until I understand how to merge the two
-
-                case 'R':
-                    if (!gimpPlugin) {
-                        remote = true;
-                    }
-
-                    break;
-#endif
-
                 case 'g':
                     if (currParam == "-gimp") {
                         gimpPlugin = true;
                         simpleEditor = true;
-                        remote = false;
                         break;
                     }
 
@@ -152,9 +140,6 @@ int processLineParams ( int argc, char **argv )
                     printf("  -w Do not open the Windows console\n");
 #endif
                     printf("  -v Print RawTherapee version number and exit\n");
-#ifndef __APPLE__
-                    printf("  -R Raise an already running RawTherapee instance (if available)\n");
-#endif
                     printf("  -h -? Display this help message\n");
 
                     ret = -1;
@@ -350,7 +335,6 @@ int main (int argc, char **argv)
 
     simpleEditor = false;
     gimpPlugin = false;
-    remote = false;
     argv0 = "";
     argv1 = "";
     argv2 = "";
@@ -419,7 +403,7 @@ int main (int argc, char **argv)
     SetErrorMode (SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
 
     if (argc > 1) {
-        if (!remote && !Glib::file_test (argv1, Glib::FileTest::EXISTS ) && !Glib::file_test (argv1, Glib::FileTest::IS_DIR)) {
+        if (!Glib::file_test (argv1, Glib::FileTest::EXISTS ) && !Glib::file_test (argv1, Glib::FileTest::IS_DIR)) {
             const bool stdoutRedirecttoConsole = (GetFileType (GetStdHandle (STD_OUTPUT_HANDLE)) == 0x0000);
             // open console, if stdout is invalid
             if (stdoutRedirecttoConsole) {
@@ -506,14 +490,13 @@ int main (int argc, char **argv)
             printf ("Error: -gimp requires two arguments\n");
             return 1;
         }
-    } else if (!remote && Glib::file_test(argv1, Glib::FileTest::EXISTS) && !Glib::file_test(argv1, Glib::FileTest::IS_DIR)) {
+    } else if (Glib::file_test(argv1, Glib::FileTest::EXISTS) && !Glib::file_test(argv1, Glib::FileTest::IS_DIR)) {
         simpleEditor = true;
     }
 
     int ret = 0;
-    // gtk_init();
 
-    if (fatalError.empty() && remote) {
+    if (fatalError.empty()) {
         char *app_argv[2] = { const_cast<char *> (argv0.c_str()) };
         int app_argc = 1;
 

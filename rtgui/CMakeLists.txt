@@ -245,7 +245,7 @@ target_link_libraries(rth rtengine
     PkgConfig::CAIROMM
     PkgConfig::SIGC
     # Other Libraries
-    PkgConfig::CANBERRA-GTK
+    # PkgConfig::CANBERRA-GTK
     ${EXTRA_LIB_RTGUI}
     ${TCMALLOC_LIBRARIES}
 )
