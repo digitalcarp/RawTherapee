@@ -171,7 +171,9 @@ class MyExpander final : public Gtk::Box
 public:
     typedef sigc::signal<void()> type_signal_enabled_toggled;
 private:
+    type_signal_enabled_toggled titleButtonRelease;
     type_signal_enabled_toggled message;
+
     const Glib::ustring inconsistentImage; /// "inconsistent" image, displayed when useEnabled is true ; in this case, nothing will tell that an expander is opened/closed
     const Glib::ustring enabledImage;      ///      "enabled" image, displayed when useEnabled is true ; in this case, nothing will tell that an expander is opened/closed
     const Glib::ustring disabledImage;     ///     "disabled" image, displayed when useEnabled is true ; in this case, nothing will tell that an expander is opened/closed
@@ -185,14 +187,19 @@ private:
     ExpanderBox* expBox;   /// Frame that includes the child and control its visibility
     Gtk::Box *imageEvBox;  /// Enable/Disable or Open/Close arrow event box
 
+    void setupPart1();
+    void setupPart2();
+
     /// Triggered on opened/closed event
-    bool on_toggle(GdkEventButton* event);
+    void onToggle(int n_press, double x, double y);
     /// Triggered on enabled/disabled change -> will emit a toggle event to the connected objects
-    bool on_enabled_change(GdkEventButton* event);
+    void onEnabledChange(int n_press, double x, double y);
     /// Used to handle the colored background for the whole Title
-    bool on_enter_leave_title (GdkEventCrossing* event);
+    void onEnterTitle();
+    void onLeaveTitle();
     /// Used to handle the colored background for the Enable button
-    bool on_enter_leave_enable (GdkEventCrossing* event);
+    void onEnterEnable();
+    void onLeaveEnable();
 
     void updateStyle();
 
@@ -217,10 +224,7 @@ public:
      */
     MyExpander(bool useEnabled, Gtk::Widget* titleWidget);
 
-    Glib::SignalProxy<bool, GdkEventButton*> signal_button_release_event()
-    {
-        return titleEvBox->signal_button_release_event();
-    }
+    type_signal_enabled_toggled signal_button_release_event();
     type_signal_enabled_toggled signal_enabled_toggled();
 
     /// Set the nesting level of the Expander to adapt its style accordingly

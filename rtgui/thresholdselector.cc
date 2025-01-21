@@ -433,7 +433,7 @@ bool ThresholdSelector::onDraw(const Cairo::RefPtr<Cairo::Context>& cr, int widt
     return true;
 }
 
-void ThresholdSelector::onButtonPress(int n_press, double x, double y)
+void ThresholdSelector::onButtonPress(int /*n_press*/, double x, double /*y*/)
 {
     movedCursor = litCursor;
     findSecondaryMovedCursor(clickController->get_current_event_state());
@@ -445,7 +445,7 @@ void ThresholdSelector::onButtonPress(int n_press, double x, double y)
     return true;
 }
 
-void ThresholdSelector::onButtonRelease(int n_press, double x, double y)
+void ThresholdSelector::onButtonRelease(int /*n_press*/, double x, double y)
 {
     findLitCursor(x, y);
     movedCursor = TS_UNDEFINED;
