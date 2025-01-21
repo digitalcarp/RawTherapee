@@ -24,35 +24,38 @@
 #endif
 
 #include "config.h"
+#include "extprog.h"
+#include "multilangmgr.h"
+#include "options.h"
+#include "pathutils.h"
+#include "soundman.h"
+#include "version.h"
+// #include "rtwindow.h"
+// #include "cachemanager.h"
+// #include "editorpanel.h"
+// #include "filecatalog.h"
+// #include "filepanel.h"
+// #include "rtimage.h"
+
+#include "rtengine/rtengine.h"
+// #include "rtengine/procparams.h"
+// #include "rtengine/dynamicprofile.h"
+
 #include <gtkmm.h>
 #include <giomm.h>
-#include <iostream>
 #include <tiffio.h>
-#include "rtwindow.h"
-#include <cstring>
-#include <cstdlib>
-#include <locale.h>
 #include <lensfun.h>
-#include "cachemanager.h"
-#include "editorpanel.h"
-#include "filecatalog.h"
-#include "filepanel.h"
-#include "options.h"
-#include "soundman.h"
-#include "rtimage.h"
-#include "version.h"
-#include "extprog.h"
-#include "rtengine/dynamicprofile.h"
-#include "rtengine/procparams.h"
-#include "pathutils.h"
+
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <locale.h>
 
 #ifndef _WIN32
 #include <glibmm/fileutils.h>
 #include <glib.h>
 #include <glib/gstdio.h>
-#include <glibmm/threads.h>
 #else
-#include <glibmm/thread.h>
 #include "conio.h"
 #include "windows.h"
 #endif
@@ -69,29 +72,8 @@ Glib::ustring argv2;
 bool simpleEditor = false;
 bool gimpPlugin = false;
 bool remote = false;
-//Glib::Threads::Thread* mainThread;
 
 namespace {
-
-// This recursive mutex will be used by gdk_threads_enter/leave instead of a simple mutex
-static Glib::Threads::RecMutex myGdkRecMutex;
-
-static void myGdkLockEnter()
-{
-    myGdkRecMutex.lock();
-}
-static void myGdkLockLeave()
-{
-    // Automatic gdk_flush for non main thread
-#if AUTO_GDK_FLUSH
-    //if (Glib::Thread::self() != mainThread) {
-    //    gdk_flush();
-    //}
-
-#endif
-    myGdkRecMutex.unlock();
-}
-
 
 /* Process line command options
  * Returns
@@ -212,7 +194,7 @@ bool init_rt()
 #ifndef _WIN32
 
     // Move the old path to the new one if the new does not exist
-    if (Glib::file_test (Glib::build_filename (options.rtdir, "cache"), Glib::FILE_TEST_IS_DIR) && !Glib::file_test (options.cacheBaseDir, Glib::FILE_TEST_IS_DIR)) {
+    if (Glib::file_test (Glib::build_filename (options.rtdir, "cache"), Glib::FileTest::IS_DIR) && !Glib::file_test (options.cacheBaseDir, Glib::FileTest::IS_DIR)) {
         g_rename (Glib::build_filename (options.rtdir, "cache").c_str (), options.cacheBaseDir.c_str ());
     }
 
@@ -221,124 +203,120 @@ bool init_rt()
     return true;
 }
 
-
 void cleanup_rt()
 {
     rtengine::cleanup();
 }
 
-
-RTWindow *create_rt_window()
-{
-    Glib::ustring icon_path = Glib::build_filename (argv0, "icons");
-    Glib::RefPtr<Gtk::IconTheme> defaultIconTheme = Gtk::IconTheme::get_default();
-    defaultIconTheme->append_search_path (icon_path);
-
-    //gdk_threads_enter ();
-    RTWindow *rtWindow = new RTWindow();
-    rtWindow->setWindowSize(); // Need to be called after RTWindow creation to work with all OS Windows Manager
-    return rtWindow;
-}
-
+// RTWindow *create_rt_window()
+// {
+//     Glib::ustring icon_path = Glib::build_filename (argv0, "icons");
+//     Glib::RefPtr<Gtk::IconTheme> defaultIconTheme = Gtk::IconTheme::get_default();
+//     defaultIconTheme->append_search_path (icon_path);
+//
+//     RTWindow *rtWindow = new RTWindow();
+//     rtWindow->setWindowSize(); // Need to be called after RTWindow creation to work with all OS Windows Manager
+//     return rtWindow;
+// }
 
 class RTApplication: public Gtk::Application
 {
 public:
-    RTApplication():
-        Gtk::Application ("com.rawtherapee.application",
-                          Gio::APPLICATION_HANDLES_OPEN),
-        rtWindow (nullptr)
+    RTApplication() :
+        Gtk::Application("com.rawtherapee.application", Gio::APPLICATION_HANDLES_OPEN)
+        // Gtk::Application ("com.rawtherapee.application",
+        //                   Gio::APPLICATION_HANDLES_OPEN),
+        // rtWindow (nullptr)
     {
     }
 
     ~RTApplication() override
     {
-        if (rtWindow) {
-            delete rtWindow;
-        }
+        // if (rtWindow) {
+        //     delete rtWindow;
+        // }
 
         cleanup_rt();
     }
 
 private:
-    bool create_window()
-    {
-        if (rtWindow) {
-            return true;
-        }
-
-        if (!init_rt()) {
-            Gtk::MessageDialog msgd ("Fatal error!\nThe RT_SETTINGS and/or RT_PATH environment variables are set, but use a relative path. The path must be absolute!", true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
-            add_window (msgd);
-            msgd.run ();
-            return false;
-        } else {
-            rtWindow = create_rt_window();
-            add_window (*rtWindow);
-            return true;
-        }
-    }
+    // bool create_window()
+    // {
+    //     if (rtWindow) {
+    //         return true;
+    //     }
+    //
+    //     if (!init_rt()) {
+    //         Gtk::MessageDialog msgd ("Fatal error!\nThe RT_SETTINGS and/or RT_PATH environment variables are set, but use a relative path. The path must be absolute!", true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
+    //         add_window (msgd);
+    //         msgd.present ();
+    //         return false;
+    //     } else {
+    //         rtWindow = create_rt_window();
+    //         add_window (*rtWindow);
+    //         return true;
+    //     }
+    // }
 
     // Override default signal handlers:
     void on_activate() override
     {
-        if (create_window()) {
-            rtWindow->present();
-        }
+        // if (create_window()) {
+        //     rtWindow->present();
+        // }
     }
 
     void on_open (const Gio::Application::type_vec_files& files,
                   const Glib::ustring& hint) override
     {
-        if (create_window()) {
-            struct Data {
-                std::vector<Thumbnail *> entries;
-                Glib::ustring lastfilename;
-                FileCatalog *filecatalog;
-            };
-            Data *d = new Data;
-            d->filecatalog = rtWindow->fpanel->fileCatalog;
-
-            for (const auto &f : files) {
-                Thumbnail *thm = cacheMgr->getEntry (f->get_path());
-
-                if (thm) {
-                    d->entries.push_back (thm);
-                    d->lastfilename = f->get_path();
-                }
-            }
-
-            if (!d->entries.empty()) {
-                const auto doit =
-                [] (gpointer data) -> gboolean {
-                    Data *d = static_cast<Data *> (data);
-                    d->filecatalog->openRequested (d->entries);
-                    d->filecatalog->selectImage (d->lastfilename, true);
-                    delete d;
-                    return FALSE;
-                };
-                gdk_threads_add_idle (doit, d);
-            } else {
-                delete d;
-            }
-
-            rtWindow->present();
-        }
+        // if (create_window()) {
+        //     struct Data {
+        //         std::vector<Thumbnail *> entries;
+        //         Glib::ustring lastfilename;
+        //         FileCatalog *filecatalog;
+        //     };
+        //     Data *d = new Data;
+        //     d->filecatalog = rtWindow->fpanel->fileCatalog;
+        //
+        //     for (const auto &f : files) {
+        //         Thumbnail *thm = cacheMgr->getEntry (f->get_path());
+        //
+        //         if (thm) {
+        //             d->entries.push_back (thm);
+        //             d->lastfilename = f->get_path();
+        //         }
+        //     }
+        //
+        //     if (!d->entries.empty()) {
+        //         const auto doit =
+        //         [] (gpointer data) -> gboolean {
+        //             Data *d = static_cast<Data *> (data);
+        //             d->filecatalog->openRequested (d->entries);
+        //             d->filecatalog->selectImage (d->lastfilename, true);
+        //             delete d;
+        //             return FALSE;
+        //         };
+        //         gdk_threads_add_idle (doit, d);
+        //     } else {
+        //         delete d;
+        //     }
+        //
+        //     rtWindow->present();
+        // }
     }
 
 private:
-    RTWindow *rtWindow;
+    // RTWindow *rtWindow;
 };
 
 void show_gimp_plugin_info_dialog(Gtk::Window *parent)
 {
     if (options.gimpPluginShowInfoDialog) {
-        Gtk::MessageDialog info(*parent, M("GIMP_PLUGIN_INFO"), false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
+        Gtk::MessageDialog info(*parent, M("GIMP_PLUGIN_INFO"), false, Gtk::MessageType::INFO, Gtk::ButtonsType::OK, true);
         Gtk::Box *box = info.get_message_area();
         Gtk::CheckButton dontshowagain(M("DONT_SHOW_AGAIN"));
-        dontshowagain.show();
-        box->pack_start(dontshowagain);
-        info.run();
+        box->prepend(dontshowagain);
+        info.present();
         options.gimpPluginShowInfoDialog = !dontshowagain.get_active();
     }
 }
@@ -422,7 +400,7 @@ int main (int argc, char **argv)
     SetErrorMode (SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
 
     if (argc > 1) {
-        if (!remote && !Glib::file_test (argv1, Glib::FileTest::EXISTS ) && !Glib::file_test (argv1, Glib::FILE_TEST_IS_DIR)) {
+        if (!remote && !Glib::file_test (argv1, Glib::FileTest::EXISTS ) && !Glib::file_test (argv1, Glib::FileTest::IS_DIR)) {
             const bool stdoutRedirecttoConsole = (GetFileType (GetStdHandle (STD_OUTPUT_HANDLE)) == 0x0000);
             // open console, if stdout is invalid
             if (stdoutRedirecttoConsole) {
@@ -500,7 +478,7 @@ int main (int argc, char **argv)
     }
 
     if (gimpPlugin) {
-        if (!Glib::file_test (argv1, Glib::FileTest::EXISTS) || Glib::file_test (argv1, Glib::FILE_TEST_IS_DIR)) {
+        if (!Glib::file_test (argv1, Glib::FileTest::EXISTS) || Glib::file_test (argv1, Glib::FileTest::IS_DIR)) {
             printf ("Error: argv1 doesn't exist\n");
             return 1;
         }
@@ -509,7 +487,7 @@ int main (int argc, char **argv)
             printf ("Error: -gimp requires two arguments\n");
             return 1;
         }
-    } else if (!remote && Glib::file_test(argv1, Glib::FileTest::EXISTS) && !Glib::file_test(argv1, Glib::FILE_TEST_IS_DIR)) {
+    } else if (!remote && Glib::file_test(argv1, Glib::FileTest::EXISTS) && !Glib::file_test(argv1, Glib::FileTest::IS_DIR)) {
         simpleEditor = true;
     }
 
@@ -534,24 +512,24 @@ int main (int argc, char **argv)
         if (fatalError.empty() && init_rt()) {
             Gtk::Main m (&argc, &argv);
             gdk_threads_enter();
-            const std::unique_ptr<RTWindow> rtWindow (create_rt_window());
-            if (gimpPlugin) {
-                show_gimp_plugin_info_dialog(rtWindow.get());
-            }
-            m.run (*rtWindow);
+            // const std::unique_ptr<RTWindow> rtWindow (create_rt_window());
+            // if (gimpPlugin) {
+            //     show_gimp_plugin_info_dialog(rtWindow.get());
+            // }
+            // m.run (*rtWindow);
             gdk_threads_leave();
 
-            if (gimpPlugin && rtWindow->epanel && rtWindow->epanel->isRealized()) {
-                if (!rtWindow->epanel->saveImmediately(argv2, SaveFormat())) {
-                    ret = -2;
-                }
-            }
+            // if (gimpPlugin && rtWindow->epanel && rtWindow->epanel->isRealized()) {
+            //     if (!rtWindow->epanel->saveImmediately(argv2, SaveFormat())) {
+            //         ret = -2;
+            //     }
+            // }
 
             cleanup_rt();
         } else {
             Gtk::Main m (&argc, &argv);
-            Gtk::MessageDialog msgd (Glib::ustring::compose("FATAL ERROR!\n\n%1", fatalError), true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
-            msgd.run ();
+            Gtk::MessageDialog msgd (Glib::ustring::compose("FATAL ERROR!\n\n%1", fatalError), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
+            msgd.present ();
             ret = -2;
         }
     }

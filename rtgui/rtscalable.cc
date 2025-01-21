@@ -24,7 +24,6 @@
 #include <librsvg/rsvg.h>
 
 #include "rtengine/settings.h"
-#include "guiutils.h"
 
 extern Glib::ustring argv0;
 
@@ -203,14 +202,14 @@ Cairo::RefPtr<Cairo::ImageSurface> RTScalable::loadSurfaceFromSVG(const Glib::us
         }
 
         // Create an upscaled surface to avoid blur effect
-        surf = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32,
+        surf = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32,
             w * RTScalable::getScale(),
             h * RTScalable::getScale());
 
         // Render (and erase with) default surface background
         Cairo::RefPtr<Cairo::Context> c = Cairo::Context::create(surf);
         c->set_source_rgba (0., 0., 0., 0.);
-        c->set_operator (Cairo::OPERATOR_CLEAR);
+        c->set_operator (Cairo::Context::Operator::CLEAR);
         c->paint();
 
         // Render upscaled surface based on SVG image
@@ -221,7 +220,7 @@ Cairo::RefPtr<Cairo::ImageSurface> RTScalable::loadSurfaceFromSVG(const Glib::us
             .width = static_cast<double>(w * RTScalable::getScale()),
             .height = static_cast<double>(h * RTScalable::getScale())
         };
-        c->set_operator (Cairo::OPERATOR_OVER);
+        c->set_operator (Cairo::Context::Operator::CLEAR);
         const bool success = rsvg_handle_render_document(handle, c->cobj(), &rect, &error);
 
         if (!success && error) {

@@ -11,173 +11,173 @@ set(CLISOURCEFILES
 )
 
 set(NONCLISOURCEFILES
-    adjuster.cc
-    alignedmalloc.cc
-    aspectratios.cc
-    batchqueue.cc
-    batchqueuebuttonset.cc
-    batchqueueentry.cc
-    batchqueuepanel.cc
-    batchtoolpanelcoord.cc
-    bayerpreprocess.cc
-    bayerprocess.cc
-    bayerrawexposure.cc
-    blackwhite.cc
-    bqentryupdater.cc
-    browserfilter.cc
-    cacheimagedata.cc
-    cachemanager.cc
-    cacorrection.cc
-    checkbox.cc
-    chmixer.cc
-    clipboard.cc
-    coarsepanel.cc
-    colorappearance.cc
-    coloredbar.cc
-    colortoning.cc
-    colorpreview.cc
-    controllines.cc
-    controlspotpanel.cc
-    coordinateadjuster.cc
-    compressgamut.cc
-    crop.cc
-    crophandler.cc
-    cropwindow.cc
-    cursormanager.cc
-    curveeditor.cc
-    curveeditorgroup.cc
-    darkframe.cc
-    defringe.cc
-    dehaze.cc
-    diagonalcurveeditorsubgroup.cc
-    dirbrowser.cc
-    dirpyrdenoise.cc
-    dirpyrequalizer.cc
-    distortion.cc
-    dynamicprofilepanel.cc
-    editbuffer.cc
-    editcallbacks.cc
-    editorpanel.cc
-    editwidgets.cc
-    editwindow.cc
-    epd.cc
-    eventmapper.cc
-    exiffiltersettings.cc
-    exifpanel.cc
-    exportpanel.cc
-    externaleditorpreferences.cc
-    extprog.cc
-    fattaltonemap.cc
-    filebrowser.cc
-    filebrowserentry.cc
-    filecatalog.cc
-    filepanel.cc
-    filethumbnailbuttonset.cc
-    filmnegative.cc
-    filmsimulation.cc
-    filterpanel.cc
-    flatcurveeditorsubgroup.cc
-    flatfield.cc
-    framing.cc
-    gradient.cc
-    guiutils.cc
-    hidpi.cc
-    histogrampanel.cc
-    history.cc
-    hsvequalizer.cc
-    iccprofilecreator.cc
-    icmpanel.cc
-    imagearea.cc
-    imageareapanel.cc
-    impulsedenoise.cc
-    indclippedpanel.cc
-    inspector.cc
-    iptcpanel.cc
-    labcurve.cc
-    labgrid.cc
-    lensgeom.cc
-    lensprofile.cc
-    localcontrast.cc
-    locallab.cc
-    locallabtools.cc
-    locallabtools2.cc
-    lockablecolorpicker.cc
-    lwbutton.cc
-    lwbuttonset.cc
+    # adjuster.cc
+    # alignedmalloc.cc
+    # aspectratios.cc
+    # batchqueue.cc
+    # batchqueuebuttonset.cc
+    # batchqueueentry.cc
+    # batchqueuepanel.cc
+    # batchtoolpanelcoord.cc
+    # bayerpreprocess.cc
+    # bayerprocess.cc
+    # bayerrawexposure.cc
+    # blackwhite.cc
+    # bqentryupdater.cc
+    # browserfilter.cc
+    # cacheimagedata.cc
+    # cachemanager.cc
+    # cacorrection.cc
+    # checkbox.cc
+    # chmixer.cc
+    # clipboard.cc
+    # coarsepanel.cc
+    # colorappearance.cc
+    # coloredbar.cc
+    # colortoning.cc
+    # colorpreview.cc
+    # controllines.cc
+    # controlspotpanel.cc
+    # coordinateadjuster.cc
+    # compressgamut.cc
+    # crop.cc
+    # crophandler.cc
+    # cropwindow.cc
+    # cursormanager.cc
+    # curveeditor.cc
+    # curveeditorgroup.cc
+    # darkframe.cc
+    # defringe.cc
+    # dehaze.cc
+    # diagonalcurveeditorsubgroup.cc
+    # dirbrowser.cc
+    # dirpyrdenoise.cc
+    # dirpyrequalizer.cc
+    # distortion.cc
+    # dynamicprofilepanel.cc
+    # editbuffer.cc
+    # editcallbacks.cc
+    # editorpanel.cc
+    # editwidgets.cc
+    # editwindow.cc
+    # epd.cc
+    # eventmapper.cc
+    # exiffiltersettings.cc
+    # exifpanel.cc
+    # exportpanel.cc
+    # externaleditorpreferences.cc
+    # extprog.cc
+    # fattaltonemap.cc
+    # filebrowser.cc
+    # filebrowserentry.cc
+    # filecatalog.cc
+    # filepanel.cc
+    # filethumbnailbuttonset.cc
+    # filmnegative.cc
+    # filmsimulation.cc
+    # filterpanel.cc
+    # flatcurveeditorsubgroup.cc
+    # flatfield.cc
+    # framing.cc
+    # gradient.cc
+    # guiutils.cc
+    # hidpi.cc
+    # histogrampanel.cc
+    # history.cc
+    # hsvequalizer.cc
+    # iccprofilecreator.cc
+    # icmpanel.cc
+    # imagearea.cc
+    # imageareapanel.cc
+    # impulsedenoise.cc
+    # indclippedpanel.cc
+    # inspector.cc
+    # iptcpanel.cc
+    # labcurve.cc
+    # labgrid.cc
+    # lensgeom.cc
+    # lensprofile.cc
+    # localcontrast.cc
+    # locallab.cc
+    # locallabtools.cc
+    # locallabtools2.cc
+    # lockablecolorpicker.cc
+    # lwbutton.cc
+    # lwbuttonset.cc
     main.cc
-    metadatapanel.cc
-    multilangmgr.cc
-    mycurve.cc
-    mydiagonalcurve.cc
-    myflatcurve.cc
-    navigator.cc
-    options.cc
-    paramsedited.cc
-    partialpastedlg.cc
-    pathutils.cc
-    pcvignette.cc
-    pdsharpening.cc
-    perspective.cc
-    placesbrowser.cc
-    popupbutton.cc
-    popupcommon.cc
-    popuptogglebutton.cc
-    preferences.cc
-    preprocess.cc
-    preprocesswb.cc
-    previewhandler.cc
-    previewloader.cc
-    previewmodepanel.cc
-    previewwindow.cc
-    profilepanel.cc
-    profilestorecombobox.cc
-    prsharpening.cc
-    rawcacorrection.cc
-    rawexposure.cc
-    recentbrowser.cc
-    renamedlg.cc
-    resize.cc
-    retinex.cc
-    rgbcurves.cc
-    rotate.cc
-    rtappchooserdialog.cc
-    rtimage.cc
-    rtscalable.cc
-    rtsurface.cc
-    rtwindow.cc
-    saveasdlg.cc
-    saveformatpanel.cc
-    sensorbayer.cc
-    sensorxtrans.cc
-    shadowshighlights.cc
-    sharpenedge.cc
-    sharpening.cc
-    sharpenmicro.cc
-    shcselector.cc
-    softlight.cc
-    soundman.cc
-    splash.cc
-    spot.cc
-    threadutils.cc
-    thresholdadjuster.cc
-    thresholdselector.cc
-    thumbbrowserbase.cc
-    thumbbrowserentrybase.cc
-    thumbimageupdater.cc
-    thumbnail.cc
-    tonecurve.cc
-    toneequalizer.cc
-    toolbar.cc
-    toollocationpref.cc
-    toolpanel.cc
-    toolpanelcoord.cc
-    vibrance.cc
-    vignetting.cc
-    wavelet.cc
-    whitebalance.cc
-    xtransprocess.cc
-    xtransrawexposure.cc
-    zoompanel.cc
+    # metadatapanel.cc
+    # multilangmgr.cc
+    # mycurve.cc
+    # mydiagonalcurve.cc
+    # myflatcurve.cc
+    # navigator.cc
+    # options.cc
+    # paramsedited.cc
+    # partialpastedlg.cc
+    # pathutils.cc
+    # pcvignette.cc
+    # pdsharpening.cc
+    # perspective.cc
+    # placesbrowser.cc
+    # popupbutton.cc
+    # popupcommon.cc
+    # popuptogglebutton.cc
+    # preferences.cc
+    # preprocess.cc
+    # preprocesswb.cc
+    # previewhandler.cc
+    # previewloader.cc
+    # previewmodepanel.cc
+    # previewwindow.cc
+    # profilepanel.cc
+    # profilestorecombobox.cc
+    # prsharpening.cc
+    # rawcacorrection.cc
+    # rawexposure.cc
+    # recentbrowser.cc
+    # renamedlg.cc
+    # resize.cc
+    # retinex.cc
+    # rgbcurves.cc
+    # rotate.cc
+    # rtappchooserdialog.cc
+    # rtimage.cc
+    # rtscalable.cc
+    # rtsurface.cc
+    # rtwindow.cc
+    # saveasdlg.cc
+    # saveformatpanel.cc
+    # sensorbayer.cc
+    # sensorxtrans.cc
+    # shadowshighlights.cc
+    # sharpenedge.cc
+    # sharpening.cc
+    # sharpenmicro.cc
+    # shcselector.cc
+    # softlight.cc
+    # soundman.cc
+    # splash.cc
+    # spot.cc
+    # threadutils.cc
+    # thresholdadjuster.cc
+    # thresholdselector.cc
+    # thumbbrowserbase.cc
+    # thumbbrowserentrybase.cc
+    # thumbimageupdater.cc
+    # thumbnail.cc
+    # tonecurve.cc
+    # toneequalizer.cc
+    # toolbar.cc
+    # toollocationpref.cc
+    # toolpanel.cc
+    # toolpanelcoord.cc
+    # vibrance.cc
+    # vignetting.cc
+    # wavelet.cc
+    # whitebalance.cc
+    # xtransprocess.cc
+    # xtransrawexposure.cc
+    # zoompanel.cc
 )
 
 if(APPLE)
