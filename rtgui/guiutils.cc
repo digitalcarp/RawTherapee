@@ -35,6 +35,19 @@ using namespace std;
 namespace
 {
 
+template <class T, class RemoveFunc>
+bool removeIfThere(T parent, Gtk::Widget* widget, bool inc_ref, RemoveFunc remove)
+{
+    auto found = std::find(parent->get_children().begin(), parent->get_children().end(), widget);
+    if (!found) return false;
+
+    if (inc_ref) {
+        widget->reference();
+    }
+    std::invoke(remove);
+    return true;
+}
+
 void drawCropGuides(const Cairo::RefPtr<Cairo::Context>& cr,
                     double rectx1, double recty1, double rectx2, double recty2,
                     const rtengine::procparams::CropParams& cparams)
@@ -415,24 +428,13 @@ Gtk::Border getPadding(const Glib::RefPtr<Gtk::StyleContext> style)
     return padding;
 }
 
-bool removeIfThere (Gtk::Container* cont, Gtk::Widget* w, bool increference)
+bool removeIfThere(Gtk::Box* box, Gtk::Widget* w, bool increference)
 {
-
-    Glib::ListHandle<Gtk::Widget*> list = cont->get_children ();
-    Glib::ListHandle<Gtk::Widget*>::iterator i = list.begin ();
-
-    for (; i != list.end() && *i != w; ++i);
-
-    if (i != list.end()) {
-        if (increference) {
-            w->reference ();
-        }
-
-        cont->remove (*w);
-        return true;
-    } else {
-        return false;
-    }
+    return removeIfThere(box, w, increference, [&]() { box->remove(w); });
+}
+bool removeIfThere(Gtk::Grid* grid, Gtk::Widget* w, bool increference)
+{
+    return removeIfThere(grid, w, increference, [&]() { grid->remove(w); });
 }
 
 bool confirmOverwrite (Gtk::Window& parent, const std::string& filename)
@@ -509,48 +511,9 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
     }
 }
 
-/*
-bool ExpanderBox::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr) {
-
-    if (!options.useSystemTheme) {
-        Glib::RefPtr<Gtk::Window> window = get_window();
-        Glib::RefPtr<Gtk::StyleContext> style = get_style_context ();
-
-        int x_, y_, w_, h_;
-        window->get_geometry(x_, y_, w_, h_);
-        double x = 0.;
-        double y = 0.;
-        double w = double(w_);
-        double h = double(h_);
-
-        cr->set_antialias (Cairo::ANTIALIAS_NONE);
-
-        // draw a frame
-        style->render_background(cr, x, y, w, h);
-        / *
-        cr->set_line_width (1.0);
-        Gdk::RGBA c = style->get_color (Gtk::STATE_FLAG_NORMAL);
-        cr->set_source_rgb (c.get_red(), c.get_green(), c.get_blue());
-        cr->move_to(x+0.5, y+0.5);
-        cr->line_to(x+w, y+0.5);
-        cr->line_to(x+w, y+h);
-        cr->line_to(x+0.5, y+h);
-        cr->line_to(x+0.5, y+0.5);
-        cr->stroke ();
-        * /
-    }
-    return Gtk::EventBox::on_draw(cr);
-}
-*/
-
 ExpanderBox::ExpanderBox( Gtk::Container *p): pC(p)
 {
     set_name ("ExpanderBox");
-//GTK318
-#if GTK_MAJOR_VERSION == 3 && GTK_MINOR_VERSION < 20
-    set_border_width(2);
-#endif
-//GTK318
 }
 
 void ExpanderBox::setLevel(int level)
@@ -572,12 +535,12 @@ void ExpanderBox::show_all()
 
 void ExpanderBox::showBox()
 {
-    Gtk::EventBox::show();
+    Gtk::Box::show();
 }
 
 void ExpanderBox::hideBox()
 {
-    Gtk::EventBox::hide();
+    Gtk::Box::hide();
 }
 
 MyExpander::MyExpander(bool useEnabled, Gtk::Widget* titleWidget) :

@@ -50,7 +50,10 @@ class RTImage;
 class ToolPanel;
 
 Glib::ustring escapeHtmlChars(const Glib::ustring &src);
-bool removeIfThere (Gtk::Container* cont, Gtk::Widget* w, bool increference = true);
+
+bool removeIfThere(Gtk::Box* box, Gtk::Widget* w, bool increference = true);
+bool removeIfThere(Gtk::Grid* grid, Gtk::Widget* w, bool increference = true);
+
 bool confirmOverwrite (Gtk::Window& parent, const std::string& filename);
 void writeFailed (Gtk::Window& parent, const std::string& filename);
 void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
@@ -139,17 +142,10 @@ private:
 /**
  * @brief Glue box to control visibility of the MyExpender's content ; also handle the frame around it
  */
-class ExpanderBox final : public Gtk::EventBox
+class ExpanderBox final : public Gtk::Box
 {
-private:
-    Gtk::Container *pC;
-
 public:
-    explicit ExpanderBox( Gtk::Container *p);
-    ~ExpanderBox( ) override
-    {
-        delete pC;
-    }
+    ExpanderBox();
 
     void setLevel(int level);
 
@@ -160,8 +156,6 @@ public:
 
     void showBox();
     void hideBox();
-
-//  bool on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr);
 };
 
 /**
@@ -183,15 +177,13 @@ private:
     const Glib::ustring disabledImage;     ///     "disabled" image, displayed when useEnabled is true ; in this case, nothing will tell that an expander is opened/closed
     const Glib::ustring openedImage;       ///       "opened" image, displayed when useEnabled is false
     const Glib::ustring closedImage;       ///       "closed" image, displayed when useEnabled is false
-    bool enabled;               /// Enabled feature (default to true)
-    bool inconsistent;          /// True if the enabled button is inconsistent
-    Gtk::EventBox *titleEvBox;  /// EventBox of the title, to get a connector from it
+    bool enabled;          /// Enabled feature (default to true)
+    bool inconsistent;     /// True if the enabled button is inconsistent
+    Gtk::Box *titleEvBox;  /// EventBox of the title, to get a connector from it
     Gtk::Box *headerHBox;
-    bool flushEvent;            /// Flag to control the weird event mechanism of Gtk (please prove me wrong!)
-    ExpanderBox* expBox;        /// Frame that includes the child and control its visibility
-    Gtk::EventBox *imageEvBox;  /// Enable/Disable or Open/Close arrow event box
-
-    using Gtk::Container::add;
+    bool flushEvent;       /// Flag to control the weird event mechanism of Gtk (please prove me wrong!)
+    ExpanderBox* expBox;   /// Frame that includes the child and control its visibility
+    Gtk::Box *imageEvBox;  /// Enable/Disable or Open/Close arrow event box
 
     /// Triggered on opened/closed event
     bool on_toggle(GdkEventButton* event);
@@ -205,7 +197,7 @@ private:
     void updateStyle();
 
 protected:
-    Gtk::Container* child;      /// Gtk::Contained to display below the expander's title
+    Gtk::Widget* child;         /// Widget to display below the expander's title
     Gtk::Widget* headerWidget;  /// Widget to display in the header, next to the arrow image ; can be NULL if the "string" version of the ctor has been used
     RTImage* statusImage;       /// Image to display the opened/closed status (if useEnabled is false) of the enabled/disabled status (if useEnabled is true)
     Gtk::Label* label;          /// Text to display in the header, next to the arrow image ; can be NULL if the "widget" version of the ctor has been used
@@ -267,9 +259,9 @@ public:
     /// Get the collapsed/expanded state of the expander
     bool get_expanded();
 
-    /// Add a Gtk::Container for the content of the expander
+    /// Add a widget for the content of the expander
     /// Warning: do not manually Show/Hide the widget, because this parameter is handled by the click on the Expander's title
-    void add  (Gtk::Container& widget, bool setChild = true);
+    void add(Gtk::Widget& widget, bool setChild = true);
 
     void updateVScrollbars(bool hide);
 };
@@ -730,9 +722,9 @@ class SpotPicker : public Gtk::Grid
         {
             _spotButton.signal_toggled().connect(sigc::mem_fun(returnv, function));
         }
-        bool remove_if_there(Gtk::Container* cont, bool increference = true)
+        bool remove_if_there(Gtk::Box* box, bool increference = true)
         {
-            return removeIfThere(cont, &_spotButton, increference);
+            return removeIfThere(box, &_spotButton, increference);
         }
 
     protected:
