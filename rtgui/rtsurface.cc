@@ -34,7 +34,7 @@ RTSurface::RTSurface() :
     // Initialize other private parameters
     type = RTSurfaceType::InvalidType;
     name = "";
-    icon_size = Gtk::ICON_SIZE_INVALID;
+    icon_size = Gtk::IconSize::INHERIT;
 }
 
 RTSurface::RTSurface(const Glib::ustring &icon_name, const Gtk::IconSize iconSize) :
@@ -88,18 +88,20 @@ RTSurface::RTSurface(const Glib::ustring &fname) :
 
 int RTSurface::getWidth()
 {
-    int w, h;
-
     if (hasSurface()) {
         switch (type) {
             case RTSurfaceType::IconType:
-                // Get width from Gtk::IconSize
-                if (!Gtk::IconSize::lookup(icon_size, w, h)) { // Size in invalid
-                    w = h = -1; // Invalid case
-                }
-
-                return RTScalable::scalePixelSize(w);
-
+            {
+                // int w, h;
+                // // Get width from Gtk::IconSize
+                // if (!Gtk::IconSize::lookup(icon_size, w, h)) { // Size in invalid
+                //     w = h = -1; // Invalid case
+                // }
+                //
+                // return RTScalable::scalePixelSize(w);
+                // TODO: Icon size scaling?
+                return RTScalable::scalePixelSize(16);
+            }
             case RTSurfaceType::PNGType:
                 // Directly return surface width
                 return surface->get_width();
@@ -121,18 +123,20 @@ int RTSurface::getWidth()
 
 int RTSurface::getHeight()
 {
-    int w, h;
-
     if (hasSurface()) {
         switch (type) {
             case RTSurfaceType::IconType:
-                // Get width from Gtk::IconSize
-                if (!Gtk::IconSize::lookup(icon_size, w, h)) { // Size in invalid
-                    w = h = -1; // Invalid case
-                }
-
-                return RTScalable::scalePixelSize(h);
-
+            {
+                // int w, h;
+                // // Get width from Gtk::IconSize
+                // if (!Gtk::IconSize::lookup(icon_size, w, h)) { // Size in invalid
+                //     w = h = -1; // Invalid case
+                // }
+                //
+                // return RTScalable::scalePixelSize(w);
+                // TODO: Icon size scaling?
+                return RTScalable::scalePixelSize(16);
+            }
             case RTSurfaceType::PNGType:
                 // Directly return surface width
                 return surface->get_height();

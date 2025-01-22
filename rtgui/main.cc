@@ -195,12 +195,8 @@ void cleanup_rt()
 
 RtWindow *create_rt_window()
 {
-    Glib::ustring icon_path = Glib::build_filename (argv0, "icons");
-    Glib::RefPtr<Gtk::IconTheme> defaultIconTheme = Gtk::IconTheme::get_default();
-    defaultIconTheme->append_search_path (icon_path);
-
     RtWindow *rtWindow = new RtWindow();
-    rtWindow->setWindowSize(); // Need to be called after RTWindow creation to work with all OS Windows Manager
+    // rtWindow->setWindowSize(); // Need to be called after RTWindow creation to work with all OS Windows Manager
     return rtWindow;
 }
 

@@ -156,7 +156,7 @@ set(NONCLISOURCEFILES
     # shcselector.cc
     # softlight.cc
     # soundman.cc
-    splash.cc
+    # splash.cc
     # spot.cc
     # threadutils.cc
     # thresholdadjuster.cc

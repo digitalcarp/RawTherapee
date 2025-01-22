@@ -49,8 +49,10 @@ int RTScalable::getScaleForWidget(const Gtk::Widget* widget)
 void RTScalable::getDPInScale(const Gtk::Window* window, double &newDPI, int &newScale)
 {
     if (window) {
-        const auto screen = window->get_screen();
-        newDPI = screen->get_resolution(); // Get DPI retrieved from the OS
+        // TODO: Screen API removed... how do you get the DPI now?
+        // const auto screen = window->get_screen();
+        // newDPI = screen->get_resolution(); // Get DPI retrieved from the OS
+        newDPI = s_dpi;
 
         // Get scale factor associated to the window
         newScale = getScaleForWindow(window);
@@ -69,9 +71,11 @@ Cairo::RefPtr<Cairo::ImageSurface> RTScalable::loadSurfaceFromIcon(const Glib::u
     // Get pixel size from Gtk::IconSize
     int wSize, hSize;
 
-    if (!Gtk::IconSize::lookup(iconSize, wSize, hSize)) { // Size in invalid
-        wSize = hSize = 16; // Set to a default size of 16px (i.e. Gtk::ICON_SIZE_SMALL_TOOLBAR one)
-    }
+    // TODO: Size lookup no longer available
+    // if (!Gtk::IconSize::lookup(iconSize, wSize, hSize)) { // Size in invalid
+    //     wSize = hSize = 16; // Set to a default size of 16px (i.e. Gtk::ICON_SIZE_SMALL_TOOLBAR one)
+    // }
+    wSize = hSize = 16;
 
     // Get scale based on DPI and scale
     // Note: hSize not used because icon are considered squared
@@ -100,44 +104,11 @@ Cairo::RefPtr<Cairo::ImageSurface> RTScalable::loadSurfaceFromIcon(const Glib::u
     if (pos < iconPath.length()) {
         const auto fext = iconPath.substr(pos + 1, iconPath.length()).lowercase();
 
-        // Case where iconPath is a PNG file
-        if (fext == "png") {
-            // Create surface from PNG file
-            surf = RTScalable::loadSurfaceFromPNG(iconPath, true);
-        }
-
         // Case where iconPath is a SVG file
         if (fext == "svg") {
             // Create surface from SVG file
             surf = RTScalable::loadSurfaceFromSVG(iconPath, size, size, true);
         }
-    }
-
-    return surf;
-}
-
-Cairo::RefPtr<Cairo::ImageSurface> RTScalable::loadSurfaceFromPNG(const Glib::ustring &fname, const bool is_path)
-{
-    GThreadLock lock; // All icon theme access or image access on separate thread HAVE to be protected
-
-    Cairo::RefPtr<Cairo::ImageSurface> surf; // Create Cairo::RefPtr<Cairo::ImageSurface> nullptr
-
-    Glib::ustring path;
-
-    if (is_path) {
-        // Directly use fname as a path
-        path = fname;
-    } else {
-        // Look for PNG file in "images" folder
-        Glib::ustring imagesFolder = Glib::build_filename(argv0, "images");
-        path = Glib::build_filename(imagesFolder, fname);
-    }
-
-    // Create surface from PNG file if file exist
-    if (Glib::file_test(path.c_str(), Glib::FileTest::EXISTS)) {
-        surf = Cairo::ImageSurface::create_from_png(path);
-    } else {
-        std::cerr << "Failed to load PNG file \"" << fname << "\"" << std::endl;
     }
 
     return surf;

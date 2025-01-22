@@ -62,7 +62,6 @@ private:
 
 protected:
     static Cairo::RefPtr<Cairo::ImageSurface> loadSurfaceFromIcon(const Glib::ustring &icon_name, const Gtk::IconSize iconSize = Gtk::IconSize::LARGE);
-    static Cairo::RefPtr<Cairo::ImageSurface> loadSurfaceFromPNG(const Glib::ustring &fname, const bool is_path = false);
     static Cairo::RefPtr<Cairo::ImageSurface> loadSurfaceFromSVG(const Glib::ustring &fname, const int width = -1, const int height = -1, const bool is_path = false);
 
 public:
