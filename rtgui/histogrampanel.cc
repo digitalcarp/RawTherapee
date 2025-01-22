@@ -972,7 +972,7 @@ void HistogramRGBAreaHori::drawBar(const Cairo::RefPtr<Cairo::Context> &cc, cons
 
 Gtk::SizeRequestMode HistogramRGBAreaHori::get_request_mode_vfunc () const
 {
-    return Gtk::SIZE_REQUEST_HEIGHT_FOR_WIDTH;
+    return Gtk::SizeRequestMode::HEIGHT_FOR_WIDTH;
 }
 
 void HistogramRGBAreaHori::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const
@@ -1010,7 +1010,7 @@ void HistogramRGBAreaVert::drawBar(const Cairo::RefPtr<Cairo::Context> &cc, cons
 
 Gtk::SizeRequestMode HistogramRGBAreaVert::get_request_mode_vfunc () const
 {
-    return Gtk::SIZE_REQUEST_WIDTH_FOR_HEIGHT;
+    return Gtk::SizeRequestMode::WIDTH_FOR_HEIGHT;
 }
 
 void HistogramRGBAreaVert::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const
@@ -1080,7 +1080,7 @@ HistogramArea::~HistogramArea ()
 
 Gtk::SizeRequestMode HistogramArea::get_request_mode_vfunc () const
 {
-    return Gtk::SIZE_REQUEST_CONSTANT_SIZE;
+    return Gtk::SizeRequestMode::CONSTANT_SIZE;
 }
 
 void HistogramArea::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const

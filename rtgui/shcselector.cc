@@ -47,7 +47,7 @@ SHCSelector::SHCSelector() : movingPosition(-1), tmpX(0.0), tmpPos(0.0), wslider
 
 Gtk::SizeRequestMode SHCSelector::get_request_mode_vfunc () const
 {
-    return Gtk::SIZE_REQUEST_CONSTANT_SIZE;
+    return Gtk::SizeRequestMode::CONSTANT_SIZE;
 }
 
 void SHCSelector::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const

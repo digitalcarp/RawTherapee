@@ -49,7 +49,7 @@ ToolParamBlock::ToolParamBlock() {
 
 Gtk::SizeRequestMode ToolParamBlock::get_request_mode_vfunc () const
 {
-    return Gtk::SIZE_REQUEST_HEIGHT_FOR_WIDTH;
+    return Gtk::SizeRequestMode::HEIGHT_FOR_WIDTH;
 }
 
 FoldableToolPanel::FoldableToolPanel(Gtk::Box* content, Glib::ustring toolName, Glib::ustring UILabel, bool need11, bool useEnabled) : ToolPanel(toolName, need11), parentContainer(nullptr), exp(nullptr), lastEnabled(true)

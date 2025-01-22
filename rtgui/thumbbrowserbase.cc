@@ -1041,7 +1041,7 @@ bool ThumbBrowserBase::Internal::on_draw(const ::Cairo::RefPtr< Cairo::Context> 
 
 Gtk::SizeRequestMode ThumbBrowserBase::Internal::get_request_mode_vfunc () const
 {
-    return Gtk::SIZE_REQUEST_CONSTANT_SIZE;
+    return Gtk::SizeRequestMode::CONSTANT_SIZE;
 }
 
 void ThumbBrowserBase::Internal::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const

@@ -560,7 +560,7 @@ bool LabGridArea::on_motion_notify_event(GdkEventMotion *event)
 
 Gtk::SizeRequestMode LabGridArea::get_request_mode_vfunc() const
 {
-    return Gtk::SIZE_REQUEST_HEIGHT_FOR_WIDTH;
+    return Gtk::SizeRequestMode::HEIGHT_FOR_WIDTH;
 }
 
 

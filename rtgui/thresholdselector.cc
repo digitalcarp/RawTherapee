@@ -168,7 +168,7 @@ void ThresholdSelector::initValues ()
 
 Gtk::SizeRequestMode ThresholdSelector::get_request_mode_vfunc () const
 {
-    return Gtk::SIZE_REQUEST_CONSTANT_SIZE;
+    return Gtk::SizeRequestMode::CONSTANT_SIZE;
 }
 
 void ThresholdSelector::measure_vfunc(Gtk::Orientation orientation, int /*for_size*/,

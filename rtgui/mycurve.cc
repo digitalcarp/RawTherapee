@@ -87,7 +87,7 @@ void MyCurve::calcDimensions ()
 
 Gtk::SizeRequestMode MyCurve::get_request_mode_vfunc () const
 {
-    return Gtk::SIZE_REQUEST_HEIGHT_FOR_WIDTH;
+    return Gtk::SizeRequestMode::HEIGHT_FOR_WIDTH;
 }
 
 void MyCurve::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const

@@ -320,7 +320,7 @@ bool PreviewWindow::on_button_release_event (GdkEventButton* event)
 
 Gtk::SizeRequestMode PreviewWindow::get_request_mode_vfunc () const
 {
-    return Gtk::SIZE_REQUEST_CONSTANT_SIZE;
+    return Gtk::SizeRequestMode::CONSTANT_SIZE;
 }
 
 void PreviewWindow::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const

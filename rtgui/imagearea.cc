@@ -811,7 +811,7 @@ int ImageArea::getSpotWBRectSize  ()
 
 Gtk::SizeRequestMode ImageArea::get_request_mode_vfunc () const
 {
-    return Gtk::SIZE_REQUEST_CONSTANT_SIZE;
+    return Gtk::SizeRequestMode::CONSTANT_SIZE;
 }
 
 void ImageArea::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const

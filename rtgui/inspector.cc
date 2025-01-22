@@ -683,7 +683,7 @@ void Inspector::setActive(bool state)
 
 Gtk::SizeRequestMode Inspector::get_request_mode_vfunc () const
 {
-    return Gtk::SIZE_REQUEST_CONSTANT_SIZE;
+    return Gtk::SizeRequestMode::CONSTANT_SIZE;
 }
 
 void Inspector::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const
