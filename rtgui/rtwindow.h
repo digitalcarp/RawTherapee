@@ -41,7 +41,7 @@ class RtWindow final :
 {
 
 private:
-    // Gtk::Notebook* mainNB;
+    Gtk::Notebook* mainNB;
     // BatchQueuePanel* bpanel;
     // std::set<Glib::ustring> filesEdited;
     // std::map<Glib::ustring, EditorPanel*> epanels;
@@ -67,13 +67,13 @@ private:
     // bool isEditorPanel (Widget* panel);
     // bool isEditorPanel (guint pageNum);
     // void showErrors ();
-    //
-    // Glib::ustring versionStr;
+
+    Glib::ustring versionStr;
 
 public:
-    // RtWindow();
-    // ~RtWindow();
-    //
+    RtWindow();
+    ~RtWindow();
+
     // void addEditorPanel (EditorPanel* ep, const std::string &name);
     // void remEditorPanel (EditorPanel* ep);
     // bool selectEditorPanel (const std::string &name);
@@ -86,8 +86,8 @@ public:
     // bool on_configure_event (GdkEventConfigure* event) override;
     // bool on_delete_event (GdkEventAny* event) override;
     // bool on_window_state_event (GdkEventWindowState* event) override;
-    // void on_mainNB_switch_page (Gtk::Widget* widget, guint page_num);
-    //
+    void on_mainNB_switch_page (Gtk::Widget* widget, guint page_num);
+
     // void showRawPedia();
     // void showICCProfileCreator ();
     // void showPreferences ();

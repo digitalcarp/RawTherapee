@@ -41,7 +41,7 @@
 Glib::RefPtr<Gtk::CssProvider> cssForced;
 Glib::RefPtr<Gtk::CssProvider> cssRT;
 
-// RtWindow::RtWindow ()
+RtWindow::RtWindow ()
 //     : mainNB (nullptr)
 //     , bpanel (nullptr)
 //     , splash (nullptr)
@@ -50,113 +50,104 @@ Glib::RefPtr<Gtk::CssProvider> cssRT;
 //     , iFullscreen_exit (nullptr)
 //     , epanel (nullptr)
 //     , fpanel (nullptr)
-// {
+{
 //     cacheMgr->init ();
 //     ProfilePanel::init (this);
-//
-//     // ------- loading theme files
-//
-//     Glib::RefPtr<Gdk::Screen> screen = Gdk::Screen::get_default();
-//
-//     if (screen) {
-//         // Setting default theme and icon theme (bases for custom themes)
-//         Gtk::Settings::get_for_screen (screen)->property_gtk_theme_name() = "Adwaita";
-//         Gtk::Settings::get_for_screen (screen)->property_gtk_application_prefer_dark_theme() = true;
-//         Gtk::Settings::get_for_screen (screen)->property_gtk_icon_theme_name() = "rawtherapee";
-//
+
+    // ------- loading theme files
+
+    Glib::RefPtr<Gdk::Display> display = Gdk::Display::get_default();
+    if (display) {
+        // Setting default theme and icon theme (bases for custom themes)
+        auto settings = Gtk::Settings::get_for_display(display);
+        settings->property_gtk_theme_name() = "Adwaita";
+        settings->property_gtk_application_prefer_dark_theme() = true;
+        settings->property_gtk_icon_theme_name() = "rawtherapee";
+
 //         // Initialize RTScalable for Hi-DPI support
 //         RTScalable::init(this);
-//
-//         // Look for theme and set it
-//         // Check if the current theme name in options exists, otherwise set it to default one (i.e. "RawTherapee.css")
-//         auto filename = Glib::build_filename(argv0, "themes", options.theme + ".css");
-//         if (!Glib::file_test(filename, Glib::FileTest::EXISTS)) {
-//             options.theme = "RawTherapee";
-//             filename = Glib::build_filename(argv0, "themes", options.theme + ".css");
-//         }
-//
-//         cssRT = Gtk::CssProvider::create();
-//
-//         try {
-//             cssRT->load_from_path (filename);
-//             Gtk::StyleContext::add_provider_for_screen (screen, cssRT, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-//         } catch (Glib::Error &err) {
-//             printf ("Error: Can't load css file \"%s\"\nMessage: %s\n", filename.c_str(), err.what().c_str());
-//         } catch (...) {
-//             printf ("Error: Can't load css file \"%s\"\n", filename.c_str());
-//         }
-//
-//         // Set the font face and size
-//         Glib::ustring css;
-//
-//         if (options.fontFamily != "default") { // Set font and size according to user choice
-//             // Set font and size in css from options
-//             css = Glib::ustring::compose ("* { font-family: %1; font-size: %2pt}",
-//                 options.fontFamily,
-//                 options.fontSize); // Font size is in "pt" in options
-//         } else { // Set font and size according to default values
-//             // Retrieve default style values from Gtk::Settings
-//             const auto defaultSettings = Gtk::Settings::get_default();
-//             Glib::ustring defaultFont;
-//             defaultSettings->get_property("gtk-font-name", defaultFont);
-//             const Pango::FontDescription defaultFontDesc = Pango::FontDescription(defaultFont);
-//
-//             // Set font and size in css
-//             auto defaultFontFamily = defaultFontDesc.get_family();
-//             const int defaultFontSize = defaultFontDesc.get_size() / Pango::SCALE; // Font size is managed in ()"pt" * Pango::SCALE) by Pango (also refer to notes in rtscalable.h)
-// #if defined(__APPLE__)
-//             // Default MacOS font (i.e. "") is not correctly handled
-//             // in Gtk css. Replacing it by "-apple-system" to avoid this
-//             if (defaultFontFamily == ".AppleSystemUIFont") {
-//                 defaultFontFamily = "-apple-system";
-//             }
-// #endif
-//             css = Glib::ustring::compose ("* { font-family: %1; font-size: %2pt}",
-//                 defaultFontFamily,
-//                 defaultFontSize);
-//         }
-//
-//         // Load custom CSS for font
-//         if (!css.empty()) {
-//             if (rtengine::settings->verbose) {
-//                 printf("CSS:\n%s\n\n", css.c_str());
-//             }
-//
-//             try {
-//                 cssForced = Gtk::CssProvider::create();
-//                 cssForced->load_from_data (css);
-//
-//                 Gtk::StyleContext::add_provider_for_screen (screen, cssForced, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-//             } catch (Glib::Error &err) {
-//                 printf ("Error: \"%s\"\n", err.what().c_str());
-//             } catch (...) {
-//                 printf ("Error: Can't load the desired font correctly\n");
-//             }
-//         }
-//     }
-//
-//     // ------- end loading theme files
-//
+
+        // Look for theme and set it
+        // Check if the current theme name in options exists, otherwise set it to default one (i.e. "RawTherapee.css")
+        auto filename = Glib::build_filename(argv0, "themes", options.theme + ".css");
+        if (!Glib::file_test(filename, Glib::FileTest::EXISTS)) {
+            options.theme = "RawTherapee";
+            filename = Glib::build_filename(argv0, "themes", options.theme + ".css");
+        }
+
+        cssRT = Gtk::CssProvider::create();
+
+        try {
+            cssRT->load_from_path (filename);
+            Gtk::StyleContext::add_provider_for_display (display, cssRT, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+        } catch (Glib::Error &err) {
+            printf ("Error: Can't load css file \"%s\"\nMessage: %s\n", filename.c_str(), err.what());
+        } catch (...) {
+            printf ("Error: Can't load css file \"%s\"\n", filename.c_str());
+        }
+
+        // Set the font face and size
+        Glib::ustring css;
+
+        if (options.fontFamily != "default") { // Set font and size according to user choice
+            // Set font and size in css from options
+            css = Glib::ustring::compose ("* { font-family: %1; font-size: %2pt}",
+                options.fontFamily,
+                options.fontSize); // Font size is in "pt" in options
+        } else { // Set font and size according to default values
+            // Retrieve default style values from Gtk::Settings
+            const auto defaultSettings = Gtk::Settings::get_default();
+            Glib::ustring defaultFont;
+            defaultSettings->get_property("gtk-font-name", defaultFont);
+            const Pango::FontDescription defaultFontDesc = Pango::FontDescription(defaultFont);
+
+            // Set font and size in css
+            auto defaultFontFamily = defaultFontDesc.get_family();
+            const int defaultFontSize = defaultFontDesc.get_size() / Pango::SCALE; // Font size is managed in ()"pt" * Pango::SCALE) by Pango (also refer to notes in rtscalable.h)
+#if defined(__APPLE__)
+            // Default MacOS font (i.e. "") is not correctly handled
+            // in Gtk css. Replacing it by "-apple-system" to avoid this
+            if (defaultFontFamily == ".AppleSystemUIFont") {
+                defaultFontFamily = "-apple-system";
+            }
+#endif
+            css = Glib::ustring::compose ("* { font-family: %1; font-size: %2pt}",
+                defaultFontFamily,
+                defaultFontSize);
+        }
+
+        // Load custom CSS for font
+        if (!css.empty()) {
+            if (rtengine::settings->verbose) {
+                printf("CSS:\n%s\n\n", css.c_str());
+            }
+
+            try {
+                cssForced = Gtk::CssProvider::create();
+                cssForced->load_from_data (css);
+
+                Gtk::StyleContext::add_provider_for_display (display, cssForced, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+            } catch (Glib::Error &err) {
+                printf ("Error: \"%s\"\n", err.what());
+            } catch (...) {
+                printf ("Error: Can't load the desired font correctly\n");
+            }
+        }
+    }
+
+    // ------- end loading theme files
+
 //     // Initialize FileBrowserEntry icons
 //     FileBrowserEntry::init();
-//
-//     // For UNIX system, set app icon
-// #ifndef _WIN32
-//     try {
-//         set_default_icon_name("rawtherapee");
-//     } catch (const Glib::Error& ex) {
-//         printf ("%s\n", ex.what().c_str());
-//     }
-// #endif
-//
-//     versionStr = "RawTherapee " + versionString;
-//
-//     set_title_decorated ("");
-//     set_resizable (true);
-//     set_decorated (true);
-//     set_default_size (options.windowWidth, options.windowHeight);
-//     set_modal (false);
-//
+
+    versionStr = "RawTherapee " + versionString;
+
+    set_icon_name("rawtherapee");
+    set_resizable (true);
+    set_decorated (true);
+    set_default_size (options.windowWidth, options.windowHeight);
+    set_modal (false);
+
 //     on_delete_has_run = false;
 //     is_fullscreen = false;
 //     is_minimized = false;
@@ -166,7 +157,7 @@ Glib::RefPtr<Gtk::CssProvider> cssRT;
 //     signal_key_press_event().connect ( sigc::mem_fun (*this, &RtWindow::keyPressed) );
 //     signal_key_release_event().connect(sigc::mem_fun(*this, &RtWindow::keyReleased));
 //
-//     if (simpleEditor) {
+    if (simpleEditor) {
 //         epanel = Gtk::manage ( new EditorPanel (nullptr) );
 //         epanel->setParent (this);
 //         epanel->setParentWindow (this);
@@ -183,12 +174,12 @@ Glib::RefPtr<Gtk::CssProvider> cssRT;
 //             rtengine::InitialImage *ii = rtengine::InitialImage::load (argv1, thm->getType() == FT_Raw, &error, nullptr);
 //             epanel->open ( thm, ii );
 //         }
-//     } else {
-//         mainNB = Gtk::manage (new Gtk::Notebook ());
-//         mainNB->set_name ("MainNotebook");
-//         mainNB->set_scrollable (true);
-//         mainNB->signal_switch_page().connect_notify ( sigc::mem_fun (*this, &RtWindow::on_mainNB_switch_page) );
-//
+    } else {
+        mainNB = Gtk::manage (new Gtk::Notebook ());
+        mainNB->set_name ("MainNotebook");
+        mainNB->set_scrollable (true);
+        mainNB->signal_switch_page().connect ( sigc::mem_fun (*this, &RtWindow::on_mainNB_switch_page) );
+
 //         // Editor panel
 //         fpanel =  new FilePanel () ;
 //         fpanel->setParent (this);
@@ -301,10 +292,9 @@ Glib::RefPtr<Gtk::CssProvider> cssRT;
 //         actionGrid->show_all();
 //
 //         pldBridge = new PLDBridge (static_cast<rtengine::ProgressListener*> (this));
-//
-//         add (*mainNB);
-//         show_all ();
-//
+
+        set_child(*mainNB);
+
 //         bpanel->init (this);
 //
 //         if (!argv1.empty() && !remote) {
@@ -314,22 +304,22 @@ Glib::RefPtr<Gtk::CssProvider> cssRT;
 //                 fpanel->fileCatalog->openRequested ({thm});
 //             }
 //         }
-//     }
-// }
-//
-// RtWindow::~RtWindow()
-// {
-//     if (!simpleEditor) {
-//         delete pldBridge;
-//     }
-//
-//     pldBridge = nullptr;
-//
-//     delete fpanel;
-//     delete iFullscreen;
-//     delete iFullscreen_exit;
-// }
-//
+    }
+}
+
+RtWindow::~RtWindow()
+{
+    // if (!simpleEditor) {
+    //     delete pldBridge;
+    // }
+    //
+    // pldBridge = nullptr;
+    //
+    // delete fpanel;
+    // delete iFullscreen;
+    // delete iFullscreen_exit;
+}
+
 // void RtWindow::on_realize ()
 // {
 //     Gtk::Window::on_realize ();
@@ -417,38 +407,38 @@ Glib::RefPtr<Gtk::CssProvider> cssRT;
 //
 //     return Gtk::Widget::on_window_state_event (event);
 // }
-//
-// void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
-// {
-//     if (!on_delete_has_run) {
-//         if (isEditorPanel (page_num)) {
-//             if (isSingleTabMode() && epanel) {
-//                 MoveFileBrowserToEditor();
-//             }
-//
-//             EditorPanel *ep = static_cast<EditorPanel*> (mainNB->get_nth_page (page_num));
-//             ep->setAspect();
-//
-//             if (!isSingleTabMode()) {
-//                 if (filesEdited.size() > 0) {
-//                     set_title_decorated (ep->getFileName());
-//                 }
-//             }
-//         } else {
-//             // in single tab mode with command line filename epanel does not exist yet
-//             if (isSingleTabMode() && epanel) {
-//                 // Save profile on leaving the editor panel
-//                 epanel->saveProfile();
-//
-//                 // Moving the FileBrowser only if the user has switched to the FileBrowser tab
-//                 if (mainNB->get_nth_page (page_num) == fpanel) {
-//                     MoveFileBrowserToMain();
-//                 }
-//             }
-//         }
-//     }
-// }
-//
+
+void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
+{
+    // if (!on_delete_has_run) {
+    //     if (isEditorPanel (page_num)) {
+    //         if (isSingleTabMode() && epanel) {
+    //             MoveFileBrowserToEditor();
+    //         }
+    //
+    //         EditorPanel *ep = static_cast<EditorPanel*> (mainNB->get_nth_page (page_num));
+    //         ep->setAspect();
+    //
+    //         if (!isSingleTabMode()) {
+    //             if (filesEdited.size() > 0) {
+    //                 set_title_decorated (ep->getFileName());
+    //             }
+    //         }
+    //     } else {
+    //         // in single tab mode with command line filename epanel does not exist yet
+    //         if (isSingleTabMode() && epanel) {
+    //             // Save profile on leaving the editor panel
+    //             epanel->saveProfile();
+    //
+    //             // Moving the FileBrowser only if the user has switched to the FileBrowser tab
+    //             if (mainNB->get_nth_page (page_num) == fpanel) {
+    //                 MoveFileBrowserToMain();
+    //             }
+    //         }
+    //     }
+    // }
+}
+
 // void RtWindow::addEditorPanel (EditorPanel* ep, const std::string &name)
 // {
 //     if (options.multiDisplayMode > 0) {
