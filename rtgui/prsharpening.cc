@@ -54,7 +54,7 @@ PrSharpening::PrSharpening () : FoldableToolPanel(this, TOOL_NAME, M("TP_PRSHARP
     hb->pack_start(*method);
     pack_start (*hb);
 
-    rld = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
+    rld = new Gtk::Box(Gtk::Orientation::VERTICAL);
     dradius = Gtk::manage (new Adjuster (M("TP_SHARPENING_EDRADIUS"), 0.4, 2.5, 0.01, 0.45));
     damount = Gtk::manage (new Adjuster (M("TP_SHARPENING_RLD_AMOUNT"), 0.0, 100, 1, 100));
     ddamping = Gtk::manage (new Adjuster (M("TP_SHARPENING_RLD_DAMPING"), 0, 100, 1, 0));
@@ -69,10 +69,10 @@ PrSharpening::PrSharpening () : FoldableToolPanel(this, TOOL_NAME, M("TP_PRSHARP
     diter->show ();
     rld->show ();
 
-    usm = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
+    usm = new Gtk::Box(Gtk::Orientation::VERTICAL);
     usm->show ();
 
-    Gtk::Separator* hsep6a = Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* hsep6a = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     amount = Gtk::manage (new Adjuster (M("TP_SHARPENING_AMOUNT"), 1, 1000, 1, 200));
     radius = Gtk::manage (new Adjuster (M("TP_SHARPENING_RADIUS"), 0.3, 3, 0.01, 0.5));
     threshold = Gtk::manage (new ThresholdAdjuster (M("TP_SHARPENING_THRESHOLD"), 0., 2000., 20., 80., 2000., 1200., 0, false));
@@ -90,10 +90,10 @@ PrSharpening::PrSharpening () : FoldableToolPanel(this, TOOL_NAME, M("TP_PRSHARP
     amount->show ();
     threshold->show ();
 
-    Gtk::Separator* hsep6 = Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* hsep6 = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     edgesonly = Gtk::manage (new Gtk::CheckButton (M("TP_SHARPENING_ONLYEDGES")));
     edgesonly->set_active (false);
-    edgebox = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
+    edgebox = new Gtk::Box(Gtk::Orientation::VERTICAL);
     eradius = Gtk::manage (new Adjuster (M("TP_SHARPENING_EDRADIUS"), 0.5, 2.5, 0.1, 1.9));
     etolerance = Gtk::manage (new Adjuster (M("TP_SHARPENING_EDTOLERANCE"), 10, 10000, 100, 1800));
     usm->pack_start(*hsep6, Gtk::PACK_SHRINK, 2);
@@ -101,7 +101,7 @@ PrSharpening::PrSharpening () : FoldableToolPanel(this, TOOL_NAME, M("TP_PRSHARP
     edgebox->pack_start(*eradius);
     edgebox->pack_start(*etolerance);
     edgebox->show ();
-    edgebin = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    edgebin = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     usm->pack_start (*edgebin);
     edgebin->show ();
     hsep6->show();
@@ -109,16 +109,16 @@ PrSharpening::PrSharpening () : FoldableToolPanel(this, TOOL_NAME, M("TP_PRSHARP
     eradius->show();
     etolerance->show();
 
-    Gtk::Separator* hsep6b = Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* hsep6b = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     halocontrol = Gtk::manage (new Gtk::CheckButton (M("TP_SHARPENING_HALOCONTROL")));
     halocontrol->set_active (false);
-    hcbox = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
+    hcbox = new Gtk::Box(Gtk::Orientation::VERTICAL);
     hcamount = Gtk::manage (new Adjuster (M("TP_SHARPENING_HCAMOUNT"), 1, 100, 1, 75));
     usm->pack_start(*hsep6b, Gtk::PACK_SHRINK, 2);
     usm->pack_start(*halocontrol);
     hcbox->pack_start(*hcamount);
     hcbox->show ();
-    hcbin = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    hcbin = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     usm->pack_start (*hcbin);
     hcbin->show ();
     hsep6b->show ();

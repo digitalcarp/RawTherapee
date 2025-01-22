@@ -27,7 +27,7 @@ using namespace rtengine::procparams;
 
 
 ToolVBox::ToolVBox() {
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
 //GTK318
 #if GTK_MAJOR_VERSION == 3 && GTK_MINOR_VERSION < 20
     set_spacing(1);       // Vertical space between tools
@@ -37,7 +37,7 @@ ToolVBox::ToolVBox() {
 }
 
 ToolParamBlock::ToolParamBlock() {
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
     get_style_context()->add_class("ToolParamBlock");
 //GTK318
 #if GTK_MAJOR_VERSION == 3 && GTK_MINOR_VERSION < 20

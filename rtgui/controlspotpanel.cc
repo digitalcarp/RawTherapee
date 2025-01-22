@@ -511,7 +511,7 @@ ControlSpotPanel::ControlSpotPanel():
     expMaskMerge_->add(*maskBox, false);
     pack_start(*expMaskMerge_, false, false);
 
-    Gtk::Separator *separatormet = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator *separatormet = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     pack_start(*separatormet, Gtk::PACK_SHRINK, 2);
 
     //Gtk::Box* const ctboxcomplexmethod = Gtk::manage(new Gtk::Box());

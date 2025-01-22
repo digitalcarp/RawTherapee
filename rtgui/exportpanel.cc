@@ -31,10 +31,10 @@ using namespace rtengine::procparams;
 ExportPanel::ExportPanel () : listener (nullptr), ornamentSurface(new RTSurface("ornament1.svg"))
 {
 
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
     /*enabled = Gtk::manage ( new Gtk::CheckButton (M("EXPORT_ENABLE")) );
     pack_start(*enabled, Gtk::PACK_SHRINK, 4);
-    pack_start (*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)), Gtk::PACK_SHRINK, 2);*/
+    pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Gtk::PACK_SHRINK, 2);*/
 
     Gtk::Label* labExportTitle = Gtk::manage ( new Gtk::Label (M ("EXPORT_FASTEXPORTOPTIONS")) );
     labExportTitle->set_use_markup (true);
@@ -45,7 +45,7 @@ ExportPanel::ExportPanel () : listener (nullptr), ornamentSurface(new RTSurface(
     Gtk::RadioButton::Group pipeline_group;
     use_fast_pipeline       = Gtk::manage ( new Gtk::RadioButton (pipeline_group, M ("EXPORT_USE_FAST_PIPELINE")));
     use_normal_pipeline     = Gtk::manage ( new Gtk::RadioButton (pipeline_group, M ("EXPORT_USE_NORMAL_PIPELINE")));
-    bypass_box = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    bypass_box = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     bypass_ALL              = Gtk::manage ( new Gtk::CheckButton (M ("EXPORT_BYPASS_ALL")));
     use_fast_pipeline->set_tooltip_text (M ("EXPORT_USE_FAST_PIPELINE_TOOLTIP"));
     bypass_sharpening       = Gtk::manage ( new Gtk::CheckButton (M ("EXPORT_BYPASS_SHARPENING")));
@@ -66,7 +66,7 @@ ExportPanel::ExportPanel () : listener (nullptr), ornamentSurface(new RTSurface(
 
     Gtk::Frame *bayerFrame = Gtk::manage ( new Gtk::Frame (M ("TP_RAW_SENSOR_BAYER_LABEL")));
     bayerFrame->set_label_align(0.025, 0.5);
-    Gtk::Box* bayerFrameVBox = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* bayerFrameVBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     Gtk::Box* hb_raw_bayer_method = Gtk::manage (new Gtk::Box ());
     hb_raw_bayer_method->pack_start (*Gtk::manage (new Gtk::Label ( M ("EXPORT_RAW_DMETHOD") + ": ")), Gtk::PACK_SHRINK, 4);
@@ -90,7 +90,7 @@ ExportPanel::ExportPanel () : listener (nullptr), ornamentSurface(new RTSurface(
 
     Gtk::Frame *xtransFrame = Gtk::manage ( new Gtk::Frame (M ("TP_RAW_SENSOR_XTRANS_LABEL")));
     xtransFrame->set_label_align(0.025, 0.5);
-    Gtk::Box* xtransFrameVBox = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* xtransFrameVBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     Gtk::Box* hb_raw_xtrans_method = Gtk::manage (new Gtk::Box ());
     hb_raw_xtrans_method->pack_start (*Gtk::manage (new Gtk::Label ( M ("EXPORT_RAW_DMETHOD") + ": ")), Gtk::PACK_SHRINK, 4);
@@ -112,12 +112,12 @@ ExportPanel::ExportPanel () : listener (nullptr), ornamentSurface(new RTSurface(
     pack_start (*use_fast_pipeline, Gtk::PACK_SHRINK, 4);
     pack_start (*use_normal_pipeline, Gtk::PACK_SHRINK, 4);
 
-    bypass_box->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)), Gtk::PACK_SHRINK, 4);
+    bypass_box->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Gtk::PACK_SHRINK, 4);
     lblbox = Gtk::manage (new Gtk::Box ());
     lblbox->pack_start (*Gtk::manage (new Gtk::Label (M ("EXPORT_BYPASS"))), Gtk::PACK_SHRINK, 4);
     bypass_box->pack_start (*lblbox, Gtk::PACK_SHRINK, 4);
     bypass_box->pack_start (*bypass_ALL, Gtk::PACK_SHRINK, 4);
-    // bypass_box->pack_start(*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)), Gtk::PACK_SHRINK, 4);
+    // bypass_box->pack_start(*Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Gtk::PACK_SHRINK, 4);
     bypass_box->pack_start (*bypass_sharpening, Gtk::PACK_SHRINK, 4);
     bypass_box->pack_start (*bypass_sharpenEdge, Gtk::PACK_SHRINK, 4);
     bypass_box->pack_start (*bypass_sharpenMicro, Gtk::PACK_SHRINK, 4);
@@ -150,7 +150,7 @@ ExportPanel::ExportPanel () : listener (nullptr), ornamentSurface(new RTSurface(
 
     pack_start (*bypass_box, Gtk::PACK_SHRINK);
 
-    pack_start (*Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)), Gtk::PACK_SHRINK, 2);
+    pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Gtk::PACK_SHRINK, 2);
 
     // Resize options
 
@@ -191,8 +191,8 @@ ExportPanel::ExportPanel () : listener (nullptr), ornamentSurface(new RTSurface(
 
 
     // add panel ending
-    Gtk::Box* vboxpe = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
-    Gtk::Separator* hseptpe = Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Box* vboxpe = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
+    Gtk::Separator* hseptpe = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     Gtk::Image* peImg = Gtk::manage (new Gtk::Image (ornamentSurface->get()));
     vboxpe->pack_start (*hseptpe, Gtk::PACK_SHRINK, 4);
     vboxpe->pack_start (*peImg);

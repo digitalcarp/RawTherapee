@@ -24,7 +24,7 @@ using namespace rtengine;
 
 RecentBrowser::RecentBrowser ()
 {
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
     
     recentDirs = Gtk::manage (new MyComboBoxText ());
 

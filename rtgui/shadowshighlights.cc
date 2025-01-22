@@ -40,21 +40,21 @@ ShadowsHighlights::ShadowsHighlights () : FoldableToolPanel(this, TOOL_NAME, M("
     hb->pack_start(*colorspace);
     pack_start(*hb);
 
-    pack_start (*Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)));
+    pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)));
 
     highlights   = Gtk::manage (new Adjuster (M("TP_SHADOWSHLIGHTS_HIGHLIGHTS"), 0, 100, 1, 0));
     h_tonalwidth = Gtk::manage (new Adjuster (M("TP_SHADOWSHLIGHTS_HLTONALW"), 10, 100, 1, 70));
     pack_start (*highlights);
     pack_start (*h_tonalwidth);
 
-    pack_start (*Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)));
+    pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)));
 
     shadows      = Gtk::manage (new Adjuster (M("TP_SHADOWSHLIGHTS_SHADOWS"), 0, 100, 1, 0));
     s_tonalwidth = Gtk::manage (new Adjuster (M("TP_SHADOWSHLIGHTS_SHTONALW"), 10, 100, 1, 30));
     pack_start (*shadows);
     pack_start (*s_tonalwidth);
 
-    pack_start (*Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)));
+    pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)));
 
     radius = Gtk::manage (new Adjuster (M("TP_SHADOWSHLIGHTS_RADIUS"), 1, 100, 1, 40));
     pack_start (*radius);

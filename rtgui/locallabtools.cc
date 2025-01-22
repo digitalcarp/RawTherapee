@@ -133,7 +133,7 @@ LocallabTool::LocallabTool(Gtk::Box* content, Glib::ustring toolName, Glib::ustr
 {
     // Create expander title bar
     Gtk::Box *titVBox;
-    titVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    titVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     titVBox->set_spacing(2);
 
     Gtk::Box* const titleBox = Gtk::manage(new Gtk::Box());
@@ -157,7 +157,7 @@ LocallabTool::LocallabTool(Gtk::Box* content, Glib::ustring toolName, Glib::ustr
         complexityConn = complexity->signal_changed().connect(sigc::mem_fun(*this, &LocallabTool::complexityModeChanged));
     }
 
-    Gtk::Separator* const separator = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Separator* const separator = Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL));
     titleBox->pack_end(*separator, Gtk::PACK_SHRINK, 0);
 
     if (need100Percent) {
@@ -545,7 +545,7 @@ LocallabColor::LocallabColor():
     //rtengine::ProcEvent EvlocallabenacieMaskall;
     Evlocallabfeathercol = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_FEATHERCOL");
     Evlocallabpreviewcol = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_PREVIEWCOL");
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
 
     float R, G, B;
 
@@ -904,7 +904,7 @@ LocallabColor::LocallabColor():
     Gtk::Frame* const merge1colFrame = Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_MERGE1COLFRA")));
     merge1colFrame->set_label_align(0.025, 0.5);
     ToolParamBlock* const mergecolBox = Gtk::manage(new ToolParamBlock());
-    Gtk::Separator* const separatormer = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* const separatormer = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     mergecolBox->pack_start(*separatormer, Gtk::PACK_SHRINK, 2);
     mergecolBox->pack_start(*mergecolMethod);
     mergecolBox->pack_start(*mercol);
@@ -2756,7 +2756,7 @@ LocallabExposure::LocallabExposure():
     Evlocallabtmosatur(ProcEventMapper::getInstance()->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_TMO_SATUR"))
     
 {
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
 
     const LocallabParams::LocallabSpot defSpot;
     auto m = ProcEventMapper::getInstance();
@@ -4319,7 +4319,7 @@ LocallabShadow::LocallabShadow():
     Evlocallabpreviewsh = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_PREVIEWSH");
     EvlocallabfeatherSH = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_FEATHERSH");
     
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
 
     const LocallabParams::LocallabSpot defSpot;
 
@@ -5543,7 +5543,7 @@ LocallabVibrance::LocallabVibrance():
     auto m = ProcEventMapper::getInstance();
     Evlocallabpreviewvib = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_PREVIEWVIB");
     Evlocallabfeathervib = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_FEATHERVIB");
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
 
     float R, G, B;
 
@@ -5669,7 +5669,7 @@ LocallabVibrance::LocallabVibrance():
     pack_start(*saturated, Gtk::PACK_SHRINK, 0);
     pack_start(*pastels, Gtk::PACK_SHRINK, 0);
     pack_start(*vibgam, Gtk::PACK_SHRINK, 0);
-    Gtk::Separator* const separatorvib = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* const separatorvib = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     pack_start(*separatorvib, Gtk::PACK_SHRINK, 2);
     pack_start(*warm, Gtk::PACK_SHRINK, 0);
     pack_start(*psThreshold, Gtk::PACK_SHRINK, 0);
@@ -6601,7 +6601,7 @@ LocallabSoft::LocallabSoft():
     laplace(Gtk::manage(new Adjuster(M("TP_LOCALLAB_LAPLACE"), 0., 100., 0.5, 25.))),
     sensisf(Gtk::manage(new Adjuster(M("TP_LOCALLAB_SENSI"), 1, 100, 1, 30)))
 {
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
 
     // Parameter Soft light specific widgets
     softMethod->append(M("TP_LOCALLAB_SOFTM"));
@@ -7120,7 +7120,7 @@ LocallabBlur::LocallabBlur():
     quaHBox(Gtk::manage(new Gtk::Box())),
     csThresholdblur(Gtk::manage(new ThresholdAdjuster(M("TP_LOCALLAB_CSTHRESHOLDBLUR"), 0, 9, 0, 0, 6, 5, 0, false)))
 {
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
 
     const LocallabParams::LocallabSpot defSpot;
 
@@ -7501,7 +7501,7 @@ LocallabBlur::LocallabBlur():
     maskblBox->pack_start(*maskblCurveEditorG, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     maskblBox->pack_start(*strumaskbl, Gtk::PACK_SHRINK, 0);
     maskblBox->pack_start(*toolbl, Gtk::PACK_SHRINK, 0);
-    Gtk::Separator* const separatorstrubl = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* const separatorstrubl = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     maskblBox->pack_start(*separatorstrubl, Gtk::PACK_SHRINK, 2);
     maskblBox->pack_start(*blendmaskbl, Gtk::PACK_SHRINK, 0);
     toolblFrame->set_label_align(0.025, 0.5);

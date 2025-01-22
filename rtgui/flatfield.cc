@@ -79,7 +79,7 @@ FlatField::FlatField () : FoldableToolPanel(this, TOOL_NAME, M("TP_FLATFIELD_LAB
     flatFieldClipControl->set_tooltip_markup (M("TP_FLATFIELD_CLIPCONTROL_TOOLTIP"));
 
     pack_start( *flatFieldFromMetaData, Gtk::PACK_SHRINK);
-    pack_start( *Gtk::manage( new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)), Gtk::PACK_SHRINK, 0 );
+    pack_start( *Gtk::manage( new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Gtk::PACK_SHRINK, 0 );
     pack_start( *flatFieldAutoSelect, Gtk::PACK_SHRINK);
     pack_start( *hbff, Gtk::PACK_SHRINK);
     pack_start( *ffInfo, Gtk::PACK_SHRINK);

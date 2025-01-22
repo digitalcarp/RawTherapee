@@ -231,14 +231,14 @@ void DynamicProfilePanel::EditDialog::add_optional (const Glib::ustring &name, G
 //-----------------------------------------------------------------------------
 
 DynamicProfilePanel::DynamicProfilePanel():
-    vbox_ (Gtk::ORIENTATION_VERTICAL),
+    vbox_ (Gtk::Orientation::VERTICAL),
     button_up_ (M ("DYNPROFILEEDITOR_MOVE_UP")),
     button_down_ (M ("DYNPROFILEEDITOR_MOVE_DOWN")),
     button_new_ (M ("DYNPROFILEEDITOR_NEW")),
     button_edit_ (M ("DYNPROFILEEDITOR_EDIT")),
     button_delete_ (M ("DYNPROFILEEDITOR_DELETE"))
 {
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
     
     add (vbox_);
 

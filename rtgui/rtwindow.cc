@@ -234,7 +234,7 @@ RtWindow::RtWindow ()
 
         mainNB->set_current_page (mainNB->page_num (*fpanel));
 
-        //Gtk::Box* mainBox = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+        //Gtk::Box* mainBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
         //mainBox->pack_start (*mainNB);
 
         // filling bottom box
@@ -278,9 +278,9 @@ RtWindow::RtWindow ()
         setExpandAlignProperties (actionGrid, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
 
         if (options.mainNBVertical) {
-            prProgBar.set_orientation (Gtk::ORIENTATION_VERTICAL);
+            prProgBar.set_orientation (Gtk::Orientation::VERTICAL);
             prProgBar.set_inverted (true);
-            actionGrid->set_orientation (Gtk::ORIENTATION_VERTICAL);
+            actionGrid->set_orientation (Gtk::Orientation::VERTICAL);
             actionGrid->attach_next_to (prProgBar, Gtk::PositionType::BOTTOM, 1, 1);
             actionGrid->attach_next_to (*iccProfileCreator, Gtk::PositionType::BOTTOM, 1, 1);
             actionGrid->attach_next_to (*helpBtn, Gtk::PositionType::BOTTOM, 1, 1);
@@ -288,8 +288,8 @@ RtWindow::RtWindow ()
             actionGrid->attach_next_to (*btn_fullscreen, Gtk::PositionType::BOTTOM, 1, 1);
             mainNB->set_action_widget (actionGrid, Gtk::PACK_END);
         } else {
-            prProgBar.set_orientation (Gtk::ORIENTATION_HORIZONTAL);
-            actionGrid->set_orientation (Gtk::ORIENTATION_HORIZONTAL);
+            prProgBar.set_orientation (Gtk::Orientation::HORIZONTAL);
+            actionGrid->set_orientation (Gtk::Orientation::HORIZONTAL);
             actionGrid->attach_next_to (prProgBar, Gtk::PositionType::RIGHT, 1, 1);
             actionGrid->attach_next_to (*iccProfileCreator, Gtk::PositionType::RIGHT, 1, 1);
             actionGrid->attach_next_to (*helpBtn, Gtk::PositionType::RIGHT, 1, 1);

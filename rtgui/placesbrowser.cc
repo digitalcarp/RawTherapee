@@ -31,7 +31,7 @@
 
 PlacesBrowser::PlacesBrowser ()
 {
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
 
     scrollw = Gtk::manage (new Gtk::ScrolledWindow ());
     scrollw->set_policy (Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
@@ -51,7 +51,7 @@ PlacesBrowser::PlacesBrowser ()
     del->get_style_context()->add_class("Right");
     del->set_image (*Gtk::manage (new RTImage ("remove-small", Gtk::ICON_SIZE_BUTTON)));
     Gtk::Grid* buttonBox = Gtk::manage (new Gtk::Grid ());
-    buttonBox->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
+    buttonBox->set_orientation(Gtk::Orientation::HORIZONTAL);
     buttonBox->attach_next_to(*add, Gtk::POS_LEFT, 1, 1);
     buttonBox->attach_next_to(*del, *add, Gtk::POS_RIGHT, 1, 1);
 

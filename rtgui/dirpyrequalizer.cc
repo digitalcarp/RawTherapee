@@ -55,7 +55,7 @@ DirPyrEqualizer::DirPyrEqualizer () : FoldableToolPanel(this, TOOL_NAME, M("TP_D
     Color::hsv2rgb01(0.3240, 0.5, 0.5, r, g, b);
     milestones.push_back( GradientMilestone(1.    , r, g, b) ); // hsv: 0.324  rad:  2.5
 
-    Gtk::Box*  cbVBox = Gtk::manage ( new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box*  cbVBox = Gtk::manage ( new Gtk::Box(Gtk::Orientation::VERTICAL));
     cbVBox->set_border_width(4);
     cbVBox->set_spacing(2);
 
@@ -92,7 +92,7 @@ DirPyrEqualizer::DirPyrEqualizer () : FoldableToolPanel(this, TOOL_NAME, M("TP_D
 
     buttonBox1->show_all_children();
 
-    Gtk::Separator *separator2 = Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator *separator2 = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     pack_start(*separator2, Gtk::PACK_SHRINK, 2);
 
     for(int i = 0; i < 6; i++) {
@@ -110,14 +110,14 @@ DirPyrEqualizer::DirPyrEqualizer () : FoldableToolPanel(this, TOOL_NAME, M("TP_D
         pack_start(*multiplier[i]);
     }
 
-    Gtk::Separator *separator3 = Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator *separator3 = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     pack_start(*separator3, Gtk::PACK_SHRINK, 2);
 
     threshold = Gtk::manage ( new Adjuster (M("TP_DIRPYREQUALIZER_THRESHOLD"), 0, 1, 0.01, 0.2) );
     threshold->setAdjusterListener(this);
     pack_start(*threshold);
 
-    Gtk::Separator *separator4 = Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator *separator4 = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     pack_start(*separator4, Gtk::PACK_SHRINK, 2);
     /*
         algoHBox = Gtk::manage (new Gtk::Box ());

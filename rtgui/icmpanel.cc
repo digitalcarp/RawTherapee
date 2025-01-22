@@ -87,7 +87,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     Gtk::Frame *iFrame = Gtk::manage(new Gtk::Frame(M("TP_ICM_INPUTPROFILE")));
     iFrame->set_label_align(0.025, 0.5);
 
-    iVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    iVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     inone = Gtk::manage(new Gtk::RadioButton(M("TP_ICM_INPUTNONE")));
     inone->set_tooltip_text(M("TP_ICM_INPUTNONE_TOOLTIP"));
@@ -196,7 +196,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     Gtk::Frame *wFrame = Gtk::manage(new Gtk::Frame(M("TP_ICM_WORKINGPROFILE")));
     wFrame->set_label_align(0.025, 0.5);
 
-    Gtk::Box* wProfVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* wProfVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     wProfNames = Gtk::manage(new MyComboBoxText());
     wProfVBox->pack_start(*wProfNames, Gtk::PACK_SHRINK);
@@ -216,7 +216,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     trcExp = Gtk::manage(new MyExpander(true, M("TP_ICM_TRCFRAME")));
     setExpandAlignProperties(trcExp, true, false, Gtk::Align::FILL, Gtk::Align::START);
 //    trcFrame->set_label_align(0.025, 0.5);
-    Gtk::Box *trcProfVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box *trcProfVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     trcExp->set_tooltip_text(M("TP_ICM_TRCFRAME_TOOLTIP"));
     trcExp->signal_button_release_event().connect_notify ( sigc::bind ( sigc::mem_fun (this, &ICMPanel::foldAllButMe), trcExp) );
     trcExpconn = trcExp->signal_enabled_toggled().connect(sigc::mem_fun(*this, &ICMPanel::trcExpChanged));
@@ -350,7 +350,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     colorFramecie->set_label_align(0.025, 0.5);
     colorFramecie->set_tooltip_text(M("TP_LOCALLAB_PRECAMREFIMAIN_TOOLTIP"));
 
-    Gtk::Box *redVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box *redVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     primCoordGrid = Gtk::manage(new Gtk::Grid());
     primCoordGrid->set_column_homogeneous(true);
     primCoordGrid->attach(*redx, 0, 0, 1, 1);
@@ -361,8 +361,8 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     primCoordGrid->attach_next_to(*bluy, *blux, Gtk::PositionType::POS_RIGHT, 1, 1);
     redVBox->pack_start(*primCoordGrid, Gtk::PACK_EXPAND_WIDGET);
 
-    Gtk::Separator* const separator1 = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL));
-    Gtk::Separator* const separator2 = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Separator* const separator1 = Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL));
+    Gtk::Separator* const separator2 = Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL));
 
     preser = Gtk::manage(new Adjuster(M("TP_ICM_WORKING_PRESER"), 0., 100., 0.5, 0.));
     preser->setAdjusterListener(this);
@@ -455,7 +455,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     oFrame->set_label_align(0.025, 0.5);
     oFrame->set_tooltip_text(M("TP_ICM_OUTPUTPROFILE_TOOLTIP"));
 
-    Gtk::Box* oProfVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* oProfVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     oProfNames = Gtk::manage(new MyComboBoxText());
     oProfVBox->pack_start(*oProfNames, Gtk::PACK_SHRINK);

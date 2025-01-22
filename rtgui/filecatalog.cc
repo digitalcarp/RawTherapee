@@ -68,7 +68,7 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     toolBar(tb)
 {
 
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
 
     inTabMode = false;
 
@@ -82,7 +82,7 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
 
     set_size_request(0, 250);
     // construct trash panel with the extra "empty trash" button
-    trashButtonBox = Gtk::manage( new Gtk::Box(Gtk::ORIENTATION_VERTICAL) );
+    trashButtonBox = Gtk::manage( new Gtk::Box(Gtk::Orientation::VERTICAL) );
     Gtk::Button* emptyT = Gtk::manage( new Gtk::Button ());
     emptyT->set_tooltip_markup (M("FILEBROWSER_EMPTYTRASHHINT"));
     emptyT->set_image (*Gtk::manage(new RTImage ("trash-delete", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
@@ -163,7 +163,7 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     tbLeftPanel_1->signal_toggled().connect( sigc::mem_fun(*this, &FileCatalog::tbLeftPanel_1_toggled) );
     buttonBar->pack_start (*tbLeftPanel_1, Gtk::PACK_SHRINK);
 
-    vSepiLeftPanel = new Gtk::Separator(Gtk::ORIENTATION_VERTICAL);
+    vSepiLeftPanel = new Gtk::Separator(Gtk::Orientation::VERTICAL);
     buttonBar->pack_start (*vSepiLeftPanel, Gtk::PACK_SHRINK);
 
     iFilterClear = new RTImage ("filter-clear", Gtk::ICON_SIZE_LARGE_TOOLBAR);
@@ -176,9 +176,9 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     bFilterClear->signal_button_press_event().connect (sigc::mem_fun(*this, &FileCatalog::capture_event), false);
     bCateg[0] = bFilterClear->signal_toggled().connect (sigc::bind(sigc::mem_fun(*this, &FileCatalog::categoryButtonToggled), bFilterClear, true));
     buttonBar->pack_start (*bFilterClear, Gtk::PACK_SHRINK);
-    buttonBar->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL)), Gtk::PACK_SHRINK);
+    buttonBar->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Gtk::PACK_SHRINK);
 
-    fltrVbox1 = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    fltrVbox1 = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     fltrRankbox = Gtk::manage (new Gtk::Box());
     fltrRankbox->get_style_context()->add_class("smallbuttonbox");
     fltrLabelbox = Gtk::manage (new Gtk::Box());
@@ -257,9 +257,9 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     bCLabel[3]->set_tooltip_markup (M("FILEBROWSER_SHOWCOLORLABEL4HINT"));
     bCLabel[4]->set_tooltip_markup (M("FILEBROWSER_SHOWCOLORLABEL5HINT"));
 
-    buttonBar->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL)), Gtk::PACK_SHRINK);
+    buttonBar->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Gtk::PACK_SHRINK);
 
-    fltrVbox2 = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    fltrVbox2 = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     fltrEditedBox = Gtk::manage (new Gtk::Box());
     fltrEditedBox->get_style_context()->add_class("smallbuttonbox");
     fltrRecentlySavedBox = Gtk::manage (new Gtk::Box());
@@ -319,7 +319,7 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     fltrVbox2->pack_start (*fltrRecentlySavedBox, Gtk::PACK_SHRINK, 0);
     buttonBar->pack_start (*fltrVbox2, Gtk::PACK_SHRINK);
 
-    buttonBar->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL)), Gtk::PACK_SHRINK);
+    buttonBar->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Gtk::PACK_SHRINK);
 
     // Trash
     iTrashShowEmpty = new RTImage("trash-empty-show", Gtk::ICON_SIZE_LARGE_TOOLBAR) ;
@@ -360,7 +360,7 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     buttonBar->pack_start (*bNotTrash, Gtk::PACK_SHRINK);
     buttonBar->pack_start (*bOriginal, Gtk::PACK_SHRINK);
     buttonBar->pack_start(*bRecursive, Gtk::PACK_SHRINK);
-    buttonBar->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL)), Gtk::PACK_SHRINK);
+    buttonBar->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Gtk::PACK_SHRINK);
     fileBrowser->trash_changed().connect( sigc::mem_fun(*this, &FileCatalog::trashChanged) );
 
     // 0  - bFilterClear
@@ -433,7 +433,7 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     zoomBox->pack_end (*zoomOutButton, Gtk::PACK_SHRINK);
 
     buttonBar->pack_start (*zoomBox, Gtk::PACK_SHRINK);
-    buttonBar->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL)), Gtk::PACK_SHRINK);
+    buttonBar->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Gtk::PACK_SHRINK);
 
     // if it IS a single row toolbar
     if (options.FileBrowserToolbarSingleRow) {
@@ -452,9 +452,9 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     buttonBar->pack_end (*tbRightPanel_1, Gtk::PACK_SHRINK);
 
     buttonBar->pack_end (*coarsePanel, Gtk::PACK_SHRINK);
-    buttonBar->pack_end (*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL)), Gtk::PACK_SHRINK, 4);
+    buttonBar->pack_end (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Gtk::PACK_SHRINK, 4);
     buttonBar->pack_end (*toolBar, Gtk::PACK_SHRINK);
-    buttonBar->pack_end (*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL)), Gtk::PACK_SHRINK, 4);
+    buttonBar->pack_end (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Gtk::PACK_SHRINK, 4);
 
     // add default panel
     hBox = Gtk::manage( new Gtk::Box () );

@@ -235,11 +235,11 @@ HistogramPanel::HistogramPanel () :
     scopeVectHsBtn->set_tooltip_text(M("HISTOGRAM_TOOLTIP_TYPE_VECTORSCOPE_HS"));
 
     buttonGrid = Gtk::manage (new Gtk::Grid ());
-    buttonGrid->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
+    buttonGrid->set_orientation(Gtk::Orientation::HORIZONTAL);
     persistentButtons = Gtk::manage(new Gtk::Box());
-    persistentButtons->set_orientation(Gtk::ORIENTATION_VERTICAL);
+    persistentButtons->set_orientation(Gtk::Orientation::VERTICAL);
     optionButtons = Gtk::manage(new Gtk::Box());
-    optionButtons->set_orientation(Gtk::ORIENTATION_VERTICAL);
+    optionButtons->set_orientation(Gtk::Orientation::VERTICAL);
 
     showRed->set_active   (options.histogramRed);
     showGreen->set_active (options.histogramGreen);
@@ -325,7 +325,7 @@ HistogramPanel::HistogramPanel () :
     scopeVectHcBtn->signal_toggled().connect(sigc::bind(sigc::mem_fun(*this, &HistogramPanel::type_selected), scopeVectHcBtn));
     scopeVectHsBtn->signal_toggled().connect(sigc::bind(sigc::mem_fun(*this, &HistogramPanel::type_selected), scopeVectHsBtn));
 
-    brightnessWidget = Gtk::manage(new Gtk::Scale(Gtk::ORIENTATION_VERTICAL));
+    brightnessWidget = Gtk::manage(new Gtk::Scale(Gtk::Orientation::VERTICAL));
     brightnessWidget->set_inverted();
     brightnessWidget->set_range(log(HistogramArea::MIN_BRIGHT), log(HistogramArea::MAX_BRIGHT));
     brightnessWidget->set_draw_value(false);
@@ -343,7 +343,7 @@ HistogramPanel::HistogramPanel () :
     optionButtons->add(*showBAR);
     optionButtons->add(*brightnessWidget);
 
-    Gtk::Separator* separator = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Separator* separator = Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL));
     setExpandAlignProperties(separator, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     persistentButtons->add(*scopeHistBtn);
     persistentButtons->add(*scopeHistRawBtn);

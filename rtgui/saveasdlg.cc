@@ -127,14 +127,14 @@ SaveAsDialog::SaveAsDialog (const Glib::ustring &initialDir, Gtk::Window* parent
 
 // pack everything
 // ~~~~~~~~~~~~~~~
-    Gtk::Box* vbox_bottomRight = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* vbox_bottomRight = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     // There is no queue in simple mode, so no need to choose
     if (!simpleEditor) {
         vbox_bottomRight->pack_start (*saveMethod[0], Gtk::PACK_SHRINK, 2);
         vbox_bottomRight->pack_start (*saveMethod[1], Gtk::PACK_SHRINK, 2);
         vbox_bottomRight->pack_start (*saveMethod[2], Gtk::PACK_SHRINK, 2);
-        vbox_bottomRight->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)), Gtk::PACK_SHRINK, 5);
+        vbox_bottomRight->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Gtk::PACK_SHRINK, 5);
     }
 
     vbox_bottomRight->pack_start (*forceFormatOpts, Gtk::PACK_SHRINK, 4);
@@ -142,7 +142,7 @@ SaveAsDialog::SaveAsDialog (const Glib::ustring &initialDir, Gtk::Window* parent
 
     Gtk::Box* hbox_bottom = Gtk::manage( new Gtk::Box() );
     hbox_bottom->pack_start (*formatOpts, Gtk::PACK_EXPAND_WIDGET, 2);
-    hbox_bottom->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL)), Gtk::PACK_SHRINK, 2);
+    hbox_bottom->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Gtk::PACK_SHRINK, 2);
     hbox_bottom->pack_start (*vbox_bottomRight, Gtk::PACK_EXPAND_WIDGET, 2);
 
     box->pack_start (*fchooser);

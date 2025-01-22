@@ -80,7 +80,7 @@ IPTCPanel::IPTCPanel():
     embeddedData(new rtengine::procparams::IPTCPairs)
 {
 
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
     set_spacing(4);
 
     Gtk::Grid* iptc = Gtk::manage(new Gtk::Grid());
@@ -140,7 +140,7 @@ IPTCPanel::IPTCPanel():
 
     // --------------------------
 
-    Gtk::Separator* hsep1 = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* hsep1 = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     setExpandAlignProperties(hsep1, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     iptc->attach(*hsep1, 0, row++, 2, 1);
 
@@ -184,7 +184,7 @@ IPTCPanel::IPTCPanel():
     iptc->attach(*scrolledWindowkw, 0, row++, 2, 1);
     // --------------------------
 
-    Gtk::Separator* hsep2 = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* hsep2 = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     setExpandAlignProperties(hsep2, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     iptc->attach(*hsep2, 0, row++, 2, 1);
     // --------------------------
@@ -237,7 +237,7 @@ IPTCPanel::IPTCPanel():
     iptc->attach(*scrolledWindowsc, 0, row++, 2, 1);
     // --------------------------
 
-    Gtk::Separator* hsep3 = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* hsep3 = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     setExpandAlignProperties(hsep3, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     iptc->attach(*hsep3, 0, row++, 2, 1);
     // --------------------------
@@ -297,7 +297,7 @@ IPTCPanel::IPTCPanel():
 
     // --------------------------
 
-    Gtk::Separator* hsep4 = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* hsep4 = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     setExpandAlignProperties(hsep4, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     iptc->attach(*hsep4, 0, row++, 2, 1);
 

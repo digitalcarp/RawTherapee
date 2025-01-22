@@ -45,12 +45,12 @@ FilePanel::FilePanel () : parent(nullptr), error(0)
     recentBrowser = Gtk::manage ( new RecentBrowser () );
 
     // The whole left panel. Contains Places, Recent Folders and Folders.
-    placespaned = Gtk::manage ( new Gtk::Paned (Gtk::ORIENTATION_VERTICAL) );
+    placespaned = Gtk::manage ( new Gtk::Paned (Gtk::Orientation::VERTICAL) );
     placespaned->set_name ("PlacesPaned");
     placespaned->set_size_request(250, 100);
     placespaned->set_position (options.dirBrowserHeight);
 
-    Gtk::Box* obox = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* obox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     obox->get_style_context()->add_class ("plainback");
     obox->pack_start (*recentBrowser, Gtk::PACK_SHRINK, 4);
     obox->pack_start (*dirBrowser);
@@ -83,7 +83,7 @@ FilePanel::FilePanel () : parent(nullptr), error(0)
     rightBox->set_size_request(350, 100);
     rightNotebook = Gtk::manage ( new Gtk::Notebook () );
     rightNotebookSwitchConn = rightNotebook->signal_switch_page().connect_notify( sigc::mem_fun(*this, &FilePanel::on_NB_switch_page) );
-    //Gtk::Box* taggingBox = Gtk::manage ( new Gtk::Box(Gtk::ORIENTATION_VERTICAL) );
+    //Gtk::Box* taggingBox = Gtk::manage ( new Gtk::Box(Gtk::Orientation::VERTICAL) );
 
     history = Gtk::manage ( new History (false) );
 
@@ -130,7 +130,7 @@ FilePanel::FilePanel () : parent(nullptr), error(0)
     exportLab->set_name ("LabelRightNotebook");
     exportLab->set_angle (90);
 
-    tpcPaned = Gtk::manage ( new Gtk::Paned (Gtk::ORIENTATION_VERTICAL) );
+    tpcPaned = Gtk::manage ( new Gtk::Paned (Gtk::Orientation::VERTICAL) );
     tpcPaned->pack1 (*tpc->toolPanelNotebook, false, true);
     tpcPaned->pack2 (*history, true, false);
 

@@ -146,7 +146,7 @@ PerspCorrection::PerspCorrection () : FoldableToolPanel(this, TOOL_NAME, M("TP_P
     method_hbox->pack_start(*method);
     pack_start(*method_hbox);
 
-    simple = Gtk::manage( new Gtk::Box(Gtk::ORIENTATION_VERTICAL) );
+    simple = Gtk::manage( new Gtk::Box(Gtk::Orientation::VERTICAL) );
 
     vert = Gtk::manage (new Adjuster (M("TP_PERSPECTIVE_VERTICAL"), -100, 100, 0.1, 0, ipersVL, ipersVR));
     vert->setAdjusterListener (this);
@@ -154,13 +154,13 @@ PerspCorrection::PerspCorrection () : FoldableToolPanel(this, TOOL_NAME, M("TP_P
     horiz = Gtk::manage (new Adjuster (M("TP_PERSPECTIVE_HORIZONTAL"), -100, 100, 0.1, 0, ipersHL, ipersHR));
     horiz->setAdjusterListener (this);
 
-    camera_based = Gtk::manage( new Gtk::Box(Gtk::ORIENTATION_VERTICAL) );
+    camera_based = Gtk::manage( new Gtk::Box(Gtk::Orientation::VERTICAL) );
 
     Gtk::Frame* camera_frame = Gtk::manage (new Gtk::Frame
             (M("TP_PERSPECTIVE_CAMERA_FRAME")));
     camera_frame->set_label_align(0.025, 0.5);
 
-    Gtk::Box* camera_vbox = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* camera_vbox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     camera_focal_length = Gtk::manage (new Adjuster (M("TP_PERSPECTIVE_CAMERA_FOCAL_LENGTH"), 0.5, 2000, 0.01, PerspectiveParams::DEFAULT_CAMERA_FOCAL_LENGTH));
     camera_focal_length->setAdjusterListener (this);
@@ -238,7 +238,7 @@ PerspCorrection::PerspCorrection () : FoldableToolPanel(this, TOOL_NAME, M("TP_P
             (M("TP_PERSPECTIVE_POST_CORRECTION_ADJUSTMENT_FRAME")));
     pca_frame->set_label_align(0.025, 0.5);
 
-    Gtk::Box* pca_vbox = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* pca_vbox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     projection_shift_horiz = Gtk::manage (new Adjuster (M("TP_PERSPECTIVE_PROJECTION_SHIFT_HORIZONTAL"), -100, 100, 0.01, 0));
     projection_shift_horiz->setAdjusterListener (this);
@@ -253,7 +253,7 @@ PerspCorrection::PerspCorrection () : FoldableToolPanel(this, TOOL_NAME, M("TP_P
             (M("TP_PERSPECTIVE_RECOVERY_FRAME")));
     recovery_frame->set_label_align(0.025, 0.5);
 
-    Gtk::Box* recovery_vbox = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* recovery_vbox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     projection_pitch = Gtk::manage (new Adjuster (M("TP_PERSPECTIVE_PROJECTION_PITCH"), -60, 60, 0.1, 0, ipers_proj_pitch_left, ipers_proj_pitch_right));
     projection_pitch->setAdjusterListener (this);
@@ -275,9 +275,9 @@ PerspCorrection::PerspCorrection () : FoldableToolPanel(this, TOOL_NAME, M("TP_P
     camera_vbox->pack_start (*camera_roll);
     camera_vbox->pack_start (*camera_pitch);
     camera_vbox->pack_start (*camera_yaw);
-    camera_vbox->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)));
+    camera_vbox->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)));
     camera_vbox->pack_start (*control_lines_box);
-    camera_vbox->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)));
+    camera_vbox->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)));
     camera_vbox->pack_start (*auto_hbox);
     camera_frame->add(*camera_vbox);
     camera_based->pack_start(*camera_frame);

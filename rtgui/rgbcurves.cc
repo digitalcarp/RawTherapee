@@ -38,7 +38,7 @@ RGBCurves::RGBCurves () : FoldableToolPanel(this, TOOL_NAME, M("TP_RGBCURVES_LAB
     lumamode->show ();
     pack_start (*lumamode);
 
-    Gtk::Separator *hsep1 = Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator *hsep1 = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     hsep1->show ();
     pack_start (*hsep1);
 

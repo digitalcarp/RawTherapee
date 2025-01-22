@@ -47,7 +47,7 @@ ExifPanel::ExifPanel() :
         editableTags.push_back(std::make_pair(k, ""));
     }
 
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
     exifTree = Gtk::manage (new Gtk::TreeView());
     scrolledWindow = Gtk::manage (new Gtk::ScrolledWindow());
 

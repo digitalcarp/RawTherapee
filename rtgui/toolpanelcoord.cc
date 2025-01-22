@@ -462,7 +462,7 @@ ToolPanelCoordinator::ToolPanelCoordinator (bool batch) : ipc (nullptr), favorit
 
     // load panel endings
     for (int i = 0; i < 8; i++) {
-        vbPanelEnd[i] = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+        vbPanelEnd[i] = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
         imgPanelEnd[i] = Gtk::manage (new Gtk::Image (ornamentSurface->get()));
         imgPanelEnd[i]->show();
         vbPanelEnd[i]->get_style_context()->add_class("PanelEnding");

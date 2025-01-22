@@ -62,7 +62,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
 
     //----------- Color curve ------------------------------
 
-    colorSep = Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    colorSep = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     pack_start (*colorSep);
 
     colorCurveEditorG = new CurveEditorGroup (options.lastColorToningCurvesDir, M("TP_COLORTONING_COLOR"));
@@ -203,7 +203,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
 
     //----------- Saturation and strength ------------------------------
 
-//  satLimiterSep = Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+//  satLimiterSep = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
 
 
 //  pack_start (*satLimiterSep, Gtk::PACK_SHRINK);
@@ -214,7 +214,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
     p1Frame = Gtk::manage (new Gtk::Frame(M("TP_COLORTONING_SA")) );
     p1Frame->set_label_align(0.025, 0.5);
 
-    p1VBox = Gtk::manage ( new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    p1VBox = Gtk::manage ( new Gtk::Box(Gtk::Orientation::VERTICAL));
     p1VBox->set_spacing(2);
 
     autosat = Gtk::manage (new Gtk::CheckButton (M("TP_COLORTONING_AUTOSAT")));
@@ -245,10 +245,10 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
 
     //  --------------------Sliders BW Colortoning -------------------
 
-    chanMixerBox = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
-    Gtk::Box* chanMixerHLBox = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
-    Gtk::Box* chanMixerMidBox = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
-    Gtk::Box* chanMixerShadowsBox = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    chanMixerBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
+    Gtk::Box* chanMixerHLBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
+    Gtk::Box* chanMixerMidBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
+    Gtk::Box* chanMixerShadowsBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     Gtk::Image* iblueR   = Gtk::manage (new RTImage ("circle-blue-small"));
     Gtk::Image* iyelL    = Gtk::manage (new RTImage ("circle-yellow-small"));
@@ -380,7 +380,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
     EvLabRegionMaskBlur = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_COLORTONING_LABREGION_MASKBLUR");
     EvLabRegionShowMask = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_COLORTONING_LABREGION_SHOWMASK");
     EvLabRegionChannel = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_COLORTONING_LABREGION_CHANNEL");
-    labRegionBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    labRegionBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     labRegionList = Gtk::manage(new Gtk::ListViewText(3));
     labRegionList->set_size_request(-1, 150);
@@ -392,7 +392,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
     labRegionSelectionConn = labRegionList->get_selection()->signal_changed().connect(sigc::mem_fun(this, &ColorToning::onLabRegionSelectionChanged));
     Gtk::Box *hb = Gtk::manage(new Gtk::Box());
     hb->pack_start(*labRegionList, Gtk::PACK_EXPAND_WIDGET);
-    Gtk::Box* vb = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* vb = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     labRegionAdd = Gtk::manage(new Gtk::Button());
     labRegionAdd->add(*Gtk::manage(new RTImage("add-small", Gtk::ICON_SIZE_BUTTON)));
     labRegionAdd->signal_clicked().connect(sigc::mem_fun(*this, &ColorToning::labRegionAddPressed));
@@ -448,7 +448,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
     hb->pack_start(*labRegionChannel);
     labRegionBox->pack_start(*hb);
 
-    labRegionBox->pack_start(*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)));
+    labRegionBox->pack_start(*Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL)));
 
     CurveEditorGroup *labRegionEditorG = Gtk::manage(new CurveEditorGroup(options.lastColorToningCurvesDir, M("TP_COLORTONING_LABREGION_MASK")));
     labRegionEditorG->setCurveListener(this);

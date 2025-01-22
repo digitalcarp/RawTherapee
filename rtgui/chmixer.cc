@@ -49,7 +49,7 @@ ChMixer::ChMixer (): FoldableToolPanel(this, TOOL_NAME, M("TP_CHMIXER_LABEL"), f
     red[1] = Gtk::manage (new Adjuster ("", -RANGE, RANGE, 0.1, 0, imgIcon[1]));
     red[2] = Gtk::manage (new Adjuster ("",  -RANGE, RANGE, 0.1, 0, imgIcon[2]));
 
-    Gtk::Separator* rsep = Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* rsep = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
 
     pack_start (*rlabel);
 
@@ -68,7 +68,7 @@ ChMixer::ChMixer (): FoldableToolPanel(this, TOOL_NAME, M("TP_CHMIXER_LABEL"), f
     green[1] = Gtk::manage (new Adjuster ("", -RANGE, RANGE, 0.1, 100, imgIcon[4]));
     green[2] = Gtk::manage (new Adjuster ("",  -RANGE, RANGE, 0.1, 0, imgIcon[5]));
 
-    Gtk::Separator* gsep = Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* gsep = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
 
     pack_start (*glabel);
 

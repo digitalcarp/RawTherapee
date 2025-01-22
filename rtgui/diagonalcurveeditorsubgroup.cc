@@ -53,7 +53,7 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
 
     // custom curve
     customCurveGrid = new Gtk::Grid ();
-    customCurveGrid->set_orientation(Gtk::ORIENTATION_VERTICAL);
+    customCurveGrid->set_orientation(Gtk::Orientation::VERTICAL);
     customCurveGrid->get_style_context()->add_class("curve-mainbox");
 
     customCurve = Gtk::manage (new MyDiagonalCurve ());
@@ -67,19 +67,19 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
     custombbox->get_style_context()->add_class("curve-buttonbox");
 
     if (options.curvebboxpos == 0) {
-        custombbox->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
+        custombbox->set_orientation(Gtk::Orientation::HORIZONTAL);
         setExpandAlignProperties(custombbox, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
         customCurveGrid->get_style_context()->add_class("top");
     } else if (options.curvebboxpos == 2) {
-        custombbox->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
+        custombbox->set_orientation(Gtk::Orientation::HORIZONTAL);
         setExpandAlignProperties(custombbox, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
         customCurveGrid->get_style_context()->add_class("bottom");
     } else if (options.curvebboxpos == 1) {
-        custombbox->set_orientation(Gtk::ORIENTATION_VERTICAL);
+        custombbox->set_orientation(Gtk::Orientation::VERTICAL);
         setExpandAlignProperties(custombbox, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
         customCurveGrid->get_style_context()->add_class("right");
     } else if (options.curvebboxpos == 3){
-        custombbox->set_orientation(Gtk::ORIENTATION_VERTICAL);
+        custombbox->set_orientation(Gtk::Orientation::VERTICAL);
         setExpandAlignProperties(custombbox, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
         customCurveGrid->get_style_context()->add_class("left");
     }
@@ -145,7 +145,7 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
 
     // NURBS curve
     NURBSCurveGrid = new Gtk::Grid ();
-    NURBSCurveGrid->set_orientation(Gtk::ORIENTATION_VERTICAL);
+    NURBSCurveGrid->set_orientation(Gtk::Orientation::VERTICAL);
     NURBSCurveGrid->get_style_context()->add_class("curve-mainbox");
 
     NURBSCurve = Gtk::manage (new MyDiagonalCurve ());
@@ -159,19 +159,19 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
     NURBSbbox->get_style_context()->add_class("curve-buttonbox");
 
     if (options.curvebboxpos == 0) {
-        NURBSbbox->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
+        NURBSbbox->set_orientation(Gtk::Orientation::HORIZONTAL);
         setExpandAlignProperties(NURBSbbox, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
         NURBSCurveGrid->get_style_context()->add_class("top");
     } else if (options.curvebboxpos == 2) {
-        NURBSbbox->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
+        NURBSbbox->set_orientation(Gtk::Orientation::HORIZONTAL);
         setExpandAlignProperties(NURBSbbox, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
         NURBSCurveGrid->get_style_context()->add_class("bottom");
     } else if (options.curvebboxpos == 1) {
-        NURBSbbox->set_orientation(Gtk::ORIENTATION_VERTICAL);
+        NURBSbbox->set_orientation(Gtk::Orientation::VERTICAL);
         setExpandAlignProperties(NURBSbbox, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
         NURBSCurveGrid->get_style_context()->add_class("right");
     } else if (options.curvebboxpos == 3){
-        NURBSbbox->set_orientation(Gtk::ORIENTATION_VERTICAL);
+        NURBSbbox->set_orientation(Gtk::Orientation::VERTICAL);
         setExpandAlignProperties(NURBSbbox, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
         NURBSCurveGrid->get_style_context()->add_class("left");
     }
@@ -237,7 +237,7 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
 
     // parametric curve
     paramCurveGrid = new Gtk::Grid ();
-    paramCurveGrid->set_orientation(Gtk::ORIENTATION_VERTICAL);
+    paramCurveGrid->set_orientation(Gtk::Orientation::VERTICAL);
     paramCurveGrid->get_style_context()->add_class("curve-mainbox");
 
     paramCurve = Gtk::manage (new MyDiagonalCurve ());
@@ -251,19 +251,19 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
     parambbox->get_style_context()->add_class("curve-buttonbox");
 
     if (options.curvebboxpos == 0) {
-        parambbox->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
+        parambbox->set_orientation(Gtk::Orientation::HORIZONTAL);
         setExpandAlignProperties(parambbox, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
         paramCurveGrid->get_style_context()->add_class("top");
     } else if (options.curvebboxpos == 2) {
-        parambbox->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
+        parambbox->set_orientation(Gtk::Orientation::HORIZONTAL);
         setExpandAlignProperties(parambbox, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
         paramCurveGrid->get_style_context()->add_class("bottom");
     } else if (options.curvebboxpos == 1) {
-        parambbox->set_orientation(Gtk::ORIENTATION_VERTICAL);
+        parambbox->set_orientation(Gtk::Orientation::VERTICAL);
         setExpandAlignProperties(parambbox, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
         paramCurveGrid->get_style_context()->add_class("right");
     } else if (options.curvebboxpos == 3){
-        parambbox->set_orientation(Gtk::ORIENTATION_VERTICAL);
+        parambbox->set_orientation(Gtk::Orientation::VERTICAL);
         setExpandAlignProperties(parambbox, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
         paramCurveGrid->get_style_context()->add_class("left");
     }
@@ -318,7 +318,7 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
 
     // paramCurveSliderBox needed to set vspacing(4) between curve+shc and sliders without vspacing between each slider
     Gtk::Grid* paramCurveSliderBox = Gtk::manage (new Gtk::Grid());
-    paramCurveSliderBox->set_orientation(Gtk::ORIENTATION_VERTICAL);
+    paramCurveSliderBox->set_orientation(Gtk::Orientation::VERTICAL);
     paramCurveSliderBox->get_style_context()->add_class("curve-sliderbox");
 
     paramCurveSliderBox->attach_next_to(*evhighlights, Gtk::POS_TOP, 1, 1);

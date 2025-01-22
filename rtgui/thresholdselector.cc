@@ -418,7 +418,7 @@ void ThresholdSelector::updateDrawingArea(const Cairo::RefPtr<Cairo::Context>& c
         const double arrowY = i == 0 || i == 2 ? yStart - 3. : yEnd + 3.;
         const double baseY = i == 0 || i == 2 ? static_cast<double>(h) - static_cast<double>(padding.get_bottom()) - 0.5 : static_cast<double>(padding.get_top()) + 0.5;
 
-        style->render_slider(cr, posX - hwslider, i == 0 || i == 2 ? arrowY : baseY, wslider, i == 0 || i == 2 ? baseY - arrowY : arrowY - baseY, Gtk::ORIENTATION_HORIZONTAL);
+        style->render_slider(cr, posX - hwslider, i == 0 || i == 2 ? arrowY : baseY, wslider, i == 0 || i == 2 ? baseY - arrowY : arrowY - baseY, Gtk::Orientation::HORIZONTAL);
     }
 
     style->set_state(currState);

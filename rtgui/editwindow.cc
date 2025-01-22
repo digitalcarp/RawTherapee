@@ -82,7 +82,7 @@ EditWindow::EditWindow (RTWindow* p)
     signal_window_state_event().connect(sigc::mem_fun(*this, &EditWindow::on_window_state_event));
     onConfEventConn = signal_configure_event().connect(sigc::mem_fun(*this, &EditWindow::on_configure_event));
 
-    Gtk::Box* mainBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* mainBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     mainBox->pack_start(*mainNB);
 
     add(*mainBox);

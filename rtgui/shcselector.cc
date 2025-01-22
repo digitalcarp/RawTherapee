@@ -168,7 +168,7 @@ void SHCSelector::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cr)
                 static_cast<double>(vb),
                 wslider,
                 static_cast<double>(h) - static_cast<double>(vb),
-                Gtk::ORIENTATION_VERTICAL);
+                Gtk::Orientation::VERTICAL);
         style->set_state(Gtk::STATE_FLAG_NORMAL);
     }
 

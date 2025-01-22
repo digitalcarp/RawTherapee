@@ -31,7 +31,7 @@ using namespace rtengine::procparams;
 
 History::History (bool bookmarkSupport) : historyVPaned (nullptr), blistener (nullptr), tpc (nullptr), bmnum (1)
 {
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
 
     blistenerLock = false; // sets default that the Before preview will not be locked
     /*
@@ -117,14 +117,14 @@ History::History (bool bookmarkSupport) : historyVPaned (nullptr), blistener (nu
 
     Gtk::Frame* bmFrame = Gtk::manage (new Gtk::Frame (M ("HISTORY_SNAPSHOTS")));
     bmFrame->set_name ("Snapshots");
-    Gtk::Box* bmBox = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* bmBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     bmFrame->add (*bmBox);
     bmBox->pack_start (*bscrollw, Gtk::PACK_EXPAND_WIDGET, 4);
     bmBox->pack_end (*ahbox, Gtk::PACK_SHRINK, 4);
     bmBox->set_size_request (-1, 60);
 
     if (bookmarkSupport) {
-        historyVPaned = Gtk::manage ( new Gtk::Paned (Gtk::ORIENTATION_VERTICAL) );
+        historyVPaned = Gtk::manage ( new Gtk::Paned (Gtk::Orientation::VERTICAL) );
         historyVPaned->pack1 (*histFrame, true, false);
         historyVPaned->pack2 (*bmFrame, false, false);
         pack_start (*historyVPaned);

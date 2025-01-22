@@ -52,7 +52,7 @@ Compressgamut::Compressgamut () : FoldableToolPanel(this, TOOL_NAME, M("TP_COMPR
     iFrame->set_label_align(0.025f, 0.5);
     iFrame->set_tooltip_markup (M("TP_COMPRESSGAMUT_COLORSPACE_TOOLTIP"));
 
-    Gtk::Box *iVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box *iVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
    
     colorspace = Gtk::manage(new MyComboBoxText());
     colorspace->append(M("TP_COMPRESSGAMUT_REC2020"));
@@ -77,7 +77,7 @@ Compressgamut::Compressgamut () : FoldableToolPanel(this, TOOL_NAME, M("TP_COMPR
 
     Gtk::Frame *thFrame = Gtk::manage(new Gtk::Frame(M("TP_COMPRESSGAMUT_THRESHOLD")));
     thFrame->set_label_align(0.025f, 0.5);
-    Gtk::Box *thVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box *thVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     thFrame->set_tooltip_markup (M("TP_COMPRESSGAMUT_THRESHOLD_TOOLTIP"));
 
     thVBox->pack_start (*th_c);
@@ -97,7 +97,7 @@ Compressgamut::Compressgamut () : FoldableToolPanel(this, TOOL_NAME, M("TP_COMPR
     limFrame->set_label_align(0.025f, 0.5);
     limFrame->set_tooltip_markup (M("TP_COMPRESSGAMUT_LIMIT_TOOLTIP"));
 
-    Gtk::Box *limVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box *limVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     limVBox->pack_start (*d_c);
     limVBox->pack_start (*d_m);
     limVBox->pack_start (*d_y);
@@ -113,7 +113,7 @@ Compressgamut::Compressgamut () : FoldableToolPanel(this, TOOL_NAME, M("TP_COMPR
     rollFrame->set_label_align(0.025f, 0.5);
     rollFrame->set_label_widget(*rolloff);
     rolloff->set_active(true); 
-    Gtk::Box *rollVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box *rollVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     rollFrame->set_tooltip_markup (M("TP_COMPRESSGAMUT_POWER_TOOLTIP"));
 
     rollVBox->pack_start (*pwr);

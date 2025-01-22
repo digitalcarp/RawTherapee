@@ -64,7 +64,7 @@ Distortion::Distortion (): FoldableToolPanel(this, TOOL_NAME, M("TP_DISTORTION_L
 
     Gtk::Frame* defish_frame = Gtk::manage (new Gtk::Frame());
     defish_frame->set_label_align(0.025, 0.5);
-    Gtk::Box* defish_vbox = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* defish_vbox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     defish = Gtk::manage(new Gtk::CheckButton(M("TP_DISTORTION_DEFISH")));
     defish->signal_toggled().connect(sigc::mem_fun(*this, &Distortion::defishChanged));
     defish->show();

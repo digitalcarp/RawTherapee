@@ -586,7 +586,7 @@ MyExpander::MyExpander(bool useEnabled, Glib::ustring titleLabel) :
 
 void MyExpander::setupPart1()
 {
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
     set_spacing(0);
     set_name("MyExpander");
     set_can_focus(false);
@@ -1444,7 +1444,7 @@ MyFileChooserButton::MyFileChooserButton(const Glib::ustring &title, Gtk::FileCh
     pimpl->lbl_.set_justify(Gtk::JUSTIFY_LEFT);
     on_filename_set();
     pimpl->box_.pack_start(pimpl->lbl_, true, true);
-    pimpl->box_.pack_start(*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL)), false, false, 5);
+    pimpl->box_.pack_start(*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), false, false, 5);
     pimpl->box_.pack_start(*Gtk::manage(make_folder_image().release()), false, false);
     pimpl->box_.show_all_children();
     add(pimpl->box_);
@@ -1596,7 +1596,7 @@ ImageAndLabel::ImageAndLabel(const Glib::ustring& label, RTImage *image) :
     pimpl(new Impl(image, Gtk::manage(new Gtk::Label(label))))
 {
     Gtk::Grid* grid = Gtk::manage(new Gtk::Grid());
-    grid->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
+    grid->set_orientation(Gtk::Orientation::HORIZONTAL);
 
     if (image) {
         grid->attach_next_to(*image, Gtk::POS_LEFT, 1, 1);

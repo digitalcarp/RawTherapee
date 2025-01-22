@@ -315,9 +315,9 @@ Framing::Framing() :
 {
     setupEvents();
     setupFramingMethodGui();
-    pack_start(*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)));
+    pack_start(*Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL)));
     setupBorderSizeGui();
-    pack_start(*Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)));
+    pack_start(*Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL)));
     setupBorderColorsGui();
 }
 
@@ -451,7 +451,7 @@ void Framing::setupBorderSizeGui()
     minSizeEnabled = Gtk::manage(new Gtk::CheckButton(M("TP_FRAMING_LIMIT_MINIMUM")));
     minSizeFrame->set_label_widget(*minSizeEnabled);
 
-    minSizeFrameContent = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    minSizeFrameContent = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     minWidth = DimensionGui(minSizeFrameContent, "TP_FRAMING_MIN_WIDTH");
     minWidth.setRange(0, imgWidth);
@@ -493,7 +493,7 @@ void Framing::setupBorderColorsGui()
     frame->set_label_align(FRAME_LABEL_ALIGN_X, FRAME_LABEL_ALIGN_Y);
     frame->set_label_widget(*label);
 
-    Gtk::Box* const box = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* const box = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     redAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_RED"), 0, MAX_COLOR_VAL, 1, MAX_COLOR_VAL));
     box->add(*redAdj);
     greenAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_GREEN"), 0, MAX_COLOR_VAL, 1, MAX_COLOR_VAL));

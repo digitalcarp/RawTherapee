@@ -42,10 +42,10 @@ static Glib::ustring makeFolderLabel(Glib::ustring path)
 
 BatchQueuePanel::BatchQueuePanel (FileCatalog* aFileCatalog) : parent(nullptr)
 {
-    set_orientation(Gtk::ORIENTATION_VERTICAL);
+    set_orientation(Gtk::Orientation::VERTICAL);
     batchQueue = Gtk::manage( new BatchQueue(aFileCatalog) );
 
-    Gtk::Box* batchQueueButtonBox = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* batchQueueButtonBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     batchQueueButtonBox->set_name("BatchQueueButtons");
 
     qStartStop = Gtk::manage (new Gtk::Switch());
@@ -67,7 +67,7 @@ BatchQueuePanel::BatchQueuePanel (FileCatalog* aFileCatalog) : parent(nullptr)
     // Output directory selection
     fdir = Gtk::manage (new Gtk::Frame (M("QUEUE_LOCATION_TITLE")));
     fdir->set_label_align(0.025, 0.5);
-    Gtk::Box* odvb = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* odvb = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Box* hb2 = Gtk::manage (new Gtk::Box ());
     useTemplate = Gtk::manage (new Gtk::RadioButton (M("QUEUE_LOCATION_TEMPLATE") + ":"));
     hb2->pack_start (*useTemplate, Gtk::PACK_SHRINK, 4);
@@ -151,7 +151,7 @@ BatchQueuePanel::BatchQueuePanel (FileCatalog* aFileCatalog) : parent(nullptr)
     topBox->pack_start (*fdir, Gtk::PACK_EXPAND_WIDGET, 4);
     topBox->pack_start (*fformat, Gtk::PACK_EXPAND_WIDGET, 4);
 
-    middleSplitPane = Gtk::manage (new Gtk::Paned(Gtk::ORIENTATION_HORIZONTAL));
+    middleSplitPane = Gtk::manage (new Gtk::Paned(Gtk::Orientation::HORIZONTAL));
     templateHelpTextView = Gtk::manage (new Gtk::TextView());
     templateHelpTextView->set_editable(false);
     templateHelpTextView->set_wrap_mode(Gtk::WRAP_WORD);
@@ -171,7 +171,7 @@ BatchQueuePanel::BatchQueuePanel (FileCatalog* aFileCatalog) : parent(nullptr)
 
     // thumbnail zoom
     Gtk::Box* zoomBox = Gtk::manage (new Gtk::Box ());
-    zoomBox->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_VERTICAL)), Gtk::PACK_SHRINK, 4);
+    zoomBox->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL)), Gtk::PACK_SHRINK, 4);
     Gtk::Label* zoomLabel = Gtk::manage (new Gtk::Label (Glib::ustring("<b>") + M("FILEBROWSER_THUMBSIZE") + ":</b>"));
     zoomLabel->set_use_markup (true);
     zoomBox->pack_start (*zoomLabel, Gtk::PACK_SHRINK, 4);

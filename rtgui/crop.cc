@@ -164,7 +164,7 @@ Crop::Crop():
     methodgrid->attach (*resetCrop, 2, 2, 2, 1);
     pack_start (*methodgrid, Gtk::PACK_EXPAND_WIDGET, 0 );
 
-    Gtk::Separator* methodseparator = Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* methodseparator = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     methodseparator->get_style_context()->add_class("grid-row-separator");
     pack_start (*methodseparator, Gtk::PACK_SHRINK, 0);
 
@@ -214,7 +214,7 @@ Crop::Crop():
     ppigrid->set_column_homogeneous (true);
     setExpandAlignProperties(ppigrid, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
-    Gtk::Separator* ppiseparator = Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* ppiseparator = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     ppiseparator->get_style_context()->add_class("grid-row-separator");
 
     Gtk::Grid* ppisubgrid = Gtk::manage(new Gtk::Grid());

@@ -63,7 +63,7 @@ LCurve::LCurve() : FoldableToolPanel(this, TOOL_NAME, M("TP_LABCURVE_LABEL"), fa
     chromaticity->setLogScale(2, 0, true);
 
     //%%%%%%%%%%%%%%%%%%
-    Gtk::Separator* hsep2 = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* hsep2 = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     hsep2->show();
     pack_start(*hsep2, Gtk::PACK_EXPAND_WIDGET, 4);
 
@@ -103,7 +103,7 @@ LCurve::LCurve() : FoldableToolPanel(this, TOOL_NAME, M("TP_LABCURVE_LABEL"), fa
 
     //%%%%%%%%%%%%%%%%%%%
 
-    Gtk::Separator* hsep3 = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* hsep3 = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     hsep3->show();
     pack_start(*hsep3, Gtk::PACK_EXPAND_WIDGET, 4);
 
@@ -239,7 +239,7 @@ LCurve::LCurve() : FoldableToolPanel(this, TOOL_NAME, M("TP_LABCURVE_LABEL"), fa
     curveEditorG->curveListComplete();
 
     pack_start(*curveEditorG, Gtk::PACK_SHRINK, 4);
-    Gtk::Separator* hsepdh = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* hsepdh = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     hsepdh->show();
     pack_start(*hsepdh, Gtk::PACK_EXPAND_WIDGET, 4);
     show_all_children();
