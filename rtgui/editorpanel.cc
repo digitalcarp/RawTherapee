@@ -2035,7 +2035,7 @@ bool EditorPanel::idle_saveImage (ProgressConnector<rtengine::IImagefloat*> *pc,
         }
     } else {
         Glib::ustring msg_ = Glib::ustring ("<b>") + escapeHtmlChars(fname) + ": Error during image processing\n</b>";
-        Gtk::MessageDialog msgd (*parent, msg_, true, Gtk::MessageType::ERROR, Gtk::BUTTONS_OK, true);
+        Gtk::MessageDialog msgd (*parent, msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
         msgd.run ();
 
         saveimgas->set_sensitive (true);
@@ -2396,7 +2396,7 @@ bool EditorPanel::idle_sendToGimp ( ProgressConnector<rtengine::IImagefloat*> *p
                        sigc::bind (sigc::mem_fun (*this, &EditorPanel::idle_sentToGimp), ld, img, fileName));
     } else {
         Glib::ustring msg_ = Glib::ustring ("<b> Error during image processing\n</b>");
-        Gtk::MessageDialog msgd (*parent, msg_, true, Gtk::MessageType::ERROR, Gtk::BUTTONS_OK, true);
+        Gtk::MessageDialog msgd (*parent, msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
         msgd.run ();
         saveimgas->set_sensitive (true);
         send_to_external->set_sensitive(send_to_external->getEntryCount());
@@ -2430,7 +2430,7 @@ bool EditorPanel::idle_sentToGimp (ProgressConnector<int> *pc, rtengine::IImagef
         success = ExtProgStore::openInExternalEditor(filename, external_editor_info);
 
         if (!success) {
-            Gtk::MessageDialog msgd (*parent, M ("MAIN_MSG_CANNOTSTARTEDITOR"), false, Gtk::MessageType::ERROR, Gtk::BUTTONS_OK, true);
+            Gtk::MessageDialog msgd (*parent, M ("MAIN_MSG_CANNOTSTARTEDITOR"), false, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
             msgd.set_secondary_text (M ("MAIN_MSG_CANNOTSTARTEDITOR_SECONDARY"));
             msgd.set_title (M ("MAIN_BUTTON_SENDTOEDITOR"));
             msgd.run ();

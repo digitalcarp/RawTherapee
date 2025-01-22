@@ -50,7 +50,7 @@ bool notifySlowParseDir (const std::chrono::system_clock::time_point& startedAt)
         return true;
     }
 
-    Gtk::MessageDialog dialog(M("TP_FILMSIMULATION_SLOWPARSEDIR"), false, Gtk::MessageType::WARNING, Gtk::BUTTONS_YES_NO, true);
+    Gtk::MessageDialog dialog(M("TP_FILMSIMULATION_SLOWPARSEDIR"), false, Gtk::MessageType::WARNING, Gtk::ButtonsType::YES_NO, true);
     if (dialog.run() == Gtk::RESPONSE_YES) {
         decision = CANCEL;
         return false;

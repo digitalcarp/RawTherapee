@@ -1022,7 +1022,7 @@ void FileCatalog::deleteRequested(const std::vector<FileBrowserEntry*>& tbe, boo
         return;
     }
 
-    Gtk::MessageDialog msd (getToplevelWindow(this), M("FILEBROWSER_DELETEDIALOG_HEADER"), true, Gtk::MessageType::QUESTION, Gtk::BUTTONS_YES_NO, true);
+    Gtk::MessageDialog msd (getToplevelWindow(this), M("FILEBROWSER_DELETEDIALOG_HEADER"), true, Gtk::MessageType::QUESTION, Gtk::ButtonsType::YES_NO, true);
     if (onlySelected) {
         msd.set_secondary_text(Glib::ustring::compose (inclBatchProcessed ? M("FILEBROWSER_DELETEDIALOG_SELECTEDINCLPROC") : M("FILEBROWSER_DELETEDIALOG_SELECTED"), tbe.size()), true);
     } else {
@@ -1345,7 +1345,7 @@ void FileCatalog::renameRequested(const std::vector<FileBrowserEntry*>& tbe)
                 /* check if filename already exists*/
                 if (Glib::file_test (nfname, Glib::FileTest::EXISTS)) {
                     Glib::ustring msg_ = Glib::ustring("<b>") + escapeHtmlChars(nfname) + ": " + M("MAIN_MSG_ALREADYEXISTS") + "</b>";
-                    Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::BUTTONS_OK, true);
+                    Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
                     msgd.run ();
                 } else {
                     success = true;

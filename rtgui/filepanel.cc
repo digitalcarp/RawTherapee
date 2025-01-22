@@ -315,7 +315,7 @@ bool FilePanel::imageLoaded( Thumbnail* thm, ProgressConnector<rtengine::Initial
 #ifdef _WIN32
                     else {
                         Glib::ustring msg_ = Glib::ustring("<b>") + M("MAIN_MSG_CANNOTLOAD") + " \"" + escapeHtmlChars(thm->getFileName()) + "\" .\n" + M("MAIN_MSG_TOOMANYOPENEDITORS") + "</b>";
-                        Gtk::MessageDialog msgd (*parent, msg_, true, Gtk::MessageType::ERROR, Gtk::BUTTONS_OK, true);
+                        Gtk::MessageDialog msgd (*parent, msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
                         msgd.run ();
                         goto MAXGDIHANDLESREACHED;
                     }
@@ -336,7 +336,7 @@ bool FilePanel::imageLoaded( Thumbnail* thm, ProgressConnector<rtengine::Initial
             }
         } else {
             Glib::ustring msg_ = Glib::ustring("<b>") + M("MAIN_MSG_CANNOTLOAD") + " \"" + escapeHtmlChars(thm->getFileName()) + "\" .\n</b>";
-            Gtk::MessageDialog msgd (*parent, msg_, true, Gtk::MessageType::ERROR, Gtk::BUTTONS_OK, true);
+            Gtk::MessageDialog msgd (*parent, msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
             msgd.run ();
         }
 #ifdef _WIN32

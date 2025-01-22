@@ -250,7 +250,7 @@ void SaveAsDialog::okPressed ()
                 + "</b>",
             true,
             Gtk::MessageType::WARNING,
-            Gtk::BUTTONS_OK,
+            Gtk::ButtonsType::OK,
             true
         ).run();
         return;
@@ -287,7 +287,7 @@ void SaveAsDialog::okPressed ()
                 + "\"</b>",
             true,
             Gtk::MessageType::WARNING,
-            Gtk::BUTTONS_OK_CANCEL,
+            Gtk::ButtonsType::OK_CANCEL,
             true
         );
 
