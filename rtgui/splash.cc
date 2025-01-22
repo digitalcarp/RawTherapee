@@ -26,11 +26,12 @@ extern Glib::ustring creditsPath;
 extern Glib::ustring licensePath;
 extern Glib::ustring versionString;
 
-SplashImage::SplashImage () : surface(new RTSurface("splash.svg"))
+SplashImage::SplashImage() : surface(new RTSurface("splash.svg"))
 {
+    set_draw_func(sigc::mem_fun(*this, &SplashImage::on_draw));
 }
 
-bool SplashImage::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
+void SplashImage::on_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height)
 {
     if (surface->hasSurface()) {
         cr->set_source(surface->get(), 0., 0.);
@@ -41,8 +42,8 @@ bool SplashImage::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
         cfo.set_antialias (Cairo::ANTIALIAS_SUBPIXEL);
         Glib::RefPtr<Pango::Context> context = get_pango_context ();
         context->set_cairo_font_options (cfo);
-        Pango::FontDescription fontd = get_style_context()->get_font();
-        fontd.set_weight (Pango::WEIGHT_LIGHT);
+        Pango::FontDescription fontd = context->get_font_description();
+        fontd.set_weight (Pango::Weight::LIGHT);
         const int fontSize = 12; // pt
         // Non-absolute size is defined in "Pango units" and shall be multiplied by
         // Pango::SCALE from "pt":
@@ -57,7 +58,7 @@ bool SplashImage::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
         version->get_pixel_size (w, h);
         cr->set_source_rgb (0., 0., 0.);
         cr->set_line_width(3.);
-        cr->set_line_join(Cairo::LINE_JOIN_ROUND);
+        cr->set_line_join(Cairo::Context::LineJoin::ROUND);
         cr->move_to (surface->getWidth() - w - 32, surface->getHeight() - h - 20);
         version->add_to_cairo_context (cr);
         cr->stroke_preserve();
@@ -66,33 +67,30 @@ bool SplashImage::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
         cr->stroke_preserve();
         cr->fill();
     }
-
-    return true;
 }
 
-Gtk::SizeRequestMode SplashImage::get_request_mode_vfunc () const
+Gtk::SizeRequestMode SplashImage::get_request_mode_vfunc() const
 {
-    return Gtk::SIZE_REQUEST_CONSTANT_SIZE;
+    return Gtk::SizeRequestMode::CONSTANT_SIZE;
 }
 
-void SplashImage::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const
+void SplashImage::measure_vfunc(Gtk::Orientation orientation, int /*for_size*/,
+                                int& minimum, int& natural,
+                                int& minimum_baseline, int& natural_baseline) const
 {
-    minimum_height = natural_height = surface ? surface->getHeight() : RTScalable::scalePixelSize(100);
-}
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        int width = surface ? surface->getWidth() : RTScalable::scalePixelSize(100);
+        minimum = width;
+        natural = width;
+    } else {
+        int height = surface ? surface->getHeight() : RTScalable::scalePixelSize(100);
+        minimum = height;
+        natural = height;
+    }
 
-void SplashImage::get_preferred_width_vfunc (int &minimum_width, int &natural_width) const
-{
-    minimum_width = natural_width = surface ? surface->getWidth() : RTScalable::scalePixelSize(100);
-}
-
-void SplashImage::get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const
-{
-    get_preferred_height_vfunc (minimum_height, natural_height);
-}
-
-void SplashImage::get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const
-{
-    get_preferred_width_vfunc (minimum_width, natural_width);
+    // Don't use baseline alignment
+    minimum_baseline = -1;
+    natural_baseline = -1;
 }
 
 Splash::Splash (Gtk::Window& parent) : Gtk::Dialog(M("GENERAL_ABOUT"), parent, true)
@@ -102,21 +100,21 @@ Splash::Splash (Gtk::Window& parent) : Gtk::Dialog(M("GENERAL_ABOUT"), parent, t
 
     nb = Gtk::manage (new Gtk::Notebook ());
     nb->set_name ("AboutNotebook");
-    get_content_area()->pack_start (*nb);
+    get_content_area()->prepend (*nb);
 
     // Add close button to bottom of the notebook
     Gtk::Button* closeButton = Gtk::manage (new Gtk::Button (M("GENERAL_CLOSE")));
     closeButton->signal_clicked().connect( sigc::mem_fun(*this, &Splash::closePressed) );
-    get_action_area()->pack_start (*closeButton, Gtk::PACK_SHRINK, 0);
+    add_action_widget(*closeButton, 0);
 
     Glib::RefPtr<Gtk::CssProvider> localCSS = Gtk::CssProvider::create();
     localCSS->load_from_data ("textview { font-family: monospace; }");
 
     // Tab 1: the image
     splashImage = Gtk::manage(new SplashImage ());
-    splashImage->set_halign(Gtk::ALIGN_CENTER);
-    splashImage->set_valign(Gtk::ALIGN_CENTER);
-    nb->append_page (*splashImage,  M("ABOUT_TAB_SPLASH"));
+    splashImage->set_halign(Gtk::Align::CENTER);
+    splashImage->set_valign(Gtk::Align::CENTER);
+    nb->append_page (*splashImage, M("ABOUT_TAB_SPLASH"));
     splashImage->show ();
 
     // Tab 2: the information about the current version
@@ -145,7 +143,7 @@ Splash::Splash (Gtk::Window& parent) : Gtk::Dialog(M("GENERAL_ABOUT"), parent, t
             buildTV->set_editable(false);
             buildTV->set_left_margin (10);
             buildTV->set_right_margin (5);
-            buildSW->add(*buildTV);
+            buildSW->set_child(*buildTV);
             nb->append_page (*buildSW, M("ABOUT_TAB_BUILD"));
         }
     }
@@ -172,12 +170,11 @@ Splash::Splash (Gtk::Window& parent) : Gtk::Dialog(M("GENERAL_ABOUT"), parent, t
 
             Gtk::ScrolledWindow *creditsSW = Gtk::manage (new Gtk::ScrolledWindow());
             Gtk::TextView *creditsTV = Gtk::manage (new Gtk::TextView (textBuffer));
-            //creditsTV->get_style_context()->add_provider(localCSS, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
             creditsTV->set_left_margin (10);
             creditsTV->set_right_margin (5);
-            creditsTV->set_wrap_mode(Gtk::WRAP_WORD);
+            creditsTV->set_wrap_mode(Gtk::WrapMode::WORD);
             creditsTV->set_editable(false);
-            creditsSW->add(*creditsTV);
+            creditsSW->set_child(*creditsTV);
             nb->append_page (*creditsSW, M("ABOUT_TAB_CREDITS"));
         }
     }
@@ -204,13 +201,12 @@ Splash::Splash (Gtk::Window& parent) : Gtk::Dialog(M("GENERAL_ABOUT"), parent, t
 
             Gtk::ScrolledWindow *licenseSW = Gtk::manage (new Gtk::ScrolledWindow());
             Gtk::TextView *licenseTV = Gtk::manage (new Gtk::TextView (textBuffer));
-            //licenseTV->get_style_context()->add_provider(localCSS, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
             // set monospace font to enhance readability of formatted text
             licenseTV->set_left_margin (10);
             licenseTV->set_right_margin (5);
             licenseTV->set_editable(false);
-            licenseSW->add(*licenseTV);
+            licenseSW->set_child(*licenseTV);
             nb->append_page (*licenseSW, M("ABOUT_TAB_LICENSE"));
         }
     }
@@ -241,37 +237,21 @@ Splash::Splash (Gtk::Window& parent) : Gtk::Dialog(M("GENERAL_ABOUT"), parent, t
             releaseNotesTV->set_left_margin (10);
             releaseNotesTV->set_right_margin (3);
             releaseNotesTV->set_editable(false);
-            releaseNotesTV->set_wrap_mode(Gtk::WRAP_WORD);
-            releaseNotesSW->add(*releaseNotesTV);
+            releaseNotesTV->set_wrap_mode(Gtk::WrapMode::WORD);
+            releaseNotesSW->set_child(*releaseNotesTV);
             nb->append_page (*releaseNotesSW, M("ABOUT_TAB_RELEASENOTES"));
         }
     }
 
-    set_position (Gtk::WIN_POS_CENTER);
-    //add_events(Gdk::BUTTON_RELEASE_MASK);
     set_resizable (true);
-
     nb->set_current_page (0);
-
-    show_all_children ();
-    set_keep_above (true);
 }
 
 bool Splash::on_timer ()
 {
-
     hide ();
     return false;
 }
-
-/*
- * removed as it seem to be too sensitive in some OS
-bool Splash::on_button_release_event (GdkEventButton* event) {
-
-    hide ();
-    return true;
-}
-*/
 
 void Splash::showReleaseNotes()
 {

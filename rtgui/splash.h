@@ -29,17 +29,15 @@ private:
     std::shared_ptr<RTSurface> surface;
     Glib::RefPtr<Pango::Layout> version;
 
+    void on_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height);
+
 public:
-    SplashImage ();
-    bool on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr) override;
-    Gtk::SizeRequestMode get_request_mode_vfunc () const override;
-    void get_preferred_height_vfunc (int &minimum_height, int &natural_height) const override;
-    void get_preferred_width_vfunc (int &minimum_width, int &natural_width) const override;
-    void get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const override;
-    void get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const override;
+    SplashImage();
+    Gtk::SizeRequestMode get_request_mode_vfunc() const override;
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
 };
 
-//class Splash : public Gtk::Window {
 class Splash final : public Gtk::Dialog
 {
 
@@ -57,6 +55,5 @@ public:
     };
     void showReleaseNotes();
     bool on_timer ();
-    //virtual bool on_button_release_event (GdkEventButton* event);
     void closePressed();
 };
