@@ -374,22 +374,22 @@ void RtWindow::showErrors()
     // alerting users if the default raw and image profiles are missing
     if (options.is_defProfRawMissing()) {
         options.defProfRaw = DEFPROFILE_RAW;
-        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_DEFRAW_MISSING"), escapeHtmlChars(options.defProfRaw)), true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_DEFRAW_MISSING"), escapeHtmlChars(options.defProfRaw)), true, Gtk::MessageType::ERROR, Gtk::BUTTONS_OK, true);
         msgd.run ();
     }
     if (options.is_bundledDefProfRawMissing()) {
-        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_BUNDLED_MISSING"), escapeHtmlChars(options.defProfRaw)), true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_BUNDLED_MISSING"), escapeHtmlChars(options.defProfRaw)), true, Gtk::MessageType::ERROR, Gtk::BUTTONS_OK, true);
         msgd.run ();
         options.defProfRaw = DEFPROFILE_INTERNAL;
     }
 
     if (options.is_defProfImgMissing()) {
         options.defProfImg = DEFPROFILE_IMG;
-        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_DEFIMG_MISSING"), escapeHtmlChars(options.defProfImg)), true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_DEFIMG_MISSING"), escapeHtmlChars(options.defProfImg)), true, Gtk::MessageType::ERROR, Gtk::BUTTONS_OK, true);
         msgd.run ();
     }
     if (options.is_bundledDefProfImgMissing()) {
-        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_BUNDLED_MISSING"), escapeHtmlChars(options.defProfImg)), true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_BUNDLED_MISSING"), escapeHtmlChars(options.defProfImg)), true, Gtk::MessageType::ERROR, Gtk::BUTTONS_OK, true);
         msgd.run ();
         options.defProfImg = DEFPROFILE_INTERNAL;
     }
@@ -759,7 +759,7 @@ bool RtWindow::on_delete_event (GdkEventAny* event)
     try {
         Options::save ();
     } catch (Options::Error &e) {
-        Gtk::MessageDialog msgd (getToplevelWindow (this), e.get_msg(), true, Gtk::MESSAGE_WARNING, Gtk::BUTTONS_CLOSE, true);
+        Gtk::MessageDialog msgd (getToplevelWindow (this), e.get_msg(), true, Gtk::MessageType::WARNING, Gtk::BUTTONS_CLOSE, true);
         msgd.run();
     }
 

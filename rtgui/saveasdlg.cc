@@ -249,7 +249,7 @@ void SaveAsDialog::okPressed ()
                 + M("MAIN_MSG_EMPTYFILENAME")
                 + "</b>",
             true,
-            Gtk::MESSAGE_WARNING,
+            Gtk::MessageType::WARNING,
             Gtk::BUTTONS_OK,
             true
         ).run();
@@ -286,7 +286,7 @@ void SaveAsDialog::okPressed ()
                 + escapeHtmlChars(formatOpts->getFormat().format)
                 + "\"</b>",
             true,
-            Gtk::MESSAGE_WARNING,
+            Gtk::MessageType::WARNING,
             Gtk::BUTTONS_OK_CANCEL,
             true
         );

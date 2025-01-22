@@ -310,7 +310,7 @@ void ExportPanel::SaveSettingsAsDefault()
         try {
             Options::save();
         } catch (Options::Error &e) {
-            Gtk::MessageDialog msgd (getToplevelWindow (this), e.get_msg(), true, Gtk::MESSAGE_WARNING, Gtk::BUTTONS_CLOSE, true);
+            Gtk::MessageDialog msgd (getToplevelWindow (this), e.get_msg(), true, Gtk::MessageType::WARNING, Gtk::BUTTONS_CLOSE, true);
             msgd.run();
         }
     }

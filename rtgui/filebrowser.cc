@@ -916,13 +916,13 @@ void FileBrowser::menuItemActivated (Gtk::MenuItem* m)
                 options.rtSettings.darkFramesPath.clear();
                 Glib::ustring msg_ = Glib::ustring::compose (M("MAIN_MSG_PATHDOESNTEXIST"), escapeHtmlChars(options.rtSettings.darkFramesPath))
                                      + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
-                Gtk::MessageDialog msgd (msg_, true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+                Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::BUTTONS_OK, true);
                 msgd.set_title(M("TP_DARKFRAME_LABEL"));
                 msgd.run ();
             }
         } else {
             Glib::ustring msg_ = M("MAIN_MSG_SETPATHFIRST") + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
-            Gtk::MessageDialog msgd (msg_, true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+            Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::BUTTONS_OK, true);
             msgd.set_title(M("TP_DARKFRAME_LABEL"));
             msgd.run ();
         }
@@ -992,13 +992,13 @@ void FileBrowser::menuItemActivated (Gtk::MenuItem* m)
                 options.rtSettings.flatFieldsPath.clear();
                 Glib::ustring msg_ = Glib::ustring::compose (M("MAIN_MSG_PATHDOESNTEXIST"), escapeHtmlChars(options.rtSettings.flatFieldsPath))
                                      + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
-                Gtk::MessageDialog msgd (msg_, true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+                Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::BUTTONS_OK, true);
                 msgd.set_title(M("TP_FLATFIELD_LABEL"));
                 msgd.run ();
             }
         } else {
             Glib::ustring msg_ = M("MAIN_MSG_SETPATHFIRST") + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
-            Gtk::MessageDialog msgd (msg_, true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+            Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::BUTTONS_OK, true);
             msgd.set_title(M("TP_FLATFIELD_LABEL"));
             msgd.run ();
         }
@@ -1171,7 +1171,7 @@ void FileBrowser::openDefaultViewer (int destination)
     }
 
     if (!success) {
-        Gtk::MessageDialog msgd(getToplevelWindow(this), M("MAIN_MSG_IMAGEUNPROCESSED"), true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        Gtk::MessageDialog msgd(getToplevelWindow(this), M("MAIN_MSG_IMAGEUNPROCESSED"), true, Gtk::MessageType::ERROR, Gtk::BUTTONS_OK, true);
         msgd.run ();
     }
 }
