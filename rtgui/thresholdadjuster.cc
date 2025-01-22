@@ -86,7 +86,7 @@ void ThresholdAdjuster::initObject (Glib::ustring label, bool editedcb)
 
     hbox = Gtk::manage (new Gtk::Box ());
 
-    this->label = Gtk::manage (new Gtk::Label (label, Gtk::ALIGN_START));
+    this->label = Gtk::manage (new Gtk::Label (label, Gtk::Align::START));
 
     if (editedcb) {
         editedCheckBox = Gtk::manage (new Gtk::CheckButton ());

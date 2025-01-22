@@ -118,11 +118,11 @@ DirPyrDenoise::DirPyrDenoise () : FoldableToolPanel(this, TOOL_NAME, M("TP_DIRPY
     C2method->set_active(0);
     C2methodconn = C2method->signal_changed().connect ( sigc::mem_fun(*this, &DirPyrDenoise::C2methodChanged) );
 
-    NoiseLabels = Gtk::manage(new Gtk::Label("---", Gtk::ALIGN_CENTER));
+    NoiseLabels = Gtk::manage(new Gtk::Label("---", Gtk::Align::CENTER));
     NoiseLabels->set_tooltip_text(M("TP_DIRPYRDENOISE_CHROMINANCE_PREVIEWRESIDUAL_INFO_TOOLTIP"));
 
-    TileLabels = Gtk::manage(new Gtk::Label("---", Gtk::ALIGN_CENTER));
-    PrevLabels = Gtk::manage(new Gtk::Label("---", Gtk::ALIGN_CENTER));
+    TileLabels = Gtk::manage(new Gtk::Label("---", Gtk::Align::CENTER));
+    PrevLabels = Gtk::manage(new Gtk::Label("---", Gtk::Align::CENTER));
 
     chroma    = Gtk::manage (new Adjuster (M("TP_DIRPYRDENOISE_CHROMINANCE_MASTER"), 0, 100, 0.01, 15));
     redchro    = Gtk::manage (new Adjuster (M("TP_DIRPYRDENOISE_CHROMINANCE_REDGREEN"), -100, 100, 0.1, 0));

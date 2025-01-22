@@ -114,7 +114,7 @@ BatchQueuePanel::BatchQueuePanel (FileCatalog* aFileCatalog) : parent(nullptr)
     destinationPreviewLabel = Gtk::manage (new Gtk::Label ());
     destinationPreviewLabel->set_tooltip_markup (M("QUEUE_DESTPREVIEW_TOOLTIP"));
     destinationPreviewLabel->set_selectable (true);  // so users can copy the path to the clipboard
-    destinationPreviewLabel->set_halign (Gtk::ALIGN_START);
+    destinationPreviewLabel->set_halign (Gtk::Align::START);
     auto destinationPreviewScrolledWindow = Gtk::manage(new Gtk::ScrolledWindow ());
     destinationPreviewScrolledWindow->set_policy (Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
     destinationPreviewScrolledWindow->add (*destinationPreviewLabel);
@@ -127,7 +127,7 @@ BatchQueuePanel::BatchQueuePanel (FileCatalog* aFileCatalog) : parent(nullptr)
     fformat = Gtk::manage (new Gtk::Frame (M("QUEUE_FORMAT_TITLE")));
     fformat->set_label_align(0.025, 0.5);
     saveFormatPanel = Gtk::manage (new SaveFormatPanel ());
-    setExpandAlignProperties(saveFormatPanel, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(saveFormatPanel, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     fformat->add (*saveFormatPanel);
 
     outdirTemplate->set_text (options.savePathTemplate);

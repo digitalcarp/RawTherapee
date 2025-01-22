@@ -143,7 +143,7 @@ BlackWhite::BlackWhite (): FoldableToolPanel(this, TOOL_NAME, M("TP_BWMIX_LABEL"
     mixerVBox->pack_start (*settingHBox);
     settingconn = setting->signal_changed().connect ( sigc::mem_fun(*this, &BlackWhite::settingChanged) );
 
-    RGBLabels = Gtk::manage(new Gtk::Label("---", Gtk::ALIGN_CENTER));
+    RGBLabels = Gtk::manage(new Gtk::Label("---", Gtk::Align::CENTER));
     RGBLabels->set_tooltip_text(M("TP_BWMIX_RGBLABEL_HINT"));
     mixerVBox->pack_start (*RGBLabels);
 

@@ -75,11 +75,11 @@ Adjuster::Adjuster(
     set_vexpand(false);
 
     if (imageIcon1) {
-        setExpandAlignProperties(imageIcon1, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+        setExpandAlignProperties(imageIcon1, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
     }
 
     if (imageIcon2) {
-        setExpandAlignProperties(imageIcon2, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+        setExpandAlignProperties(imageIcon2, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
     }
 
     set_column_spacing(0);
@@ -89,13 +89,13 @@ Adjuster::Adjuster(
 
     if (!adjustmentName.empty()) {
         label = Gtk::manage(new Gtk::Label(adjustmentName));
-        setExpandAlignProperties(label, true, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
+        setExpandAlignProperties(label, true, false, Gtk::Align::START, Gtk::Align::BASELINE);
     }
 
     reset = Gtk::manage(new Gtk::Button());
 
     reset->add(*Gtk::manage(new RTImage("undo-small", Gtk::ICON_SIZE_BUTTON)));
-    setExpandAlignProperties(reset, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(reset, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
     reset->set_relief(Gtk::RELIEF_NONE);
     reset->set_tooltip_markup(M("ADJUSTER_RESET_TO_DEFAULT"));
     reset->get_style_context()->add_class(GTK_STYLE_CLASS_FLAT);
@@ -103,12 +103,12 @@ Adjuster::Adjuster(
 
     spin = Gtk::manage(new MySpinButton());
 
-    setExpandAlignProperties(spin, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(spin, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
     spin->set_input_purpose(Gtk::INPUT_PURPOSE_DIGITS);
 
     reset->set_size_request(-1, RTScalable::scalePixelSize(spin->get_height() > MIN_RESET_BUTTON_HEIGHT ? spin->get_height() : MIN_RESET_BUTTON_HEIGHT));
     slider = Gtk::manage(new MyHScale());
-    setExpandAlignProperties(slider, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(slider, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     slider->set_draw_value(false);
     //slider->set_has_origin(false);  // ------------------ This will remove the colored part on the left of the slider's knob
 
@@ -196,7 +196,7 @@ void Adjuster::addAutoButton (const Glib::ustring &tooltip)
         automatic = Gtk::manage(new Gtk::CheckButton());
         //automatic->add (*Gtk::manage (new RTImage ("gears")));
         automatic->set_tooltip_markup(tooltip.length() ? Glib::ustring::compose("<b>%1</b>\n\n%2", M("GENERAL_AUTO"), tooltip) : M("GENERAL_AUTO"));
-        setExpandAlignProperties(automatic, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+        setExpandAlignProperties(automatic, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
         autoChange = automatic->signal_toggled().connect( sigc::mem_fun(*this, &Adjuster::autoToggled) );
 
         if (grid) {
@@ -502,13 +502,13 @@ void Adjuster::showEditedCB ()
 
         if (grid) {
             editedCheckBox->set_hexpand(true);
-            editedCheckBox->set_halign(Gtk::ALIGN_START);
-            editedCheckBox->set_valign(Gtk::ALIGN_CENTER);
+            editedCheckBox->set_halign(Gtk::Align::START);
+            editedCheckBox->set_valign(Gtk::Align::CENTER);
             attach_next_to(*editedCheckBox, *spin, Gtk::POS_LEFT, 1, 1);
         } else {
             editedCheckBox->set_hexpand(false);
-            editedCheckBox->set_halign(Gtk::ALIGN_START);
-            editedCheckBox->set_valign(Gtk::ALIGN_CENTER);
+            editedCheckBox->set_halign(Gtk::Align::START);
+            editedCheckBox->set_valign(Gtk::Align::CENTER);
 
             if (imageIcon1) {
                 attach_next_to(*editedCheckBox, *imageIcon1, Gtk::POS_LEFT, 1, 1);

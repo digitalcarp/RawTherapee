@@ -359,7 +359,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
     const auto add_button =
         [&](Gtk::Button *btn, Gtk::Box *box) -> void
         {
-            setExpandAlignProperties(btn, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_START);
+            setExpandAlignProperties(btn, false, false, Gtk::Align::CENTER, Gtk::Align::START);
             btn->set_relief(Gtk::RELIEF_NONE);
             btn->get_style_context()->add_class(GTK_STYLE_CLASS_FLAT);
             btn->set_can_focus(false);

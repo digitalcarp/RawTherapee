@@ -80,7 +80,7 @@ SaveAsDialog::SaveAsDialog (const Glib::ustring &initialDir, Gtk::Window* parent
 // Output Options
 // ~~~~~~~~~~~~~~
     formatOpts = Gtk::manage( new SaveFormatPanel () );
-    setExpandAlignProperties(formatOpts, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties(formatOpts, true, false, Gtk::Align::FILL, Gtk::Align::START);
     formatOpts->setListener (this);
 
 // queue/immediate

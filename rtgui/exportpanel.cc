@@ -39,7 +39,7 @@ ExportPanel::ExportPanel () : listener (nullptr), ornamentSurface(new RTSurface(
     Gtk::Label* labExportTitle = Gtk::manage ( new Gtk::Label (M ("EXPORT_FASTEXPORTOPTIONS")) );
     labExportTitle->set_use_markup (true);
     labExportTitle->set_tooltip_text (M ("EXPORT_INSTRUCTIONS"));
-    labExportTitle->set_alignment (Gtk::ALIGN_START);
+    labExportTitle->set_alignment (Gtk::Align::START);
     pack_start (*labExportTitle, Gtk::PACK_SHRINK, 4);
 
     Gtk::RadioButton::Group pipeline_group;

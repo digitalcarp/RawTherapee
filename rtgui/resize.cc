@@ -49,9 +49,9 @@ Resize::Resize () : FoldableToolPanel(this, TOOL_NAME, M("TP_RESIZE_LABEL"), fal
     appliesTo->append (M("TP_RESIZE_FULLIMAGE"));
     appliesTo->set_active (0);
     appliesTo->set_hexpand();
-    appliesTo->set_halign(Gtk::ALIGN_FILL);
+    appliesTo->set_halign(Gtk::Align::FILL);
 
-    Gtk::Label *label = Gtk::manage (new Gtk::Label (M("TP_RESIZE_APPLIESTO"), Gtk::ALIGN_START));
+    Gtk::Label *label = Gtk::manage (new Gtk::Label (M("TP_RESIZE_APPLIESTO"), Gtk::Align::START));
     
     combos->attach(*label, 0, 0, 1, 1);
     combos->attach(*appliesTo, 1, 0, 1, 1);
@@ -62,9 +62,9 @@ Resize::Resize () : FoldableToolPanel(this, TOOL_NAME, M("TP_RESIZE_LABEL"), fal
     method->append (M("TP_RESIZE_NEAREST"));
     method->set_active (0);
     method->set_hexpand();
-    method->set_halign(Gtk::ALIGN_FILL);
+    method->set_halign(Gtk::Align::FILL);
 
-    label = Gtk::manage (new Gtk::Label (M("TP_RESIZE_METHOD"), Gtk::ALIGN_START));
+    label = Gtk::manage (new Gtk::Label (M("TP_RESIZE_METHOD"), Gtk::Align::START));
     
     combos->attach(*label, 0, 1, 1, 1);
     combos->attach(*method, 1, 1, 1, 1);
@@ -78,9 +78,9 @@ Resize::Resize () : FoldableToolPanel(this, TOOL_NAME, M("TP_RESIZE_LABEL"), fal
     spec->append (M("TP_RESIZE_SHORT"));
     spec->set_active (0);
     spec->set_hexpand();
-    spec->set_halign(Gtk::ALIGN_FILL);
+    spec->set_halign(Gtk::Align::FILL);
 
-    label = Gtk::manage (new Gtk::Label (M("TP_RESIZE_SPECIFY"), Gtk::ALIGN_START));
+    label = Gtk::manage (new Gtk::Label (M("TP_RESIZE_SPECIFY"), Gtk::Align::START));
 
     combos->attach(*label, 0, 2, 1, 1);
     combos->attach(*spec, 1, 2, 1, 1);
@@ -103,16 +103,16 @@ Resize::Resize () : FoldableToolPanel(this, TOOL_NAME, M("TP_RESIZE_LABEL"), fal
     
     w = Gtk::manage (new MySpinButton ());
     w->set_width_chars(5);
-    setExpandAlignProperties(w, false, false, Gtk::ALIGN_END, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(w, false, false, Gtk::Align::END, Gtk::Align::CENTER);
     h = Gtk::manage (new MySpinButton ());
     h->set_width_chars(5);
-    setExpandAlignProperties(h, false, false, Gtk::ALIGN_END, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(h, false, false, Gtk::Align::END, Gtk::Align::CENTER);
     le = Gtk::manage (new MySpinButton ());
     le->set_width_chars(5);
-    setExpandAlignProperties(le, false, false, Gtk::ALIGN_END, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(le, false, false, Gtk::Align::END, Gtk::Align::CENTER);
     se = Gtk::manage (new MySpinButton ());
     se->set_width_chars(5);
-    setExpandAlignProperties(se, false, false, Gtk::ALIGN_END, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(se, false, false, Gtk::Align::END, Gtk::Align::CENTER);
 
     wbox->pack_start (*Gtk::manage (new Gtk::Label (M("TP_RESIZE_W"))), Gtk::PACK_SHRINK, 0);
     wbox->pack_start (*w);

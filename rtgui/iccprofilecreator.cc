@@ -80,11 +80,11 @@ ICCProfileCreator::ICCProfileCreator(RTWindow *rtwindow)
     //--------------------------------- primaries
 
     Gtk::Label* prilab = Gtk::manage(new Gtk::Label(M("ICCPROFCREATOR_PRIMARIES")));
-    setExpandAlignProperties(prilab, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties(prilab, false, false, Gtk::Align::START, Gtk::Align::BASELINE);
     mainGrid->attach(*prilab, 0, 0, 1, 1);
 
     primaries = Gtk::manage(new MyComboBoxText());
-    setExpandAlignProperties(primaries, false, false, Gtk::ALIGN_FILL, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties(primaries, false, false, Gtk::Align::FILL, Gtk::Align::BASELINE);
     primaries->append(M("ICCPROFCREATOR_CUSTOM"));
     primaries->append(M("ICCPROFCREATOR_PRIM_ACESP0"));
     primaries->append(M("ICCPROFCREATOR_PRIM_ACESP1"));
@@ -101,21 +101,21 @@ ICCProfileCreator::ICCProfileCreator(RTWindow *rtwindow)
     mainGrid->attach(*primaries, 1, 0, 1, 1);
 
     primariesGrid = Gtk::manage(new Gtk::Grid());
-    setExpandAlignProperties(primariesGrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(primariesGrid, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     primariesGrid->set_column_spacing(5);
 
     aPrimariesRedX = Gtk::manage(new Adjuster(M("ICCPROFCREATOR_PRIM_REDX"), 0.4100, 0.9000, 0.0001, 0.6400/*, gamuts0, gamutl0*/));
-    setExpandAlignProperties(aPrimariesRedX, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(aPrimariesRedX, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     aPrimariesRedY = Gtk::manage(new Adjuster(M("ICCPROFCREATOR_PRIM_REDY"), 0.1000, 0.6000, 0.0001, 0.3300/*, gamutl1, gamuts1*/));
-    setExpandAlignProperties(aPrimariesRedY, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(aPrimariesRedY, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     aPrimariesGreenX = Gtk::manage(new Adjuster(M("ICCPROFCREATOR_PRIM_GREX"), -0.100, 0.4000, 0.0001, 0.3000/*, gamutl2, gamuts2*/));
-    setExpandAlignProperties(aPrimariesGreenX, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(aPrimariesGreenX, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     aPrimariesGreenY = Gtk::manage(new Adjuster(M("ICCPROFCREATOR_PRIM_GREY"), 0.50, 1.0000, 0.0001, 0.6000/*, gamuts3, gamutl3*/));
-    setExpandAlignProperties(aPrimariesGreenY, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(aPrimariesGreenY, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     aPrimariesBlueX = Gtk::manage(new Adjuster(M("ICCPROFCREATOR_PRIM_BLUX"), -0.1, 0.3000, 0.0001, 0.1500/*, gamutl4, gamuts4*/));
-    setExpandAlignProperties(aPrimariesBlueX, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(aPrimariesBlueX, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     aPrimariesBlueY = Gtk::manage(new Adjuster(M("ICCPROFCREATOR_PRIM_BLUY"), -0.100, 0.4000, 0.0001, 0.060/*, gamutl5, gamuts5*/));
-    setExpandAlignProperties(aPrimariesBlueY, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(aPrimariesBlueY, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
     primariesGrid->attach(*aPrimariesRedX,   0, 0, 1, 1);
     primariesGrid->attach(*aPrimariesRedY,   1, 0, 1, 1);
@@ -131,11 +131,11 @@ ICCProfileCreator::ICCProfileCreator(RTWindow *rtwindow)
     //--------------------------------- output gamma
 
     Gtk::Label* galab = Gtk::manage(new Gtk::Label(M("ICCPROFCREATOR_TRC_PRESET")));
-    setExpandAlignProperties(galab, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties(galab, false, false, Gtk::Align::START, Gtk::Align::BASELINE);
     mainGrid->attach(*galab, 0, 2, 1, 1);
 
     trcPresets = Gtk::manage(new MyComboBoxText());
-    setExpandAlignProperties(trcPresets, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties(trcPresets, true, false, Gtk::Align::FILL, Gtk::Align::BASELINE);
     std::vector<Glib::ustring> outputTRCPresets;
     outputTRCPresets.push_back(M("ICCPROFCREATOR_CUSTOM"));
 
@@ -152,7 +152,7 @@ ICCProfileCreator::ICCProfileCreator(RTWindow *rtwindow)
     //--------------------------------- sliders gampos and slpos
 
     aGamma = Gtk::manage(new Adjuster(M("ICCPROFCREATOR_GAMMA"), 1, 3.5, 0.00001, 2.4));
-    setExpandAlignProperties(aGamma, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties(aGamma, true, false, Gtk::Align::FILL, Gtk::Align::BASELINE);
 
     aGamma->setDelay(std::max(options.adjusterMinDelay, options.adjusterMaxDelay));
 
@@ -160,7 +160,7 @@ ICCProfileCreator::ICCProfileCreator(RTWindow *rtwindow)
     mainGrid->attach(*aGamma, 1, 3, 1, 1); //gamma
 
     aSlope = Gtk::manage(new Adjuster(M("ICCPROFCREATOR_SLOPE"), 0, 15, 0.00001, 12.92310));
-    setExpandAlignProperties(aSlope, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties(aSlope, true, false, Gtk::Align::FILL, Gtk::Align::BASELINE);
 
     aSlope->setDelay(std::max(options.adjusterMinDelay, options.adjusterMaxDelay));
 
@@ -170,10 +170,10 @@ ICCProfileCreator::ICCProfileCreator(RTWindow *rtwindow)
     //--------------------------------- temperature
 
     Gtk::Label* illlab = Gtk::manage(new Gtk::Label(M("ICCPROFCREATOR_ILL")));
-    setExpandAlignProperties(illlab, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties(illlab, false, false, Gtk::Align::START, Gtk::Align::BASELINE);
     mainGrid->attach(*illlab, 0, 5, 1, 1); //slope
     cIlluminant = Gtk::manage(new MyComboBoxText());
-    setExpandAlignProperties(cIlluminant, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties(cIlluminant, true, false, Gtk::Align::FILL, Gtk::Align::BASELINE);
     cIlluminant->append(M("ICCPROFCREATOR_ILL_DEF"));
     cIlluminant->append(M("ICCPROFCREATOR_ILL_41"));
     cIlluminant->append(M("ICCPROFCREATOR_ILL_50"));
@@ -189,10 +189,10 @@ ICCProfileCreator::ICCProfileCreator(RTWindow *rtwindow)
     //--------------------------------- V2  or V4 profiles
 
     Gtk::Label* proflab = Gtk::manage(new Gtk::Label(M("ICCPROFCREATOR_ICCVERSION")));
-    setExpandAlignProperties(proflab, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties(proflab, false, false, Gtk::Align::START, Gtk::Align::BASELINE);
     mainGrid->attach(*proflab, 0, 6, 1, 1);
     iccVersion = Gtk::manage(new MyComboBoxText());
-    setExpandAlignProperties(iccVersion, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties(iccVersion, true, false, Gtk::Align::FILL, Gtk::Align::BASELINE);
     iccVersion->append(M("ICCPROFCREATOR_PROF_V4"));
     iccVersion->append(M("ICCPROFCREATOR_PROF_V2"));
     mainGrid->attach(*iccVersion, 1, 6, 1, 1);
@@ -200,29 +200,29 @@ ICCProfileCreator::ICCProfileCreator(RTWindow *rtwindow)
     //--------------------------------- Description
 
     Gtk::Label* desclab = Gtk::manage(new Gtk::Label(M("ICCPROFCREATOR_DESCRIPTION")));
-    setExpandAlignProperties(desclab, false, false, Gtk::ALIGN_START, Gtk::ALIGN_START);
+    setExpandAlignProperties(desclab, false, false, Gtk::Align::START, Gtk::Align::START);
     mainGrid->attach(*desclab, 0, 7, 1, 2);
     eDescription = Gtk::manage(new Gtk::Entry());
-    setExpandAlignProperties(eDescription, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(eDescription, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     eDescription->set_tooltip_text(M("ICCPROFCREATOR_DESCRIPTION_TOOLTIP"));
     mainGrid->attach(*eDescription, 1, 7, 1, 1);
     cAppendParamsToDesc = Gtk::manage(new Gtk::CheckButton(M("ICCPROFCREATOR_DESCRIPTION_ADDPARAM")));
-    setExpandAlignProperties(cAppendParamsToDesc, true, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties(cAppendParamsToDesc, true, false, Gtk::Align::START, Gtk::Align::BASELINE);
     mainGrid->attach(*cAppendParamsToDesc, 1, 8, 1, 1);
 
     //--------------------------------- Copyright
 
     Gtk::Label* copylab = Gtk::manage(new Gtk::Label(M("ICCPROFCREATOR_COPYRIGHT")));
-    setExpandAlignProperties(copylab, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties(copylab, false, false, Gtk::Align::START, Gtk::Align::BASELINE);
     mainGrid->attach(*copylab, 0, 9, 1, 1);
     Gtk::Grid* copygrid = Gtk::manage(new Gtk::Grid());
-    setExpandAlignProperties(copygrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties(copygrid, true, false, Gtk::Align::FILL, Gtk::Align::START);
     eCopyright = Gtk::manage(new Gtk::Entry());
-    setExpandAlignProperties(eCopyright, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(eCopyright, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     copygrid->attach(*eCopyright, 0, 0, 1, 1);
     resetCopyright = Gtk::manage(new Gtk::Button());
     resetCopyright->add(*Gtk::manage(new RTImage("undo-small", Gtk::ICON_SIZE_BUTTON)));
-    setExpandAlignProperties(resetCopyright, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(resetCopyright, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
     resetCopyright->set_relief(Gtk::RELIEF_NONE);
     resetCopyright->set_tooltip_markup(M("ICCPROFCREATOR_COPYRIGHT_RESET_TOOLTIP"));
     resetCopyright->get_style_context()->add_class(GTK_STYLE_CLASS_FLAT);

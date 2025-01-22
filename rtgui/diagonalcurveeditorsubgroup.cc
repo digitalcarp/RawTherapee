@@ -68,35 +68,35 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
 
     if (options.curvebboxpos == 0) {
         custombbox->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
-        setExpandAlignProperties(custombbox, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+        setExpandAlignProperties(custombbox, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
         customCurveGrid->get_style_context()->add_class("top");
     } else if (options.curvebboxpos == 2) {
         custombbox->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
-        setExpandAlignProperties(custombbox, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+        setExpandAlignProperties(custombbox, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
         customCurveGrid->get_style_context()->add_class("bottom");
     } else if (options.curvebboxpos == 1) {
         custombbox->set_orientation(Gtk::ORIENTATION_VERTICAL);
-        setExpandAlignProperties(custombbox, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+        setExpandAlignProperties(custombbox, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
         customCurveGrid->get_style_context()->add_class("right");
     } else if (options.curvebboxpos == 3){
         custombbox->set_orientation(Gtk::ORIENTATION_VERTICAL);
-        setExpandAlignProperties(custombbox, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+        setExpandAlignProperties(custombbox, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
         customCurveGrid->get_style_context()->add_class("left");
     }
 
     editPointCustom = Gtk::manage (new Gtk::ToggleButton ());
-    initButton(*editPointCustom, Glib::ustring("edit-point"), Gtk::ALIGN_START, false, "CURVEEDITOR_EDITPOINT_HINT");
+    initButton(*editPointCustom, Glib::ustring("edit-point"), Gtk::Align::START, false, "CURVEEDITOR_EDITPOINT_HINT");
     editCustom = Gtk::manage (new Gtk::ToggleButton());
-    initButton(*editCustom, Glib::ustring("crosshair-node-curve"), Gtk::ALIGN_START, false, "EDIT_PIPETTE_TOOLTIP");
+    initButton(*editCustom, Glib::ustring("crosshair-node-curve"), Gtk::Align::START, false, "EDIT_PIPETTE_TOOLTIP");
     editCustom->hide();
     copyCustom = Gtk::manage (new Gtk::Button ());
-    initButton(*copyCustom, Glib::ustring("copy"), Gtk::ALIGN_END, true);
+    initButton(*copyCustom, Glib::ustring("copy"), Gtk::Align::END, true);
     pasteCustom = Gtk::manage (new Gtk::Button ());
-    initButton(*pasteCustom, Glib::ustring("paste"), Gtk::ALIGN_END, false);
+    initButton(*pasteCustom, Glib::ustring("paste"), Gtk::Align::END, false);
     loadCustom = Gtk::manage (new Gtk::Button ());
-    initButton(*loadCustom, Glib::ustring("folder-open"), Gtk::ALIGN_END, false);
+    initButton(*loadCustom, Glib::ustring("folder-open"), Gtk::Align::END, false);
     saveCustom = Gtk::manage (new Gtk::Button ());
-    initButton(*saveCustom, Glib::ustring("save"), Gtk::ALIGN_END, false);
+    initButton(*saveCustom, Glib::ustring("save"), Gtk::Align::END, false);
 
     custombbox->attach_next_to(*editPointCustom, sideStart, 1, 1);
     custombbox->attach_next_to(*editCustom,      sideStart, 1, 1);
@@ -160,35 +160,35 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
 
     if (options.curvebboxpos == 0) {
         NURBSbbox->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
-        setExpandAlignProperties(NURBSbbox, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+        setExpandAlignProperties(NURBSbbox, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
         NURBSCurveGrid->get_style_context()->add_class("top");
     } else if (options.curvebboxpos == 2) {
         NURBSbbox->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
-        setExpandAlignProperties(NURBSbbox, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+        setExpandAlignProperties(NURBSbbox, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
         NURBSCurveGrid->get_style_context()->add_class("bottom");
     } else if (options.curvebboxpos == 1) {
         NURBSbbox->set_orientation(Gtk::ORIENTATION_VERTICAL);
-        setExpandAlignProperties(NURBSbbox, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+        setExpandAlignProperties(NURBSbbox, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
         NURBSCurveGrid->get_style_context()->add_class("right");
     } else if (options.curvebboxpos == 3){
         NURBSbbox->set_orientation(Gtk::ORIENTATION_VERTICAL);
-        setExpandAlignProperties(NURBSbbox, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+        setExpandAlignProperties(NURBSbbox, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
         NURBSCurveGrid->get_style_context()->add_class("left");
     }
 
     editPointNURBS = Gtk::manage (new Gtk::ToggleButton ());
-    initButton(*editPointNURBS, Glib::ustring("edit-point"), Gtk::ALIGN_START, false, "CURVEEDITOR_EDITPOINT_HINT");
+    initButton(*editPointNURBS, Glib::ustring("edit-point"), Gtk::Align::START, false, "CURVEEDITOR_EDITPOINT_HINT");
     editNURBS = Gtk::manage (new Gtk::ToggleButton());
-    initButton(*editNURBS, Glib::ustring("crosshair-node-curve"), Gtk::ALIGN_START, false, "EDIT_PIPETTE_TOOLTIP");
+    initButton(*editNURBS, Glib::ustring("crosshair-node-curve"), Gtk::Align::START, false, "EDIT_PIPETTE_TOOLTIP");
     editNURBS->hide();
     copyNURBS = Gtk::manage (new Gtk::Button ());
-    initButton(*copyNURBS, Glib::ustring("copy"), Gtk::ALIGN_END, true);
+    initButton(*copyNURBS, Glib::ustring("copy"), Gtk::Align::END, true);
     pasteNURBS = Gtk::manage (new Gtk::Button ());
-    initButton(*pasteNURBS, Glib::ustring("paste"), Gtk::ALIGN_END, false);
+    initButton(*pasteNURBS, Glib::ustring("paste"), Gtk::Align::END, false);
     loadNURBS = Gtk::manage (new Gtk::Button ());
-    initButton(*loadNURBS, Glib::ustring("folder-open"), Gtk::ALIGN_END, false);
+    initButton(*loadNURBS, Glib::ustring("folder-open"), Gtk::Align::END, false);
     saveNURBS = Gtk::manage (new Gtk::Button ());
-    initButton(*saveNURBS, Glib::ustring("save"), Gtk::ALIGN_END, false);
+    initButton(*saveNURBS, Glib::ustring("save"), Gtk::Align::END, false);
 
     NURBSbbox->attach_next_to(*editPointNURBS, sideStart, 1, 1);
     NURBSbbox->attach_next_to(*editNURBS,      sideStart, 1, 1);
@@ -252,19 +252,19 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
 
     if (options.curvebboxpos == 0) {
         parambbox->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
-        setExpandAlignProperties(parambbox, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+        setExpandAlignProperties(parambbox, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
         paramCurveGrid->get_style_context()->add_class("top");
     } else if (options.curvebboxpos == 2) {
         parambbox->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
-        setExpandAlignProperties(parambbox, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+        setExpandAlignProperties(parambbox, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
         paramCurveGrid->get_style_context()->add_class("bottom");
     } else if (options.curvebboxpos == 1) {
         parambbox->set_orientation(Gtk::ORIENTATION_VERTICAL);
-        setExpandAlignProperties(parambbox, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+        setExpandAlignProperties(parambbox, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
         paramCurveGrid->get_style_context()->add_class("right");
     } else if (options.curvebboxpos == 3){
         parambbox->set_orientation(Gtk::ORIENTATION_VERTICAL);
-        setExpandAlignProperties(parambbox, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+        setExpandAlignProperties(parambbox, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
         paramCurveGrid->get_style_context()->add_class("left");
     }
 
@@ -273,16 +273,16 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
     paramCurveBox->attach_next_to(*shcSelector, *paramCurve, Gtk::POS_BOTTOM, 1, 1);
 
     editParam = Gtk::manage (new Gtk::ToggleButton());
-    initButton(*editParam, Glib::ustring("crosshair-node-curve"), Gtk::ALIGN_START, false, "EDIT_PIPETTE_TOOLTIP");
+    initButton(*editParam, Glib::ustring("crosshair-node-curve"), Gtk::Align::START, false, "EDIT_PIPETTE_TOOLTIP");
     editParam->hide();
     copyParam = Gtk::manage (new Gtk::Button ());
-    initButton(*copyParam, Glib::ustring("copy"), Gtk::ALIGN_END, true);
+    initButton(*copyParam, Glib::ustring("copy"), Gtk::Align::END, true);
     pasteParam = Gtk::manage (new Gtk::Button ());
-    initButton(*pasteParam, Glib::ustring("paste"), Gtk::ALIGN_END, false);
+    initButton(*pasteParam, Glib::ustring("paste"), Gtk::Align::END, false);
     loadParam = Gtk::manage (new Gtk::Button ());
-    initButton(*loadParam, Glib::ustring("folder-open"), Gtk::ALIGN_END, false);
+    initButton(*loadParam, Glib::ustring("folder-open"), Gtk::Align::END, false);
     saveParam = Gtk::manage (new Gtk::Button ());
-    initButton(*saveParam, Glib::ustring("save"), Gtk::ALIGN_END, false);
+    initButton(*saveParam, Glib::ustring("save"), Gtk::Align::END, false);
 
     parambbox->attach_next_to(*editParam,  sideStart, 1, 1);
     parambbox->attach_next_to(*copyParam,  sideEnd,   1, 1);

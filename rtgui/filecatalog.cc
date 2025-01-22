@@ -773,7 +773,7 @@ void FileCatalog::_refreshProgressBar ()
             // create tab label once
             Gtk::Notebook *nb = (Gtk::Notebook *)(filepanel->get_parent());
             Gtk::Grid* grid = Gtk::manage(new Gtk::Grid());
-            setExpandAlignProperties (grid, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+            setExpandAlignProperties (grid, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
             progressImage = Gtk::manage(new RTImage("folder-closed", Gtk::ICON_SIZE_LARGE_TOOLBAR));
             progressLabel = Gtk::manage(new Gtk::Label(M("MAIN_FRAME_FILEBROWSER")));
             grid->attach_next_to(*progressImage, options.mainNBVertical ? Gtk::POS_TOP : Gtk::POS_RIGHT, 1, 1);

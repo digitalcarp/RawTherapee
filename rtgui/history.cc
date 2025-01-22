@@ -94,7 +94,7 @@ History::History (bool bookmarkSupport) : historyVPaned (nullptr), blistener (nu
 
     Gtk::Box* ahbox = Gtk::manage (new Gtk::Box ());
     addBookmark = Gtk::manage (new Gtk::Button ());  // M("HISTORY_NEWSNAPSHOT")
-    setExpandAlignProperties (addBookmark, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (addBookmark, true, false, Gtk::Align::FILL, Gtk::Align::START);
     //addBookmark->get_style_context()->set_junction_sides(Gtk::JUNCTION_RIGHT);
     addBookmark->get_style_context()->add_class ("Left");
     addBookmark->set_tooltip_markup (M ("HISTORY_NEWSNAPSHOT_TOOLTIP"));
@@ -103,7 +103,7 @@ History::History (bool bookmarkSupport) : historyVPaned (nullptr), blistener (nu
     ahbox->pack_start (*addBookmark);
 
     delBookmark = Gtk::manage (new Gtk::Button ());  // M("HISTORY_DELSNAPSHOT")
-    setExpandAlignProperties (delBookmark, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (delBookmark, true, false, Gtk::Align::FILL, Gtk::Align::START);
     //delBookmark->get_style_context()->set_junction_sides(Gtk::JUNCTION_LEFT);
     delBookmark->get_style_context()->add_class ("Right");
     Gtk::Image* delimg = Gtk::manage (new RTImage ("remove-small", Gtk::ICON_SIZE_BUTTON));

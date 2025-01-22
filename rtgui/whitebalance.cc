@@ -139,16 +139,16 @@ WhiteBalance::WhiteBalance () : FoldableToolPanel(this, TOOL_NAME, M("TP_WBALANC
 
     Gtk::Grid* methodgrid = Gtk::manage(new Gtk::Grid());
     methodgrid->get_style_context()->add_class("grid-spacing");
-    setExpandAlignProperties(methodgrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(methodgrid, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
     Gtk::Label* lab = Gtk::manage (new Gtk::Label (M("TP_WBALANCE_METHOD") + ":"));
-    setExpandAlignProperties(lab, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(lab, false, false, Gtk::Align::START, Gtk::Align::CENTER);
 
     // Create the Tree model
     refTreeModel = Gtk::TreeStore::create(methodColumns);
     // Create the Combobox
     method = Gtk::manage (new MyComboBox ());
-    setExpandAlignProperties(method, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(method, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     // Assign the model to the Combobox
     method->set_model(refTreeModel);
     method->clear(); // Clear default cell layout to add custom one
@@ -248,7 +248,7 @@ WhiteBalance::WhiteBalance () : FoldableToolPanel(this, TOOL_NAME, M("TP_WBALANC
     EvWBitcwgreen = m->newEvent(WB, "HISTORY_MSG_WBITC_GREEN");
 
     resetButton = Gtk::manage (new Gtk::Button()); // No label, keep it short
-    setExpandAlignProperties(resetButton, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(resetButton, false, false, Gtk::Align::START, Gtk::Align::CENTER);
     resetButton->set_relief(Gtk::RELIEF_NONE);
     resetButton->get_style_context()->add_class(GTK_STYLE_CLASS_FLAT);
     resetButton->set_image (*Gtk::manage (new RTImage ("undo-small", Gtk::ICON_SIZE_BUTTON)));
@@ -262,23 +262,23 @@ WhiteBalance::WhiteBalance () : FoldableToolPanel(this, TOOL_NAME, M("TP_WBALANC
 
     Gtk::Grid* spotgrid = Gtk::manage(new Gtk::Grid());
     spotgrid->get_style_context()->add_class("grid-spacing");
-    setExpandAlignProperties(spotgrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(spotgrid, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
     spotbutton = Gtk::manage (new Gtk::Button (M("TP_WBALANCE_PICKER")));
-    setExpandAlignProperties(spotbutton, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(spotbutton, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     spotbutton->get_style_context()->add_class("independent");
     spotbutton->set_tooltip_text(M("TP_WBALANCE_SPOTWB"));
     spotbutton->set_image (*Gtk::manage (new RTImage ("color-picker-small", Gtk::ICON_SIZE_BUTTON)));
 
     Gtk::Label* slab = Gtk::manage (new Gtk::Label (M("TP_WBALANCE_SIZE")));
-    setExpandAlignProperties(slab, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(slab, false, false, Gtk::Align::START, Gtk::Align::CENTER);
 
     Gtk::Grid* wbsizehelper = Gtk::manage(new Gtk::Grid());
     wbsizehelper->set_name("WB-Size-Helper");
-    setExpandAlignProperties(wbsizehelper, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(wbsizehelper, false, false, Gtk::Align::START, Gtk::Align::CENTER);
 
     spotsize = Gtk::manage (new MyComboBoxText ());
-    setExpandAlignProperties(spotsize, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(spotsize, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     spotsize->append ("2");
 
     if (options.whiteBalanceSpotSize == 2) {
@@ -329,14 +329,14 @@ WhiteBalance::WhiteBalance () : FoldableToolPanel(this, TOOL_NAME, M("TP_WBALANC
     Gtk::Image* itempbiasL =  Gtk::manage (new RTImage ("circle-blue-small", Gtk::ICON_SIZE_BUTTON));
     Gtk::Image* itempbiasR =  Gtk::manage (new RTImage ("circle-yellow-small", Gtk::ICON_SIZE_BUTTON));
 
-    StudLabel = Gtk::manage(new Gtk::Label("---", Gtk::ALIGN_CENTER));
+    StudLabel = Gtk::manage(new Gtk::Label("---", Gtk::Align::CENTER));
     StudLabel->set_tooltip_text(M("TP_WBALANCE_STUDLABEL_TOOLTIP"));
-    PatchLabel = Gtk::manage(new Gtk::Label("---", Gtk::ALIGN_CENTER));
+    PatchLabel = Gtk::manage(new Gtk::Label("---", Gtk::Align::CENTER));
     PatchLabel->set_tooltip_text(M("TP_WBALANCE_PATCHLABEL_TOOLTIP"));
-    PatchlevelLabel = Gtk::manage(new Gtk::Label("---", Gtk::ALIGN_CENTER));
+    PatchlevelLabel = Gtk::manage(new Gtk::Label("---", Gtk::Align::CENTER));
     PatchlevelLabel->set_tooltip_text(M("TP_WBALANCE_PATCHLEVELLABEL_TOOLTIP"));
 
-    mulLabel = Gtk::manage(new Gtk::Label("---", Gtk::ALIGN_CENTER));
+    mulLabel = Gtk::manage(new Gtk::Label("---", Gtk::Align::CENTER));
     mulLabel->set_tooltip_text(M("TP_WBALANCE_MULLABEL_TOOLTIP"));
     mulLabel->show();
 

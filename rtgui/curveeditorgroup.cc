@@ -36,12 +36,12 @@ CurveEditorGroup::CurveEditorGroup (Glib::ustring& curveDir, Glib::ustring group
 
     // We set the label to the one provided as parameter, even if it's an empty string
     if(blank == 0) {
-        curveGroupLabel = Gtk::manage (new Gtk::Label (groupLabel + ":", Gtk::ALIGN_START));
+        curveGroupLabel = Gtk::manage (new Gtk::Label (groupLabel + ":", Gtk::Align::START));
     } else if(blank == 1){
-        curveGroupLabel = Gtk::manage (new Gtk::Label (groupLabel, Gtk::ALIGN_START));
+        curveGroupLabel = Gtk::manage (new Gtk::Label (groupLabel, Gtk::Align::START));
     }
 
-    setExpandAlignProperties(curveGroupLabel, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(curveGroupLabel, false, false, Gtk::Align::START, Gtk::Align::CENTER);
     set_row_spacing(RTScalable::scalePixelSize(1));
 }
 
@@ -129,7 +129,7 @@ void CurveEditorGroup::newLine()
 
     if (curveEditors.size() > numberOfPackedCurve) {
         Gtk::Grid* currLine = Gtk::manage (new Gtk::Grid ());
-        setExpandAlignProperties(currLine, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+        setExpandAlignProperties(currLine, true, false, Gtk::Align::FILL, Gtk::Align::START);
         currLine->set_column_spacing(RTScalable::scalePixelSize(1));
 
         bool isHeader = false;
@@ -149,11 +149,11 @@ void CurveEditorGroup::newLine()
         }
 
         for (int i = numberOfPackedCurve; i < (int)(curveEditors.size()); ++i) {
-            setExpandAlignProperties(curveEditors[i]->curveType->buttonGroup, !rwe, true, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
+            setExpandAlignProperties(curveEditors[i]->curveType->buttonGroup, !rwe, true, Gtk::Align::FILL, Gtk::Align::FILL);
             currLine->attach(*curveEditors[i]->curveType->buttonGroup, x++, 0, 1, 1);
 
             if (curveEditors[i]->relatedWidget != nullptr) {
-                setExpandAlignProperties(curveEditors[i]->relatedWidget, curveEditors[i]->expandRelatedWidget, true, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
+                setExpandAlignProperties(curveEditors[i]->relatedWidget, curveEditors[i]->expandRelatedWidget, true, Gtk::Align::FILL, Gtk::Align::FILL);
                 currLine->attach(*curveEditors[i]->relatedWidget, x++, 0, 1, 1);
             }
 
@@ -162,7 +162,7 @@ void CurveEditorGroup::newLine()
 
         if (isHeader) {
             curve_reset = Gtk::manage (new Gtk::Button ());
-            setExpandAlignProperties(curve_reset, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+            setExpandAlignProperties(curve_reset, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
             curve_reset->add (*Gtk::manage (new RTImage ("undo-small", Gtk::ICON_SIZE_BUTTON)));
             curve_reset->set_relief (Gtk::RELIEF_NONE);
             curve_reset->set_tooltip_text (M("CURVEEDITOR_TOOLTIPLINEAR"));
@@ -434,12 +434,12 @@ void CurveEditorSubGroup::initButton (Gtk::Button &button, const Glib::ustring &
         hExpand = !vExpand;
     }
     Gtk::Align hAlign, vAlign;
-    if (align == Gtk::ALIGN_START) {
-        hAlign = options.curvebboxpos == 0 || options.curvebboxpos == 2 ? Gtk::ALIGN_START : Gtk::ALIGN_FILL;
-        vAlign = options.curvebboxpos == 0 || options.curvebboxpos == 2 ? Gtk::ALIGN_FILL : Gtk::ALIGN_START;
+    if (align == Gtk::Align::START) {
+        hAlign = options.curvebboxpos == 0 || options.curvebboxpos == 2 ? Gtk::Align::START : Gtk::Align::FILL;
+        vAlign = options.curvebboxpos == 0 || options.curvebboxpos == 2 ? Gtk::Align::FILL : Gtk::Align::START;
     } else {
-        hAlign = options.curvebboxpos == 0 || options.curvebboxpos == 2 ?  Gtk::ALIGN_END : Gtk::ALIGN_FILL;
-        vAlign = options.curvebboxpos == 0 || options.curvebboxpos == 2 ?  Gtk::ALIGN_FILL : Gtk::ALIGN_END;
+        hAlign = options.curvebboxpos == 0 || options.curvebboxpos == 2 ?  Gtk::Align::END : Gtk::Align::FILL;
+        vAlign = options.curvebboxpos == 0 || options.curvebboxpos == 2 ?  Gtk::Align::FILL : Gtk::Align::END;
     }
 
     button.add (*Gtk::manage (new RTImage(iconName, Gtk::ICON_SIZE_LARGE_TOOLBAR)));

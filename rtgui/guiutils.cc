@@ -556,7 +556,7 @@ MyExpander::MyExpander(bool useEnabled, Gtk::Widget* titleWidget) :
     setupPart1();
 
     if (titleWidget) {
-        setExpandAlignProperties(titleWidget, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
+        setExpandAlignProperties(titleWidget, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
         headerHBox->pack_start(*titleWidget, Gtk::PACK_EXPAND_WIDGET, 0);
         headerWidget = titleWidget;
     }
@@ -577,7 +577,7 @@ MyExpander::MyExpander(bool useEnabled, Glib::ustring titleLabel) :
     setupPart1();
 
     label = Gtk::manage(new Gtk::Label());
-    setExpandAlignProperties(label, true, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(label, true, false, Gtk::Align::START, Gtk::Align::CENTER);
     label->set_markup(escapeHtmlChars(titleLabel));
     headerHBox->pack_start(*label, Gtk::PACK_EXPAND_WIDGET, 0);
 
@@ -590,11 +590,11 @@ void MyExpander::setupPart1()
     set_spacing(0);
     set_name("MyExpander");
     set_can_focus(false);
-    setExpandAlignProperties(this, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
+    setExpandAlignProperties(this, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
 
     headerHBox = Gtk::manage(new Gtk::Box());
     headerHBox->set_can_focus(false);
-    setExpandAlignProperties(headerHBox, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
+    setExpandAlignProperties(headerHBox, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
 
     if (useEnabled) {
         get_style_context()->add_class("OnOff");
@@ -1146,7 +1146,7 @@ MySpinButton::MySpinButton ()
     set_inner_border(border);
     set_numeric(true);
     set_wrap(false);
-    set_alignment(Gtk::ALIGN_END);
+    set_alignment(Gtk::Align::END);
     set_update_policy(Gtk::SpinButtonUpdatePolicy::UPDATE_IF_VALID); // Avoid updating text if input is not a numeric
 
     auto keyPress = Gtk::EventControllerKey::create();
@@ -1433,7 +1433,7 @@ class MyFileChooserButton::Impl
 {
 public:
     Gtk::Box box_;
-    Gtk::Label lbl_{"", Gtk::ALIGN_START};
+    Gtk::Label lbl_{"", Gtk::Align::START};
 };
 
 MyFileChooserButton::MyFileChooserButton(const Glib::ustring &title, Gtk::FileChooserAction action):
@@ -2002,7 +2002,7 @@ SpotPicker::SpotPicker(int const defaultValue, Glib::ustring const &buttonKey, G
 
 {
     this->get_style_context()->add_class("grid-spacing");
-    setExpandAlignProperties(this, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(this, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
     this->attach (_spotButton, 0, 0, 1, 1);
     this->attach (_spotLabel, 1, 0, 1, 1);
@@ -2013,14 +2013,14 @@ SpotPicker::SpotPicker(int const defaultValue, Glib::ustring const &buttonKey, G
 Gtk::Label SpotPicker::labelSetup(Glib::ustring const &key) const
 {
     Gtk::Label label(key);
-    setExpandAlignProperties(&label, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(&label, false, false, Gtk::Align::START, Gtk::Align::CENTER);
     return label;
 }
 
 MyComboBoxText SpotPicker::selecterSetup() const
 {
     MyComboBoxText spotSize = MyComboBoxText();
-    setExpandAlignProperties(&spotSize, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(&spotSize, false, false, Gtk::Align::START, Gtk::Align::CENTER);
 
     spotSize.append ("2");
     if (_spotHalfWidth == 2) {
@@ -2056,7 +2056,7 @@ MyComboBoxText SpotPicker::selecterSetup() const
 Gtk::ToggleButton SpotPicker::spotButtonTemplate(Glib::ustring const &key, const Glib::ustring &tooltip) const
 {
     Gtk::ToggleButton spotButton = Gtk::ToggleButton(key);
-    setExpandAlignProperties(&spotButton, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(&spotButton, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     spotButton.get_style_context()->add_class("independent");
     spotButton.set_tooltip_text(tooltip);
     spotButton.set_image_from_icon_name("color-picker-small");

@@ -51,17 +51,17 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 
 
     Gtk::Grid *retinexGrid = Gtk::manage ( new Gtk::Grid());
-    setExpandAlignProperties (retinexGrid, false, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (retinexGrid, false, false, Gtk::Align::FILL, Gtk::Align::START);
 
     dhgrid = Gtk::manage (new Gtk::Grid ());
-    setExpandAlignProperties (dhgrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (dhgrid, true, false, Gtk::Align::FILL, Gtk::Align::START);
 
     labmdh = Gtk::manage (new Gtk::Label (M ("TP_RETINEX_METHOD") + ":"));
-    setExpandAlignProperties (labmdh, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties (labmdh, false, false, Gtk::Align::START, Gtk::Align::BASELINE);
     dhgrid->attach (*labmdh, 0, 0, 1, 1);
 
     retinexMethod = Gtk::manage (new MyComboBoxText ());
-    setExpandAlignProperties (retinexMethod, true, true, Gtk::ALIGN_FILL, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties (retinexMethod, true, true, Gtk::Align::FILL, Gtk::Align::BASELINE);
     retinexMethod->append (M ("TP_RETINEX_LOW"));
     retinexMethod->append (M ("TP_RETINEX_UNIFORM"));
     retinexMethod->append (M ("TP_RETINEX_HIGH"));
@@ -73,7 +73,7 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
     dhgrid->attach (*retinexMethod, 1, 0, 1, 1);
 
     retinexcolorspace = Gtk::manage (new MyComboBoxText ());
-    setExpandAlignProperties (retinexcolorspace, true, true, Gtk::ALIGN_FILL, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties (retinexcolorspace, true, true, Gtk::Align::FILL, Gtk::Align::BASELINE);
     retinexcolorspace->append (M ("TP_RETINEX_LABSPACE"));
     retinexcolorspace->append (M ("TP_RETINEX_HSLSPACE_LOG"));
     retinexcolorspace->append (M ("TP_RETINEX_HSLSPACE_LIN"));
@@ -83,36 +83,36 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
     retinexGrid->attach (*dhgrid, 0, 0, 1, 1);
 
     str = Gtk::manage (new Adjuster (M ("TP_RETINEX_STRENGTH"), 0, 100., 1., 20.));
-    setExpandAlignProperties (str, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (str, true, false, Gtk::Align::FILL, Gtk::Align::START);
     retinexGrid->attach (*str, 0, 1, 1, 1);
     str->show ();
 
     neigh = Gtk::manage (new Adjuster (M ("TP_RETINEX_NEIGHBOR"), 6, 100., 1., 80.));
-    setExpandAlignProperties (neigh, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (neigh, true, false, Gtk::Align::FILL, Gtk::Align::START);
     retinexGrid->attach (*neigh, 0, 2, 1, 1);
     neigh->show ();
 
     vart   = Gtk::manage (new Adjuster (M ("TP_RETINEX_VARIANCE"), 50, 500, 1, 200));
-    setExpandAlignProperties (vart, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (vart, true, false, Gtk::Align::FILL, Gtk::Align::START);
     vart->set_tooltip_markup (M ("TP_RETINEX_VARIANCE_TOOLTIP"));
     retinexGrid->attach (*vart, 0, 3, 1, 1);
     vart->show ();
 
     highl   = Gtk::manage (new Adjuster (M ("TP_RETINEX_HIGHLIGHT"), 1, 20, 1, 4));
-    setExpandAlignProperties (highl, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (highl, true, false, Gtk::Align::FILL, Gtk::Align::START);
     highl->set_tooltip_markup (M ("TP_RETINEX_HIGHLIGHT_TOOLTIP"));
     retinexGrid->attach (*highl, 0, 4, 1, 1);
     highl->show ();
 
     viewgrid = Gtk::manage (new Gtk::Grid ());
-    setExpandAlignProperties (viewgrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (viewgrid, true, false, Gtk::Align::FILL, Gtk::Align::START);
 
     labview = Gtk::manage (new Gtk::Label (M ("TP_RETINEX_VIEW") + ":"));
-    setExpandAlignProperties (labview, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties (labview, false, false, Gtk::Align::START, Gtk::Align::BASELINE);
     viewgrid->attach (*labview, 0, 0, 1, 1);
 
     viewMethod = Gtk::manage (new MyComboBoxText ());
-    setExpandAlignProperties (viewMethod, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties (viewMethod, true, false, Gtk::Align::FILL, Gtk::Align::BASELINE);
     viewMethod->append (M ("TP_RETINEX_VIEW_NONE"));
     viewMethod->append (M ("TP_RETINEX_VIEW_UNSHARP"));
     viewMethod->append (M ("TP_RETINEX_VIEW_MASK"));
@@ -135,21 +135,21 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
  //   Gtk::Frame *maskFrame = Gtk::manage (new Gtk::Frame (M ("TP_RETINEX_LABEL_MASK")) );
     maskFrame = Gtk::manage (new Gtk::Frame (M ("TP_RETINEX_LABEL_MASK")) );
     maskFrame->set_label_align(0.025, 0.5);
-    setExpandAlignProperties (maskFrame, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (maskFrame, true, false, Gtk::Align::FILL, Gtk::Align::START);
 
     Gtk::Grid *maskGrid = Gtk::manage ( new Gtk::Grid());
-    setExpandAlignProperties (maskGrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (maskGrid, true, false, Gtk::Align::FILL, Gtk::Align::START);
 
     // Map Method
     mapgrid = Gtk::manage (new Gtk::Grid ());
-    setExpandAlignProperties (mapgrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (mapgrid, true, false, Gtk::Align::FILL, Gtk::Align::START);
 
     labmap = Gtk::manage (new Gtk::Label (M ("TP_RETINEX_MAP") + ":"));
-    setExpandAlignProperties (labmap, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties (labmap, false, false, Gtk::Align::START, Gtk::Align::BASELINE);
     mapgrid->attach (*labmap, 0, 0, 1, 1);
 
     mapMethod = Gtk::manage (new MyComboBoxText ());
-    setExpandAlignProperties (mapMethod, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties (mapMethod, true, false, Gtk::Align::FILL, Gtk::Align::BASELINE);
     mapMethod->append (M ("TP_RETINEX_MAP_NONE"));
     mapMethod->append (M ("TP_RETINEX_MAP_GAUS"));
     mapMethod->append (M ("TP_RETINEX_MAP_MAPP"));
@@ -164,7 +164,7 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 
     // Map Equalizer
     curveEditormap = new CurveEditorGroup (options.lastRetinexDir, M ("TP_RETINEX_CONTEDIT_MAP"));
-    setExpandAlignProperties (curveEditormap, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (curveEditormap, true, false, Gtk::Align::FILL, Gtk::Align::START);
     curveEditormap->setCurveListener (this);
     std::vector<GradientMilestone> milestones222;
     milestones222.push_back ( GradientMilestone (0., 0., 0., 0.) );
@@ -179,27 +179,27 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 
     // Adjusters
     highlights = Gtk::manage (new Adjuster (M ("TP_SHADOWSHLIGHTS_HIGHLIGHTS"), 0, 100, 1, 0));
-    setExpandAlignProperties (highlights, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (highlights, true, false, Gtk::Align::FILL, Gtk::Align::START);
     maskGrid->attach (*highlights, 0, 2, 1, 1);
     highlights->show();
 
     h_tonalwidth = Gtk::manage (new Adjuster (M ("TP_SHADOWSHLIGHTS_HLTONALW"), 10, 100, 1, 80));
-    setExpandAlignProperties (h_tonalwidth, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (h_tonalwidth, true, false, Gtk::Align::FILL, Gtk::Align::START);
     maskGrid->attach (*h_tonalwidth, 0, 3, 1, 1);
     h_tonalwidth->show();
 
     shadows = Gtk::manage (new Adjuster (M ("TP_SHADOWSHLIGHTS_SHADOWS"), 0, 100, 1, 0));
-    setExpandAlignProperties (shadows, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (shadows, true, false, Gtk::Align::FILL, Gtk::Align::START);
     maskGrid->attach (*shadows, 0, 4, 1, 1);
     shadows->show();
 
     s_tonalwidth = Gtk::manage (new Adjuster (M ("TP_SHADOWSHLIGHTS_SHTONALW"), 10, 100, 1, 80));
-    setExpandAlignProperties (s_tonalwidth, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (s_tonalwidth, true, false, Gtk::Align::FILL, Gtk::Align::START);
     maskGrid->attach (*s_tonalwidth, 0, 5, 1, 1);
     s_tonalwidth->show();
 
     radius = Gtk::manage (new Adjuster (M ("TP_SHADOWSHLIGHTS_RADIUS"), 5, 100, 1, 40));
-    setExpandAlignProperties (radius, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (radius, true, false, Gtk::Align::FILL, Gtk::Align::START);
     maskGrid->attach (*radius, 0, 6, 1, 1);
     radius->show();
 
@@ -217,26 +217,26 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 
 
     expsettings = Gtk::manage(new MyExpander(false, M ("TP_RETINEX_SETTINGS")));
-    setExpandAlignProperties (expsettings, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (expsettings, true, false, Gtk::Align::FILL, Gtk::Align::START);
     expsettings->signal_button_release_event().connect_notify ( sigc::bind ( sigc::mem_fun (this, &Retinex::foldAllButMe), expsettings) );
 
     Gtk::Grid *settingsGrid = Gtk::manage ( new Gtk::Grid());
-    setExpandAlignProperties (settingsGrid, false, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (settingsGrid, false, false, Gtk::Align::FILL, Gtk::Align::START);
 
     mMLabels = Gtk::manage (new Gtk::Label ("---"));
-    setExpandAlignProperties (mMLabels, true, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_START);
+    setExpandAlignProperties (mMLabels, true, false, Gtk::Align::CENTER, Gtk::Align::START);
     mMLabels->set_tooltip_markup (M ("TP_RETINEX_MLABEL_TOOLTIP"));
     settingsGrid->attach (*mMLabels, 0, 0, 1, 1);
     mMLabels->show ();
 
     transLabels = Gtk::manage (new Gtk::Label ("---"));
-    setExpandAlignProperties (transLabels, true, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_START);
+    setExpandAlignProperties (transLabels, true, false, Gtk::Align::CENTER, Gtk::Align::START);
     transLabels->set_tooltip_markup (M ("TP_RETINEX_TLABEL_TOOLTIP"));
     settingsGrid->attach (*transLabels, 0, 1, 1, 1);
     transLabels->show ();
 
     transLabels2 = Gtk::manage (new Gtk::Label ("---"));
-    setExpandAlignProperties (transLabels2, true, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_START);
+    setExpandAlignProperties (transLabels2, true, false, Gtk::Align::CENTER, Gtk::Align::START);
     settingsGrid->attach (*transLabels2, 0, 2, 1, 1);
     transLabels2->show ();
 
@@ -246,7 +246,7 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 
     equalFrame = Gtk::manage (new Gtk::Frame (M ("TP_RETINEX_EQUAL")));
     equalFrame->set_label_align(0.025, 0.5);
-    setExpandAlignProperties (equalFrame, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (equalFrame, true, false, Gtk::Align::FILL, Gtk::Align::START);
 //GTK318
 #if GTK_MAJOR_VERSION == 3 && GTK_MINOR_VERSION < 20
     equalFrame->set_border_width (5);
@@ -254,11 +254,11 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 //GTK318
 
     Gtk::Grid *equalGrid = Gtk::manage (new Gtk::Grid());
-    setExpandAlignProperties (equalGrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (equalGrid, true, false, Gtk::Align::FILL, Gtk::Align::START);
 
     // Histogram equalizer Lab curve
     curveEditorGD = new CurveEditorGroup (options.lastRetinexDir, M ("TP_RETINEX_CONTEDIT_LAB"));
-    setExpandAlignProperties (curveEditorGD, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (curveEditorGD, true, false, Gtk::Align::FILL, Gtk::Align::START);
     curveEditorGD->setCurveListener (this);
     std::vector<GradientMilestone> milestones22;
     milestones22.push_back ( GradientMilestone (0., 0., 0., 0.) );
@@ -273,7 +273,7 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 
     // Histogram equalizer HSL curve
     curveEditorGDH = new CurveEditorGroup (options.lastRetinexDir, M ("TP_RETINEX_CONTEDIT_HSL"));
-    setExpandAlignProperties (curveEditorGDH, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (curveEditorGDH, true, false, Gtk::Align::FILL, Gtk::Align::START);
     curveEditorGDH->setCurveListener (this);
     std::vector<GradientMilestone> milestones22H;
     milestones22H.push_back ( GradientMilestone (0., 0., 0., 0.) );
@@ -288,7 +288,7 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 
     // Hue equalizer
     curveEditorGH = new CurveEditorGroup (options.lastRetinexDir, M ("TP_RETINEX_CONTEDIT_LH"));
-    setExpandAlignProperties (curveEditorGH, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (curveEditorGH, true, false, Gtk::Align::FILL, Gtk::Align::START);
     curveEditorGH->setCurveListener (this);
     lhshape = static_cast<FlatCurveEditor*> (curveEditorGH->addCurve (CT_Flat, M ("TP_RETINEX_CURVEEDITOR_LH")));
     lhshape->setTooltip (M ("TP_RETINEX_CURVEEDITOR_LH_TOOLTIP"));
@@ -309,14 +309,14 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 
     // Gamma settings
     gamgrid = Gtk::manage (new Gtk::Grid ());
-    setExpandAlignProperties (gamgrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (gamgrid, true, false, Gtk::Align::FILL, Gtk::Align::START);
 
     labgam = Gtk::manage (new Gtk::Label (M ("TP_RETINEX_GAMMA") + ":"));
-    setExpandAlignProperties (labgam, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties (labgam, false, false, Gtk::Align::START, Gtk::Align::BASELINE);
     gamgrid->attach (*labgam, 0, 0, 1, 1);
 
     gammaretinex = Gtk::manage (new MyComboBoxText ());
-    setExpandAlignProperties (gammaretinex, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_BASELINE);
+    setExpandAlignProperties (gammaretinex, true, false, Gtk::Align::FILL, Gtk::Align::BASELINE);
     gammaretinex->append (M ("TP_RETINEX_GAMMA_NONE"));
     gammaretinex->append (M ("TP_RETINEX_GAMMA_LOW"));
     gammaretinex->append (M ("TP_RETINEX_GAMMA_MID"));
@@ -330,12 +330,12 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
     gammaretinex->show();
 
     gam = Gtk::manage (new Adjuster (M ("TP_RETINEX_FREEGAMMA"), 0.6, 3.0, 0.01, 1.30));
-    setExpandAlignProperties (gam, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (gam, true, false, Gtk::Align::FILL, Gtk::Align::START);
     equalGrid->attach (*gam, 0, 4, 1, 1);
     gam->show ();
 
     slope = Gtk::manage (new Adjuster (M ("TP_RETINEX_SLOPE"), 1., 20., 0.1, 3.));
-    setExpandAlignProperties (slope, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (slope, true, false, Gtk::Align::FILL, Gtk::Align::START);
     equalGrid->attach (*slope, 0, 5, 1, 1);
     slope->show ();
 
@@ -350,7 +350,7 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 
     iterFrame = Gtk::manage (new Gtk::Frame (M ("TP_RETINEX_ITERF")));
     iterFrame->set_label_align(0.025, 0.5);
-    setExpandAlignProperties (iterFrame, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (iterFrame, true, false, Gtk::Align::FILL, Gtk::Align::START);
 //GTK318
 #if GTK_MAJOR_VERSION == 3 && GTK_MINOR_VERSION < 20
     iterFrame->set_border_width (5);
@@ -358,28 +358,28 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 //GTK318
 
     Gtk::Grid *iterGrid = Gtk::manage (new Gtk::Grid());
-    setExpandAlignProperties (iterGrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (iterGrid, true, false, Gtk::Align::FILL, Gtk::Align::START);
 
     iter   = Gtk::manage (new Adjuster (M ("TP_RETINEX_ITER"), 1, 5., 1., 1.));
-    setExpandAlignProperties (iter, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (iter, true, false, Gtk::Align::FILL, Gtk::Align::START);
     iter->set_tooltip_markup (M ("TP_RETINEX_ITER_TOOLTIP"));
     iterGrid->attach (*iter, 0, 0, 1, 1);
     iter->show ();
 
     scal   = Gtk::manage (new Adjuster (M ("TP_RETINEX_SCALES"), -1, 6., 1., 3.));
-    setExpandAlignProperties (scal, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (scal, true, false, Gtk::Align::FILL, Gtk::Align::START);
     scal->set_tooltip_markup (M ("TP_RETINEX_SCALES_TOOLTIP"));
     iterGrid->attach (*scal, 0, 1, 1, 1);
     scal->show ();
 
     grad   = Gtk::manage (new Adjuster (M ("TP_RETINEX_GRAD"), -2., 2., 1., 1.));
-    setExpandAlignProperties (grad, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (grad, true, false, Gtk::Align::FILL, Gtk::Align::START);
     grad->set_tooltip_markup (M ("TP_RETINEX_GRAD_TOOLTIP"));
     iterGrid->attach (*grad, 0, 2, 1, 1);
     grad->show ();
 
     grads   = Gtk::manage (new Adjuster (M ("TP_RETINEX_GRADS"), -2., 2., 1., 1.));
-    setExpandAlignProperties (grads, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (grads, true, false, Gtk::Align::FILL, Gtk::Align::START);
     grads->set_tooltip_markup (M ("TP_RETINEX_GRADS_TOOLTIP"));
     iterGrid->attach (*grads, 0, 3, 1, 1);
     grads->show ();
@@ -395,7 +395,7 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 
     tranFrame = Gtk::manage (new Gtk::Frame (M ("TP_RETINEX_TRANF")));
     tranFrame->set_label_align(0.025, 0.5);
-    setExpandAlignProperties (tranFrame, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (tranFrame, true, false, Gtk::Align::FILL, Gtk::Align::START);
 //GTK318
 #if GTK_MAJOR_VERSION == 3 && GTK_MINOR_VERSION < 20
     tranFrame->set_border_width (5);
@@ -403,12 +403,12 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 //GTK318
 
     Gtk::Grid *tranGrid = Gtk::manage (new Gtk::Grid());
-    setExpandAlignProperties (tranGrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (tranGrid, true, false, Gtk::Align::FILL, Gtk::Align::START);
 
 
     // Transmission map curve
     transmissionCurveEditorG = new CurveEditorGroup (options.lastRetinexDir, M ("TP_RETINEX_TRANSMISSION"));
-    setExpandAlignProperties (transmissionCurveEditorG, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (transmissionCurveEditorG, true, false, Gtk::Align::FILL, Gtk::Align::START);
     transmissionCurveEditorG->setCurveListener (this);
     transmissionShape = static_cast<FlatCurveEditor*> (transmissionCurveEditorG->addCurve (CT_Flat, "", nullptr, false, false));
     transmissionShape->setIdentityValue (0.);
@@ -421,20 +421,20 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 
     // Scale
     skal = Gtk::manage (new Adjuster (M ("TP_RETINEX_SKAL"), 1, 8, 1, 3));
-    setExpandAlignProperties (skal, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (skal, true, false, Gtk::Align::FILL, Gtk::Align::START);
     tranGrid->attach (*skal, 0, 1, 1, 1);
     skal->show ();
 
     // Threshold
     limd = Gtk::manage (new Adjuster (M ("TP_RETINEX_THRESHOLD"), 2, 100, 1, 8));
-    setExpandAlignProperties (limd, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (limd, true, false, Gtk::Align::FILL, Gtk::Align::START);
     limd->set_tooltip_markup (M ("TP_RETINEX_THRESHOLD_TOOLTIP"));
     tranGrid->attach (*limd, 0, 2, 1, 1);
     limd->show ();
 
     // Transmission median filter
     medianmap = Gtk::manage (new Gtk::CheckButton (M ("TP_RETINEX_MEDIAN")));
-    setExpandAlignProperties (medianmap, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (medianmap, true, false, Gtk::Align::FILL, Gtk::Align::START);
     medianmap->set_active (true);
     medianmapConn  = medianmap->signal_toggled().connect ( sigc::mem_fun (*this, &Retinex::medianmapChanged) );
     tranGrid->attach (*medianmap, 0, 3, 1, 1);
@@ -451,7 +451,7 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 
     gainFrame = Gtk::manage (new Gtk::Frame (M ("TP_RETINEX_GAINOFFS")));
     gainFrame->set_label_align(0.025, 0.5);
-    setExpandAlignProperties (gainFrame, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (gainFrame, true, false, Gtk::Align::FILL, Gtk::Align::START);
 //GTK318
 #if GTK_MAJOR_VERSION == 3 && GTK_MINOR_VERSION < 20
     gainFrame->set_border_width (5);
@@ -459,11 +459,11 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
 //GTK318
 
     Gtk::Grid *gainGrid = Gtk::manage (new Gtk::Grid());
-    setExpandAlignProperties (gainGrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (gainGrid, true, false, Gtk::Align::FILL, Gtk::Align::START);
 
     // Gain Transmission map curve
     gaintransmissionCurve = new CurveEditorGroup (options.lastRetinexDir, M ("TP_RETINEX_GAINTRANSMISSION"));
-    setExpandAlignProperties (gaintransmissionCurve, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (gaintransmissionCurve, true, false, Gtk::Align::FILL, Gtk::Align::START);
     gaintransmissionCurve->setCurveListener (this);
     gaintransmissionShape = static_cast<FlatCurveEditor*> (gaintransmissionCurve->addCurve (CT_Flat, "", nullptr, false, false));
     gaintransmissionShape->setIdentityValue (0.);
@@ -476,7 +476,7 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
     gaintransmissionCurve->show();
 
     offs   = Gtk::manage (new Adjuster (M ("TP_RETINEX_OFFSET"), -1000, 5000, 1, 0));
-    setExpandAlignProperties (offs, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (offs, true, false, Gtk::Align::FILL, Gtk::Align::START);
     gainGrid->attach (*offs, 0, 1, 1, 1);
     offs->show ();
 
@@ -492,9 +492,9 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
     // Reset button
 
     neutral = Gtk::manage (new Gtk::Button (M ("TP_RETINEX_NEUTRAL")));
-    setExpandAlignProperties (neutral, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (neutral, true, false, Gtk::Align::FILL, Gtk::Align::START);
     RTImage *resetImg = Gtk::manage (new RTImage ("undo-small", Gtk::ICON_SIZE_BUTTON));
-    setExpandAlignProperties (resetImg, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties (resetImg, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
     neutral->set_image (*resetImg);
     neutral->set_tooltip_text (M ("TP_RETINEX_NEUTRAL_TOOLTIP"));
     neutralconn = neutral->signal_pressed().connect ( sigc::mem_fun (*this, &Retinex::neutral_pressed) );

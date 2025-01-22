@@ -27,14 +27,14 @@ RenameDialog::RenameDialog (Gtk::Window* parent)
 
     Gtk::Grid* names = Gtk::manage (new Gtk::Grid());
     Gtk::Label* onlab = Gtk::manage (new Gtk::Label (M("FILEBROWSER_CURRENT_NAME")));
-    onlab->set_halign(Gtk::ALIGN_START);
+    onlab->set_halign(Gtk::Align::START);
     Gtk::Label* nnlab = Gtk::manage (new Gtk::Label (M("FILEBROWSER_NEW_NAME")));
-    nnlab->set_halign(Gtk::ALIGN_START);
+    nnlab->set_halign(Gtk::Align::START);
     oldName = Gtk::manage (new Gtk::Label("alma"));
-    oldName->set_halign(Gtk::ALIGN_START);
+    oldName->set_halign(Gtk::Align::START);
     newName = Gtk::manage (new Gtk::Entry());
     newName->set_hexpand();
-    newName->set_halign(Gtk::ALIGN_FILL);
+    newName->set_halign(Gtk::Align::FILL);
     
     names->attach(*onlab, 0, 0, 1, 1);
     names->attach(*oldName, 1, 0, 1, 1);

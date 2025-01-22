@@ -51,7 +51,7 @@ FlatField::FlatField () : FoldableToolPanel(this, TOOL_NAME, M("TP_FLATFIELD_LAB
     flatFieldFromMetaData = Gtk::manage(new CheckBox((M("TP_FLATFIELD_FROMMETADATA")), multiImage));
     flatFieldFromMetaData->setCheckBoxListener (this);
     ffInfo = Gtk::manage(new Gtk::Label("-"));
-    setExpandAlignProperties(ffInfo, true, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(ffInfo, true, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
     flatFieldBlurRadius = Gtk::manage(new Adjuster (M("TP_FLATFIELD_BLURRADIUS"), 0, 200, 2, 32));
     flatFieldBlurRadius->setAdjusterListener (this);
 

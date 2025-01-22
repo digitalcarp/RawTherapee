@@ -42,7 +42,7 @@ ChMixer::ChMixer (): FoldableToolPanel(this, TOOL_NAME, M("TP_CHMIXER_LABEL"), f
 
     Gtk::Label* rlabel = Gtk::manage (new Gtk::Label ());
     rlabel->set_markup (Glib::ustring("\t<span foreground=\"#b00000\"><b>") + M("TP_CHMIXER_RED") + Glib::ustring(":</b></span>"));
-    rlabel->set_alignment(Gtk::ALIGN_START);
+    rlabel->set_alignment(Gtk::Align::START);
 
     constexpr double RANGE = 500.0;
     red[0] = Gtk::manage (new Adjuster ("",   -RANGE, RANGE, 0.1, 100, imgIcon[0]));
@@ -61,7 +61,7 @@ ChMixer::ChMixer (): FoldableToolPanel(this, TOOL_NAME, M("TP_CHMIXER_LABEL"), f
 
     Gtk::Label* glabel = Gtk::manage (new Gtk::Label ());
     glabel->set_markup (Glib::ustring("\t<span foreground=\"#0b8c21\"><b>") + M("TP_CHMIXER_GREEN") + Glib::ustring(":</b></span>"));
-    glabel->set_alignment(Gtk::ALIGN_START);
+    glabel->set_alignment(Gtk::Align::START);
 
 
     green[0] = Gtk::manage (new Adjuster ("",   -RANGE, RANGE, 0.1, 0, imgIcon[3]));
@@ -80,7 +80,7 @@ ChMixer::ChMixer (): FoldableToolPanel(this, TOOL_NAME, M("TP_CHMIXER_LABEL"), f
 
     Gtk::Label* blabel = Gtk::manage (new Gtk::Label ());
     blabel->set_markup (Glib::ustring("\t<span foreground=\"#1377d7\"><b>") + M("TP_CHMIXER_BLUE") + Glib::ustring(":</b></span>"));
-    blabel->set_alignment(Gtk::ALIGN_START);
+    blabel->set_alignment(Gtk::Align::START);
     blue[0] = Gtk::manage (new Adjuster ("",   -RANGE, RANGE, 0.1, 0, imgIcon[6]));
     blue[1] = Gtk::manage (new Adjuster ("", -RANGE, RANGE, 0.1, 0, imgIcon[7]));
     blue[2] = Gtk::manage (new Adjuster ("",  -RANGE, RANGE, 0.1, 100, imgIcon[8]));

@@ -48,11 +48,11 @@ SaveFormatPanel::SaveFormatPanel () : listener (nullptr)
     Gtk::Grid* hb1 = Gtk::manage (new Gtk::Grid ());
     hb1->set_column_spacing(5);
     hb1->set_row_spacing(5);
-    setExpandAlignProperties(hb1, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(hb1, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     Gtk::Label* flab = Gtk::manage (new Gtk::Label (M("SAVEDLG_FILEFORMAT") + ":"));
-    setExpandAlignProperties(flab, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(flab, false, false, Gtk::Align::START, Gtk::Align::CENTER);
     format = Gtk::manage (new MyComboBoxText ());
-    setExpandAlignProperties(format, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(format, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     format->signal_changed ().connect (sigc::mem_fun (*this, &SaveFormatPanel::formatChanged));
 
     for (const auto& sf_template : sf_templates) {
@@ -69,17 +69,17 @@ SaveFormatPanel::SaveFormatPanel () : listener (nullptr)
     jpegOpts = Gtk::manage (new Gtk::Grid ());
     jpegOpts->set_column_spacing(15);
     jpegOpts->set_row_spacing(5);
-    setExpandAlignProperties(jpegOpts, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(jpegOpts, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
     jpegQual = Gtk::manage (new Adjuster (M("SAVEDLG_JPEGQUAL"), 0, 100, 1, 100) );
-    setExpandAlignProperties(jpegQual, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(jpegQual, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     jpegQual->setAdjusterListener (this);
 
     jpegSubSampLabel = Gtk::manage (new Gtk::Label (M("SAVEDLG_SUBSAMP") + Glib::ustring(":")) );
-    setExpandAlignProperties(jpegSubSampLabel, true, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(jpegSubSampLabel, true, false, Gtk::Align::START, Gtk::Align::CENTER);
 
     jpegSubSamp = Gtk::manage (new MyComboBoxText ());
-    setExpandAlignProperties(jpegSubSamp, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(jpegSubSamp, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     jpegSubSamp->append (M("SAVEDLG_SUBSAMP_1"));
     jpegSubSamp->append (M("SAVEDLG_SUBSAMP_2"));
     jpegSubSamp->append (M("SAVEDLG_SUBSAMP_3"));
@@ -96,12 +96,12 @@ SaveFormatPanel::SaveFormatPanel () : listener (nullptr)
 
 
     tiffUncompressed = Gtk::manage (new Gtk::CheckButton (M("SAVEDLG_TIFFUNCOMPRESSED")) );
-    setExpandAlignProperties(tiffUncompressed, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(tiffUncompressed, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     tiffUncompressed->signal_toggled().connect( sigc::mem_fun(*this, &SaveFormatPanel::formatChanged));
     tiffUncompressed->show_all();
 
     bigTiff = Gtk::manage (new Gtk::CheckButton (M("SAVEDLG_BIGTIFF")) );
-    setExpandAlignProperties(bigTiff, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(bigTiff, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     bigTiff->signal_toggled().connect( sigc::mem_fun(*this, &SaveFormatPanel::formatChanged));
     bigTiff->show_all();
 

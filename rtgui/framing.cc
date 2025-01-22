@@ -229,7 +229,7 @@ constexpr float FRAME_LABEL_ALIGN_Y = 0.5;
 Gtk::Label* createGridLabel(const char* text)
 {
     Gtk::Label* label = Gtk::manage(new Gtk::Label(M(text)));
-    label->set_halign(Gtk::ALIGN_START);
+    label->set_halign(Gtk::Align::START);
     return label;
 }
 
@@ -239,7 +239,7 @@ MySpinButton* createSpinButton()
     button->set_width_chars(5);
     button->set_digits(0);
     button->set_increments(1, 100);
-    setExpandAlignProperties(button, false, false, Gtk::ALIGN_END, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(button, false, false, Gtk::Align::END, Gtk::Align::CENTER);
     return button;
 }
 
@@ -293,7 +293,7 @@ Framing::DimensionGui::DimensionGui(Gtk::Box* parent, const char* text)
 {
     box = Gtk::manage(new Gtk::Box());
     Gtk::Label* label = Gtk::manage(new Gtk::Label(M(text)));
-    setExpandAlignProperties(label, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(label, false, false, Gtk::Align::START, Gtk::Align::CENTER);
     value = createSpinButton();
     box->pack_start(*label);
     box->pack_start(*value);
@@ -362,7 +362,7 @@ void Framing::setupFramingMethodGui()
     }
     framingMethod->set_active(INDEX_STANDARD);
     framingMethod->set_hexpand();
-    framingMethod->set_halign(Gtk::ALIGN_FILL);
+    framingMethod->set_halign(Gtk::Align::FILL);
 
     combos->attach(*createGridLabel("TP_FRAMING_METHOD"), 0, 0);
     combos->attach(*framingMethod, 1, 0);
@@ -371,7 +371,7 @@ void Framing::setupFramingMethodGui()
     aspectRatio = Gtk::manage(new MyComboBoxText());
     aspectRatioData->fillCombo(aspectRatio);
     aspectRatio->set_hexpand();
-    aspectRatio->set_halign(Gtk::ALIGN_FILL);
+    aspectRatio->set_halign(Gtk::Align::FILL);
 
     combos->attach(*aspectRatioLabel, 0, 1);
     combos->attach(*aspectRatio, 1, 1);
@@ -383,7 +383,7 @@ void Framing::setupFramingMethodGui()
     }
     orientation->set_active(INDEX_AS_IMAGE);
     orientation->set_hexpand();
-    orientation->set_halign(Gtk::ALIGN_FILL);
+    orientation->set_halign(Gtk::Align::FILL);
 
     combos->attach(*orientationLabel, 0, 2);
     combos->attach(*orientation, 1, 2);
@@ -424,7 +424,7 @@ void Framing::setupBorderSizeGui()
     }
     borderSizeMethod->set_active(INDEX_SIZE_RELATIVE);
     borderSizeMethod->set_hexpand();
-    borderSizeMethod->set_halign(Gtk::ALIGN_FILL);
+    borderSizeMethod->set_halign(Gtk::Align::FILL);
 
     combos->attach(*createGridLabel("TP_FRAMING_BORDER_SIZE_METHOD"), 0, 0);
     combos->attach(*borderSizeMethod, 1, 0);
@@ -436,7 +436,7 @@ void Framing::setupBorderSizeGui()
     }
     basis->set_active(INDEX_BASIS_AUTO);
     basis->set_hexpand();
-    basis->set_halign(Gtk::ALIGN_FILL);
+    basis->set_halign(Gtk::Align::FILL);
 
     combos->attach(*basisLabel, 0, 1);
     combos->attach(*basis, 1, 1);

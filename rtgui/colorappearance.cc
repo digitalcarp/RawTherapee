@@ -402,7 +402,7 @@ ColorAppearance::ColorAppearance () : FoldableToolPanel (this, TOOL_NAME, M ("TP
     // Process 1 frame
 
     expadjust = Gtk::manage (new MyExpander (false, M ("TP_COLORAPP_LABEL_CAM02")));
-    setExpandAlignProperties (expadjust, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (expadjust, true, false, Gtk::Align::FILL, Gtk::Align::START);
     expadjust->signal_button_release_event().connect_notify ( sigc::bind ( sigc::mem_fun (this, &ColorAppearance::foldAllButMe), expadjust) );
     /*
         Gtk::Frame *p2Frame;
@@ -745,9 +745,9 @@ ColorAppearance::ColorAppearance () : FoldableToolPanel (this, TOOL_NAME, M ("TP
 
     //reset button
     neutral = Gtk::manage (new Gtk::Button (M ("TP_COLORAPP_NEUTRAL")));
-    setExpandAlignProperties (neutral, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties (neutral, true, false, Gtk::Align::FILL, Gtk::Align::START);
     RTImage* const resetImg = Gtk::manage (new RTImage ("undo-small", Gtk::ICON_SIZE_BUTTON));
-    setExpandAlignProperties (resetImg, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties (resetImg, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
     neutral->set_image (*resetImg);
     neutral->set_tooltip_text (M ("TP_COLORAPP_NEUTRAL_TOOLTIP"));
     neutralconn = neutral->signal_pressed().connect ( sigc::mem_fun (*this, &ColorAppearance::neutral_pressed) );

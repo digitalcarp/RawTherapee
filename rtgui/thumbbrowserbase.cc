@@ -40,9 +40,9 @@ ThumbBrowserBase::ThumbBrowserBase ()
     hscroll.set_orientation(Gtk::ORIENTATION_HORIZONTAL);
     vscroll.set_orientation(Gtk::ORIENTATION_VERTICAL);
 
-    setExpandAlignProperties(&internal, true, true, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
-    setExpandAlignProperties(&hscroll, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
-    setExpandAlignProperties(&vscroll, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+    setExpandAlignProperties(&internal, true, true, Gtk::Align::FILL, Gtk::Align::FILL);
+    setExpandAlignProperties(&hscroll, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
+    setExpandAlignProperties(&vscroll, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
     attach (internal, 0, 0, 1, 1);
     attach (vscroll, 1, 0, 1, 1);
     attach (hscroll, 0, 1, 1, 1);

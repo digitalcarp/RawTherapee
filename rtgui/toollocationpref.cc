@@ -731,7 +731,7 @@ ToolLocationPreference::ToolLocationPreference(Options &options) :
     tool_list_frame->add(*tool_list_scrolled_window);
     tool_list_scrolled_window->add(*impl->toolListViewPtr);
     setExpandAlignProperties(
-        tool_list_frame, true, true, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
+        tool_list_frame, true, true, Gtk::Align::FILL, Gtk::Align::FILL);
 
     // Favorites list.
     Gtk::Frame *favorites_frame = Gtk::manage(new Gtk::Frame(
@@ -746,7 +746,7 @@ ToolLocationPreference::ToolLocationPreference(Options &options) :
     favorites_frame->add(*favorites_box);
     favorites_list_scrolled_window->add(*impl->favoritesViewPtr);
     setExpandAlignProperties(
-        favorites_frame, true, true, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
+        favorites_frame, true, true, Gtk::Align::FILL, Gtk::Align::FILL);
 
     // General options.
     layout_grid->attach_next_to(

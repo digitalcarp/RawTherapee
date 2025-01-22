@@ -40,13 +40,13 @@ PlacesBrowser::PlacesBrowser ()
     // Since Gtk3, we can't have image+text buttons natively. We'll comply to the Gtk guidelines and choose one of them (icons here)
     add = Gtk::manage (new Gtk::Button ());
     add->set_tooltip_text(M("MAIN_FRAME_PLACES_ADD"));
-    setExpandAlignProperties(add, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties(add, true, false, Gtk::Align::FILL, Gtk::Align::START);
     //add->get_style_context()->set_junction_sides(Gtk::JUNCTION_RIGHT);
     add->get_style_context()->add_class("Left");
     add->set_image (*Gtk::manage (new RTImage ("add-small", Gtk::ICON_SIZE_BUTTON)));
     del = Gtk::manage (new Gtk::Button ());
     del->set_tooltip_text(M("MAIN_FRAME_PLACES_DEL"));
-    setExpandAlignProperties(del, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties(del, true, false, Gtk::Align::FILL, Gtk::Align::START);
     //del->get_style_context()->set_junction_sides(Gtk::JUNCTION_LEFT);
     del->get_style_context()->add_class("Right");
     del->set_image (*Gtk::manage (new RTImage ("remove-small", Gtk::ICON_SIZE_BUTTON)));

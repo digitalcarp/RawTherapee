@@ -196,7 +196,7 @@ Wavelet::Wavelet() :
     dirFrame(Gtk::manage(new Gtk::Frame(M("TP_WAVELET_DIRFRAME")))),
     tonFrame(Gtk::manage(new Gtk::Frame(M("TP_WAVELET_TONFRAME")))),
     guidFrame(Gtk::manage(new Gtk::Frame(M("TP_WAVELET_GUIDFRAME")))),
-    wavLabels(Gtk::manage(new Gtk::Label("---", Gtk::ALIGN_CENTER))),
+    wavLabels(Gtk::manage(new Gtk::Label("---", Gtk::Align::CENTER))),
     labmC(Gtk::manage(new Gtk::Label(M("TP_WAVELET_CTYPE") + ":"))),
     labmNP(Gtk::manage(new Gtk::Label(M("TP_WAVELET_NPTYPE") + ":"))),
     usharpLabel(Gtk::manage(new Gtk::Label(M("TP_WAVELET_USHARP") + ":"))),

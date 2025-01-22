@@ -110,15 +110,15 @@ Navigator::Navigator() :
     lLAB_L = Gtk::manage (new Gtk::Label (M("NAVIGATOR_LAB_L")));
 
     // left-align labels
-    lR->set_alignment(Gtk::ALIGN_START);
-    lG->set_alignment(Gtk::ALIGN_START);
-    lB->set_alignment(Gtk::ALIGN_START);
-    lH->set_alignment(Gtk::ALIGN_START);
-    lS->set_alignment(Gtk::ALIGN_START);
-    lV->set_alignment(Gtk::ALIGN_START);
-    lLAB_A->set_alignment(Gtk::ALIGN_START);
-    lLAB_B->set_alignment(Gtk::ALIGN_START);
-    lLAB_L->set_alignment(Gtk::ALIGN_START);
+    lR->set_alignment(Gtk::Align::START);
+    lG->set_alignment(Gtk::Align::START);
+    lB->set_alignment(Gtk::Align::START);
+    lH->set_alignment(Gtk::Align::START);
+    lS->set_alignment(Gtk::Align::START);
+    lV->set_alignment(Gtk::Align::START);
+    lLAB_A->set_alignment(Gtk::Align::START);
+    lLAB_B->set_alignment(Gtk::Align::START);
+    lLAB_L->set_alignment(Gtk::Align::START);
     
     // expand labels
     lR->set_hexpand();
@@ -143,15 +143,15 @@ Navigator::Navigator() :
     LAB_L = Gtk::manage (new Gtk::Label ());
 
     // right-align values
-    R->set_alignment(Gtk::ALIGN_END);
-    G->set_alignment(Gtk::ALIGN_END);
-    B->set_alignment(Gtk::ALIGN_END);
-    H->set_alignment(Gtk::ALIGN_END);
-    S->set_alignment(Gtk::ALIGN_END);
-    V->set_alignment(Gtk::ALIGN_END);
-    LAB_A->set_alignment(Gtk::ALIGN_END);
-    LAB_B->set_alignment(Gtk::ALIGN_END);
-    LAB_L->set_alignment(Gtk::ALIGN_END);
+    R->set_alignment(Gtk::Align::END);
+    G->set_alignment(Gtk::Align::END);
+    B->set_alignment(Gtk::Align::END);
+    H->set_alignment(Gtk::Align::END);
+    S->set_alignment(Gtk::Align::END);
+    V->set_alignment(Gtk::Align::END);
+    LAB_A->set_alignment(Gtk::Align::END);
+    LAB_B->set_alignment(Gtk::Align::END);
+    LAB_L->set_alignment(Gtk::Align::END);
 
     // set font family and size
     /*

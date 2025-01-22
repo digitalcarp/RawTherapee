@@ -64,34 +64,34 @@ FlatCurveEditorSubGroup::FlatCurveEditorSubGroup (CurveEditorGroup* prt, Glib::u
 
     if (options.curvebboxpos == 0) {
         CPointsbbox->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
-        setExpandAlignProperties(CPointsbbox, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+        setExpandAlignProperties(CPointsbbox, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
         CPointsCurveGrid->get_style_context()->add_class("top");
     } else if (options.curvebboxpos == 2) {
         CPointsbbox->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
-        setExpandAlignProperties(CPointsbbox, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+        setExpandAlignProperties(CPointsbbox, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
         CPointsCurveGrid->get_style_context()->add_class("bottom");
     } else if (options.curvebboxpos == 1) {
         CPointsbbox->set_orientation(Gtk::ORIENTATION_VERTICAL);
-        setExpandAlignProperties(CPointsbbox, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+        setExpandAlignProperties(CPointsbbox, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
         CPointsCurveGrid->get_style_context()->add_class("right");
     } else if (options.curvebboxpos == 3){
         CPointsbbox->set_orientation(Gtk::ORIENTATION_VERTICAL);
-        setExpandAlignProperties(CPointsbbox, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+        setExpandAlignProperties(CPointsbbox, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
         CPointsCurveGrid->get_style_context()->add_class("left");
     }
 
     editCPoints = Gtk::manage (new Gtk::ToggleButton());
-    initButton(*editCPoints, Glib::ustring("crosshair-node-curve"), Gtk::ALIGN_START, false, "EDIT_PIPETTE_TOOLTIP");
+    initButton(*editCPoints, Glib::ustring("crosshair-node-curve"), Gtk::Align::START, false, "EDIT_PIPETTE_TOOLTIP");
     editPointCPoints = Gtk::manage (new Gtk::ToggleButton ());
-    initButton(*editPointCPoints,  Glib::ustring("edit-point"), Gtk::ALIGN_START, false, "CURVEEDITOR_EDITPOINT_HINT");
+    initButton(*editPointCPoints,  Glib::ustring("edit-point"), Gtk::Align::START, false, "CURVEEDITOR_EDITPOINT_HINT");
     copyCPoints = Gtk::manage (new Gtk::Button ());
-    initButton(*copyCPoints, Glib::ustring("copy"), Gtk::ALIGN_END, true);
+    initButton(*copyCPoints, Glib::ustring("copy"), Gtk::Align::END, true);
     pasteCPoints = Gtk::manage (new Gtk::Button ());
-    initButton(*pasteCPoints,  Glib::ustring("paste"), Gtk::ALIGN_END, false);
+    initButton(*pasteCPoints,  Glib::ustring("paste"), Gtk::Align::END, false);
     loadCPoints = Gtk::manage (new Gtk::Button ());
-    initButton(*loadCPoints,  Glib::ustring("folder-open"), Gtk::ALIGN_END, false);
+    initButton(*loadCPoints,  Glib::ustring("folder-open"), Gtk::Align::END, false);
     saveCPoints = Gtk::manage (new Gtk::Button ());
-    initButton(*saveCPoints,  Glib::ustring("save"), Gtk::ALIGN_END, false);
+    initButton(*saveCPoints,  Glib::ustring("save"), Gtk::Align::END, false);
 
     CPointsbbox->attach_next_to(*editPointCPoints, sideStart, 1, 1);
     CPointsbbox->attach_next_to(*editCPoints,      sideStart, 1, 1);

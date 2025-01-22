@@ -62,29 +62,29 @@ ProfilePanel::ProfilePanel () : storedPProfile(nullptr),
     fillMode->set_margin_right(2);
 #endif
 //GTK318
-    setExpandAlignProperties(fillMode, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+    setExpandAlignProperties(fillMode, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
 
     // Create the Combobox
     profiles = Gtk::manage (new ProfileStoreComboBox ());
-    setExpandAlignProperties(profiles, true, true, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
+    setExpandAlignProperties(profiles, true, true, Gtk::Align::FILL, Gtk::Align::FILL);
 
     load = Gtk::manage (new Gtk::Button ());
     load->add (*Gtk::manage (new RTImage ("folder-open", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
     load->get_style_context()->add_class("Left");
     load->set_margin_left(2);
-    setExpandAlignProperties(load, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+    setExpandAlignProperties(load, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
     save = Gtk::manage (new Gtk::Button ());
     save->add (*Gtk::manage (new RTImage ("save", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
     save->get_style_context()->add_class("MiddleH");
-    setExpandAlignProperties(save, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+    setExpandAlignProperties(save, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
     copy = Gtk::manage (new Gtk::Button ());
     copy->add (*Gtk::manage (new RTImage ("copy", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
     copy->get_style_context()->add_class("MiddleH");
-    setExpandAlignProperties(copy, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+    setExpandAlignProperties(copy, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
     paste = Gtk::manage (new Gtk::Button ());
     paste->add (*Gtk::manage (new RTImage ("paste", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
     paste->get_style_context()->add_class("Right");
-    setExpandAlignProperties(paste, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+    setExpandAlignProperties(paste, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
 
     attach_next_to (*fillMode, Gtk::POS_RIGHT, 1, 1);
     attach_next_to (*profiles, Gtk::POS_RIGHT, 1, 1);
@@ -93,7 +93,7 @@ ProfilePanel::ProfilePanel () : storedPProfile(nullptr),
     attach_next_to (*copy, Gtk::POS_RIGHT, 1, 1);
     attach_next_to (*paste, Gtk::POS_RIGHT, 1, 1);
 
-    setExpandAlignProperties(this, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(this, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     show ();
 
     load->signal_button_release_event().connect_notify( sigc::mem_fun(*this, &ProfilePanel::load_clicked) );

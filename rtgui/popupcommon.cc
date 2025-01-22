@@ -35,25 +35,25 @@ PopUpCommon::PopUpCommon (Gtk::Button* thisButton, const Glib::ustring& label)
     button = thisButton;
     hasMenu = false;
     imageContainer = Gtk::manage( new Gtk::Grid());
-    setExpandAlignProperties(imageContainer, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(imageContainer, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     button->set_relief (Gtk::RELIEF_NORMAL);
     button->add(*imageContainer);
 
     if (!label.empty()) {
         Gtk::Label* buttonLabel = Gtk::manage ( new Gtk::Label(label + " ") );
-        setExpandAlignProperties(buttonLabel, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+        setExpandAlignProperties(buttonLabel, false, false, Gtk::Align::START, Gtk::Align::CENTER);
         imageContainer->attach(*buttonLabel, 0, 0, 1, 1);
     }
 
     // Create the global container and put the button in it
     buttonGroup = Gtk::manage( new Gtk::Grid());
-    setExpandAlignProperties(buttonGroup, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(buttonGroup, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     buttonGroup->attach(*button, 0, 0, 1, 1);
     buttonGroup->get_style_context()->add_class("image-combo");
 
     // Create the image for the button
     buttonImage = Gtk::manage(new RTImage());
-    setExpandAlignProperties(buttonImage, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(buttonImage, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     imageContainer->attach_next_to(*buttonImage, Gtk::POS_RIGHT, 1, 1);
     buttonImage->set_no_show_all();
 
@@ -61,7 +61,7 @@ PopUpCommon::PopUpCommon (Gtk::Button* thisButton, const Glib::ustring& label)
     arrowButton = Gtk::manage(new Gtk::Button());
     Gtk::Image *arrowImage = Gtk::manage(new Gtk::Image());
     arrowImage->set_from_icon_name("pan-down-symbolic", Gtk::ICON_SIZE_BUTTON);
-    setExpandAlignProperties(arrowButton, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+    setExpandAlignProperties(arrowButton, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
     arrowButton->add(*arrowImage); //menuSymbol);
     arrowImage->show();
     buttonGroup->attach_next_to(*arrowButton, *button, Gtk::POS_RIGHT, 1, 1);

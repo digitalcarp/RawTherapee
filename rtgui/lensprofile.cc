@@ -81,37 +81,37 @@ LensProfilePanel::LensProfilePanel() :
     nodesFrame->set_label_align (0.025, 0.5);
 
     modesGrid->get_style_context()->add_class("grid-spacing");
-    setExpandAlignProperties(modesGrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(modesGrid, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
     Gtk::Frame *distFrame = Gtk::manage(new Gtk::Frame(M("TP_LENSPROFILE_USE_HEADER")));
     distFrame->set_label_align (0.025, 0.5);
 
     distGrid->get_style_context()->add_class("grid-spacing");
-    setExpandAlignProperties(distGrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(distGrid, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
     // Mode choice widgets:
 
-    setExpandAlignProperties(corrLcpFileChooser, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(corrLcpFileChooser, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
     // Manually-selected profile widgets:
 
-    setExpandAlignProperties(lensfunCamerasLbl, false, false, Gtk::ALIGN_END, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(lensfunCamerasLbl, false, false, Gtk::Align::END, Gtk::Align::CENTER);
 
     lensfunCameras->set_model(lf->lensfunCameraModel);
     lensfunCameras->pack_start(lf->lensfunModelCam.model);
     lensfunCameras->setPreferredWidth(50, 120);
-    setExpandAlignProperties(lensfunCameras, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(lensfunCameras, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
     Gtk::CellRendererText* const camerasCellRenderer = static_cast<Gtk::CellRendererText*>(lensfunCameras->get_first_cell());
     camerasCellRenderer->property_ellipsize() = Pango::ELLIPSIZE_MIDDLE;
     camerasCellRenderer->property_ellipsize_set() = true;
 
-    setExpandAlignProperties(lensfunLensesLbl, false, false, Gtk::ALIGN_END, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(lensfunLensesLbl, false, false, Gtk::Align::END, Gtk::Align::CENTER);
 
     lensfunLenses->set_model(lf->lensfunLensModel);
     lensfunLenses->pack_start(lf->lensfunModelLens.prettylens);
     lensfunLenses->setPreferredWidth(50, 120);
-    setExpandAlignProperties(lensfunLenses, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(lensfunLenses, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
     Gtk::CellRendererText* const lensesCellRenderer = static_cast<Gtk::CellRendererText*>(lensfunLenses->get_first_cell());
     lensesCellRenderer->property_ellipsize() = Pango::ELLIPSIZE_MIDDLE;
