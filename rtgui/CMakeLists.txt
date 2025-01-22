@@ -144,7 +144,7 @@ set(NONCLISOURCEFILES
     # rtimage.cc
     # rtscalable.cc
     # rtsurface.cc
-    # rtwindow.cc
+    rtwindow.cc
     # saveasdlg.cc
     # saveformatpanel.cc
     # sensorbayer.cc
@@ -156,7 +156,7 @@ set(NONCLISOURCEFILES
     # shcselector.cc
     # softlight.cc
     # soundman.cc
-    # splash.cc
+    splash.cc
     # spot.cc
     # threadutils.cc
     # thresholdadjuster.cc

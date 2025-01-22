@@ -27,9 +27,9 @@
 #include "extprog.h"
 #include "multilangmgr.h"
 #include "options.h"
+#include "rtwindow.h"
 #include "pathutils.h"
 #include "version.h"
-// #include "rtwindow.h"
 // #include "cachemanager.h"
 // #include "editorpanel.h"
 // #include "filecatalog.h"
@@ -193,16 +193,16 @@ void cleanup_rt()
     rtengine::cleanup();
 }
 
-// RTWindow *create_rt_window()
-// {
-//     Glib::ustring icon_path = Glib::build_filename (argv0, "icons");
-//     Glib::RefPtr<Gtk::IconTheme> defaultIconTheme = Gtk::IconTheme::get_default();
-//     defaultIconTheme->append_search_path (icon_path);
-//
-//     RTWindow *rtWindow = new RTWindow();
-//     rtWindow->setWindowSize(); // Need to be called after RTWindow creation to work with all OS Windows Manager
-//     return rtWindow;
-// }
+RtWindow *create_rt_window()
+{
+    Glib::ustring icon_path = Glib::build_filename (argv0, "icons");
+    Glib::RefPtr<Gtk::IconTheme> defaultIconTheme = Gtk::IconTheme::get_default();
+    defaultIconTheme->append_search_path (icon_path);
+
+    RtWindow *rtWindow = new RtWindow();
+    rtWindow->setWindowSize(); // Need to be called after RTWindow creation to work with all OS Windows Manager
+    return rtWindow;
+}
 
 class RtApplication final : public Gtk::Application
 {
@@ -269,7 +269,7 @@ private:
     // }
 
 private:
-    Gtk::ApplicationWindow* m_window;
+    RtWindow* m_window;
 };
 
 void show_gimp_plugin_info_dialog(Gtk::Window *parent)
@@ -303,8 +303,7 @@ bool RtApplication::create_window()
         msgd.present();
         return false;
     } else {
-        // rtWindow = create_rt_window();
-        m_window = new Gtk::ApplicationWindow();
+        m_window = create_rt_window();
         // Make sure that the application runs for as long this window is still open
         add_window(*m_window);
         // Delete the window when it is hidden

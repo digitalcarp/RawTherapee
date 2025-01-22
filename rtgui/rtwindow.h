@@ -22,10 +22,6 @@
 #include <gtkmm.h>
 #include <sigc++/signal.h>
 
-#if defined(__APPLE__)
-#include <gtkosxapplication.h>
-#endif
-
 #include "progressconnector.h"
 #include "splash.h"
 
@@ -37,8 +33,9 @@ class EditorPanel;
 struct ExternalEditor;
 class FilePanel;
 class PLDBridge;
-class RTWindow final :
-    public Gtk::Window,
+
+class RtWindow final :
+    public Gtk::ApplicationWindow,
     public rtengine::ProgressListener,
     public rtengine::NonCopyable
 {
@@ -72,17 +69,11 @@ private:
     void showErrors ();
 
     Glib::ustring versionStr;
-#if defined(__APPLE__)
-    GtkosxApplication *osxApp;
-#endif
 
 public:
-    RTWindow ();
-    ~RTWindow() override;
+    RtWindow();
+    ~RtWindow();
 
-#if defined(__APPLE__)
-    bool osxFileOpenEvent (Glib::ustring path);
-#endif
     void addEditorPanel (EditorPanel* ep, const std::string &name);
     void remEditorPanel (EditorPanel* ep);
     bool selectEditorPanel (const std::string &name);
@@ -114,8 +105,8 @@ public:
         return pldBridge;
     }
 
-    EditorPanel*  epanel;
-    FilePanel* fpanel;
+    // EditorPanel*  epanel;
+    // FilePanel* fpanel;
 
     void SetEditorCurrent();
     void SetMainCurrent();
