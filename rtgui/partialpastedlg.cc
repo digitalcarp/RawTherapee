@@ -70,7 +70,7 @@ PartialSpotWidget::PartialSpotWidget():
     // Create and configure scrolled window
     Gtk::ScrolledWindow* const scrolledwindows = Gtk::manage(new Gtk::ScrolledWindow());
     scrolledwindows->add(*treeview);
-    scrolledwindows->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    scrolledwindows->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
     scrolledwindows->set_min_content_height(100);
 
     // Add widgets to VBox
@@ -475,7 +475,7 @@ PartialPasteDlg::PartialPasteDlg (const Glib::ustring &title, Gtk::Window* paren
     scrolledwindow->set_name("PartialPaste");
     scrolledwindow->set_can_focus(true);
     scrolledwindow->set_shadow_type(Gtk::SHADOW_NONE);
-    scrolledwindow->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    scrolledwindow->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
     scrolledwindow->property_window_placement().set_value(Gtk::CORNER_TOP_LEFT);
 
     scrolledwindow->add(*hbmain);

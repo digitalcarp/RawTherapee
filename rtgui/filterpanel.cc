@@ -93,7 +93,7 @@ FilterPanel::FilterPanel () : listener (nullptr), ornamentSurface(new RTSurface(
     expcomp = Gtk::manage(new Gtk::ListViewText (1, false, Gtk::SELECTION_MULTIPLE));
     expcomp->set_headers_visible (false);
     Gtk::ScrolledWindow* sexpcomp = Gtk::manage(new Gtk::ScrolledWindow());
-    sexpcomp->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
+    sexpcomp->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
     sexpcomp->set_size_request(-1, 80);
     sexpcomp->add(*expcomp);
     evb->pack_start (*sexpcomp, Gtk::PACK_SHRINK, 0);
@@ -105,7 +105,7 @@ FilterPanel::FilterPanel () : listener (nullptr), ornamentSurface(new RTSurface(
     camera = Gtk::manage(new Gtk::ListViewText (1, false, Gtk::SELECTION_MULTIPLE));
     camera->set_headers_visible (false);
     Gtk::ScrolledWindow* scamera = Gtk::manage(new Gtk::ScrolledWindow());
-    scamera->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
+    scamera->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
     scamera->set_size_request(-1, 80);
     scamera->add(*camera);
     cvb->pack_start (*scamera, Gtk::PACK_EXPAND_WIDGET, 0);
@@ -117,7 +117,7 @@ FilterPanel::FilterPanel () : listener (nullptr), ornamentSurface(new RTSurface(
     lens = Gtk::manage(new Gtk::ListViewText (1, false, Gtk::SELECTION_MULTIPLE));
     lens->set_headers_visible (false);
     Gtk::ScrolledWindow* slens = Gtk::manage(new Gtk::ScrolledWindow());
-    slens->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
+    slens->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
     slens->set_size_request(-1, 80);
     slens->add(*lens);
     lvb->pack_start (*slens, Gtk::PACK_EXPAND_WIDGET, 0);
@@ -129,7 +129,7 @@ FilterPanel::FilterPanel () : listener (nullptr), ornamentSurface(new RTSurface(
     filetype = Gtk::manage(new Gtk::ListViewText (1, false, Gtk::SELECTION_MULTIPLE));
     filetype->set_headers_visible (false);
     Gtk::ScrolledWindow* sfiletype = Gtk::manage(new Gtk::ScrolledWindow());
-    sfiletype->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
+    sfiletype->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
     sfiletype->set_size_request(-1, 80);
     sfiletype->add(*filetype);
     ftvb->pack_start (*sfiletype, Gtk::PACK_EXPAND_WIDGET, 0);

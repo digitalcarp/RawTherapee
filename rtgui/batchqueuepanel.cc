@@ -116,7 +116,7 @@ BatchQueuePanel::BatchQueuePanel (FileCatalog* aFileCatalog) : parent(nullptr)
     destinationPreviewLabel->set_selectable (true);  // so users can copy the path to the clipboard
     destinationPreviewLabel->set_halign (Gtk::Align::START);
     auto destinationPreviewScrolledWindow = Gtk::manage(new Gtk::ScrolledWindow ());
-    destinationPreviewScrolledWindow->set_policy (Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    destinationPreviewScrolledWindow->set_policy (Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
     destinationPreviewScrolledWindow->add (*destinationPreviewLabel);
     odvb->pack_start (*destinationPreviewScrolledWindow, Gtk::PACK_SHRINK);
     Gtk::RadioButton::Group g = useTemplate->get_group();

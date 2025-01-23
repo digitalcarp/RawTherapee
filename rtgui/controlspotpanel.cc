@@ -204,7 +204,7 @@ ControlSpotPanel::ControlSpotPanel():
     }
 
     scrolledwindow_->add(*treeview_);
-    scrolledwindow_->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    scrolledwindow_->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
     scrolledwindow_->set_min_content_height(150);
     pack_start(*scrolledwindow_);
     pack_start(*hishow_);

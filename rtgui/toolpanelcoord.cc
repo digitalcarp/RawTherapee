@@ -1866,15 +1866,15 @@ bool ToolPanelCoordinator::handleShortcutKey(GdkEventKey* event)
 void ToolPanelCoordinator::updateVScrollbars(bool hide)
 {
     GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
-    Gtk::PolicyType policy = hide ? Gtk::POLICY_NEVER : Gtk::POLICY_AUTOMATIC;
-    favoritePanelSW->set_policy     (Gtk::POLICY_AUTOMATIC, policy);
-    exposurePanelSW->set_policy     (Gtk::POLICY_AUTOMATIC, policy);
-    detailsPanelSW->set_policy      (Gtk::POLICY_AUTOMATIC, policy);
-    colorPanelSW->set_policy        (Gtk::POLICY_AUTOMATIC, policy);
-    transformPanelSW->set_policy    (Gtk::POLICY_AUTOMATIC, policy);
-    rawPanelSW->set_policy          (Gtk::POLICY_AUTOMATIC, policy);
-    advancedPanelSW->set_policy      (Gtk::POLICY_AUTOMATIC, policy);
-    locallabPanelSW->set_policy(Gtk::POLICY_AUTOMATIC, policy);
+    Gtk::PolicyType policy = hide ? Gtk::PolicyType::NEVER : Gtk::PolicyType::AUTOMATIC;
+    favoritePanelSW->set_policy     (Gtk::PolicyType::AUTOMATIC, policy);
+    exposurePanelSW->set_policy     (Gtk::PolicyType::AUTOMATIC, policy);
+    detailsPanelSW->set_policy      (Gtk::PolicyType::AUTOMATIC, policy);
+    colorPanelSW->set_policy        (Gtk::PolicyType::AUTOMATIC, policy);
+    transformPanelSW->set_policy    (Gtk::PolicyType::AUTOMATIC, policy);
+    rawPanelSW->set_policy          (Gtk::PolicyType::AUTOMATIC, policy);
+    advancedPanelSW->set_policy      (Gtk::PolicyType::AUTOMATIC, policy);
+    locallabPanelSW->set_policy(Gtk::PolicyType::AUTOMATIC, policy);
 
     for (auto currExp : expList) {
         currExp->updateVScrollbars(hide);

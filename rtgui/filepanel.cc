@@ -101,7 +101,7 @@ FilePanel::FilePanel () : parent(nullptr), error(0)
     Gtk::ScrolledWindow* sExportPanel = Gtk::manage ( new Gtk::ScrolledWindow() );
     exportPanel = Gtk::manage ( new ExportPanel () );
     sExportPanel->add (*exportPanel);
-    sExportPanel->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    sExportPanel->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
 
     fileCatalog->setFilterPanel (filterPanel);
     fileCatalog->setExportPanel (exportPanel);

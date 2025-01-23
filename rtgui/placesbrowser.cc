@@ -34,7 +34,7 @@ PlacesBrowser::PlacesBrowser ()
     set_orientation(Gtk::Orientation::VERTICAL);
 
     scrollw = Gtk::manage (new Gtk::ScrolledWindow ());
-    scrollw->set_policy (Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
+    scrollw->set_policy (Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
     pack_start (*scrollw);
 
     // Since Gtk3, we can't have image+text buttons natively. We'll comply to the Gtk guidelines and choose one of them (icons here)

@@ -968,7 +968,7 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
 //  */
 // MyScrolledToolbar::MyScrolledToolbar()
 // {
-//     set_policy (Gtk::POLICY_EXTERNAL, Gtk::POLICY_NEVER);
+//     set_policy (Gtk::PolicyType::EXTERNAL, Gtk::PolicyType::NEVER);
 //     get_style_context()->add_class("scrollableToolbar");
 //
 //     auto controller = Gtk::EventControllerScroll::create();

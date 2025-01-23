@@ -97,7 +97,7 @@ IPTCPanel::IPTCPanel():
     Gtk::ScrolledWindow* scrolledWindowc = Gtk::manage(new Gtk::ScrolledWindow());
     setExpandAlignProperties(scrolledWindowc, true, false, Gtk::Align::FILL, Gtk::Align::START);
     scrolledWindowc->set_min_content_height(100);
-    scrolledWindowc->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
+    scrolledWindowc->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
     scrolledWindowc->add(*captionView);
     capl->set_tooltip_text(M("IPTCPANEL_DESCRIPTIONHINT"));
     captionView->set_tooltip_text(M("IPTCPANEL_DESCRIPTIONHINT"));
@@ -156,7 +156,7 @@ IPTCPanel::IPTCPanel():
     Gtk::ScrolledWindow* scrolledWindowkw = Gtk::manage(new Gtk::ScrolledWindow());
     setExpandAlignProperties(scrolledWindowkw, true, false, Gtk::Align::FILL, Gtk::Align::START);
     scrolledWindowkw->set_min_content_height(100);
-    scrolledWindowkw->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
+    scrolledWindowkw->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
     scrolledWindowkw->add(*keywords);
     keyword  = Gtk::manage(new MyComboBoxText(true));
     setExpandAlignProperties(keyword, true, true, Gtk::Align::FILL, Gtk::Align::FILL);
@@ -205,7 +205,7 @@ IPTCPanel::IPTCPanel():
     Gtk::ScrolledWindow* scrolledWindowsc = Gtk::manage(new Gtk::ScrolledWindow());
     setExpandAlignProperties(scrolledWindowsc, true, false, Gtk::Align::FILL, Gtk::Align::START);
     scrolledWindowsc->set_min_content_height(100);
-    scrolledWindowsc->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
+    scrolledWindowsc->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
     scrolledWindowsc->add(*suppCategories);
     suppCategory  = Gtk::manage(new MyComboBoxText(true));
     suppCategory->set_size_request(75);
@@ -372,7 +372,7 @@ IPTCPanel::IPTCPanel():
     Gtk::ScrolledWindow* scrolledWindow = Gtk::manage(new Gtk::ScrolledWindow());
     setExpandAlignProperties(scrolledWindow, false, true, Gtk::Align::FILL, Gtk::Align::FILL);
     scrolledWindow->set_shadow_type(Gtk::SHADOW_NONE);
-    scrolledWindow->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
+    scrolledWindow->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
     scrolledWindow->property_window_placement().set_value(Gtk::CORNER_TOP_RIGHT);
     scrolledWindow->add(*iptc);
 

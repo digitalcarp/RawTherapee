@@ -57,7 +57,7 @@ ExifPanel::ExifPanel() :
     exifTree->set_enable_search (false);
     exifTree->get_selection()->set_mode(Gtk::SELECTION_SINGLE);
     scrolledWindow->set_shadow_type(Gtk::SHADOW_NONE);
-    scrolledWindow->set_policy(Gtk::POLICY_ALWAYS, Gtk::POLICY_ALWAYS);
+    scrolledWindow->set_policy(Gtk::PolicyType::ALWAYS, Gtk::PolicyType::ALWAYS);
     scrolledWindow->property_window_placement().set_value(Gtk::CORNER_TOP_LEFT);
     scrolledWindow->add(*exifTree);
 

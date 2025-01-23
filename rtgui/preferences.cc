@@ -164,12 +164,12 @@ int Preferences::getThemeRowNumber (const Glib::ustring& name)
 Gtk::Widget* Preferences::getBatchProcPanel()
 {
     swBatchProc = Gtk::manage(new Gtk::ScrolledWindow());
-    swBatchProc->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    swBatchProc->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
 
     Gtk::Box* vbBatchProc = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     Gtk::ScrolledWindow* behscrollw = Gtk::manage(new Gtk::ScrolledWindow());
-    behscrollw->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    behscrollw->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
     behscrollw->set_size_request(-1, 60);
     Gtk::Box* vbbeh = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     vbbeh->pack_start(*behscrollw, Gtk::PACK_EXPAND_WIDGET);
@@ -539,7 +539,7 @@ Gtk::Widget *Preferences::getFavoritesPanel()
     }
     if (!swFavorites) {
         swFavorites = Gtk::manage(new Gtk::ScrolledWindow());
-        swFavorites->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_NEVER);
+        swFavorites->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::NEVER);
         swFavorites->add(*toolLocationPreference);
     }
     return swFavorites;
@@ -548,7 +548,7 @@ Gtk::Widget *Preferences::getFavoritesPanel()
 Gtk::Widget *Preferences::getDynamicProfilePanel()
 {
     swDynamicProfile = Gtk::manage(new Gtk::ScrolledWindow());
-    swDynamicProfile->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    swDynamicProfile->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
 
     dynProfilePanel = Gtk::manage(new DynamicProfilePanel());
 
@@ -560,7 +560,7 @@ Gtk::Widget *Preferences::getDynamicProfilePanel()
 Gtk::Widget* Preferences::getImageProcessingPanel ()
 {
     swImageProcessing = Gtk::manage(new Gtk::ScrolledWindow());
-    swImageProcessing->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    swImageProcessing->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
 
     Gtk::Box* vbImageProcessing = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
 
@@ -803,7 +803,7 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
 Gtk::Widget* Preferences::getPerformancePanel()
 {
     swPerformance = Gtk::manage(new Gtk::ScrolledWindow());
-    swPerformance->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    swPerformance->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
 
     Gtk::Box* vbPerformance = Gtk::manage ( new Gtk::Box(Gtk::Orientation::VERTICAL) );
     vbPerformance->set_spacing (4);
@@ -899,7 +899,7 @@ Gtk::Widget* Preferences::getPerformancePanel()
 Gtk::Widget* Preferences::getColorManPanel ()
 {
     swColorMan = Gtk::manage(new Gtk::ScrolledWindow());
-    swColorMan->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    swColorMan->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
 
     Gtk::Box* vbColorMan = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     vbColorMan->set_spacing (4);
@@ -1084,7 +1084,7 @@ Gtk::Widget* Preferences::getColorManPanel ()
 Gtk::Widget* Preferences::getGeneralPanel()
 {
     swGeneral = Gtk::manage(new Gtk::ScrolledWindow());
-    swGeneral->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    swGeneral->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
 
     Gtk::Grid* vbGeneral = Gtk::manage ( new Gtk::Grid () );
     vbGeneral->set_column_spacing (4);
@@ -1447,7 +1447,7 @@ Gtk::Widget* Preferences::getGeneralPanel()
 Gtk::Widget* Preferences::getFileBrowserPanel()
 {
     swFileBrowser = Gtk::manage(new Gtk::ScrolledWindow());
-    swFileBrowser->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    swFileBrowser->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
 
     Gtk::Box* vbFileBrowser = Gtk::manage ( new Gtk::Box(Gtk::Orientation::VERTICAL) );
 
@@ -1607,7 +1607,7 @@ Gtk::Widget* Preferences::getFileBrowserPanel()
 
     extensions = Gtk::manage(new Gtk::TreeView());
     Gtk::ScrolledWindow* hscrollw = Gtk::manage(new Gtk::ScrolledWindow());
-    hscrollw->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
+    hscrollw->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
     hscrollw->add(*extensions);
     extensionModel = Gtk::ListStore::create(extensionColumns);
     extensions->set_model(extensionModel);
@@ -1715,7 +1715,7 @@ Gtk::Widget* Preferences::getFileBrowserPanel()
 Gtk::Widget* Preferences::getSoundsPanel ()
 {
     swSounds = Gtk::manage(new Gtk::ScrolledWindow());
-    swSounds->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    swSounds->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
 
     Gtk::Box* vbSounds = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
 

@@ -43,7 +43,7 @@ History::History (bool bookmarkSupport) : historyVPaned (nullptr), blistener (nu
     // History List
     // ~~~~~~~~~~~~
     Gtk::ScrolledWindow* hscrollw = Gtk::manage (new Gtk::ScrolledWindow ());
-    hscrollw->set_policy (Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
+    hscrollw->set_policy (Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
 
     Gtk::Frame* histFrame = Gtk::manage (new Gtk::Frame (M ("HISTORY_LABEL")));
     histFrame->set_name ("HistoryPanel");
@@ -111,8 +111,8 @@ History::History (bool bookmarkSupport) : historyVPaned (nullptr), blistener (nu
     ahbox->pack_start (*delBookmark);
 
     bscrollw = Gtk::manage (new Gtk::ScrolledWindow ());
-//    bscrollw->set_policy (Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-    bscrollw->set_policy (Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
+//    bscrollw->set_policy (Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
+    bscrollw->set_policy (Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
     bscrollw->set_size_request (-1, 45);
 
     Gtk::Frame* bmFrame = Gtk::manage (new Gtk::Frame (M ("HISTORY_SNAPSHOTS")));

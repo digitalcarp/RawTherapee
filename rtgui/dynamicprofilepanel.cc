@@ -246,7 +246,7 @@ DynamicProfilePanel::DynamicProfilePanel():
     scrolledwindow_.add (treeview_);
     scrolledwindow_.set_vexpand();
 
-    scrolledwindow_.set_policy (Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    scrolledwindow_.set_policy (Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
 
     vbox_.pack_start (scrolledwindow_);
     vbox_.pack_start (buttonbox_, Gtk::PACK_SHRINK);
