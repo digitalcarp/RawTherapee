@@ -80,7 +80,7 @@ set(NONCLISOURCEFILES
     # flatfield.cc
     # framing.cc
     # gradient.cc
-    # guiutils.cc
+    guiutils.cc
     # hidpi.cc
     # histogrampanel.cc
     # history.cc
@@ -155,7 +155,7 @@ set(NONCLISOURCEFILES
     # shcselector.cc
     # softlight.cc
     # soundman.cc
-    # splash.cc
+    splash.cc
     # spot.cc
     svgpaintable.cc
     # threadutils.cc

@@ -19,35 +19,17 @@
 #pragma once
 
 #include <gtkmm.h>
-#include "rtsurface.h"
 
-class SplashImage final :
-    public Gtk::DrawingArea
+class Splash final : public Gtk::Window
 {
 
 private:
-    std::shared_ptr<RTSurface> surface;
-    Glib::RefPtr<Pango::Layout> version;
-
-    void on_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height);
-
-public:
-    SplashImage();
-    Gtk::SizeRequestMode get_request_mode_vfunc() const override;
-    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
-                       int& minimum_baseline, int& natural_baseline) const override;
-};
-
-class Splash final : public Gtk::Dialog
-{
-
-private:
-    SplashImage* splashImage;
+    Gtk::Picture* splashImage;
     Gtk::Notebook* nb;
     Gtk::ScrolledWindow* releaseNotesSW;
 
 public:
-    explicit Splash (Gtk::Window& parent);
+    Splash();
 
     bool hasReleaseNotes()
     {
@@ -55,5 +37,4 @@ public:
     };
     void showReleaseNotes();
     bool on_timer ();
-    void closePressed();
 };

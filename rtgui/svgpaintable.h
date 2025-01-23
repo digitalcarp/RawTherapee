@@ -44,6 +44,7 @@ class SvgPaintableWrapper {
 public:
     static Glib::RefPtr<SvgPaintableWrapper>
     createFromFilename(const Glib::ustring& filepath, bool cached = true);
+    static Glib::RefPtr<SvgPaintableWrapper> createFromImage(const Glib::ustring& fname);
 
     // This takes ownership of the pointer so the caller does not need to
     // call g_object_unref().

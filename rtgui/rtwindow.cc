@@ -47,7 +47,7 @@ Glib::RefPtr<Gtk::CssProvider> cssRT;
 RtWindow::RtWindow ()
     : mainNB (nullptr)
 //     , bpanel (nullptr)
-//     , splash (nullptr)
+    , splash (nullptr)
     , btn_fullscreen (nullptr)
     , iFullscreen (nullptr)
     , iFullscreen_exit (nullptr)
@@ -322,10 +322,10 @@ RtWindow::~RtWindow()
     // delete iFullscreen_exit;
 }
 
-// void RtWindow::on_realize ()
-// {
-//     Gtk::Window::on_realize ();
-//
+void RtWindow::on_realize ()
+{
+    Gtk::Window::on_realize ();
+
 //     if ( fpanel ) {
 //         fpanel->setAspect();
 //     }
@@ -335,57 +335,58 @@ RtWindow::~RtWindow()
 //     }
 //
 //     mainWindowCursorManager.init (get_window());
-//
-//     // Display release notes only if new major version.
-//     bool waitForSplash = false;
-//     if (options.is_new_version()) {
-//         // Update the version parameter with the right value
-//         options.version = versionString;
-//
-//         splash = new Splash (*this);
-//         splash->set_transient_for (*this);
-//         splash->signal_delete_event().connect ( sigc::mem_fun (*this, &RtWindow::splashClosed) );
-//
-//         if (splash->hasReleaseNotes()) {
-//             waitForSplash = true;
-//             splash->showReleaseNotes();
-//             splash->show ();
-//         } else {
-//             delete splash;
-//             splash = nullptr;
-//         }
-//     }
-//
-//     if (!waitForSplash) {
-//         showErrors();
-//     }
-// }
-//
-// void RtWindow::showErrors()
-// {
-//     // alerting users if the default raw and image profiles are missing
-//     if (options.is_defProfRawMissing()) {
-//         options.defProfRaw = DEFPROFILE_RAW;
-//         Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_DEFRAW_MISSING"), escapeHtmlChars(options.defProfRaw)), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-//         msgd.run ();
-//     }
-//     if (options.is_bundledDefProfRawMissing()) {
-//         Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_BUNDLED_MISSING"), escapeHtmlChars(options.defProfRaw)), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-//         msgd.run ();
-//         options.defProfRaw = DEFPROFILE_INTERNAL;
-//     }
-//
-//     if (options.is_defProfImgMissing()) {
-//         options.defProfImg = DEFPROFILE_IMG;
-//         Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_DEFIMG_MISSING"), escapeHtmlChars(options.defProfImg)), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-//         msgd.run ();
-//     }
-//     if (options.is_bundledDefProfImgMissing()) {
-//         Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_BUNDLED_MISSING"), escapeHtmlChars(options.defProfImg)), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-//         msgd.run ();
-//         options.defProfImg = DEFPROFILE_INTERNAL;
-//     }
-// }
+
+    // Display release notes only if new major version.
+    bool waitForSplash = false;
+    if (options.is_new_version()) {
+        // Update the version parameter with the right value
+        options.version = versionString;
+
+        splash = new Splash();
+        splash->set_transient_for(*this);
+        splash->signal_close_request().connect(sigc::mem_fun(*this, &RtWindow::splashClosed), true);
+
+        if (splash->hasReleaseNotes()) {
+            waitForSplash = true;
+            splash->set_modal(true);
+            splash->showReleaseNotes();
+            splash->present();
+        } else {
+            delete splash;
+            splash = nullptr;
+        }
+    }
+
+    if (!waitForSplash) {
+        showErrors();
+    }
+}
+
+void RtWindow::showErrors()
+{
+    // alerting users if the default raw and image profiles are missing
+    if (options.is_defProfRawMissing()) {
+        options.defProfRaw = DEFPROFILE_RAW;
+        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_DEFRAW_MISSING"), escapeHtmlChars(options.defProfRaw)), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
+        msgd.present ();
+    }
+    if (options.is_bundledDefProfRawMissing()) {
+        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_BUNDLED_MISSING"), escapeHtmlChars(options.defProfRaw)), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
+        msgd.present ();
+        options.defProfRaw = DEFPROFILE_INTERNAL;
+    }
+
+    if (options.is_defProfImgMissing()) {
+        options.defProfImg = DEFPROFILE_IMG;
+        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_DEFIMG_MISSING"), escapeHtmlChars(options.defProfImg)), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
+        msgd.present ();
+    }
+    if (options.is_bundledDefProfImgMissing()) {
+        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_BUNDLED_MISSING"), escapeHtmlChars(options.defProfImg)), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
+        msgd.present ();
+        options.defProfImg = DEFPROFILE_INTERNAL;
+    }
+}
 
 void RtWindow::onDefaultSizeChange()
 {
@@ -990,14 +991,14 @@ void RtWindow::toggle_fullscreen ()
 //             ->updateToolPanelToolLocations(favorites, cloneFavoriteTools);
 //     }
 // }
-//
-// bool RtWindow::splashClosed (GdkEventAny* event)
-// {
-//     delete splash;
-//     splash = nullptr;
-//     showErrors();
-//     return true;
-// }
+
+bool RtWindow::splashClosed()
+{
+    delete splash;
+    splash = nullptr;
+    showErrors();
+    return true;
+}
 
 void RtWindow::setWindowSize ()
 {

@@ -23,7 +23,7 @@
 #include <sigc++/signal.h>
 
 // #include "progressconnector.h"
-// #include "splash.h"
+#include "splash.h"
 
 #include "rtengine/noncopyable.h"
 
@@ -47,8 +47,8 @@ private:
     // std::map<Glib::ustring, EditorPanel*> epanels;
     //
     // sigc::signal<void> externalEditorChangedSignal;
-    //
-    // Splash* splash;
+
+    Splash* splash;
     Gtk::ProgressBar prProgBar;
     // PLDBridge* pldBridge;
     bool is_fullscreen;
@@ -62,10 +62,10 @@ private:
 
     // bool on_expose_event_epanel (GdkEventExpose* event);
     // bool on_expose_event_fpanel (GdkEventExpose* event);
-    // bool splashClosed (GdkEventAny* event);
+    bool splashClosed ();
     // bool isEditorPanel (Widget* panel);
     // bool isEditorPanel (guint pageNum);
-    // void showErrors ();
+    void showErrors ();
 
     void onDefaultSizeChange();
     void onFullscreenChange();
@@ -92,7 +92,7 @@ public:
     // void showRawPedia();
     // void showICCProfileCreator ();
     // void showPreferences ();
-    // void on_realize () override;
+    void on_realize () override;
     void toggle_fullscreen ();
 
     // void setProgress(double p) override;

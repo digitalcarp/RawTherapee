@@ -21,101 +21,38 @@
 #include <glib/gstdio.h>
 
 #include "multilangmgr.h"
+#include "svgpaintable.h"
 
 extern Glib::ustring creditsPath;
 extern Glib::ustring licensePath;
 extern Glib::ustring versionString;
 
-SplashImage::SplashImage() : surface(new RTSurface("splash.svg"))
+Splash::Splash()
 {
-    set_draw_func(sigc::mem_fun(*this, &SplashImage::on_draw));
-}
-
-void SplashImage::on_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height)
-{
-    if (surface->hasSurface()) {
-        cr->set_source(surface->get(), 0., 0.);
-        cr->rectangle(0, 0, surface->getWidth(), surface->getHeight());
-        cr->fill();
-
-        Cairo::FontOptions cfo;
-        cfo.set_antialias (Cairo::ANTIALIAS_SUBPIXEL);
-        Glib::RefPtr<Pango::Context> context = get_pango_context ();
-        context->set_cairo_font_options (cfo);
-        Pango::FontDescription fontd = context->get_font_description();
-        fontd.set_weight (Pango::Weight::LIGHT);
-        const int fontSize = 12; // pt
-        // Non-absolute size is defined in "Pango units" and shall be multiplied by
-        // Pango::SCALE from "pt":
-        fontd.set_size(fontSize * Pango::SCALE);
-        context->set_font_description (fontd);
-
-        int w, h;
-        Glib::ustring versionStr(versionString);
-
-        version = create_pango_layout (versionStr);
-        version->set_text(versionStr);
-        version->get_pixel_size (w, h);
-        cr->set_source_rgb (0., 0., 0.);
-        cr->set_line_width(3.);
-        cr->set_line_join(Cairo::Context::LineJoin::ROUND);
-        cr->move_to (surface->getWidth() - w - 32, surface->getHeight() - h - 20);
-        version->add_to_cairo_context (cr);
-        cr->stroke_preserve();
-        cr->set_source_rgb (1., 1., 1.);
-        cr->set_line_width(0.5);
-        cr->stroke_preserve();
-        cr->fill();
-    }
-}
-
-Gtk::SizeRequestMode SplashImage::get_request_mode_vfunc() const
-{
-    return Gtk::SizeRequestMode::CONSTANT_SIZE;
-}
-
-void SplashImage::measure_vfunc(Gtk::Orientation orientation, int /*for_size*/,
-                                int& minimum, int& natural,
-                                int& minimum_baseline, int& natural_baseline) const
-{
-    if (orientation == Gtk::Orientation::HORIZONTAL) {
-        int width = surface ? surface->getWidth() : RTScalable::scalePixelSize(100);
-        minimum = width;
-        natural = width;
-    } else {
-        int height = surface ? surface->getHeight() : RTScalable::scalePixelSize(100);
-        minimum = height;
-        natural = height;
-    }
-
-    // Don't use baseline alignment
-    minimum_baseline = -1;
-    natural_baseline = -1;
-}
-
-Splash::Splash (Gtk::Window& parent) : Gtk::Dialog(M("GENERAL_ABOUT"), parent, true)
-{
+    set_title(M("GENERAL_ABOUT"));
 
     releaseNotesSW = nullptr;
 
+    auto box = Gtk::manage(new Gtk::Box());
     nb = Gtk::manage (new Gtk::Notebook ());
     nb->set_name ("AboutNotebook");
-    get_content_area()->prepend (*nb);
-
-    // Add close button to bottom of the notebook
-    Gtk::Button* closeButton = Gtk::manage (new Gtk::Button (M("GENERAL_CLOSE")));
-    closeButton->signal_clicked().connect( sigc::mem_fun(*this, &Splash::closePressed) );
-    add_action_widget(*closeButton, 0);
+    nb->set_hexpand (true);
+    box->prepend (*nb);
+    set_child (*box);
 
     Glib::RefPtr<Gtk::CssProvider> localCSS = Gtk::CssProvider::create();
     localCSS->load_from_data ("textview { font-family: monospace; }");
 
     // Tab 1: the image
-    splashImage = Gtk::manage(new SplashImage ());
+    auto splashBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
+    auto svg = SvgPaintableWrapper::createFromImage("splash.svg");
+    splashImage = Gtk::manage(new Gtk::Picture());
+    gtk_picture_set_paintable(splashImage->gobj(), svg->base_gobj());
     splashImage->set_halign(Gtk::Align::CENTER);
     splashImage->set_valign(Gtk::Align::CENTER);
-    nb->append_page (*splashImage, M("ABOUT_TAB_SPLASH"));
-    splashImage->show ();
+    splashBox->prepend(*splashImage);
+    splashBox->append(*Gtk::manage(new Gtk::Label(versionString)));
+    nb->append_page(*splashBox, M("ABOUT_TAB_SPLASH"));
 
     // Tab 2: the information about the current version
     std::string buildFileName = Glib::build_filename (creditsPath, "AboutThisBuild.txt");
@@ -258,10 +195,4 @@ void Splash::showReleaseNotes()
     if (releaseNotesSW) {
         nb->set_current_page(nb->page_num(*releaseNotesSW));
     }
-}
-
-void Splash::closePressed()
-{
-    hide();
-    close();
 }

@@ -202,9 +202,28 @@ svg_paintable_new (GFile *file)
 
 // --- END C GObject
 
+extern Glib::ustring argv0;
+
 Glib::RefPtr<SvgPaintableWrapper>
 SvgPaintableWrapper::createFromFilename(const Glib::ustring& filepath, bool cached) {
     // TODO: Caching?
+
+    if (!Glib::file_test(filepath.c_str(), Glib::FileTest::EXISTS)) {
+        std::cerr << "Failed to load SVG file \"" << filepath << "\"\n";
+        return nullptr;
+    }
+
+    GFile* file = g_file_new_for_path(filepath.c_str());
+    SvgPaintable* svg = SVG_PAINTABLE (svg_paintable_new(file));
+    g_object_unref(file);
+
+    return std::make_shared<SvgPaintableWrapper>(svg);
+}
+
+Glib::RefPtr<SvgPaintableWrapper>
+SvgPaintableWrapper::createFromImage(const Glib::ustring& fname) {
+    Glib::ustring img_dir = Glib::build_filename(argv0, "images");
+    Glib::ustring filepath = Glib::build_filename(img_dir, fname);
 
     if (!Glib::file_test(filepath.c_str(), Glib::FileTest::EXISTS)) {
         std::cerr << "Failed to load SVG file \"" << filepath << "\"\n";
