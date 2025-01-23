@@ -629,11 +629,11 @@ public:
     void pack_right_in (Gtk::Grid* grid)
     {
 #if !defined(__APPLE__) // monitor profile not supported on apple
-        grid->attach_next_to (profileBox, Gtk::POS_RIGHT, 1, 1);
+        grid->attach_next_to (profileBox, Gtk::PositionType::RIGHT, 1, 1);
 #endif
-        grid->attach_next_to (*intentBox.buttonGroup, Gtk::POS_RIGHT, 1, 1);
-        grid->attach_next_to (softProof, Gtk::POS_RIGHT, 1, 1);
-        grid->attach_next_to (spGamutCheck, Gtk::POS_RIGHT, 1, 1);
+        grid->attach_next_to (*intentBox.buttonGroup, Gtk::PositionType::RIGHT, 1, 1);
+        grid->attach_next_to (softProof, Gtk::PositionType::RIGHT, 1, 1);
+        grid->attach_next_to (spGamutCheck, Gtk::PositionType::RIGHT, 1, 1);
     }
 
     void updateProcessor()
@@ -971,21 +971,21 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
 
     // ==================  PACKING THE BOTTOM WIDGETS =================
 
-    // Adding widgets from center to the left, on the left side (using Gtk::POS_LEFT)
-    iops->attach_next_to (*vsep2, Gtk::POS_LEFT, 1, 1);
-    iops->attach_next_to (*progressLabel, Gtk::POS_LEFT, 1, 1);
-    iops->attach_next_to (*vsep1, Gtk::POS_LEFT, 1, 1);
+    // Adding widgets from center to the left, on the left side (using Gtk::PositionType::LEFT)
+    iops->attach_next_to (*vsep2, Gtk::PositionType::LEFT, 1, 1);
+    iops->attach_next_to (*progressLabel, Gtk::PositionType::LEFT, 1, 1);
+    iops->attach_next_to (*vsep1, Gtk::PositionType::LEFT, 1, 1);
 
     if (!gimpPlugin) {
-        iops->attach_next_to(*send_to_external->buttonGroup, Gtk::POS_LEFT, 1, 1);
+        iops->attach_next_to(*send_to_external->buttonGroup, Gtk::PositionType::LEFT, 1, 1);
     }
 
     if (!gimpPlugin && !simpleEditor) {
-        iops->attach_next_to (*queueimg, Gtk::POS_LEFT, 1, 1);
+        iops->attach_next_to (*queueimg, Gtk::PositionType::LEFT, 1, 1);
     }
 
     if (!gimpPlugin) {
-        iops->attach_next_to (*saveimgas, Gtk::POS_LEFT, 1, 1);
+        iops->attach_next_to (*saveimgas, Gtk::PositionType::LEFT, 1, 1);
     }
 
 
@@ -995,17 +995,17 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
 
     if (!simpleEditor && !options.tabbedUI) {
         Gtk::Separator* vsep3 = Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL));
-        iops->attach_next_to (*vsep3, Gtk::POS_RIGHT, 1, 1);
-        iops->attach_next_to (*navPrev, Gtk::POS_RIGHT, 1, 1);
-        iops->attach_next_to (*navSync, Gtk::POS_RIGHT, 1, 1);
-        iops->attach_next_to (*navNext, Gtk::POS_RIGHT, 1, 1);
+        iops->attach_next_to (*vsep3, Gtk::PositionType::RIGHT, 1, 1);
+        iops->attach_next_to (*navPrev, Gtk::PositionType::RIGHT, 1, 1);
+        iops->attach_next_to (*navSync, Gtk::PositionType::RIGHT, 1, 1);
+        iops->attach_next_to (*navNext, Gtk::PositionType::RIGHT, 1, 1);
     }
 
-    iops->attach_next_to (*vsepz2, Gtk::POS_RIGHT, 1, 1);
-    iops->attach_next_to (*iareapanel->imageArea->zoomPanel, Gtk::POS_RIGHT, 1, 1);
-    iops->attach_next_to (*vsepz3, Gtk::POS_RIGHT, 1, 1);
-    iops->attach_next_to (*tbShowHideSidePanels, Gtk::POS_RIGHT, 1, 1);
-    iops->attach_next_to (*tbRightPanel_1, Gtk::POS_RIGHT, 1, 1);
+    iops->attach_next_to (*vsepz2, Gtk::PositionType::RIGHT, 1, 1);
+    iops->attach_next_to (*iareapanel->imageArea->zoomPanel, Gtk::PositionType::RIGHT, 1, 1);
+    iops->attach_next_to (*vsepz3, Gtk::PositionType::RIGHT, 1, 1);
+    iops->attach_next_to (*tbShowHideSidePanels, Gtk::PositionType::RIGHT, 1, 1);
+    iops->attach_next_to (*tbRightPanel_1, Gtk::PositionType::RIGHT, 1, 1);
 
     MyScrolledToolbar *stb2 = Gtk::manage(new MyScrolledToolbar());
     stb2->set_name("EditorToolbarBottom");
@@ -2846,7 +2846,7 @@ void EditorPanel::updateHistogramPosition (int oldPosition, int newPosition)
             }
 
             leftbox->set_position(options.histogramHeight);
-            histogramPanel->reorder (Gtk::POS_LEFT);
+            histogramPanel->reorder (Gtk::PositionType::LEFT);
             break;
 
         case 2:
@@ -2866,7 +2866,7 @@ void EditorPanel::updateHistogramPosition (int oldPosition, int newPosition)
             }
 
             vboxright->set_position(options.histogramHeight);
-            histogramPanel->reorder (Gtk::POS_RIGHT);
+            histogramPanel->reorder (Gtk::PositionType::RIGHT);
             break;
     }
 

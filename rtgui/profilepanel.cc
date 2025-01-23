@@ -86,12 +86,12 @@ ProfilePanel::ProfilePanel () : storedPProfile(nullptr),
     paste->get_style_context()->add_class("Right");
     setExpandAlignProperties(paste, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
 
-    attach_next_to (*fillMode, Gtk::POS_RIGHT, 1, 1);
-    attach_next_to (*profiles, Gtk::POS_RIGHT, 1, 1);
-    attach_next_to (*load, Gtk::POS_RIGHT, 1, 1);
-    attach_next_to (*save, Gtk::POS_RIGHT, 1, 1);
-    attach_next_to (*copy, Gtk::POS_RIGHT, 1, 1);
-    attach_next_to (*paste, Gtk::POS_RIGHT, 1, 1);
+    attach_next_to (*fillMode, Gtk::PositionType::RIGHT, 1, 1);
+    attach_next_to (*profiles, Gtk::PositionType::RIGHT, 1, 1);
+    attach_next_to (*load, Gtk::PositionType::RIGHT, 1, 1);
+    attach_next_to (*save, Gtk::PositionType::RIGHT, 1, 1);
+    attach_next_to (*copy, Gtk::PositionType::RIGHT, 1, 1);
+    attach_next_to (*paste, Gtk::PositionType::RIGHT, 1, 1);
 
     setExpandAlignProperties(this, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     show ();

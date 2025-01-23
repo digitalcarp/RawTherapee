@@ -110,7 +110,7 @@ FilePanel::FilePanel () : parent(nullptr), error(0)
 
     //------------------
 
-    rightNotebook->set_tab_pos (Gtk::POS_LEFT);
+    rightNotebook->set_tab_pos (Gtk::PositionType::LEFT);
 
     Gtk::Label* devLab = Gtk::manage ( new Gtk::Label (M("MAIN_TAB_DEVELOP")) );
     devLab->set_name ("LabelRightNotebook");

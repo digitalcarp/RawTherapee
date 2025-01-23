@@ -131,8 +131,8 @@ void CoordinateAdjuster::createWidgets(const std::vector<Axis> &axis)
         setExpandAlignProperties(currAdjuster->label, false, false, Gtk::Align::START, Gtk::Align::CENTER);
         setExpandAlignProperties(currAdjuster->spinButton, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
-        box->attach_next_to(*(currAdjuster->spinButton), Gtk::POS_LEFT, 1, 1);
-        box->attach_next_to(*(currAdjuster->label), Gtk::POS_LEFT, 1, 1);
+        box->attach_next_to(*(currAdjuster->spinButton), Gtk::PositionType::LEFT, 1, 1);
+        box->attach_next_to(*(currAdjuster->label), Gtk::PositionType::LEFT, 1, 1);
 
         Gtk::FlowBoxChild *fbChild = Gtk::manage(new Gtk::FlowBoxChild());
         fbChild->set_can_focus(false);

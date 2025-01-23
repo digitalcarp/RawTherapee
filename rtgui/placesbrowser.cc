@@ -52,8 +52,8 @@ PlacesBrowser::PlacesBrowser ()
     del->set_image (*Gtk::manage (new RTImage ("remove-small", Gtk::ICON_SIZE_BUTTON)));
     Gtk::Grid* buttonBox = Gtk::manage (new Gtk::Grid ());
     buttonBox->set_orientation(Gtk::Orientation::HORIZONTAL);
-    buttonBox->attach_next_to(*add, Gtk::POS_LEFT, 1, 1);
-    buttonBox->attach_next_to(*del, *add, Gtk::POS_RIGHT, 1, 1);
+    buttonBox->attach_next_to(*add, Gtk::PositionType::LEFT, 1, 1);
+    buttonBox->attach_next_to(*del, *add, Gtk::PositionType::RIGHT, 1, 1);
 
     pack_start (*buttonBox, Gtk::PACK_SHRINK, 2);
 

@@ -1601,10 +1601,10 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
 //     grid->set_orientation(Gtk::Orientation::HORIZONTAL);
 //
 //     if (image) {
-//         grid->attach_next_to(*image, Gtk::POS_LEFT, 1, 1);
+//         grid->attach_next_to(*image, Gtk::PositionType::LEFT, 1, 1);
 //     }
 //
-//     grid->attach_next_to(*(pimpl->label), Gtk::POS_RIGHT, 1, 1);
+//     grid->attach_next_to(*(pimpl->label), Gtk::PositionType::RIGHT, 1, 1);
 //     grid->set_column_spacing(4);
 //     grid->set_row_spacing(0);
 //     pack_start(*grid, Gtk::PACK_SHRINK, 0);

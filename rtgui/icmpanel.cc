@@ -147,8 +147,8 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     dcpIll->show();
     dcpTemperatures[0] = 0;
     dcpTemperatures[1] = 0;
-    dcpIllGrid->attach_next_to(*dcpIllLabel, Gtk::POS_LEFT, 1, 1);
-    dcpIllGrid->attach_next_to(*dcpIll, *dcpIllLabel, Gtk::POS_RIGHT, 1, 1);
+    dcpIllGrid->attach_next_to(*dcpIllLabel, Gtk::PositionType::LEFT, 1, 1);
+    dcpIllGrid->attach_next_to(*dcpIll, *dcpIllLabel, Gtk::PositionType::RIGHT, 1, 1);
 
     ckbToneCurve = Gtk::manage(new Gtk::CheckButton(M("TP_ICM_TONECURVE")));
     ckbToneCurve->set_sensitive(false);
@@ -170,11 +170,11 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     ckbApplyBaselineExposureOffset->set_tooltip_text(M("TP_ICM_APPLYBASELINEEXPOSUREOFFSET_TOOLTIP"));
     setExpandAlignProperties(ckbApplyBaselineExposureOffset, false, false, Gtk::Align::START, Gtk::Align::CENTER);
 
-    dcpGrid->attach_next_to(*dcpIllGrid, Gtk::POS_BOTTOM, 1, 1);
-    dcpGrid->attach_next_to(*ckbToneCurve, Gtk::POS_BOTTOM, 1, 1);
-    dcpGrid->attach_next_to(*ckbApplyHueSatMap, Gtk::POS_BOTTOM, 1, 1);
-    dcpGrid->attach_next_to(*ckbApplyLookTable, Gtk::POS_BOTTOM, 1, 1);
-    dcpGrid->attach_next_to(*ckbApplyBaselineExposureOffset, Gtk::POS_BOTTOM, 1, 1);
+    dcpGrid->attach_next_to(*dcpIllGrid, Gtk::PositionType::BOTTOM, 1, 1);
+    dcpGrid->attach_next_to(*ckbToneCurve, Gtk::PositionType::BOTTOM, 1, 1);
+    dcpGrid->attach_next_to(*ckbApplyHueSatMap, Gtk::PositionType::BOTTOM, 1, 1);
+    dcpGrid->attach_next_to(*ckbApplyLookTable, Gtk::PositionType::BOTTOM, 1, 1);
+    dcpGrid->attach_next_to(*ckbApplyBaselineExposureOffset, Gtk::PositionType::BOTTOM, 1, 1);
 
     dcpFrame->add(*dcpGrid);
     dcpFrame->set_sensitive(false);

@@ -42,8 +42,8 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
     editedAdjuster = nullptr;
     editedAdjusterValue = 0;
 
-    Gtk::PositionType sideStart = options.curvebboxpos == 0 || options.curvebboxpos == 2 ? Gtk::POS_LEFT : Gtk::POS_TOP;
-    Gtk::PositionType sideEnd = options.curvebboxpos == 0 || options.curvebboxpos == 2 ? Gtk::POS_RIGHT : Gtk::POS_BOTTOM;
+    Gtk::PositionType sideStart = options.curvebboxpos == 0 || options.curvebboxpos == 2 ? Gtk::PositionType::LEFT : Gtk::PositionType::TOP;
+    Gtk::PositionType sideEnd = options.curvebboxpos == 0 || options.curvebboxpos == 2 ? Gtk::PositionType::RIGHT : Gtk::PositionType::BOTTOM;
 
     valLinear = (int)DCT_Linear;
     valUnchanged = (int)DCT_Unchanged;
@@ -113,17 +113,17 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
     customCurve->set_hexpand(true);
 
     if (options.curvebboxpos == 0) {
-        customCurveGrid->attach_next_to(*custombbox, *customCurveBox, Gtk::POS_TOP, 1, 1);
-        customCurveGrid->attach_next_to(*customCoordAdjuster, *customCurveBox, Gtk::POS_BOTTOM, 1, 1);
+        customCurveGrid->attach_next_to(*custombbox, *customCurveBox, Gtk::PositionType::TOP, 1, 1);
+        customCurveGrid->attach_next_to(*customCoordAdjuster, *customCurveBox, Gtk::PositionType::BOTTOM, 1, 1);
     } else if (options.curvebboxpos == 1) {
-        customCurveGrid->attach_next_to(*custombbox, *customCurveBox, Gtk::POS_RIGHT, 1, 1);
-        customCurveGrid->attach_next_to(*customCoordAdjuster, *customCurveBox, Gtk::POS_BOTTOM, 2, 1);
+        customCurveGrid->attach_next_to(*custombbox, *customCurveBox, Gtk::PositionType::RIGHT, 1, 1);
+        customCurveGrid->attach_next_to(*customCoordAdjuster, *customCurveBox, Gtk::PositionType::BOTTOM, 2, 1);
     } else if (options.curvebboxpos == 2) {
-        customCurveGrid->attach_next_to(*customCoordAdjuster, *customCurveBox, Gtk::POS_BOTTOM, 1, 1);
-        customCurveGrid->attach_next_to(*custombbox, *customCoordAdjuster, Gtk::POS_BOTTOM, 1, 1);
+        customCurveGrid->attach_next_to(*customCoordAdjuster, *customCurveBox, Gtk::PositionType::BOTTOM, 1, 1);
+        customCurveGrid->attach_next_to(*custombbox, *customCoordAdjuster, Gtk::PositionType::BOTTOM, 1, 1);
     } else if (options.curvebboxpos == 3) {
-        customCurveGrid->attach_next_to(*custombbox, *customCurveBox, Gtk::POS_LEFT, 1, 1);
-        customCurveGrid->attach_next_to(*customCoordAdjuster, *custombbox, Gtk::POS_BOTTOM, 2, 1);
+        customCurveGrid->attach_next_to(*custombbox, *customCurveBox, Gtk::PositionType::LEFT, 1, 1);
+        customCurveGrid->attach_next_to(*customCoordAdjuster, *custombbox, Gtk::PositionType::BOTTOM, 2, 1);
     }
 
     customCurveGrid->show_all ();
@@ -205,17 +205,17 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
     NURBSCurve->set_hexpand(true);
 
     if (options.curvebboxpos == 0) {
-        NURBSCurveGrid->attach_next_to(*NURBSbbox, *NURBSCurveBox, Gtk::POS_TOP, 1, 1);
-        NURBSCurveGrid->attach_next_to(*NURBSCoordAdjuster, *NURBSCurveBox, Gtk::POS_BOTTOM, 1, 1);
+        NURBSCurveGrid->attach_next_to(*NURBSbbox, *NURBSCurveBox, Gtk::PositionType::TOP, 1, 1);
+        NURBSCurveGrid->attach_next_to(*NURBSCoordAdjuster, *NURBSCurveBox, Gtk::PositionType::BOTTOM, 1, 1);
     } else if (options.curvebboxpos == 1) {
-        NURBSCurveGrid->attach_next_to(*NURBSbbox, *NURBSCurveBox, Gtk::POS_RIGHT, 1, 1);
-        NURBSCurveGrid->attach_next_to(*NURBSCoordAdjuster, *NURBSCurveBox, Gtk::POS_BOTTOM, 2, 1);
+        NURBSCurveGrid->attach_next_to(*NURBSbbox, *NURBSCurveBox, Gtk::PositionType::RIGHT, 1, 1);
+        NURBSCurveGrid->attach_next_to(*NURBSCoordAdjuster, *NURBSCurveBox, Gtk::PositionType::BOTTOM, 2, 1);
     } else if (options.curvebboxpos == 2) {
-        NURBSCurveGrid->attach_next_to(*NURBSCoordAdjuster, *NURBSCurveBox, Gtk::POS_BOTTOM, 1, 1);
-        NURBSCurveGrid->attach_next_to(*NURBSbbox, *NURBSCoordAdjuster, Gtk::POS_BOTTOM, 1, 1);
+        NURBSCurveGrid->attach_next_to(*NURBSCoordAdjuster, *NURBSCurveBox, Gtk::PositionType::BOTTOM, 1, 1);
+        NURBSCurveGrid->attach_next_to(*NURBSbbox, *NURBSCoordAdjuster, Gtk::PositionType::BOTTOM, 1, 1);
     } else if (options.curvebboxpos == 3) {
-        NURBSCurveGrid->attach_next_to(*NURBSbbox, *NURBSCurveBox, Gtk::POS_LEFT, 1, 1);
-        NURBSCurveGrid->attach_next_to(*NURBSCoordAdjuster, *NURBSbbox, Gtk::POS_BOTTOM, 2, 1);
+        NURBSCurveGrid->attach_next_to(*NURBSbbox, *NURBSCurveBox, Gtk::PositionType::LEFT, 1, 1);
+        NURBSCurveGrid->attach_next_to(*NURBSCoordAdjuster, *NURBSbbox, Gtk::PositionType::BOTTOM, 2, 1);
     }
 
     NURBSCurveGrid->show_all ();
@@ -270,7 +270,7 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
 
     shcSelector = Gtk::manage (new SHCSelector ());
     shcSelector->set_name("CurveSHCSelector");
-    paramCurveBox->attach_next_to(*shcSelector, *paramCurve, Gtk::POS_BOTTOM, 1, 1);
+    paramCurveBox->attach_next_to(*shcSelector, *paramCurve, Gtk::PositionType::BOTTOM, 1, 1);
 
     editParam = Gtk::manage (new Gtk::ToggleButton());
     initButton(*editParam, Glib::ustring("crosshair-node-curve"), Gtk::Align::START, false, "EDIT_PIPETTE_TOOLTIP");
@@ -321,10 +321,10 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
     paramCurveSliderBox->set_orientation(Gtk::Orientation::VERTICAL);
     paramCurveSliderBox->get_style_context()->add_class("curve-sliderbox");
 
-    paramCurveSliderBox->attach_next_to(*evhighlights, Gtk::POS_TOP, 1, 1);
-    paramCurveSliderBox->attach_next_to(*evlights, Gtk::POS_TOP, 1, 1);
-    paramCurveSliderBox->attach_next_to(*evdarks, Gtk::POS_TOP, 1, 1);
-    paramCurveSliderBox->attach_next_to(*evshadows, Gtk::POS_TOP, 1, 1);
+    paramCurveSliderBox->attach_next_to(*evhighlights, Gtk::PositionType::TOP, 1, 1);
+    paramCurveSliderBox->attach_next_to(*evlights, Gtk::PositionType::TOP, 1, 1);
+    paramCurveSliderBox->attach_next_to(*evdarks, Gtk::PositionType::TOP, 1, 1);
+    paramCurveSliderBox->attach_next_to(*evshadows, Gtk::PositionType::TOP, 1, 1);
 
     paramCurveGrid->show_all ();
 
@@ -333,17 +333,17 @@ DiagonalCurveEditorSubGroup::DiagonalCurveEditorSubGroup (CurveEditorGroup* prt,
     paramCurve->set_hexpand(true);
 
     if (options.curvebboxpos == 0) {
-        paramCurveGrid->attach_next_to(*parambbox, *paramCurveBox, Gtk::POS_TOP, 1, 1);
-        paramCurveGrid->attach_next_to(*paramCurveSliderBox, *paramCurveBox, Gtk::POS_BOTTOM, 1, 1);
+        paramCurveGrid->attach_next_to(*parambbox, *paramCurveBox, Gtk::PositionType::TOP, 1, 1);
+        paramCurveGrid->attach_next_to(*paramCurveSliderBox, *paramCurveBox, Gtk::PositionType::BOTTOM, 1, 1);
     } else if (options.curvebboxpos == 1) {
-        paramCurveGrid->attach_next_to(*parambbox, *paramCurveBox, Gtk::POS_RIGHT, 1, 1);
-        paramCurveGrid->attach_next_to(*paramCurveSliderBox, *paramCurveBox, Gtk::POS_BOTTOM, 2, 1);
+        paramCurveGrid->attach_next_to(*parambbox, *paramCurveBox, Gtk::PositionType::RIGHT, 1, 1);
+        paramCurveGrid->attach_next_to(*paramCurveSliderBox, *paramCurveBox, Gtk::PositionType::BOTTOM, 2, 1);
     } else if (options.curvebboxpos == 2) {
-        paramCurveGrid->attach_next_to(*parambbox, *paramCurveBox, Gtk::POS_BOTTOM, 1, 1);
-        paramCurveGrid->attach_next_to(*paramCurveSliderBox, *parambbox, Gtk::POS_BOTTOM, 1, 1);
+        paramCurveGrid->attach_next_to(*parambbox, *paramCurveBox, Gtk::PositionType::BOTTOM, 1, 1);
+        paramCurveGrid->attach_next_to(*paramCurveSliderBox, *parambbox, Gtk::PositionType::BOTTOM, 1, 1);
     } else if (options.curvebboxpos == 3) {
-        paramCurveGrid->attach_next_to(*parambbox, *paramCurveBox, Gtk::POS_LEFT, 1, 1);
-        paramCurveGrid->attach_next_to(*paramCurveSliderBox, *parambbox, Gtk::POS_BOTTOM, 2, 1);
+        paramCurveGrid->attach_next_to(*parambbox, *paramCurveBox, Gtk::PositionType::LEFT, 1, 1);
+        paramCurveGrid->attach_next_to(*paramCurveSliderBox, *parambbox, Gtk::PositionType::BOTTOM, 2, 1);
     }
 
     paramCurveGrid->show_all ();

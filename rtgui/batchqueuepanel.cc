@@ -232,18 +232,18 @@ void BatchQueuePanel::updateTab (int qsize, int forceOrientation)
         Gtk::Label* l;
 
         if(!qsize ) {
-            grid->attach_next_to(*Gtk::manage (new RTImage ("gears", Gtk::ICON_SIZE_LARGE_TOOLBAR)), Gtk::POS_TOP, 1, 1);
+            grid->attach_next_to(*Gtk::manage (new RTImage ("gears", Gtk::ICON_SIZE_LARGE_TOOLBAR)), Gtk::PositionType::TOP, 1, 1);
             l = Gtk::manage (new Gtk::Label (Glib::ustring(" ") + M("MAIN_FRAME_QUEUE")) );
         } else if (qStartStop->get_active()) {
-            grid->attach_next_to(*Gtk::manage (new RTImage ("gears-play", Gtk::ICON_SIZE_LARGE_TOOLBAR)), Gtk::POS_TOP, 1, 1);
+            grid->attach_next_to(*Gtk::manage (new RTImage ("gears-play", Gtk::ICON_SIZE_LARGE_TOOLBAR)), Gtk::PositionType::TOP, 1, 1);
             l = Gtk::manage (new Gtk::Label (Glib::ustring(" ") + M("MAIN_FRAME_QUEUE") + " [" + Glib::ustring::format( qsize ) + "]"));
         } else {
-            grid->attach_next_to(*Gtk::manage (new RTImage ("gears-pause", Gtk::ICON_SIZE_LARGE_TOOLBAR)), Gtk::POS_TOP, 1, 1);
+            grid->attach_next_to(*Gtk::manage (new RTImage ("gears-pause", Gtk::ICON_SIZE_LARGE_TOOLBAR)), Gtk::PositionType::TOP, 1, 1);
             l = Gtk::manage (new Gtk::Label (Glib::ustring(" ") + M("MAIN_FRAME_QUEUE") + " [" + Glib::ustring::format( qsize ) + "]" ));
         }
 
         l->set_angle (90);
-        grid->attach_next_to(*l, Gtk::POS_TOP, 1, 1);
+        grid->attach_next_to(*l, Gtk::PositionType::TOP, 1, 1);
         grid->set_tooltip_markup (M("MAIN_FRAME_QUEUE_TOOLTIP"));
         grid->show_all ();
 
@@ -252,14 +252,14 @@ void BatchQueuePanel::updateTab (int qsize, int forceOrientation)
         }
     } else {
         if (!qsize ) {
-            grid->attach_next_to(*Gtk::manage (new RTImage ("gears", Gtk::ICON_SIZE_LARGE_TOOLBAR)), Gtk::POS_RIGHT, 1, 1);
-            grid->attach_next_to(*Gtk::manage (new Gtk::Label (M("MAIN_FRAME_QUEUE") )), Gtk::POS_RIGHT, 1, 1);
+            grid->attach_next_to(*Gtk::manage (new RTImage ("gears", Gtk::ICON_SIZE_LARGE_TOOLBAR)), Gtk::PositionType::RIGHT, 1, 1);
+            grid->attach_next_to(*Gtk::manage (new Gtk::Label (M("MAIN_FRAME_QUEUE") )), Gtk::PositionType::RIGHT, 1, 1);
         } else if (qStartStop->get_active()) {
-            grid->attach_next_to(*Gtk::manage (new RTImage ("gears-play", Gtk::ICON_SIZE_LARGE_TOOLBAR)), Gtk::POS_RIGHT, 1, 1);
-            grid->attach_next_to(*Gtk::manage (new Gtk::Label (M("MAIN_FRAME_QUEUE") + " [" + Glib::ustring::format( qsize ) + "]" )), Gtk::POS_RIGHT, 1, 1);
+            grid->attach_next_to(*Gtk::manage (new RTImage ("gears-play", Gtk::ICON_SIZE_LARGE_TOOLBAR)), Gtk::PositionType::RIGHT, 1, 1);
+            grid->attach_next_to(*Gtk::manage (new Gtk::Label (M("MAIN_FRAME_QUEUE") + " [" + Glib::ustring::format( qsize ) + "]" )), Gtk::PositionType::RIGHT, 1, 1);
         } else {
-            grid->attach_next_to(*Gtk::manage (new RTImage ("gears-pause", Gtk::ICON_SIZE_LARGE_TOOLBAR)), Gtk::POS_RIGHT, 1, 1);
-            grid->attach_next_to(*Gtk::manage (new Gtk::Label (M("MAIN_FRAME_QUEUE") + " [" + Glib::ustring::format( qsize ) + "]" )), Gtk::POS_RIGHT, 1, 1);
+            grid->attach_next_to(*Gtk::manage (new RTImage ("gears-pause", Gtk::ICON_SIZE_LARGE_TOOLBAR)), Gtk::PositionType::RIGHT, 1, 1);
+            grid->attach_next_to(*Gtk::manage (new Gtk::Label (M("MAIN_FRAME_QUEUE") + " [" + Glib::ustring::format( qsize ) + "]" )), Gtk::PositionType::RIGHT, 1, 1);
         }
 
         grid->set_tooltip_markup (M("MAIN_FRAME_QUEUE_TOOLTIP"));

@@ -116,40 +116,40 @@ Adjuster::Adjuster(
 
     if (adjustmentName.empty()) {
         // No label, everything goes in a single row
-        attach_next_to(*slider, Gtk::POS_LEFT, 1, 1);
+        attach_next_to(*slider, Gtk::PositionType::LEFT, 1, 1);
 
         if (imageIcon1) {
-            attach_next_to(*imageIcon1, *slider, Gtk::POS_LEFT, 1, 1);
+            attach_next_to(*imageIcon1, *slider, Gtk::PositionType::LEFT, 1, 1);
         }
 
         if (imageIcon2) {
-            attach_next_to(*imageIcon2, *slider, Gtk::POS_RIGHT, 1, 1);
-            attach_next_to(*spin, *imageIcon2, Gtk::POS_RIGHT, 1, 1);
+            attach_next_to(*imageIcon2, *slider, Gtk::PositionType::RIGHT, 1, 1);
+            attach_next_to(*spin, *imageIcon2, Gtk::PositionType::RIGHT, 1, 1);
         } else {
-            attach_next_to(*spin, *slider, Gtk::POS_RIGHT, 1, 1);
+            attach_next_to(*spin, *slider, Gtk::PositionType::RIGHT, 1, 1);
         }
 
-        attach_next_to(*reset, *spin, Gtk::POS_RIGHT, 1, 1);
+        attach_next_to(*reset, *spin, Gtk::PositionType::RIGHT, 1, 1);
     } else {
         // A label is provided, spreading the widgets in 2 rows
-        attach_next_to(*label, Gtk::POS_LEFT, 1, 1);
-        attach_next_to(*spin, Gtk::POS_RIGHT, 1, 1);
+        attach_next_to(*label, Gtk::PositionType::LEFT, 1, 1);
+        attach_next_to(*spin, Gtk::PositionType::RIGHT, 1, 1);
         // A second Grid is necessary
         grid = Gtk::manage(new Gtk::Grid());
-        grid->attach_next_to(*slider, Gtk::POS_LEFT, 1, 1);
+        grid->attach_next_to(*slider, Gtk::PositionType::LEFT, 1, 1);
 
         if (imageIcon1) {
-            grid->attach_next_to(*imageIcon1, *slider, Gtk::POS_LEFT, 1, 1);
+            grid->attach_next_to(*imageIcon1, *slider, Gtk::PositionType::LEFT, 1, 1);
         }
 
         if (imageIcon2) {
-            grid->attach_next_to(*imageIcon2, Gtk::POS_RIGHT, 1, 1);
-            grid->attach_next_to(*reset, *imageIcon2, Gtk::POS_RIGHT, 1, 1);
+            grid->attach_next_to(*imageIcon2, Gtk::PositionType::RIGHT, 1, 1);
+            grid->attach_next_to(*reset, *imageIcon2, Gtk::PositionType::RIGHT, 1, 1);
         } else {
-            grid->attach_next_to(*reset, *slider, Gtk::POS_RIGHT, 1, 1);
+            grid->attach_next_to(*reset, *slider, Gtk::PositionType::RIGHT, 1, 1);
         }
 
-        attach_next_to(*grid, *label, Gtk::POS_BOTTOM, 2, 1);
+        attach_next_to(*grid, *label, Gtk::PositionType::BOTTOM, 2, 1);
     }
 
     defaultVal = ctorDefaultVal = shapeValue(vdefault);
@@ -202,9 +202,9 @@ void Adjuster::addAutoButton (const Glib::ustring &tooltip)
         if (grid) {
             // Hombre, adding the checkbox next to the reset button because adding it next to the spin button (as before)
             // would diminish the available size for the label and would require a much heavier reorganization of the grid !
-            grid->attach_next_to(*automatic, *reset, Gtk::POS_RIGHT, 1, 1);
+            grid->attach_next_to(*automatic, *reset, Gtk::PositionType::RIGHT, 1, 1);
         } else {
-            attach_next_to(*automatic, *reset, Gtk::POS_RIGHT, 1, 1);
+            attach_next_to(*automatic, *reset, Gtk::PositionType::RIGHT, 1, 1);
         }
     }
 }
@@ -504,16 +504,16 @@ void Adjuster::showEditedCB ()
             editedCheckBox->set_hexpand(true);
             editedCheckBox->set_halign(Gtk::Align::START);
             editedCheckBox->set_valign(Gtk::Align::CENTER);
-            attach_next_to(*editedCheckBox, *spin, Gtk::POS_LEFT, 1, 1);
+            attach_next_to(*editedCheckBox, *spin, Gtk::PositionType::LEFT, 1, 1);
         } else {
             editedCheckBox->set_hexpand(false);
             editedCheckBox->set_halign(Gtk::Align::START);
             editedCheckBox->set_valign(Gtk::Align::CENTER);
 
             if (imageIcon1) {
-                attach_next_to(*editedCheckBox, *imageIcon1, Gtk::POS_LEFT, 1, 1);
+                attach_next_to(*editedCheckBox, *imageIcon1, Gtk::PositionType::LEFT, 1, 1);
             } else {
-                attach_next_to(*editedCheckBox, *slider, Gtk::POS_LEFT, 1, 1);
+                attach_next_to(*editedCheckBox, *slider, Gtk::PositionType::LEFT, 1, 1);
             }
         }
 

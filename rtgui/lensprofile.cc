@@ -473,7 +473,7 @@ void LensProfilePanel::setBatchMode(bool yes)
     FoldableToolPanel::setBatchMode(yes);
 
     corrUnchangedRB->set_group(corrGroup);
-    modesGrid->attach_next_to(*corrUnchangedRB, Gtk::POS_TOP, 3, 1);
+    modesGrid->attach_next_to(*corrUnchangedRB, Gtk::PositionType::TOP, 3, 1);
     corrUnchangedRB->signal_toggled().connect(sigc::bind(sigc::mem_fun(*this, &LensProfilePanel::onCorrModeChanged), corrUnchangedRB));
     corrUnchangedRB->set_active(true);
     corrUnchangedRB->show();

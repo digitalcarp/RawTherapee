@@ -120,11 +120,11 @@ HistogramPanel::HistogramPanel () :
     gfxGrid->add(*histogramArea);
     gfxGrid->attach_next_to(
         *histogramRGBAreaVert, *histogramArea,
-        options.histogramPosition == 1 ? Gtk::POS_RIGHT : Gtk::POS_LEFT,
+        options.histogramPosition == 1 ? Gtk::PositionType::RIGHT : Gtk::PositionType::LEFT,
         1,
         1
     );
-    gfxGrid->attach_next_to(*histogramRGBAreaHori, *histogramArea, Gtk::POS_BOTTOM, 1, 1);
+    gfxGrid->attach_next_to(*histogramRGBAreaHori, *histogramArea, Gtk::PositionType::BOTTOM, 1, 1);
     histogramRGBAreaHori->set_no_show_all();
     histogramRGBAreaVert->set_no_show_all();
 
@@ -685,11 +685,11 @@ void HistogramPanel::pointerMoved (bool validPos, const rtengine::procparams::Co
 
 /*
  * Move the vertical button bar to the right side
- * only allowed values for align are Gtk::POS_LEFT and Gtk::POS_RIGHT
+ * only allowed values for align are Gtk::PositionType::LEFT and Gtk::PositionType::RIGHT
  */
 void HistogramPanel::reorder (Gtk::PositionType align)
 {
-    if (align == Gtk::POS_LEFT) {
+    if (align == Gtk::PositionType::LEFT) {
         gfxGrid->reference();
         removeIfThere(this, gfxGrid, false);
         add (*gfxGrid);
@@ -709,7 +709,7 @@ void HistogramPanel::reorder (Gtk::PositionType align)
         buttonGrid->unreference();
 
         gfxGrid->remove(*histogramRGBAreaVert);
-        gfxGrid->attach_next_to(*histogramRGBAreaVert, *histogramArea, Gtk::POS_LEFT, 1, 1);
+        gfxGrid->attach_next_to(*histogramRGBAreaVert, *histogramArea, Gtk::PositionType::LEFT, 1, 1);
 
         persistentButtons->reference();
         removeIfThere(buttonGrid, persistentButtons, false);

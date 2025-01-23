@@ -130,7 +130,7 @@ ExifPanel::ExifPanel() :
             b->set_tooltip_text(M(tip));
             b->get_style_context()->add_class("Right");
             setExpandAlignProperties(b, true, true, Gtk::Align::FILL, Gtk::Align::FILL);
-            buttons1->attach_next_to(*b, Gtk::POS_RIGHT, 1, 1);
+            buttons1->attach_next_to(*b, Gtk::PositionType::RIGHT, 1, 1);
             return b;
         };
 

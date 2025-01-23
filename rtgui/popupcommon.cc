@@ -54,7 +54,7 @@ PopUpCommon::PopUpCommon (Gtk::Button* thisButton, const Glib::ustring& label)
     // Create the image for the button
     buttonImage = Gtk::manage(new RTImage());
     setExpandAlignProperties(buttonImage, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
-    imageContainer->attach_next_to(*buttonImage, Gtk::POS_RIGHT, 1, 1);
+    imageContainer->attach_next_to(*buttonImage, Gtk::PositionType::RIGHT, 1, 1);
     buttonImage->set_no_show_all();
 
     // Create the button for showing the pop-up.
@@ -64,7 +64,7 @@ PopUpCommon::PopUpCommon (Gtk::Button* thisButton, const Glib::ustring& label)
     setExpandAlignProperties(arrowButton, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
     arrowButton->add(*arrowImage); //menuSymbol);
     arrowImage->show();
-    buttonGroup->attach_next_to(*arrowButton, *button, Gtk::POS_RIGHT, 1, 1);
+    buttonGroup->attach_next_to(*arrowButton, *button, Gtk::PositionType::RIGHT, 1, 1);
     arrowButton->signal_button_release_event().connect_notify(sigc::mem_fun(*this, &PopUpCommon::showMenu));
     arrowButton->get_style_context()->add_class("Right");
     arrowButton->get_style_context()->add_class("popupbutton-arrow");

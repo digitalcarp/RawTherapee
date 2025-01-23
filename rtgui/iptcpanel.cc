@@ -385,25 +385,25 @@ IPTCPanel::IPTCPanel():
     reset->get_style_context()->add_class("Left");
     reset->set_image(*Gtk::manage(new RTImage("undo", Gtk::ICON_SIZE_BUTTON)));
     setExpandAlignProperties(reset, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
-    bbox->attach_next_to(*reset, Gtk::POS_LEFT, 1, 1);
+    bbox->attach_next_to(*reset, Gtk::PositionType::LEFT, 1, 1);
 
     file = Gtk::manage(new Gtk::Button());  // M("IPTCPANEL_EMBEDDED")
     file->get_style_context()->add_class("MiddleH");
     file->set_image(*Gtk::manage(new RTImage("folder-open", Gtk::ICON_SIZE_BUTTON)));
     setExpandAlignProperties(file, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
-    bbox->attach_next_to(*file, Gtk::POS_RIGHT, 1, 1);
+    bbox->attach_next_to(*file, Gtk::PositionType::RIGHT, 1, 1);
 
     copy = Gtk::manage(new Gtk::Button());
     copy->get_style_context()->add_class("MiddleH");
     copy->set_image(*Gtk::manage(new RTImage("copy", Gtk::ICON_SIZE_BUTTON)));
     setExpandAlignProperties(copy, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
-    bbox->attach_next_to(*copy, Gtk::POS_RIGHT, 1, 1);
+    bbox->attach_next_to(*copy, Gtk::PositionType::RIGHT, 1, 1);
 
     paste = Gtk::manage(new Gtk::Button());
     paste->get_style_context()->add_class("Right");
     paste->set_image(*Gtk::manage(new RTImage("paste", Gtk::ICON_SIZE_BUTTON)));
     setExpandAlignProperties(paste, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
-    bbox->attach_next_to(*paste, Gtk::POS_RIGHT, 1, 1);
+    bbox->attach_next_to(*paste, Gtk::PositionType::RIGHT, 1, 1);
 
     pack_end(*bbox, Gtk::PACK_SHRINK, 2);
 

@@ -44,8 +44,8 @@ FlatCurveEditorSubGroup::FlatCurveEditorSubGroup (CurveEditorGroup* prt, Glib::u
     valUnchanged = (int)FCT_Unchanged;
     parent = prt;
 
-    Gtk::PositionType sideStart = options.curvebboxpos == 0 || options.curvebboxpos == 2 ? Gtk::POS_LEFT : Gtk::POS_TOP;
-    Gtk::PositionType sideEnd = options.curvebboxpos == 0 || options.curvebboxpos == 2 ? Gtk::POS_RIGHT : Gtk::POS_BOTTOM;
+    Gtk::PositionType sideStart = options.curvebboxpos == 0 || options.curvebboxpos == 2 ? Gtk::PositionType::LEFT : Gtk::PositionType::TOP;
+    Gtk::PositionType sideEnd = options.curvebboxpos == 0 || options.curvebboxpos == 2 ? Gtk::PositionType::RIGHT : Gtk::PositionType::BOTTOM;
 
     // ControlPoints curve
     CPointsCurveGrid = new Gtk::Grid ();
@@ -116,17 +116,17 @@ FlatCurveEditorSubGroup::FlatCurveEditorSubGroup (CurveEditorGroup* prt, Glib::u
     CPointsCurve->set_hexpand(true);
 
     if (options.curvebboxpos == 0) {
-        CPointsCurveGrid->attach_next_to(*CPointsbbox, *CPointsCurveBox, Gtk::POS_TOP, 1, 1);
-        CPointsCurveGrid->attach_next_to(*CPointsCoordAdjuster, *CPointsCurveBox, Gtk::POS_BOTTOM, 1, 1);
+        CPointsCurveGrid->attach_next_to(*CPointsbbox, *CPointsCurveBox, Gtk::PositionType::TOP, 1, 1);
+        CPointsCurveGrid->attach_next_to(*CPointsCoordAdjuster, *CPointsCurveBox, Gtk::PositionType::BOTTOM, 1, 1);
     } else if (options.curvebboxpos == 1) {
-        CPointsCurveGrid->attach_next_to(*CPointsbbox, *CPointsCurveBox, Gtk::POS_RIGHT, 1, 1);
-        CPointsCurveGrid->attach_next_to(*CPointsCoordAdjuster, *CPointsCurveBox, Gtk::POS_BOTTOM, 2, 1);
+        CPointsCurveGrid->attach_next_to(*CPointsbbox, *CPointsCurveBox, Gtk::PositionType::RIGHT, 1, 1);
+        CPointsCurveGrid->attach_next_to(*CPointsCoordAdjuster, *CPointsCurveBox, Gtk::PositionType::BOTTOM, 2, 1);
     } else if (options.curvebboxpos == 2) {
-        CPointsCurveGrid->attach_next_to(*CPointsCoordAdjuster, *CPointsCurveBox, Gtk::POS_BOTTOM, 1, 1);
-        CPointsCurveGrid->attach_next_to(*CPointsbbox, *CPointsCoordAdjuster, Gtk::POS_BOTTOM, 1, 1);
+        CPointsCurveGrid->attach_next_to(*CPointsCoordAdjuster, *CPointsCurveBox, Gtk::PositionType::BOTTOM, 1, 1);
+        CPointsCurveGrid->attach_next_to(*CPointsbbox, *CPointsCoordAdjuster, Gtk::PositionType::BOTTOM, 1, 1);
     } else if (options.curvebboxpos == 3) {
-        CPointsCurveGrid->attach_next_to(*CPointsbbox, *CPointsCurveBox, Gtk::POS_LEFT, 1, 1);
-        CPointsCurveGrid->attach_next_to(*CPointsCoordAdjuster, *CPointsbbox, Gtk::POS_BOTTOM, 2, 1);
+        CPointsCurveGrid->attach_next_to(*CPointsbbox, *CPointsCurveBox, Gtk::PositionType::LEFT, 1, 1);
+        CPointsCurveGrid->attach_next_to(*CPointsCoordAdjuster, *CPointsbbox, Gtk::PositionType::BOTTOM, 2, 1);
     }
 
     CPointsCurveGrid->show_all ();
