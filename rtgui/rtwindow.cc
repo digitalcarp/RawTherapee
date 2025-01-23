@@ -19,11 +19,14 @@
 
 #include "rtwindow.h"
 
+#include "guiutils.h"
+#include "multilangmgr.h"
 #include "options.h"
 #include "rtimage.h"
 
 #include <gtkmm.h>
 
+#include "svgpaintable.h"
 // #include "cachemanager.h"
 // #include "preferences.h"
 // #include "iccprofilecreator.h"
@@ -149,7 +152,7 @@ RtWindow::RtWindow ()
     set_modal (false);
 
 //     on_delete_has_run = false;
-//     is_fullscreen = false;
+    is_fullscreen = false;
 //     is_minimized = false;
 //     property_destroy_with_parent().set_value (false);
 //     signal_window_state_event().connect ( sigc::mem_fun (*this, &RtWindow::on_window_state_event) );
@@ -183,114 +186,106 @@ RtWindow::RtWindow ()
 //         // Editor panel
 //         fpanel =  new FilePanel () ;
 //         fpanel->setParent (this);
-//
-//         // decorate tab
-//         Gtk::Grid* fpanelLabelGrid = Gtk::manage (new Gtk::Grid ());
+
+        // decorate tab
+        Gtk::Grid* fpanelLabelGrid = Gtk::manage (new Gtk::Grid ());
 //         setExpandAlignProperties (fpanelLabelGrid, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-//         Gtk::Label* fpl = Gtk::manage (new Gtk::Label ( Glib::ustring (" ") + M ("MAIN_FRAME_EDITOR") ));
-//
-//         if (options.mainNBVertical) {
-//             mainNB->set_tab_pos (Gtk::PositionType::LEFT);
-//             // fpl->set_angle (90);
-//             RTImage* folderIcon = Gtk::manage (new RTImage ("folder-closed", Gtk::IconSize::LARGE));
-//             fpanelLabelGrid->attach_next_to (*folderIcon, Gtk::PositionType::TOP, 1, 1);
-//             fpanelLabelGrid->attach_next_to (*fpl, Gtk::PositionType::TOP, 1, 1);
-//         } else {
-//             RTImage* folderIcon = Gtk::manage (new RTImage ("folder-closed", Gtk::IconSize::LARGE));
-//             fpanelLabelGrid->attach_next_to (*folderIcon, Gtk::PositionType::RIGHT, 1, 1);
-//             fpanelLabelGrid->attach_next_to (*fpl, Gtk::PositionType::RIGHT, 1, 1);
-//         }
-//
-//         fpanelLabelGrid->set_tooltip_markup (M ("MAIN_FRAME_FILEBROWSER_TOOLTIP"));
-//         fpanelLabelGrid->show_all ();
-//         mainNB->append_page (*fpanel, *fpanelLabelGrid);
-//
-//
+        Gtk::Label* fpl = Gtk::manage (new Gtk::Label ( Glib::ustring (" ") + M ("MAIN_FRAME_EDITOR") ));
+
+        if (options.mainNBVertical) {
+            mainNB->set_tab_pos (Gtk::PositionType::LEFT);
+            // fpl->set_angle (90);
+            RtImage* folderIcon = Gtk::manage (new RtImage("folder-closed"));
+            fpanelLabelGrid->attach_next_to (*folderIcon, Gtk::PositionType::TOP, 1, 1);
+            fpanelLabelGrid->attach_next_to (*fpl, Gtk::PositionType::TOP, 1, 1);
+        } else {
+            RtImage* folderIcon = Gtk::manage (new RtImage("folder-closed"));
+            fpanelLabelGrid->attach_next_to (*folderIcon, Gtk::PositionType::RIGHT, 1, 1);
+            fpanelLabelGrid->attach_next_to (*fpl, Gtk::PositionType::RIGHT, 1, 1);
+        }
+
+        fpanelLabelGrid->set_tooltip_markup (M ("MAIN_FRAME_FILEBROWSER_TOOLTIP"));
+        // mainNB->append_page (*fpanel, *fpanelLabelGrid);
+        mainNB->append_page(*Gtk::manage(new Gtk::Box()), *fpanelLabelGrid);
+
 //         // Batch Queue panel
 //         bpanel = Gtk::manage ( new BatchQueuePanel (fpanel->fileCatalog) );
-//
-//         // decorate tab, the label is unimportant since its updated in batchqueuepanel anyway
-//         Gtk::Label* lbq = Gtk::manage ( new Gtk::Label (M ("MAIN_FRAME_QUEUE")) );
-//
-//         if (options.mainNBVertical) {
-//             // lbq->set_angle (90);
-//         }
-//
-//         mainNB->append_page (*bpanel, *lbq);
-//
-//
+
+        // decorate tab, the label is unimportant since its updated in batchqueuepanel anyway
+        Gtk::Label* lbq = Gtk::manage ( new Gtk::Label (M ("MAIN_FRAME_QUEUE")) );
+        if (options.mainNBVertical) {
+            // lbq->set_angle (90);
+        }
+        // mainNB->append_page (*bpanel, *lbq);
+        mainNB->append_page (*Gtk::manage(new Gtk::Box()), *lbq);
+
 //         if (isSingleTabMode()) {
 //             createSetmEditor();
 //         }
 //
 //         mainNB->set_current_page (mainNB->page_num (*fpanel));
-//
-//         //Gtk::Box* mainBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
-//         //mainBox->pack_start (*mainNB);
-//
-//         // filling bottom box
-//         iFullscreen = new RTImage ("fullscreen-enter", Gtk::IconSize::LARGE);
-//         iFullscreen_exit = new RTImage ("fullscreen-leave", Gtk::IconSize::LARGE);
-//
-//         Gtk::Button* iccProfileCreator = Gtk::manage (new Gtk::Button ());
+
+        // filling bottom box
+        iFullscreen = new RtImage("fullscreen-enter");
+        iFullscreen_exit = new RtImage("fullscreen-leave");
+
+        Gtk::Button* iccProfileCreator = Gtk::manage (new Gtk::Button ());
 //         setExpandAlignProperties (iccProfileCreator, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-//         iccProfileCreator->set_relief(Gtk::RELIEF_NONE);
-//         iccProfileCreator->set_image (*Gtk::manage (new RTImage ("gamut-plus", Gtk::IconSize::LARGE)));
-//         iccProfileCreator->set_tooltip_markup (M ("MAIN_BUTTON_ICCPROFCREATOR"));
+        iccProfileCreator->set_child (*Gtk::manage (new RtImage("gamut-plus")));
+        iccProfileCreator->set_has_frame(false);
+        iccProfileCreator->set_tooltip_markup (M ("MAIN_BUTTON_ICCPROFCREATOR"));
 //         iccProfileCreator->signal_clicked().connect ( sigc::mem_fun (*this, &RtWindow::showICCProfileCreator) );
-//
-//         Gtk::Button* helpBtn = Gtk::manage (new Gtk::Button ());
+
+        Gtk::Button* helpBtn = Gtk::manage (new Gtk::Button ());
 //         setExpandAlignProperties (helpBtn, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-//         helpBtn->set_relief(Gtk::RELIEF_NONE);
-//         helpBtn->set_image (*Gtk::manage (new RTImage("questionmark", Gtk::IconSize::LARGE)));
-//         helpBtn->set_tooltip_markup (M ("GENERAL_HELP"));
+        helpBtn->set_child (*Gtk::manage (new RtImage("questionmark")));
+        helpBtn->set_has_frame(false);
+        helpBtn->set_tooltip_markup (M ("GENERAL_HELP"));
 //         helpBtn->signal_clicked().connect (sigc::mem_fun (*this, &RtWindow::showRawPedia));
-//
-//         Gtk::Button* preferences = Gtk::manage (new Gtk::Button ());
+
+        Gtk::Button* preferences = Gtk::manage (new Gtk::Button ());
 //         setExpandAlignProperties (preferences, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-//         preferences->set_relief(Gtk::RELIEF_NONE);
-//         preferences->set_image (*Gtk::manage (new RTImage ("preferences", Gtk::IconSize::LARGE)));
-//         preferences->set_tooltip_markup (M ("MAIN_BUTTON_PREFERENCES"));
+        preferences->set_child (*Gtk::manage (new RtImage("preferences")));
+        preferences->set_has_frame(false);
+        preferences->set_tooltip_markup (M ("MAIN_BUTTON_PREFERENCES"));
 //         preferences->signal_clicked().connect ( sigc::mem_fun (*this, &RtWindow::showPreferences) );
-//
-//         btn_fullscreen = Gtk::manage ( new Gtk::Button());
+
+        btn_fullscreen = Gtk::manage ( new Gtk::Button());
 //         setExpandAlignProperties (btn_fullscreen, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-//         btn_fullscreen->set_relief(Gtk::RELIEF_NONE);
-//         btn_fullscreen->set_tooltip_markup (M ("MAIN_BUTTON_FULLSCREEN"));
-//         btn_fullscreen->set_image (*iFullscreen);
-//         btn_fullscreen->signal_clicked().connect ( sigc::mem_fun (*this, &RtWindow::toggle_fullscreen) );
+        btn_fullscreen->set_tooltip_markup (M ("MAIN_BUTTON_FULLSCREEN"));
+        btn_fullscreen->set_child (*iFullscreen);
+        btn_fullscreen->set_has_frame(false);
+        btn_fullscreen->signal_clicked().connect ( sigc::mem_fun (*this, &RtWindow::toggle_fullscreen) );
 //         setExpandAlignProperties (&prProgBar, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-//         prProgBar.set_show_text (true);
-//
-//         Gtk::Grid* actionGrid = Gtk::manage (new Gtk::Grid ());
-//         actionGrid->set_row_spacing (2);
-//         actionGrid->set_column_spacing (2);
-//
+        prProgBar.set_show_text (true);
+
+        Gtk::Grid* actionGrid = Gtk::manage (new Gtk::Grid ());
+        actionGrid->set_row_spacing (2);
+        actionGrid->set_column_spacing (2);
+
 //         setExpandAlignProperties (actionGrid, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-//
-//         if (options.mainNBVertical) {
-//             prProgBar.set_orientation (Gtk::Orientation::VERTICAL);
-//             prProgBar.set_inverted (true);
-//             actionGrid->set_orientation (Gtk::Orientation::VERTICAL);
-//             actionGrid->attach_next_to (prProgBar, Gtk::PositionType::BOTTOM, 1, 1);
-//             actionGrid->attach_next_to (*iccProfileCreator, Gtk::PositionType::BOTTOM, 1, 1);
-//             actionGrid->attach_next_to (*helpBtn, Gtk::PositionType::BOTTOM, 1, 1);
-//             actionGrid->attach_next_to (*preferences, Gtk::PositionType::BOTTOM, 1, 1);
-//             actionGrid->attach_next_to (*btn_fullscreen, Gtk::PositionType::BOTTOM, 1, 1);
-//             mainNB->set_action_widget (actionGrid, Gtk::PACK_END);
-//         } else {
-//             prProgBar.set_orientation (Gtk::Orientation::HORIZONTAL);
-//             actionGrid->set_orientation (Gtk::Orientation::HORIZONTAL);
-//             actionGrid->attach_next_to (prProgBar, Gtk::PositionType::RIGHT, 1, 1);
-//             actionGrid->attach_next_to (*iccProfileCreator, Gtk::PositionType::RIGHT, 1, 1);
-//             actionGrid->attach_next_to (*helpBtn, Gtk::PositionType::RIGHT, 1, 1);
-//             actionGrid->attach_next_to (*preferences, Gtk::PositionType::RIGHT, 1, 1);
-//             actionGrid->attach_next_to (*btn_fullscreen, Gtk::PositionType::RIGHT, 1, 1);
-//             mainNB->set_action_widget (actionGrid, Gtk::PACK_END);
-//         }
-//
-//         actionGrid->show_all();
-//
+
+        if (options.mainNBVertical) {
+            prProgBar.set_orientation (Gtk::Orientation::VERTICAL);
+            prProgBar.set_inverted (true);
+            actionGrid->set_orientation (Gtk::Orientation::VERTICAL);
+            actionGrid->attach_next_to (prProgBar, Gtk::PositionType::BOTTOM, 1, 1);
+            actionGrid->attach_next_to (*iccProfileCreator, Gtk::PositionType::BOTTOM, 1, 1);
+            actionGrid->attach_next_to (*helpBtn, Gtk::PositionType::BOTTOM, 1, 1);
+            actionGrid->attach_next_to (*preferences, Gtk::PositionType::BOTTOM, 1, 1);
+            actionGrid->attach_next_to (*btn_fullscreen, Gtk::PositionType::BOTTOM, 1, 1);
+            mainNB->set_action_widget (actionGrid, Gtk::PackType::END);
+        } else {
+            prProgBar.set_orientation (Gtk::Orientation::HORIZONTAL);
+            actionGrid->set_orientation (Gtk::Orientation::HORIZONTAL);
+            actionGrid->attach_next_to (prProgBar, Gtk::PositionType::RIGHT, 1, 1);
+            actionGrid->attach_next_to (*iccProfileCreator, Gtk::PositionType::RIGHT, 1, 1);
+            actionGrid->attach_next_to (*helpBtn, Gtk::PositionType::RIGHT, 1, 1);
+            actionGrid->attach_next_to (*preferences, Gtk::PositionType::RIGHT, 1, 1);
+            actionGrid->attach_next_to (*btn_fullscreen, Gtk::PositionType::RIGHT, 1, 1);
+            mainNB->set_action_widget (actionGrid, Gtk::PackType::END);
+        }
+
 //         pldBridge = new PLDBridge (static_cast<rtengine::ProgressListener*> (this));
 
         set_child(*mainNB);
@@ -456,7 +451,7 @@ void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 //         // construct closeable tab for the image
 //         Gtk::Grid* titleGrid = Gtk::manage (new Gtk::Grid ());
 //         titleGrid->set_tooltip_markup (name);
-//         RTImage *closebimg = Gtk::manage (new RTImage ("cancel-small", Gtk::IconSize::LARGE));
+//         RtImage *closebimg = Gtk::manage (new RtImage("cancel-small"));
 //         Gtk::Button* closeb = Gtk::manage (new Gtk::Button ());
 //         closeb->set_name ("CloseButton");
 //         closeb->add (*closebimg);
@@ -465,7 +460,7 @@ void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 //         closeb->signal_clicked().connect ( sigc::bind (sigc::mem_fun (*this, &RtWindow::remEditorPanel), ep));
 //
 //         if (!EditWindow::isMultiDisplayEnabled()) {
-//             titleGrid->attach_next_to (*Gtk::manage (new RTImage ("aperture", Gtk::IconSize::LARGE)), Gtk::PositionType::RIGHT, 1, 1);
+//             titleGrid->attach_next_to (*Gtk::manage (new RtImage("aperture")), Gtk::PositionType::RIGHT, 1, 1);
 //         }
 //         titleGrid->attach_next_to (*Gtk::manage (new Gtk::Label (Glib::path_get_basename (name))), Gtk::PositionType::RIGHT, 1, 1);
 //         titleGrid->attach_next_to (*closeb, Gtk::PositionType::RIGHT, 1, 1);
@@ -854,30 +849,32 @@ void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 // {
 //     prProgBar.set_text(descr);
 // }
-//
-// void RtWindow::toggle_fullscreen ()
-// {
-//     onConfEventConn.block(true); // Avoid getting size and position while window is getting fullscreen
-//
-//     if (is_fullscreen) {
-//         unfullscreen();
-//
-//         if (btn_fullscreen) {
-//             btn_fullscreen->set_tooltip_markup (M ("MAIN_BUTTON_FULLSCREEN"));
-//             btn_fullscreen->set_image (*iFullscreen);
-//         }
-//     } else {
-//         fullscreen();
-//
-//         if (btn_fullscreen) {
-//             btn_fullscreen->set_tooltip_markup (M ("MAIN_BUTTON_UNFULLSCREEN"));
-//             btn_fullscreen->set_image (*iFullscreen_exit);
-//         }
-//     }
-//
-//     onConfEventConn.block(false);
-// }
-//
+
+void RtWindow::toggle_fullscreen ()
+{
+    onConfEventConn.block(true); // Avoid getting size and position while window is getting fullscreen
+
+    if (is_fullscreen) {
+        is_fullscreen = false;
+        unfullscreen();
+
+        if (btn_fullscreen) {
+            btn_fullscreen->set_tooltip_markup (M ("MAIN_BUTTON_FULLSCREEN"));
+            btn_fullscreen->set_child (*iFullscreen);
+        }
+    } else {
+        is_fullscreen = true;
+        fullscreen();
+
+        if (btn_fullscreen) {
+            btn_fullscreen->set_tooltip_markup (M ("MAIN_BUTTON_UNFULLSCREEN"));
+            btn_fullscreen->set_child (*iFullscreen_exit);
+        }
+    }
+
+    onConfEventConn.block(false);
+}
+
 // void RtWindow::SetEditorCurrent()
 // {
 //     mainNB->set_current_page (mainNB->page_num (*epanel));
@@ -1151,7 +1148,7 @@ void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 //         // el->set_angle (90);
 //     }
 //
-//     editorLabelGrid->attach_next_to (*Gtk::manage (new RTImage ("aperture", Gtk::IconSize::LARGE)), pos, 1, 1);
+//     editorLabelGrid->attach_next_to (*Gtk::manage (new RtImage("aperture")), pos, 1, 1);
 //     editorLabelGrid->attach_next_to (*el, pos, 1, 1);
 //
 //     editorLabelGrid->set_tooltip_markup (M ("MAIN_FRAME_EDITOR_TOOLTIP"));

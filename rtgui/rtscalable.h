@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include "rtsigc.h"
-
 #include <gtkmm.h>
 
 /**
@@ -56,13 +54,8 @@ class RTScalable
 private:
     static double s_dpi;
     static int s_scale;
-    static sigc::signal<void(double, int)> s_signal_changed;
 
     static void getDPInScale(const Gtk::Window* window, double &newDPI, int &newScale);
-
-protected:
-    static Cairo::RefPtr<Cairo::ImageSurface> loadSurfaceFromIcon(const Glib::ustring &icon_name, const Gtk::IconSize iconSize = Gtk::IconSize::LARGE);
-    static Cairo::RefPtr<Cairo::ImageSurface> loadSurfaceFromSVG(const Glib::ustring &fname, const int width = -1, const int height = -1, const bool is_path = false);
 
 public:
     static constexpr double pangoDPI = 72.; // Pango default DPI for "pt" size
@@ -78,6 +71,4 @@ public:
     static double getGlobalScale();
     static int scalePixelSize(const int pixel_size);
     static double scalePixelSize(const double pixel_size);
-
-    static RtScopedConnection connectToChanged(sigc::slot<void(double, int)>&& slot);
 };

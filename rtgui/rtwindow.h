@@ -23,7 +23,7 @@
 #include <sigc++/signal.h>
 
 // #include "progressconnector.h"
-#include "splash.h"
+// #include "splash.h"
 
 #include "rtengine/noncopyable.h"
 
@@ -49,16 +49,16 @@ private:
     // sigc::signal<void> externalEditorChangedSignal;
     //
     // Splash* splash;
-    // Gtk::ProgressBar prProgBar;
+    Gtk::ProgressBar prProgBar;
     // PLDBridge* pldBridge;
-    // bool is_fullscreen;
+    bool is_fullscreen;
     // bool is_minimized;
-    // sigc::connection onConfEventConn;
+    sigc::connection onConfEventConn;
     // bool on_delete_has_run;
-    // Gtk::Button * btn_fullscreen;
-    //
-    // Gtk::Image *iFullscreen, *iFullscreen_exit;
-    //
+    Gtk::Button* btn_fullscreen;
+
+    Gtk::Image *iFullscreen, *iFullscreen_exit;
+
     // bool isSingleTabMode() const;
     //
     // bool on_expose_event_epanel (GdkEventExpose* event);
@@ -92,7 +92,7 @@ public:
     // void showICCProfileCreator ();
     // void showPreferences ();
     // void on_realize () override;
-    // void toggle_fullscreen ();
+    void toggle_fullscreen ();
     // void get_position(int& x, int& y) const;
     //
     // void setProgress(double p) override;

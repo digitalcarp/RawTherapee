@@ -21,141 +21,40 @@
 
 #include "rtimage.h"
 
-#include "rtsurface.h"
+#include "svgpaintable.h"
 
-std::map<std::pair<Glib::ustring, Gtk::IconSize>, std::shared_ptr<RTSurface>> RTImageCache::cache;
+#include <gdkmm/display.h>
+#include <gtkmm/icontheme.h>
 
-std::shared_ptr<RTSurface> RTImageCache::getCachedSurface(const Glib::ustring &icon_name, const Gtk::IconSize icon_size)
-{
-    // Look for an existing cached icon
-    const auto key = std::pair<Glib::ustring, Gtk::IconSize>(icon_name, icon_size);
-    const auto item = cache.find(key);
+#include <iostream>
 
-    if (item != cache.end()) { // A cached icon exists
-        return item->second;
-    } else { // Create the icon
-        auto surface = std::shared_ptr<RTSurface>(new RTSurface(icon_name, icon_size));
+RtImage::RtImage() : Gtk::Image() {}
 
-        // Add the surface to the cache if the icon exist
-        if (surface) {
-            cache.insert({key, surface});
-        }
+RtImage::RtImage(const Glib::ustring& icon_name, bool cached)
+        : Gtk::Image(), m_icon_name(icon_name) {
+    Glib::RefPtr<Gdk::Display> display = Gdk::Display::get_default();
+    auto theme = Gtk::IconTheme::get_for_display(display);
 
-        return surface;
-    }
-}
-
-void RTImageCache::updateCache()
-{
-    // Iterate over cache to updated RTSurface
-    for (auto const& item : cache) {
-        item.second->updateSurface();
-    }
-}
-
-RTImage::RTImage () {}
-
-RTImage::RTImage (const Glib::ustring& iconName, const Gtk::IconSize iconSize) :
-    sigc::trackable(),
-    Glib::ObjectBase(),
-    Gtk::Image(),
-    size(iconSize),
-    icon_name(iconName),
-    g_icon(Glib::RefPtr<const Gio::Icon>())
-{
-    // Set surface from icon cache
-    surface = RTImageCache::getCachedSurface(this->icon_name, this->size);
-
-    // Add it to the RTImage if surface exists
-    if (surface) {
-        set(surface->get());
+    Glib::RefPtr<Gtk::IconPaintable> icon = theme->lookup_icon(icon_name, 16);
+    if (!icon) {
+        std::cerr << "Failed to load icon \"" << icon_name << "\"\n";
+        return;
     }
 
-    conn = RTScalable::connectToChanged(sigc::mem_fun(*this, &RTImage::onUpdate));
-}
-
-RTImage::RTImage (const Glib::RefPtr<const Gio::Icon>& gIcon, const Gtk::IconSize iconSize) :
-    Gtk::Image(),
-    size(iconSize),
-    icon_name(""),
-    g_icon(gIcon)
-{
-    // Configure RTImage based on g_icon
-    set(this->g_icon, this->size);
-}
-
-void RTImage::onUpdate(double /*dpi*/, int /*scale*/)
-{
-    if (surface) {
-        // Trigger an update of the image
-        set(surface->get());
-        queue_draw();
-    }
-}
-
-void RTImage::set_from_icon_name(const Glib::ustring& iconName)
-{
-    set_from_icon_name(iconName, this->size);
-}
-
-void RTImage::set_from_icon_name(const Glib::ustring& iconName, const Gtk::IconSize iconSize)
-{
-    this->icon_name = iconName;
-    this->size = iconSize;
-
-    // Set surface from icon cache
-    surface = RTImageCache::getCachedSurface(this->icon_name, this->size);
-
-    // Add it to the RTImage if previously chosen
-    if (surface) {
-        set(surface->get());
+    std::string file = icon->get_file()->get_path();
+    auto pos = file.find_last_of('.');
+    if (pos > file.length()) {
+        std::cerr << "Failed to parse extension for icon \"" << icon_name
+            << "\" at path: " << file << "\n";
+        return;
     }
 
-    // Unset Gio::Icon if previously chosen
-    if (this->g_icon) {
-        g_icon = Glib::RefPtr<const Gio::Icon>();
-    }
-}
-
-void RTImage::set_from_gicon(const Glib::RefPtr<const Gio::Icon>& gIcon)
-{
-    set_from_gicon(gIcon, this->size);
-}
-
-void RTImage::set_from_gicon(const Glib::RefPtr<const Gio::Icon>& gIcon, const Gtk::IconSize iconSize)
-{
-    this->g_icon = gIcon;
-    this->size = iconSize;
-
-    // Set image from Gio::Icon
-    set(this->g_icon, this->size);
-
-    // Unset surface if previously chosen
-    this->icon_name = "";
-
-    if (surface) {
-        surface = std::shared_ptr<RTSurface>();
-    }
-}
-
-int RTImage::get_width()
-{
-    if (surface) {
-        return surface->getWidth();
-    } else if (g_icon) {
-        Gtk::Image::get_width();
+    auto fext = file.substr(pos + 1);
+    if (fext != "svg") {
+        std::cerr << "Icon \"" << icon_name << "\" is not an SVG: " << file << "\n";
+        return;
     }
 
-    return -1;
-}
-
-int RTImage::get_height()
-{
-    if (surface) {
-        return surface->getHeight();
-    } else if (g_icon) {
-        Gtk::Image::get_height();
-    }
-
-    return -1;
+    Glib::RefPtr<SvgPaintableWrapper> svg = SvgPaintableWrapper::createFromFilename(file, cached);
+    gtk_image_set_from_paintable(gobj(), svg->base_gobj());
 }

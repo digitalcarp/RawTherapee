@@ -20,47 +20,17 @@
  */
 #pragma once
 
-#include "rtsigc.h"
-
-#include <gtkmm.h>
-
-class RTSurface;
-
-class RTImageCache final
-{
-private:
-    static std::map<std::pair<Glib::ustring, Gtk::IconSize>, std::shared_ptr<RTSurface>> cache;
-
-public:
-    static std::shared_ptr<RTSurface> getCachedSurface(const Glib::ustring &icon_name, const Gtk::IconSize icon_size);
-    static void updateCache();
-};
+#include <glibmm/ustring.h>
+#include <gtkmm/image.h>
 
 /**
  * @brief A derived class of Gtk::Image in order to handle theme-related icon sets.
  */
-class RTImage final : public Gtk::Image
-{
-private:
-    Gtk::IconSize size;
-    Glib::ustring icon_name;
-    std::shared_ptr<RTSurface> surface;
-    Glib::RefPtr<const Gio::Icon> g_icon;
-
-    RtScopedConnection conn;
-
-    void onUpdate(double dpi, int scale);
-
+class RtImage final : public Gtk::Image {
 public:
-    RTImage ();
-    explicit RTImage (const Glib::ustring& iconName, const Gtk::IconSize iconSize = Gtk::IconSize::LARGE);
-    explicit RTImage (const Glib::RefPtr<const Gio::Icon>& gIcon, const Gtk::IconSize iconSize = Gtk::IconSize::LARGE);
+    RtImage();
+    RtImage(const Glib::ustring& icon_name, bool cached = true);
 
-    void set_from_icon_name(const Glib::ustring& iconName);
-    void set_from_icon_name(const Glib::ustring& iconName, const Gtk::IconSize iconSize);
-    void set_from_gicon(const Glib::RefPtr<const Gio::Icon>& gIcon);
-    void set_from_gicon(const Glib::RefPtr<const Gio::Icon>& gIcon, const Gtk::IconSize iconSize);
-
-    int get_width();
-    int get_height();
+private:
+    Glib::ustring m_icon_name;
 };

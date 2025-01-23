@@ -20,17 +20,9 @@
 
 #include "rtscalable.h"
 
-#include <iostream>
-#include <librsvg/rsvg.h>
-
-#include "rtengine/settings.h"
-
-extern Glib::ustring argv0;
-
 // Default static parameter values
 double RTScalable::s_dpi = 96.;
 int RTScalable::s_scale = 1;
-sigc::signal<void(double, int)> RTScalable::s_signal_changed;
 
 int RTScalable::getScaleForWindow(const Gtk::Window* window)
 {
@@ -59,161 +51,6 @@ void RTScalable::getDPInScale(const Gtk::Window* window, double &newDPI, int &ne
     }
 }
 
-Cairo::RefPtr<Cairo::ImageSurface> RTScalable::loadSurfaceFromIcon(const Glib::ustring &iconName, const Gtk::IconSize iconSize)
-{
-    GThreadLock lock; // All icon theme access or image access on separate thread HAVE to be protected
-
-    Cairo::RefPtr<Cairo::ImageSurface> surf; // Create Cairo::RefPtr<Cairo::ImageSurface> nullptr
-
-    // Get icon theme
-    const auto theme = Gtk::IconTheme::get_default();
-
-    // Get pixel size from Gtk::IconSize
-    int wSize, hSize;
-
-    // TODO: Size lookup no longer available
-    // if (!Gtk::IconSize::lookup(iconSize, wSize, hSize)) { // Size in invalid
-    //     wSize = hSize = 16; // Set to a default size of 16px (i.e. Gtk::ICON_SIZE_SMALL_TOOLBAR one)
-    // }
-    wSize = hSize = 16;
-
-    // Get scale based on DPI and scale
-    // Note: hSize not used because icon are considered squared
-    const int size = RTScalable::scalePixelSize(wSize);
-
-    // Looking for corresponding icon (if existing)
-    const auto iconInfo = theme->lookup_icon(iconName, size);
-
-    if (!iconInfo) {
-        std::cerr << "Failed to load icon \"" << iconName << "\" for size " << size << "px" << std::endl;
-
-        return surf;
-    }
-
-    const auto iconPath = iconInfo.get_filename();
-
-    if (iconPath.empty()) {
-        std::cerr << "Failed to load icon \"" << iconName << "\" for size " << size << "px" << std::endl;
-
-        return surf;
-    }
-
-    // Create surface from corresponding icon
-    const auto pos = iconPath.find_last_of('.');
-
-    if (pos < iconPath.length()) {
-        const auto fext = iconPath.substr(pos + 1, iconPath.length()).lowercase();
-
-        // Case where iconPath is a SVG file
-        if (fext == "svg") {
-            // Create surface from SVG file
-            surf = RTScalable::loadSurfaceFromSVG(iconPath, size, size, true);
-        }
-    }
-
-    return surf;
-}
-
-Cairo::RefPtr<Cairo::ImageSurface> RTScalable::loadSurfaceFromSVG(const Glib::ustring &fname, const int width, const int height, const bool is_path)
-{
-    GThreadLock lock; // All icon theme access or image access on separate thread HAVE to be protected
-
-    Cairo::RefPtr<Cairo::ImageSurface> surf; // Create Cairo::RefPtr<Cairo::ImageSurface> nullptr
-
-    Glib::ustring path;
-
-    if (is_path) {
-        // Directly use fname as a path
-        path = fname;
-    } else {
-        // Look for SVG file in "images" folder
-        Glib::ustring imagesFolder = Glib::build_filename(argv0, "images");
-        path = Glib::build_filename(imagesFolder, fname);
-    }
-
-    // Create surface from SVG file if file exist
-    if (Glib::file_test(path.c_str(), Glib::FileTest::EXISTS)) {
-        // Read content of SVG file
-        std::string svgFile;
-        try {
-            svgFile = Glib::file_get_contents(path);
-        }
-        catch (const Glib::Error &err) {
-            std::cerr << "Failed to load SVG file \"" << fname << "\": " << err.what() << std::endl;
-            return surf;
-        }
-
-        // Create surface with librsvg library
-        GError* error = nullptr;
-        RsvgHandle* handle = rsvg_handle_new_from_data((unsigned const char*)svgFile.c_str(), svgFile.length(), &error);
-
-        if (error) {
-            std::cerr << "Failed to load SVG file \"" << fname << "\": " << std::endl
-                      << Glib::ustring(error->message) << std::endl;
-            free(error);
-            return surf;
-        }
-
-        int w, h;
-
-        if (width == -1 || height == -1) {
-            // Use SVG image natural width and height
-            double _w, _h;
-            const bool has_dim = rsvg_handle_get_intrinsic_size_in_pixels(handle, &_w, &_h); // Get SVG image dimensions
-            if (has_dim) {
-                w = std::ceil(_w);
-                h = std::ceil(_h);
-            } else {
-                w = h = 16; // Set to a default size of 16px (i.e. Gtk::ICON_SIZE_SMALL_TOOLBAR one)
-            }
-        } else {
-            // Use given width and height
-            w = width;
-            h = height;
-        }
-
-        // Create an upscaled surface to avoid blur effect
-        surf = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32,
-            w * RTScalable::getScale(),
-            h * RTScalable::getScale());
-
-        // Render (and erase with) default surface background
-        Cairo::RefPtr<Cairo::Context> c = Cairo::Context::create(surf);
-        c->set_source_rgba (0., 0., 0., 0.);
-        c->set_operator (Cairo::Context::Operator::CLEAR);
-        c->paint();
-
-        // Render upscaled surface based on SVG image
-        error = nullptr;
-        RsvgRectangle rect = {
-            .x = 0.,
-            .y = 0.,
-            .width = static_cast<double>(w * RTScalable::getScale()),
-            .height = static_cast<double>(h * RTScalable::getScale())
-        };
-        c->set_operator (Cairo::Context::Operator::CLEAR);
-        const bool success = rsvg_handle_render_document(handle, c->cobj(), &rect, &error);
-
-        if (!success && error) {
-            std::cerr << "Failed to load SVG file \"" << fname << "\": " << std::endl
-                      << Glib::ustring(error->message) << std::endl;
-            free(error);
-            return surf;
-        }
-
-        g_object_unref(handle);
-
-        // Set device scale to avoid blur effect
-        cairo_surface_set_device_scale(surf->cobj(),
-            static_cast<double>(RTScalable::getScale()),
-            static_cast<double>(RTScalable::getScale()));
-    } else {
-        std::cerr << "Failed to load SVG file \"" << fname << "\"" << std::endl;
-    }
-
-    return surf;
-}
-
 void RTScalable::init(const Gtk::Window* window)
 {
     // Retrieve DPI and Scale paremeters from OS
@@ -236,7 +73,6 @@ void RTScalable::setDPInScale (const double newDPI, const int newScale)
     if (s_dpi != newDPI || s_scale != newScale) {
         s_dpi = newDPI;
         s_scale = newScale;
-        s_signal_changed.emit(newDPI, newScale);
     }
 }
 
@@ -265,9 +101,4 @@ double RTScalable::scalePixelSize(const double pixel_size)
 {
     const double s = getGlobalScale();
     return (pixel_size * s);
-}
-
-RtScopedConnection RTScalable::connectToChanged(sigc::slot<void(double, int)>&& slot)
-{
-    return RtScopedConnection(s_signal_changed.connect(std::move(slot)));
 }

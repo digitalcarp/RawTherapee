@@ -141,9 +141,8 @@ set(NONCLISOURCEFILES
     # rgbcurves.cc
     # rotate.cc
     # rtappchooserdialog.cc
-    # rtimage.cc
-    # rtscalable.cc
-    # rtsurface.cc
+    rtimage.cc
+    rtscalable.cc
     rtwindow.cc
     # saveasdlg.cc
     # saveformatpanel.cc
@@ -158,6 +157,7 @@ set(NONCLISOURCEFILES
     # soundman.cc
     # splash.cc
     # spot.cc
+    svgpaintable.cc
     # threadutils.cc
     # thresholdadjuster.cc
     # thresholdselector.cc
