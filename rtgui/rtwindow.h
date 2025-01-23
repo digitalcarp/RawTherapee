@@ -52,8 +52,7 @@ private:
     Gtk::ProgressBar prProgBar;
     // PLDBridge* pldBridge;
     bool is_fullscreen;
-    // bool is_minimized;
-    sigc::connection onConfEventConn;
+    bool ignoreDefaultSizeChange;
     // bool on_delete_has_run;
     Gtk::Button* btn_fullscreen;
 
@@ -67,6 +66,10 @@ private:
     // bool isEditorPanel (Widget* panel);
     // bool isEditorPanel (guint pageNum);
     // void showErrors ();
+
+    void onDefaultSizeChange();
+    void onFullscreenChange();
+    void onMaximizedChange();
 
     Glib::ustring versionStr;
 
@@ -83,9 +86,7 @@ public:
     //
     // bool keyPressed (GdkEventKey* event);
     // bool keyReleased(GdkEventKey *event);
-    // bool on_configure_event (GdkEventConfigure* event) override;
     // bool on_delete_event (GdkEventAny* event) override;
-    // bool on_window_state_event (GdkEventWindowState* event) override;
     void on_mainNB_switch_page (Gtk::Widget* widget, guint page_num);
 
     // void showRawPedia();
@@ -122,10 +123,10 @@ public:
     // void updateShowtooltipVisibility (bool showtooltip);
     // void updateToolPanelToolLocations(
     //     const std::vector<Glib::ustring> &favorites, bool cloneFavoriteTools);
-    // bool getIsFullscreen()
-    // {
-    //     return is_fullscreen;
-    // }
+    bool getIsFullscreen()
+    {
+        return is_fullscreen;
+    }
     // void setWindowSize ();
     // void set_title_decorated (Glib::ustring fname);
     // void closeOpenEditors();

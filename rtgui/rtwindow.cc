@@ -23,10 +23,10 @@
 #include "multilangmgr.h"
 #include "options.h"
 #include "rtimage.h"
+#include "rtscalable.h"
 
 #include <gtkmm.h>
 
-#include "svgpaintable.h"
 // #include "cachemanager.h"
 // #include "preferences.h"
 // #include "iccprofilecreator.h"
@@ -45,12 +45,12 @@ Glib::RefPtr<Gtk::CssProvider> cssForced;
 Glib::RefPtr<Gtk::CssProvider> cssRT;
 
 RtWindow::RtWindow ()
-//     : mainNB (nullptr)
+    : mainNB (nullptr)
 //     , bpanel (nullptr)
 //     , splash (nullptr)
-//     , btn_fullscreen (nullptr)
-//     , iFullscreen (nullptr)
-//     , iFullscreen_exit (nullptr)
+    , btn_fullscreen (nullptr)
+    , iFullscreen (nullptr)
+    , iFullscreen_exit (nullptr)
 //     , epanel (nullptr)
 //     , fpanel (nullptr)
 {
@@ -67,8 +67,8 @@ RtWindow::RtWindow ()
         settings->property_gtk_application_prefer_dark_theme() = true;
         settings->property_gtk_icon_theme_name() = "rawtherapee";
 
-//         // Initialize RTScalable for Hi-DPI support
-//         RTScalable::init(this);
+        // Initialize RTScalable for Hi-DPI support
+        RTScalable::init(this);
 
         // Look for theme and set it
         // Check if the current theme name in options exists, otherwise set it to default one (i.e. "RawTherapee.css")
@@ -153,10 +153,17 @@ RtWindow::RtWindow ()
 
 //     on_delete_has_run = false;
     is_fullscreen = false;
-//     is_minimized = false;
-//     property_destroy_with_parent().set_value (false);
-//     signal_window_state_event().connect ( sigc::mem_fun (*this, &RtWindow::on_window_state_event) );
-//     onConfEventConn = signal_configure_event().connect ( sigc::mem_fun (*this, &RtWindow::on_configure_event) );
+    ignoreDefaultSizeChange = false;
+    property_destroy_with_parent().set_value (false);
+    property_default_width().signal_changed().connect(
+        sigc::mem_fun(*this, &RtWindow::onDefaultSizeChange));
+    property_default_height().signal_changed().connect(
+        sigc::mem_fun(*this, &RtWindow::onDefaultSizeChange));
+    property_fullscreened().signal_changed().connect(
+        sigc::mem_fun(*this, &RtWindow::onFullscreenChange));
+    property_maximized().signal_changed().connect(
+        sigc::mem_fun(*this, &RtWindow::onMaximizedChange));
+
 //     signal_key_press_event().connect ( sigc::mem_fun (*this, &RtWindow::keyPressed) );
 //     signal_key_release_event().connect(sigc::mem_fun(*this, &RtWindow::keyReleased));
 //
@@ -379,29 +386,23 @@ RtWindow::~RtWindow()
 //         options.defProfImg = DEFPROFILE_INTERNAL;
 //     }
 // }
-//
-// bool RtWindow::on_configure_event (GdkEventConfigure* event)
-// {
-//     if (!options.windowMaximized && !is_fullscreen && !is_minimized) {
-//         get_size (options.windowWidth, options.windowHeight);
-//         get_position (options.windowX, options.windowY);
-//     }
-//
-//     // With update the RTScalable on scale or resolution change
-//     RTScalable::setDPInScale(this);
-//
-//     return Gtk::Widget::on_configure_event (event);
-// }
-//
-// bool RtWindow::on_window_state_event (GdkEventWindowState* event)
-// {
-//     // Retrieve RT window states
-//     options.windowMaximized = event->new_window_state & GDK_WINDOW_STATE_MAXIMIZED;
-//     is_minimized = event->new_window_state & GDK_WINDOW_STATE_ICONIFIED;
-//     is_fullscreen = event->new_window_state & GDK_WINDOW_STATE_FULLSCREEN;
-//
-//     return Gtk::Widget::on_window_state_event (event);
-// }
+
+void RtWindow::onDefaultSizeChange()
+{
+    if (!ignoreDefaultSizeChange && !options.windowMaximized && !is_fullscreen && !is_suspended()) {
+        get_default_size(options.windowWidth, options.windowHeight);
+    }
+}
+
+void RtWindow::onFullscreenChange()
+{
+    is_fullscreen = property_fullscreened().get_value();
+}
+
+void RtWindow::onMaximizedChange()
+{
+    options.windowMaximized = property_maximized().get_value();
+}
 
 void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 {
@@ -724,7 +725,7 @@ void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 //     FileBrowserEntry::hdr.reset();
 //     FileBrowserEntry::ps.reset();
 //
-//     if (!options.windowMaximized && !is_fullscreen && !is_minimized) {
+//     if (!options.windowMaximized && !is_fullscreen && !is_suspended()) {
 //         get_size (options.windowWidth, options.windowHeight);
 //         get_position (options.windowX, options.windowY);
 //     }
@@ -852,10 +853,9 @@ void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 
 void RtWindow::toggle_fullscreen ()
 {
-    onConfEventConn.block(true); // Avoid getting size and position while window is getting fullscreen
+    ignoreDefaultSizeChange = true;
 
     if (is_fullscreen) {
-        is_fullscreen = false;
         unfullscreen();
 
         if (btn_fullscreen) {
@@ -863,7 +863,6 @@ void RtWindow::toggle_fullscreen ()
             btn_fullscreen->set_child (*iFullscreen);
         }
     } else {
-        is_fullscreen = true;
         fullscreen();
 
         if (btn_fullscreen) {
@@ -872,7 +871,7 @@ void RtWindow::toggle_fullscreen ()
         }
     }
 
-    onConfEventConn.block(false);
+    ignoreDefaultSizeChange = false;
 }
 
 // void RtWindow::SetEditorCurrent()
