@@ -228,18 +228,12 @@ public:
     bool browserDirPanelOpened;
     bool editorFilmStripOpened;
     int historyPanelWidth;
-    int windowX;
-    int windowY;
     int windowWidth;
     int windowHeight;
     bool windowMaximized;
-    int windowMonitor;
-    int meowMonitor;
     bool meowMaximized;
     int meowWidth;
     int meowHeight;
-    int meowX;
-    int meowY;
     int detailWindowWidth;
     int detailWindowHeight;
     int dirBrowserWidth;

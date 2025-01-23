@@ -726,20 +726,7 @@ void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 //     FileBrowserEntry::ps.reset();
 //
 //     if (!options.windowMaximized && !is_fullscreen && !is_suspended()) {
-//         get_size (options.windowWidth, options.windowHeight);
-//         get_position (options.windowX, options.windowY);
-//     }
-//
-//     // Retrieve window monitor ID
-//     options.windowMonitor = 0;
-//     const auto display = get_screen()->get_display();
-//     const int monitor_nb = display->get_n_monitors();
-//
-//     for (int id = 0; id < monitor_nb; id++) {
-//         if (display->get_monitor_at_window(get_window()) == display->get_monitor(id)) {
-//             options.windowMonitor = id;
-//             break;
-//         }
+//         get_default_size(options.windowWidth, options.windowHeight);
 //     }
 //
 //     try {
@@ -1011,75 +998,22 @@ void RtWindow::toggle_fullscreen ()
 //     showErrors();
 //     return true;
 // }
-//
-// void RtWindow::setWindowSize ()
-// {
-//     onConfEventConn.block(true); // Avoid getting size and position while window is being moved, maximized, ...
-//
-//     Gdk::Rectangle lMonitorRect;
-//     const auto display = get_screen()->get_display();
-//     display->get_monitor (std::min (options.windowMonitor, display->get_n_monitors() - 1))->get_geometry(lMonitorRect);
-//
-// #ifdef __APPLE__
-//     // Get macOS menu bar height
-//     Gdk::Rectangle lWorkAreaRect;
-//     display->get_monitor (std::min (options.windowMonitor, display->get_n_monitors() - 1))->get_workarea(lWorkAreaRect);
-//     const int macMenuBarHeight = lWorkAreaRect.get_y();
-//
-//     // Place RT window to saved one in options file
-//     if (options.windowX <= lMonitorRect.get_x() + lMonitorRect.get_width()
-//             && options.windowX >= 0
-//             && options.windowY <= lMonitorRect.get_y() + lMonitorRect.get_height() - macMenuBarHeight
-//             && options.windowY >= 0) {
-//         move (options.windowX, options.windowY + macMenuBarHeight);
-//     } else {
-//         move (lMonitorRect.get_x(), lMonitorRect.get_y() + macMenuBarHeight);
-//     }
-// #else
-//     // Place RT window to saved one in options file
-//     if (options.windowX <= lMonitorRect.get_x() + lMonitorRect.get_width()
-//             && options.windowX >= 0
-//             && options.windowY <= lMonitorRect.get_y() + lMonitorRect.get_height()
-//             && options.windowY >= 0) {
-//         move (options.windowX, options.windowY);
-//     } else {
-//         move (lMonitorRect.get_x(), lMonitorRect.get_y());
-//     }
-// #endif
-//
-//     // Maximize RT window according to options file
-//     if (options.windowMaximized) {
-//         maximize();
-//     } else {
-//         unmaximize();
-//         resize (options.windowWidth, options.windowHeight);
-//     }
-//
-//     onConfEventConn.block(false);
-// }
-//
-// void RtWindow::get_position(int& x, int& y) const
-// {
-//     // Call native function
-//     Gtk::Window::get_position (x, y);
-//
-//     // Retrieve display (concatenation of all monitors) size
-//     int width = 0, height = 0;
-//     const auto display = get_screen()->get_display();
-//     const int nbMonitors = display->get_n_monitors();
-//
-//     for (int i = 0; i < nbMonitors; i++) {
-//         Gdk::Rectangle lMonitorRect;
-//         display->get_monitor(i)->get_geometry(lMonitorRect);
-//         width = std::max(width, lMonitorRect.get_x() + lMonitorRect.get_width());
-//         height = std::max(height, lMonitorRect.get_y() + lMonitorRect.get_height());
-//     }
-//
-//     // Saturate position at monitor limits to avoid unexpected behavior (fixes #6233)
-//     x = std::min(width, std::max(0, x));
-//     y = std::min(height, std::max(0, y));
-// }
-//
+
+void RtWindow::setWindowSize ()
+{
+    ignoreDefaultSizeChange = true;
+
+    // Maximize RT window according to options file
+    if (options.windowMaximized) {
+        maximize();
+    } else {
+        unmaximize();
+        set_default_size(options.windowWidth, options.windowHeight);
+    }
+
+    ignoreDefaultSizeChange = false;
+}
+
 // void RtWindow::set_title_decorated (Glib::ustring fname)
 // {
 //     Glib::ustring subtitle;
@@ -1156,8 +1090,8 @@ void RtWindow::toggle_fullscreen ()
 //     mainNB->append_page (*epanel, *editorLabelGrid);
 //
 // }
-//
-// bool RtWindow::isSingleTabMode() const
-// {
-//     return !options.tabbedUI && ! (options.multiDisplayMode > 0);
-// }
+
+bool RtWindow::isSingleTabMode() const
+{
+    return !options.tabbedUI && ! (options.multiDisplayMode > 0);
+}

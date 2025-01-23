@@ -297,16 +297,10 @@ void Options::setDefaults()
 
     windowWidth = 1200;
     windowHeight = 680;
-    windowX = 0;
-    windowY = 0;
     windowMaximized = true;
-    windowMonitor = 0;
-    meowMonitor = -1;
     meowMaximized = true;
     meowWidth = 1200;
     meowHeight = 680;
-    meowX = 0;
-    meowY = 0;
     saveAsDialogWidth = 920;
     saveAsDialogHeight = 680;
     savesParamsAtExit = true;
@@ -1490,22 +1484,6 @@ void Options::readFromFile(Glib::ustring fname)
                     windowHeight = keyFile->get_integer("GUI", "WindowHeight");
                 }
 
-                if (keyFile->has_key("GUI", "WindowX")) {
-                    windowX = keyFile->get_integer("GUI", "WindowX");
-                }
-
-                if (keyFile->has_key("GUI", "WindowY")) {
-                    windowY = keyFile->get_integer("GUI", "WindowY");
-                }
-
-                if (keyFile->has_key("GUI", "WindowMonitor")) {
-                    windowMonitor = keyFile->get_integer("GUI", "WindowMonitor");
-                }
-
-                if (keyFile->has_key("GUI", "MeowMonitor")) {
-                    meowMonitor = keyFile->get_integer("GUI", "MeowMonitor");
-                }
-
                 if (keyFile->has_key("GUI", "MeowMaximized")) {
                     meowMaximized = keyFile->get_boolean("GUI", "MeowMaximized");
                 }
@@ -1516,14 +1494,6 @@ void Options::readFromFile(Glib::ustring fname)
 
                 if (keyFile->has_key("GUI", "MeowHeight")) {
                     meowHeight = keyFile->get_integer("GUI", "MeowHeight");
-                }
-
-                if (keyFile->has_key("GUI", "MeowX")) {
-                    meowX = keyFile->get_integer("GUI", "MeowX");
-                }
-
-                if (keyFile->has_key("GUI", "MeowY")) {
-                    meowY = keyFile->get_integer("GUI", "MeowY");
                 }
 
                 if (keyFile->has_key("GUI", "WindowMaximized")) {
@@ -2587,15 +2557,9 @@ void Options::saveToFile(Glib::ustring fname)
         keyFile->set_boolean("GUI", "FavoritesCloneTools", cloneFavoriteTools);
         keyFile->set_integer("GUI", "WindowWidth", windowWidth);
         keyFile->set_integer("GUI", "WindowHeight", windowHeight);
-        keyFile->set_integer("GUI", "WindowX", windowX);
-        keyFile->set_integer("GUI", "WindowY", windowY);
-        keyFile->set_integer("GUI", "WindowMonitor", windowMonitor);
-        keyFile->set_integer("GUI", "MeowMonitor", meowMonitor);
         keyFile->set_boolean("GUI", "MeowMaximized", meowMaximized);
         keyFile->set_integer("GUI", "MeowWidth", meowWidth);
         keyFile->set_integer("GUI", "MeowHeight", meowHeight);
-        keyFile->set_integer("GUI", "MeowX", meowX);
-        keyFile->set_integer("GUI", "MeowY", meowY);
         keyFile->set_boolean("GUI", "WindowMaximized", windowMaximized);
         keyFile->set_integer("GUI", "DetailWindowWidth", detailWindowWidth);
         keyFile->set_integer("GUI", "DetailWindowHeight", detailWindowHeight);

@@ -202,7 +202,7 @@ RtWindow *create_rt_window()
     theme->add_search_path(icon_path);
 
     RtWindow *rtWindow = new RtWindow();
-    // rtWindow->setWindowSize(); // Need to be called after RTWindow creation to work with all OS Windows Manager
+    rtWindow->setWindowSize(); // Need to be called after RTWindow creation to work with all OS Windows Manager
     return rtWindow;
 }
 

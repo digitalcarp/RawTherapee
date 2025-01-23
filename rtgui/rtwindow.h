@@ -58,8 +58,8 @@ private:
 
     Gtk::Image *iFullscreen, *iFullscreen_exit;
 
-    // bool isSingleTabMode() const;
-    //
+    bool isSingleTabMode() const;
+
     // bool on_expose_event_epanel (GdkEventExpose* event);
     // bool on_expose_event_fpanel (GdkEventExpose* event);
     // bool splashClosed (GdkEventAny* event);
@@ -94,8 +94,7 @@ public:
     // void showPreferences ();
     // void on_realize () override;
     void toggle_fullscreen ();
-    // void get_position(int& x, int& y) const;
-    //
+
     // void setProgress(double p) override;
     // void setProgressStr(const Glib::ustring& str) override;
     // void setProgressState(bool inProcessing) override;
@@ -127,7 +126,7 @@ public:
     {
         return is_fullscreen;
     }
-    // void setWindowSize ();
+    void setWindowSize ();
     // void set_title_decorated (Glib::ustring fname);
     // void closeOpenEditors();
     // void setEditorMode (bool tabbedUI);
