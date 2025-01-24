@@ -477,8 +477,8 @@ Glib::ustring CurveEditorSubGroup::outputFile ()
     bindCurrentFolder (dialog, curveDir);
     dialog.set_current_name (lastFilename);
 
-    dialog.add_button(M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
-    dialog.add_button(M("GENERAL_SAVE"), Gtk::RESPONSE_APPLY);
+    dialog.add_button(M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
+    dialog.add_button(M("GENERAL_SAVE"), Gtk::ResponseType::APPLY);
 
     Glib::RefPtr<Gtk::FileFilter> filter_pp = Gtk::FileFilter::create();
     filter_pp->set_name(M("FILECHOOSER_FILTER_CURVE"));
@@ -495,7 +495,7 @@ Glib::ustring CurveEditorSubGroup::outputFile ()
     Glib::ustring fname;
 
     do {
-        if (dialog.run() == Gtk::RESPONSE_APPLY) {
+        if (dialog.run() == Gtk::ResponseType::APPLY) {
             fname = dialog.get_filename();
 
             if (getExtension (fname) != "rtc") {
@@ -521,8 +521,8 @@ Glib::ustring CurveEditorSubGroup::inputFile ()
     Gtk::FileChooserDialog dialog (getToplevelWindow (parent), M("CURVEEDITOR_LOADDLGLABEL"), Gtk::FileChooser::Action::OPEN);
     bindCurrentFolder (dialog, curveDir);
 
-    dialog.add_button(M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
-    dialog.add_button(M("GENERAL_APPLY"), Gtk::RESPONSE_APPLY);
+    dialog.add_button(M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
+    dialog.add_button(M("GENERAL_APPLY"), Gtk::ResponseType::APPLY);
 
     Glib::RefPtr<Gtk::FileFilter> filter_pp = Gtk::FileFilter::create();
     filter_pp->set_name(M("FILECHOOSER_FILTER_CURVE"));
@@ -538,7 +538,7 @@ Glib::ustring CurveEditorSubGroup::inputFile ()
 
     Glib::ustring fname;
 
-    if (result == Gtk::RESPONSE_APPLY) {
+    if (result == Gtk::ResponseType::APPLY) {
         fname = dialog.get_filename();
 
         if (Glib::file_test (fname, Glib::FileTest::EXISTS)) {

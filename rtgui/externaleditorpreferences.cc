@@ -229,13 +229,13 @@ void ExternalEditorPreferences::onAppChooserDialogResponse(
     int response_id, RTAppChooserDialog *dialog)
 {
     switch (response_id) {
-        case Gtk::RESPONSE_OK:
+        case Gtk::ResponseType::OK:
             dialog->close();
             setApp(dialog->get_app_info());
             break;
 
-        case Gtk::RESPONSE_CANCEL:
-        case Gtk::RESPONSE_CLOSE:
+        case Gtk::ResponseType::CANCEL:
+        case Gtk::ResponseType::CLOSE:
             dialog->close();
             break;
 
@@ -248,7 +248,7 @@ void ExternalEditorPreferences::onFileChooserDialogResponse(
         int response_id, Gtk::FileChooserDialog *dialog)
 {
     switch (response_id) {
-        case Gtk::RESPONSE_OK: {
+        case Gtk::ResponseType::OK: {
             dialog->close();
 
             auto selection = list_view->get_selection()->get_selected_rows();
@@ -272,8 +272,8 @@ void ExternalEditorPreferences::onFileChooserDialogResponse(
             break;
         }
 
-        case Gtk::RESPONSE_CANCEL:
-        case Gtk::RESPONSE_CLOSE:
+        case Gtk::ResponseType::CANCEL:
+        case Gtk::ResponseType::CLOSE:
             dialog->close();
             break;
 
@@ -327,8 +327,8 @@ void ExternalEditorPreferences::openFileChooserDialog()
         sigc::mem_fun(*this, &ExternalEditorPreferences::onFileChooserDialogResponse),
         file_chooser_dialog.get()));
     file_chooser_dialog->set_modal();
-    file_chooser_dialog->add_button(M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
-    file_chooser_dialog->add_button(M("GENERAL_OPEN"), Gtk::RESPONSE_OK);
+    file_chooser_dialog->add_button(M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
+    file_chooser_dialog->add_button(M("GENERAL_OPEN"), Gtk::ResponseType::OK);
     file_chooser_dialog->show();
 }
 

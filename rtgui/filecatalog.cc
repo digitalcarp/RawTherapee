@@ -1029,7 +1029,7 @@ void FileCatalog::deleteRequested(const std::vector<FileBrowserEntry*>& tbe, boo
         msd.set_secondary_text(Glib::ustring::compose (M("FILEBROWSER_DELETEDIALOG_ALL"), tbe.size()), true);
     }
 
-    if (msd.run() == Gtk::RESPONSE_YES) {
+    if (msd.run() == Gtk::ResponseType::YES) {
         for (unsigned int i = 0; i < tbe.size(); i++) {
             const auto fname = tbe[i]->filename;
             // remove from browser
@@ -1076,8 +1076,8 @@ void FileCatalog::copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe, b
     }
 
     Gtk::FileChooserDialog fc (getToplevelWindow (this), fc_title, Gtk::FileChooser::Action::SELECT_FOLDER );
-    fc.add_button( M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
-    fc.add_button( M("GENERAL_OK"), Gtk::RESPONSE_OK);
+    fc.add_button( M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
+    fc.add_button( M("GENERAL_OK"), Gtk::ResponseType::OK);
     if (!options.lastCopyMovePath.empty() && Glib::file_test(options.lastCopyMovePath, Glib::FileTest::IS_DIR)) {
         fc.set_current_folder(options.lastCopyMovePath);
     } else {
@@ -1086,7 +1086,7 @@ void FileCatalog::copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe, b
     }
     //!!! TODO prevent dialog closing on "enter" key press
 
-    if( fc.run() == Gtk::RESPONSE_OK ) {
+    if( fc.run() == Gtk::ResponseType::OK ) {
         options.lastCopyMovePath = fc.get_current_folder();
 
         // iterate through selected files
@@ -1172,7 +1172,7 @@ void FileCatalog::copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe, b
         redrawAll ();
 
         _refreshProgressBar();
-    } // Gtk::RESPONSE_OK
+    } // Gtk::ResponseType::OK
 }
 
 void FileCatalog::developRequested(const std::vector<FileBrowserEntry*>& tbe, bool fastmode)
@@ -1325,7 +1325,7 @@ void FileCatalog::renameRequested(const std::vector<FileBrowserEntry*>& tbe)
         bool success = false;
 
         do {
-            if (renameDlg->run () == Gtk::RESPONSE_OK) {
+            if (renameDlg->run () == Gtk::ResponseType::OK) {
                 Glib::ustring nBaseName = renameDlg->getNewName ();
 
                 // if path has directory components, exit

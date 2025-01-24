@@ -306,7 +306,7 @@ void ProfilePanel::save_clicked (GdkEventButton* event)
         const auto response = partialProfileDlg->run();
         partialProfileDlg->hide();
 
-        if (response != Gtk::RESPONSE_OK) {
+        if (response != Gtk::ResponseType::OK) {
             return;
         }
     }
@@ -326,8 +326,8 @@ void ProfilePanel::save_clicked (GdkEventButton* event)
     } catch (Glib::Error&) {}
 
     //Add response buttons to the dialog:
-    dialog.add_button(M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
-    dialog.add_button(M("GENERAL_SAVE"), Gtk::RESPONSE_OK);
+    dialog.add_button(M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
+    dialog.add_button(M("GENERAL_SAVE"), Gtk::ResponseType::OK);
 
     //Add filters, so that only certain file types can be selected:
     auto filter_pp = Gtk::FileFilter::create();
@@ -345,7 +345,7 @@ void ProfilePanel::save_clicked (GdkEventButton* event)
         // Run the saving dialog and let the user select a path and filename.
         const auto response = dialog.run();
 
-        if (response != Gtk::RESPONSE_OK) {
+        if (response != Gtk::ResponseType::OK) {
             // Just exit the loop, cause the user cancels the dialog.
             
             break;
@@ -439,7 +439,7 @@ void ProfilePanel::copy_clicked (GdkEventButton* event)
             int i = partialProfileDlg->run();
             partialProfileDlg->hide();
 
-            if (i != Gtk::RESPONSE_OK) {
+            if (i != Gtk::ResponseType::OK) {
                 return;
             }
 
@@ -480,8 +480,8 @@ void ProfilePanel::load_clicked (GdkEventButton* event)
     } catch (Glib::Error&) {}
 
     //Add response buttons to the dialog:
-    dialog.add_button(M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
-    dialog.add_button(M("GENERAL_OPEN"), Gtk::RESPONSE_OK);
+    dialog.add_button(M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
+    dialog.add_button(M("GENERAL_OPEN"), Gtk::ResponseType::OK);
 
     //Add filters, so that only certain file types can be selected:
     Glib::RefPtr<Gtk::FileFilter> filter_pp = Gtk::FileFilter::create();
@@ -497,7 +497,7 @@ void ProfilePanel::load_clicked (GdkEventButton* event)
     int result = dialog.run();
     dialog.hide();
 
-    if (result == Gtk::RESPONSE_OK) {
+    if (result == Gtk::ResponseType::OK) {
         Glib::ustring fname = dialog.get_filename();
 		printf("fname=%s\n", fname.c_str());
 
@@ -550,7 +550,7 @@ void ProfilePanel::load_clicked (GdkEventButton* event)
                 int i = partialProfileDlg->run();
                 partialProfileDlg->hide();
 
-                if (i != Gtk::RESPONSE_OK) {
+                if (i != Gtk::ResponseType::OK) {
                     return;
                 }
 
@@ -674,7 +674,7 @@ void ProfilePanel::paste_clicked (GdkEventButton* event)
             int i = partialProfileDlg->run();
             partialProfileDlg->hide();
 
-            if (i != Gtk::RESPONSE_OK) {
+            if (i != Gtk::ResponseType::OK) {
                 return;
             }
 
@@ -704,7 +704,7 @@ void ProfilePanel::paste_clicked (GdkEventButton* event)
             int i = partialProfileDlg->run();
             partialProfileDlg->hide();
 
-            if (i != Gtk::RESPONSE_OK) {
+            if (i != Gtk::ResponseType::OK) {
                 return;
             }
 

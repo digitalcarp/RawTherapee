@@ -952,8 +952,8 @@ void ICCProfileCreator::savePressed()
     dialog.set_current_name(fName);
     //dialog.set_current_folder(lastPath);
 
-    dialog.add_button(M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
-    dialog.add_button(M("GENERAL_SAVE"), Gtk::RESPONSE_OK);
+    dialog.add_button(M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
+    dialog.add_button(M("GENERAL_SAVE"), Gtk::ResponseType::OK);
 
     Glib::RefPtr<Gtk::FileFilter> filter_icc = Gtk::FileFilter::create();
     filter_icc->set_name(M("FILECHOOSER_FILTER_COLPROF"));
@@ -975,7 +975,7 @@ void ICCProfileCreator::savePressed()
     do {
         int result = dialog.run();
 
-        if (result != Gtk::RESPONSE_OK) {
+        if (result != Gtk::ResponseType::OK) {
             return;
         } else {
             absoluteFName = dialog.get_filename();

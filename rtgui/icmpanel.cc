@@ -2444,8 +2444,8 @@ void ICMPanel::saveReferencePressed()
     bindCurrentFolder(dialog, options.lastProfilingReferenceDir);
     dialog.set_current_name(lastRefFilename);
 
-    dialog.add_button(M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
-    dialog.add_button(M("GENERAL_SAVE"), Gtk::RESPONSE_OK);
+    dialog.add_button(M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
+    dialog.add_button(M("GENERAL_SAVE"), Gtk::ResponseType::OK);
 
     Gtk::CheckButton applyWB(M("TP_ICM_SAVEREFERENCE_APPLYWB"));
     applyWB.set_tooltip_text(M("TP_ICM_SAVEREFERENCE_APPLYWB_TOOLTIP"));
@@ -2473,7 +2473,7 @@ void ICMPanel::saveReferencePressed()
     do {
         int result = dialog.run();
 
-        if (result != Gtk::RESPONSE_OK) {
+        if (result != Gtk::ResponseType::OK) {
             done = true;
         } else {
             std::string fname = dialog.get_filename();

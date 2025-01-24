@@ -2133,7 +2133,7 @@ void EditorPanel::saveAsPressed ()
         options.saveFormat = sf;
         options.forceFormatOpts = saveAsDialog->getForceFormatOpts ();
 
-        if (result != Gtk::RESPONSE_OK) {
+        if (result != Gtk::ResponseType::OK) {
             break;
         }
 
@@ -2456,7 +2456,7 @@ RTAppChooserDialog *EditorPanel::getAppChooserDialog()
 void EditorPanel::onAppChooserDialogResponse(int responseId)
 {
     switch (responseId) {
-        case Gtk::RESPONSE_OK: {
+        case Gtk::ResponseType::OK: {
             getAppChooserDialog()->close();
             const auto app_info = getAppChooserDialog()->get_app_info();
             external_editor_info = {
@@ -2466,8 +2466,8 @@ void EditorPanel::onAppChooserDialogResponse(int responseId)
             sendToExternal();
             break;
         }
-        case Gtk::RESPONSE_CANCEL:
-        case Gtk::RESPONSE_CLOSE:
+        case Gtk::ResponseType::CANCEL:
+        case Gtk::ResponseType::CLOSE:
             getAppChooserDialog()->close();
             break;
         default:

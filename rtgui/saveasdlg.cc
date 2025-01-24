@@ -291,19 +291,19 @@ void SaveAsDialog::okPressed ()
             true
         );
 
-        if (msgd.run() == Gtk::RESPONSE_OK) {
+        if (msgd.run() == Gtk::ResponseType::OK) {
             fname += "." + formatOpts->getFormat().format;
         } else {
             return;
         }
     }
 
-    response (Gtk::RESPONSE_OK);
+    response (Gtk::ResponseType::OK);
 }
 
 void SaveAsDialog::cancelPressed ()
 {
-    response (Gtk::RESPONSE_CANCEL);
+    response (Gtk::ResponseType::CANCEL);
 }
 
 void SaveAsDialog::formatChanged(const Glib::ustring& format)

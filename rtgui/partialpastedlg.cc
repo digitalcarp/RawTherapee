@@ -597,10 +597,10 @@ PartialPasteDlg::PartialPasteDlg (const Glib::ustring &title, Gtk::Window* paren
     //---
     raw_preprocwbConn       = raw_preprocwb->signal_toggled().connect (sigc::bind (sigc::mem_fun(*raw, &Gtk::CheckButton::set_inconsistent), true));
 
-    add_button (M("GENERAL_OK"), Gtk::RESPONSE_OK);
-    add_button (M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
-    set_response_sensitive (Gtk::RESPONSE_OK);
-    set_default_response (Gtk::RESPONSE_OK);
+    add_button (M("GENERAL_OK"), Gtk::ResponseType::OK);
+    add_button (M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
+    set_response_sensitive (Gtk::ResponseType::OK);
+    set_default_response (Gtk::ResponseType::OK);
     show_all_children ();
 }
 

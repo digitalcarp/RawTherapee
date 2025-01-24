@@ -508,13 +508,13 @@ void BatchQueuePanel::pathFolderButtonPressed ()
 {
 
     Gtk::FileChooserDialog fc (getToplevelWindow (this), M("QUEUE_LOCATION_FOLDER"), Gtk::FileChooser::Action::SELECT_FOLDER );
-    fc.add_button( "_Cancel", Gtk::RESPONSE_CANCEL); // STOCKICON WAS THERE
-    fc.add_button( "_OK", Gtk::RESPONSE_OK); // STOCKICON WAS THERE
+    fc.add_button( "_Cancel", Gtk::ResponseType::CANCEL); // STOCKICON WAS THERE
+    fc.add_button( "_OK", Gtk::ResponseType::OK); // STOCKICON WAS THERE
     fc.set_filename(options.savePathFolder);
     fc.set_transient_for(*parent);
     int result = fc.run();
 
-    if (result == Gtk::RESPONSE_OK) {
+    if (result == Gtk::ResponseType::OK) {
         if (Glib::file_test(fc.get_current_folder(), Glib::FileTest::IS_DIR)) {
             options.savePathFolder = fc.get_filename ();
             outdirFolderButton->set_label(makeFolderLabel(options.savePathFolder));

@@ -870,14 +870,14 @@ void FileBrowser::menuItemActivated (Gtk::MenuItem* m)
             rtengine::procparams::ProcParams pp = mselected[0]->thumbnail->getProcParams();
             Gtk::FileChooserDialog fc (getToplevelWindow (this), "Dark Frame", Gtk::FileChooser::Action::OPEN );
             bindCurrentFolder (fc, options.lastDarkframeDir);
-            fc.add_button( M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
-            fc.add_button( M("GENERAL_APPLY"), Gtk::RESPONSE_APPLY);
+            fc.add_button( M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
+            fc.add_button( M("GENERAL_APPLY"), Gtk::ResponseType::APPLY);
 
             if(!pp.raw.dark_frame.empty()) {
                 fc.set_filename( pp.raw.dark_frame );
             }
 
-            if( fc.run() == Gtk::RESPONSE_APPLY ) {
+            if( fc.run() == Gtk::ResponseType::APPLY ) {
                 if (bppcl) {
                     bppcl->beginBatchPParamsChange(mselected.size());
                 }
@@ -946,14 +946,14 @@ void FileBrowser::menuItemActivated (Gtk::MenuItem* m)
             rtengine::procparams::ProcParams pp = mselected[0]->thumbnail->getProcParams();
             Gtk::FileChooserDialog fc (getToplevelWindow (this), "Flat Field", Gtk::FileChooser::Action::OPEN );
             bindCurrentFolder (fc, options.lastFlatfieldDir);
-            fc.add_button( M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
-            fc.add_button( M("GENERAL_APPLY"), Gtk::RESPONSE_APPLY);
+            fc.add_button( M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
+            fc.add_button( M("GENERAL_APPLY"), Gtk::ResponseType::APPLY);
 
             if(!pp.raw.ff_file.empty()) {
                 fc.set_filename( pp.raw.ff_file );
             }
 
-            if( fc.run() == Gtk::RESPONSE_APPLY ) {
+            if( fc.run() == Gtk::ResponseType::APPLY ) {
                 if (bppcl) {
                     bppcl->beginBatchPParamsChange(mselected.size());
                 }
@@ -1126,7 +1126,7 @@ void FileBrowser::partPasteProfile ()
 
         int i = partialPasteDlg.run ();
 
-        if (i == Gtk::RESPONSE_OK) {
+        if (i == Gtk::ResponseType::OK) {
 
             if (!mselected.empty() && bppcl) {
                 bppcl->beginBatchPParamsChange(mselected.size());
@@ -1465,7 +1465,7 @@ void FileBrowser::applyPartialMenuItemActivated (ProfileStoreLabel *label)
 
         partialPasteDlg.updateSpotWidget(srcProfiles->pparams);
 
-        if (partialPasteDlg.run() == Gtk::RESPONSE_OK) {
+        if (partialPasteDlg.run() == Gtk::ResponseType::OK) {
 
             MYREADERLOCK(l, entryRW);
 
