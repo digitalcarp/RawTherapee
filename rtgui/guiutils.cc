@@ -26,7 +26,7 @@
 // #include "adjuster.h"
 #include "multilangmgr.h"
 #include "options.h"
-// #include "rtimage.h"
+#include "rtimage.h"
 #include "rtscalable.h"
 // #include "toolpanel.h"
 
@@ -414,6 +414,18 @@ void pack_start(Gtk::Box* box, Gtk::Widget& child, Pack pack, int /*padding*/)
     box->append(child);
 }
 
+void pack_start(Gtk::Box* box, Gtk::Widget& child, bool expand, bool fill, int /*padding*/)
+{
+    if (box->get_orientation() == Gtk::Orientation::HORIZONTAL) {
+        child.set_halign(fill ? Gtk::Align::FILL : Gtk::Align::START);
+        child.set_hexpand(expand);
+    } else {
+        child.set_valign(fill ? Gtk::Align::FILL : Gtk::Align::START);
+        child.set_vexpand(expand);
+    }
+    box->append(child);
+}
+
 void pack_end(Gtk::Box* box, Gtk::Widget& child, Pack pack, int /*padding*/)
 {
     if (box->get_orientation() == Gtk::Orientation::HORIZONTAL) {
@@ -537,390 +549,388 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
     }
 }
 
-// ExpanderBox::ExpanderBox( Gtk::Container *p): pC(p)
-// {
-//     set_name ("ExpanderBox");
-// }
-//
-// void ExpanderBox::setLevel(int level)
-// {
-//     if (level <= 1) {
-//         set_name("ExpanderBox");
-//     } else if (level == 2) {
-//         set_name("ExpanderBox2");
-//     } else if (level >= 3) {
-//         set_name("ExpanderBox3");
-//     }
-// }
-//
-// void ExpanderBox::show_all()
-// {
-//     // ask childs to show themselves, but not us (remain unchanged)
-//     Gtk::Container::show_all_children(true);
-// }
-//
-// void ExpanderBox::showBox()
-// {
-//     Gtk::Box::show();
-// }
-//
-// void ExpanderBox::hideBox()
-// {
-//     Gtk::Box::hide();
-// }
-//
-// MyExpander::MyExpander(bool useEnabled, Gtk::Widget* titleWidget) :
-//     inconsistentImage("power-inconsistent-small"),
-//     enabledImage("power-on-small"),
-//     disabledImage("power-off-small"),
-//     openedImage("expander-open-small"),
-//     closedImage("expander-closed-small"),
-//     enabled(false), inconsistent(false), flushEvent(false), expBox(nullptr),
-//     child(nullptr), headerWidget(nullptr), statusImage(nullptr),
-//     label(nullptr), useEnabled(useEnabled)
-// {
-//     setupPart1();
-//
-//     if (titleWidget) {
-//         setExpandAlignProperties(titleWidget, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
-//         headerHBox->pack_start(*titleWidget, Gtk::PACK_EXPAND_WIDGET, 0);
-//         headerWidget = titleWidget;
-//     }
-//
-//     setupPart2();
-// }
-//
-// MyExpander::MyExpander(bool useEnabled, Glib::ustring titleLabel) :
-//     inconsistentImage("power-inconsistent-small"),
-//     enabledImage("power-on-small"),
-//     disabledImage("power-off-small"),
-//     openedImage("expander-open-small"),
-//     closedImage("expander-closed-small"),
-//     enabled(false), inconsistent(false), flushEvent(false), expBox(nullptr),
-//     child(nullptr), headerWidget(nullptr),
-//     label(nullptr), useEnabled(useEnabled)
-// {
-//     setupPart1();
-//
-//     label = Gtk::manage(new Gtk::Label());
-//     setExpandAlignProperties(label, true, false, Gtk::Align::START, Gtk::Align::CENTER);
-//     label->set_markup(escapeHtmlChars(titleLabel));
-//     headerHBox->pack_start(*label, Gtk::PACK_EXPAND_WIDGET, 0);
-//
-//     setupPart2();
-// }
-//
-// void MyExpander::setupPart1()
-// {
-//     set_orientation(Gtk::Orientation::VERTICAL);
-//     set_spacing(0);
-//     set_name("MyExpander");
-//     set_can_focus(false);
-//     setExpandAlignProperties(this, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
-//
-//     headerHBox = Gtk::manage(new Gtk::Box());
-//     headerHBox->set_can_focus(false);
-//     setExpandAlignProperties(headerHBox, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
-//
-//     if (useEnabled) {
-//         get_style_context()->add_class("OnOff");
-//         statusImage = Gtk::manage(new RTImage(disabledImage));
-//         imageEvBox = Gtk::manage(new Gtk::EventBox());
-//         imageEvBox->set_name("MyExpanderStatus");
-//         imageEvBox->add(*statusImage);
-//         imageEvBox->set_above_child(true);
-//         headerHBox->pack_start(*imageEvBox, Gtk::PACK_SHRINK, 0);
-//
-//         auto clickController = Gtk::GestureClick::create();
-//         clickController->set_button(GDK_BUTTON_PRIMARY);
-//         clickController->signal_released().connect(
-//             sigc::mem_fun(this, &MyExpander::onEnabledChange));
-//         imageEvBox->add_controller(clickController);
-//
-//         auto motionController = Gtk::EventControllerMotion::create();
-//         motionController->signal_enter().connect(
-//             sigc::mem_fun(this, &MyExpander::onEnterEnable), false);
-//         motionController->signal_leave().connect(
-//             sigc::mem_fun(this, &MyExpander::onLeaveEnable), false);
-//         imageEvBox->add_controller(motionController);
-//     } else {
-//         get_style_context()->add_class("Fold");
-//         statusImage = Gtk::manage(new RTImage(openedImage));
-//         headerHBox->pack_start(*statusImage, Gtk::PACK_SHRINK, 0);
-//     }
-//
-//     statusImage->set_can_focus(false);
-// }
-//
-// void MyExpander::setupPart2()
-// {
-//     titleEvBox = Gtk::manage(new Gtk::EventBox());
-//     titleEvBox->set_name("MyExpanderTitle");
-//     titleEvBox->set_border_width(0);
-//     titleEvBox->add(*headerHBox);
-//     titleEvBox->set_above_child(false);  // this is the key! By make it below the child, they will get the events first.
-//     titleEvBox->set_can_focus(false);
-//
-//     pack_start(*titleEvBox, Gtk::PACK_EXPAND_WIDGET, 0);
-//
-//     updateStyle();
-//
-//     auto clickController = Gtk::GestureClick::create();
-//     clickController->set_button(GDK_BUTTON_PRIMARY);
-//     clickController->signal_released().connect(
-//         sigc::mem_fun(this, &MyExpander::onToggle));
-//     titleEvBox->add_controller(clickController);
-//
-//     auto motionController = Gtk::EventControllerMotion::create();
-//     motionController->signal_enter().connect(
-//         sigc::mem_fun(this, &MyExpander::onEnterTitle), false);
-//     motionController->signal_leave().connect(
-//         sigc::mem_fun(this, &MyExpander::onLeaveTitle), false);
-//     titleEvBox->add_controller(motionController);
-// }
-//
-// void MyExpander::onEnterTitle()
-// {
-//     if (is_sensitive()) {
-//         titleEvBox->set_state(Gtk::STATE_PRELIGHT);
-//         queue_draw();
-//     }
-// }
-//
-// void MyExpander::onLeaveTitle()
-// {
-//     if (is_sensitive()) {
-//         titleEvBox->set_state(Gtk::STATE_NORMAL);
-//         queue_draw();
-//     }
-// }
-//
-// void MyExpander::onEnterEnable()
-// {
-//     if (is_sensitive()) {
-//         imageEvBox->set_state(Gtk::STATE_PRELIGHT);
-//         queue_draw();
-//     }
-// }
-//
-// void MyExpander::onLeaveEnable()
-// {
-//     if (is_sensitive()) {
-//         imageEvBox->set_state(Gtk::STATE_NORMAL);
-//         queue_draw();
-//     }
-// }
-//
-// void MyExpander::updateStyle()
-// {
-//     updateVScrollbars(options.hideTPVScrollbar);
-//
-// //GTK318
-// #if GTK_MAJOR_VERSION == 3 && GTK_MINOR_VERSION < 20
-//     headerHBox->set_spacing(2);
-//     headerHBox->set_border_width(1);
-//     set_spacing(0);
-//     set_border_width(0);
-// #endif
-// //GTK318
-// }
-//
-// void MyExpander::updateVScrollbars(bool hide)
-// {
-//     if (hide) {
-//         get_style_context()->remove_class("withScrollbar");
-//     } else {
-//         get_style_context()->add_class("withScrollbar");
-//     }
-// }
-//
-// void MyExpander::setLevel (int level)
-// {
-//     if (expBox) {
-//         expBox->setLevel(level);
-//     }
-// }
-//
-// void MyExpander::setLabel (Glib::ustring newLabel)
-// {
-//     if (label) {
-//         label->set_markup(escapeHtmlChars(newLabel));
-//     }
-// }
-//
-// void MyExpander::setLabel (Gtk::Widget *newWidget)
-// {
-//     if (headerWidget) {
-//         removeIfThere(headerHBox, headerWidget, false);
-//         headerHBox->pack_start(*newWidget, Gtk::PACK_EXPAND_WIDGET, 0);
-//     }
-// }
-//
-// bool MyExpander::get_inconsistent()
-// {
-//     return inconsistent;
-// }
-//
-// void MyExpander::set_inconsistent(bool isInconsistent)
-// {
-//     if (inconsistent != isInconsistent) {
-//         inconsistent = isInconsistent;
-//
-//         if (useEnabled) {
-//             if (isInconsistent) {
-//                 statusImage->set_from_icon_name(inconsistentImage);
-//             } else {
-//                 if (enabled) {
-//                     statusImage->set_from_icon_name(enabledImage);
-//                     get_style_context()->add_class("enabledTool");
-//                 } else {
-//                     statusImage->set_from_icon_name(disabledImage);
-//                     get_style_context()->remove_class("enabledTool");
-//                 }
-//             }
-//         }
-//
-//     }
-// }
-//
-// bool MyExpander::getUseEnabled()
-// {
-//     return useEnabled;
-// }
-//
-// bool MyExpander::getEnabled()
-// {
-//     return enabled;
-// }
-//
-// void MyExpander::setEnabled(bool isEnabled)
-// {
-//     if (isEnabled != enabled) {
-//         if (useEnabled) {
-//             if (enabled) {
-//                 enabled = false;
-//
-//                 if (!inconsistent) {
-//                     statusImage->set_from_icon_name(disabledImage);
-//                     get_style_context()->remove_class("enabledTool");
-//                     message.emit();
-//                 }
-//             } else {
-//                 enabled = true;
-//
-//                 if (!inconsistent) {
-//                     statusImage->set_from_icon_name(enabledImage);
-//                     get_style_context()->add_class("enabledTool");
-//                     message.emit();
-//                 }
-//             }
-//         }
-//     }
-// }
-//
-// void MyExpander::setEnabledTooltipMarkup(Glib::ustring tooltipMarkup)
-// {
-//     if (useEnabled) {
-//         statusImage->set_tooltip_markup(tooltipMarkup);
-//     }
-// }
-//
-// void MyExpander::setEnabledTooltipText(Glib::ustring tooltipText)
-// {
-//     if (useEnabled) {
-//         statusImage->set_tooltip_text(tooltipText);
-//     }
-// }
-//
-// void MyExpander::set_expanded( bool expanded )
-// {
-//     if (!expBox) {
-//         return;
-//     }
-//
-//     if (!useEnabled) {
-//         if (expanded ) {
-//             statusImage->set_from_icon_name(openedImage);
-//         } else {
-//             statusImage->set_from_icon_name(closedImage);
-//         }
-//     }
-//
-//     if (expanded) {
-//         expBox->showBox();
-//     } else {
-//         expBox->hideBox();
-//     }
-// }
-//
-// bool MyExpander::get_expanded()
-// {
-//     return expBox ? expBox->get_visible() : false;
-// }
-//
-// void MyExpander::add  (Gtk::Container& widget, bool setChild)
-// {
-//     if(setChild) {
-//         child = &widget;
-//     }
-//     expBox = Gtk::manage (new ExpanderBox (child));
-//     expBox->add (widget);
-//     pack_start(*expBox, Gtk::PACK_SHRINK, 0);
-//     widget.show();
-//     expBox->hideBox();
-// }
-//
-// void MyExpander::onToggle(int /*n_press*/, double /*x*/, double /*y*/)
-// {
-//     if (flushEvent) {
-//         flushEvent = false;
-//         return false;
-//     }
-//
-//     if (!expBox) return false;
-//
-//     bool isVisible = expBox->is_visible();
-//
-//     if (!useEnabled) {
-//         if (isVisible) {
-//             statusImage->set_from_icon_name(closedImage);
-//         } else {
-//             statusImage->set_from_icon_name(openedImage);
-//         }
-//     }
-//
-//     if (isVisible) {
-//         expBox->hideBox();
-//     } else {
-//         expBox->showBox();
-//     }
-//
-//     titleButtonRelease.emit();
-// }
-//
-// // used to connect a function to the enabled_toggled signal
-// MyExpander::type_signal_enabled_toggled MyExpander::signal_enabled_toggled()
-// {
-//     return message;
-// }
-//
-// // internal use ; when the user clicks on the toggle button, it calls this method that will emit an enabled_change event
-// void MyExpander::onEnabledChange(int /*n_press*/, double /*x*/, double /*y*/)
-// {
-//     if (enabled) {
-//         enabled = false;
-//         statusImage->set_from_icon_name(disabledImage);
-//         get_style_context()->remove_class("enabledTool");
-//     } else {
-//         enabled = true;
-//         statusImage->set_from_icon_name(enabledImage);
-//         get_style_context()->add_class("enabledTool");
-//     }
-//
-//     message.emit();
-//     flushEvent = true;
-// }
-//
+ExpanderBox::ExpanderBox()
+{
+    set_name ("ExpanderBox");
+}
+
+void ExpanderBox::setLevel(int level)
+{
+    if (level <= 1) {
+        set_name("ExpanderBox");
+    } else if (level == 2) {
+        set_name("ExpanderBox2");
+    } else if (level >= 3) {
+        set_name("ExpanderBox3");
+    }
+}
+
+void ExpanderBox::show_all()
+{
+    // ask childs to show themselves, but not us (remain unchanged)
+    for (auto& child : get_children()) {
+        child->show();
+    }
+}
+
+void ExpanderBox::showBox()
+{
+    Gtk::Box::show();
+}
+
+void ExpanderBox::hideBox()
+{
+    Gtk::Box::hide();
+}
+
+MyExpander::MyExpander(bool useEnabled, Gtk::Widget* titleWidget) :
+    inconsistentImage("power-inconsistent-small"),
+    enabledImage("power-on-small"),
+    disabledImage("power-off-small"),
+    openedImage("expander-open-small"),
+    closedImage("expander-closed-small"),
+    enabled(false), inconsistent(false), flushEvent(false), expBox(nullptr),
+    child(nullptr), headerWidget(nullptr), statusImage(nullptr),
+    label(nullptr), useEnabled(useEnabled)
+{
+    setupPart1();
+
+    if (titleWidget) {
+        setExpandAlignProperties(titleWidget, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
+        pack_start(headerHBox, *titleWidget, Pack::EXPAND_WIDGET, 0);
+        headerWidget = titleWidget;
+    }
+
+    setupPart2();
+}
+
+MyExpander::MyExpander(bool useEnabled, Glib::ustring titleLabel) :
+    inconsistentImage("power-inconsistent-small"),
+    enabledImage("power-on-small"),
+    disabledImage("power-off-small"),
+    openedImage("expander-open-small"),
+    closedImage("expander-closed-small"),
+    enabled(false), inconsistent(false), flushEvent(false), expBox(nullptr),
+    child(nullptr), headerWidget(nullptr),
+    label(nullptr), useEnabled(useEnabled)
+{
+    setupPart1();
+
+    label = Gtk::manage(new Gtk::Label());
+    setExpandAlignProperties(label, true, false, Gtk::Align::START, Gtk::Align::CENTER);
+    label->set_markup(escapeHtmlChars(titleLabel));
+    pack_start(headerHBox, *label, Pack::EXPAND_WIDGET, 0);
+
+    setupPart2();
+}
+
+void MyExpander::setupPart1()
+{
+    set_orientation(Gtk::Orientation::VERTICAL);
+    set_spacing(0);
+    set_name("MyExpander");
+    set_can_focus(false);
+    setExpandAlignProperties(this, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
+
+    headerHBox = Gtk::manage(new Gtk::Box());
+    headerHBox->set_can_focus(false);
+    setExpandAlignProperties(headerHBox, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
+
+    if (useEnabled) {
+        get_style_context()->add_class("OnOff");
+        statusImage = Gtk::manage(new RtImage(disabledImage));
+        imageEvBox = Gtk::manage(new Gtk::Box());
+        imageEvBox->set_name("MyExpanderStatus");
+        imageEvBox->append(*statusImage);
+        pack_start(headerHBox, *imageEvBox, Pack::SHRINK, 0);
+
+        auto clickController = Gtk::GestureClick::create();
+        clickController->set_button(GDK_BUTTON_PRIMARY);
+        clickController->signal_released().connect(
+            sigc::mem_fun(*this, &MyExpander::onEnabledChange));
+        imageEvBox->add_controller(clickController);
+
+        auto motionController = Gtk::EventControllerMotion::create();
+        motionController->signal_enter().connect(
+            sigc::mem_fun(*this, &MyExpander::onEnterEnable), false);
+        motionController->signal_leave().connect(
+            sigc::mem_fun(*this, &MyExpander::onLeaveEnable), false);
+        imageEvBox->add_controller(motionController);
+    } else {
+        get_style_context()->add_class("Fold");
+        statusImage = Gtk::manage(new RtImage(openedImage));
+        pack_start(headerHBox, *statusImage, Pack::SHRINK, 0);
+    }
+
+    statusImage->set_can_focus(false);
+}
+
+void MyExpander::setupPart2()
+{
+    titleEvBox = Gtk::manage(new Gtk::Box());
+    titleEvBox->set_name("MyExpanderTitle");
+    titleEvBox->append(*headerHBox);
+    titleEvBox->set_can_focus(false);
+
+    pack_start(this, *titleEvBox, Pack::EXPAND_WIDGET, 0);
+
+    updateStyle();
+
+    auto clickController = Gtk::GestureClick::create();
+    clickController->set_button(GDK_BUTTON_PRIMARY);
+    clickController->signal_released().connect(
+        sigc::mem_fun(*this, &MyExpander::onToggle));
+    titleEvBox->add_controller(clickController);
+
+    auto motionController = Gtk::EventControllerMotion::create();
+    motionController->signal_enter().connect(
+        sigc::mem_fun(*this, &MyExpander::onEnterTitle), false);
+    motionController->signal_leave().connect(
+        sigc::mem_fun(*this, &MyExpander::onLeaveTitle), false);
+    titleEvBox->add_controller(motionController);
+}
+
+void MyExpander::onEnterTitle(double /*x*/, double /*y*/)
+{
+    if (is_sensitive()) {
+        titleEvBox->set_state_flags(Gtk::StateFlags::PRELIGHT);
+        queue_draw();
+    }
+}
+
+void MyExpander::onLeaveTitle()
+{
+    if (is_sensitive()) {
+        titleEvBox->set_state_flags(Gtk::StateFlags::NORMAL);
+        queue_draw();
+    }
+}
+
+void MyExpander::onEnterEnable(double /*x*/, double /*y*/)
+{
+    if (is_sensitive()) {
+        imageEvBox->set_state_flags(Gtk::StateFlags::PRELIGHT);
+        queue_draw();
+    }
+}
+
+void MyExpander::onLeaveEnable()
+{
+    if (is_sensitive()) {
+        imageEvBox->set_state_flags(Gtk::StateFlags::NORMAL);
+        queue_draw();
+    }
+}
+
+void MyExpander::updateStyle()
+{
+    updateVScrollbars(options.hideTPVScrollbar);
+
+//GTK318
+#if GTK_MAJOR_VERSION == 3 && GTK_MINOR_VERSION < 20
+    headerHBox->set_spacing(2);
+    headerHBox->set_border_width(1);
+    set_spacing(0);
+    set_border_width(0);
+#endif
+//GTK318
+}
+
+void MyExpander::updateVScrollbars(bool hide)
+{
+    if (hide) {
+        get_style_context()->remove_class("withScrollbar");
+    } else {
+        get_style_context()->add_class("withScrollbar");
+    }
+}
+
+void MyExpander::setLevel (int level)
+{
+    if (expBox) {
+        expBox->setLevel(level);
+    }
+}
+
+void MyExpander::setLabel (Glib::ustring newLabel)
+{
+    if (label) {
+        label->set_markup(escapeHtmlChars(newLabel));
+    }
+}
+
+void MyExpander::setLabel (Gtk::Widget *newWidget)
+{
+    if (headerWidget) {
+        removeIfThere(headerHBox, headerWidget, false);
+        pack_start(headerHBox, *newWidget, Pack::EXPAND_WIDGET, 0);
+    }
+}
+
+bool MyExpander::get_inconsistent()
+{
+    return inconsistent;
+}
+
+void MyExpander::set_inconsistent(bool isInconsistent)
+{
+    if (inconsistent != isInconsistent) {
+        inconsistent = isInconsistent;
+
+        if (useEnabled) {
+            if (isInconsistent) {
+                statusImage->set_from_icon_name(inconsistentImage);
+            } else {
+                if (enabled) {
+                    statusImage->set_from_icon_name(enabledImage);
+                    get_style_context()->add_class("enabledTool");
+                } else {
+                    statusImage->set_from_icon_name(disabledImage);
+                    get_style_context()->remove_class("enabledTool");
+                }
+            }
+        }
+
+    }
+}
+
+bool MyExpander::getUseEnabled()
+{
+    return useEnabled;
+}
+
+bool MyExpander::getEnabled()
+{
+    return enabled;
+}
+
+void MyExpander::setEnabled(bool isEnabled)
+{
+    if (isEnabled != enabled) {
+        if (useEnabled) {
+            if (enabled) {
+                enabled = false;
+
+                if (!inconsistent) {
+                    statusImage->set_from_icon_name(disabledImage);
+                    get_style_context()->remove_class("enabledTool");
+                    message.emit();
+                }
+            } else {
+                enabled = true;
+
+                if (!inconsistent) {
+                    statusImage->set_from_icon_name(enabledImage);
+                    get_style_context()->add_class("enabledTool");
+                    message.emit();
+                }
+            }
+        }
+    }
+}
+
+void MyExpander::setEnabledTooltipMarkup(Glib::ustring tooltipMarkup)
+{
+    if (useEnabled) {
+        statusImage->set_tooltip_markup(tooltipMarkup);
+    }
+}
+
+void MyExpander::setEnabledTooltipText(Glib::ustring tooltipText)
+{
+    if (useEnabled) {
+        statusImage->set_tooltip_text(tooltipText);
+    }
+}
+
+void MyExpander::set_expanded( bool expanded )
+{
+    if (!expBox) {
+        return;
+    }
+
+    if (!useEnabled) {
+        if (expanded ) {
+            statusImage->set_from_icon_name(openedImage);
+        } else {
+            statusImage->set_from_icon_name(closedImage);
+        }
+    }
+
+    if (expanded) {
+        expBox->showBox();
+    } else {
+        expBox->hideBox();
+    }
+}
+
+bool MyExpander::get_expanded()
+{
+    return expBox ? expBox->get_visible() : false;
+}
+
+void MyExpander::add  (Gtk::Widget& widget, bool setChild)
+{
+    if(setChild) {
+        child = &widget;
+    }
+    expBox = Gtk::manage (new ExpanderBox ());
+    expBox->append (widget);
+    pack_start(this, *expBox, Pack::SHRINK, 0);
+    expBox->hideBox();
+}
+
+void MyExpander::onToggle(int /*n_press*/, double /*x*/, double /*y*/)
+{
+    if (flushEvent) {
+        flushEvent = false;
+        return;
+    }
+
+    if (!expBox) return;
+
+    bool isVisible = expBox->is_visible();
+
+    if (!useEnabled) {
+        if (isVisible) {
+            statusImage->set_from_icon_name(closedImage);
+        } else {
+            statusImage->set_from_icon_name(openedImage);
+        }
+    }
+
+    if (isVisible) {
+        expBox->hideBox();
+    } else {
+        expBox->showBox();
+    }
+
+    titleButtonRelease.emit();
+}
+
+// used to connect a function to the enabled_toggled signal
+MyExpander::type_signal_enabled_toggled MyExpander::signal_enabled_toggled()
+{
+    return message;
+}
+
+// internal use ; when the user clicks on the toggle button, it calls this method that will emit an enabled_change event
+void MyExpander::onEnabledChange(int /*n_press*/, double /*x*/, double /*y*/)
+{
+    if (enabled) {
+        enabled = false;
+        statusImage->set_from_icon_name(disabledImage);
+        get_style_context()->remove_class("enabledTool");
+    } else {
+        enabled = true;
+        statusImage->set_from_icon_name(enabledImage);
+        get_style_context()->add_class("enabledTool");
+    }
+
+    message.emit();
+    flushEvent = true;
+}
+
 // /*
 //  *
 //  * Derived class of some widgets to properly handle the scroll wheel ;
@@ -1047,121 +1057,125 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
 //     minimum_baseline = -1;
 //     natural_baseline = -1;
 // }
-//
-// MyComboBoxText::MyComboBoxText (bool has_entry) : Gtk::ComboBoxText(has_entry)
-// {
-//     minimumWidth = naturalWidth = RTScalable::scalePixelSize(70);
-//     Gtk::CellRendererText* cellRenderer = dynamic_cast<Gtk::CellRendererText*>(get_first_cell());
-//     cellRenderer->property_ellipsize() = Pango::ELLIPSIZE_MIDDLE;
-//
-//     controller = Gtk::EventControllerScroll::create();
-//     using Flags = Gtk::EventControllerScroll::Flags;
-//     controller->set_flags(Flags::VERTICAL | Flags::DISCRETE);
-//     controller->signal_scroll().connect(
-//         sigc::mem_fun(*this, &MyComboBoxText::onScroll), false);
-//     add_controller(controller);
-// }
-//
-// bool MyComboBoxText::onScroll(double /*dx*/, double /*dy*/)
-// {
-//     // If Shift is pressed, the widget is modified
-//     if (controller->get_current_event_state() & GDK_SHIFT_MASK) {
-//         Gtk::ComboBoxText::on_scroll_event(event);
-//         return true;
-//     }
-//
-//     // ... otherwise the scroll event is sent back to an upper level
-//     return false;
-// }
-//
-// void MyComboBoxText::setPreferredWidth (int minimum_width, int natural_width)
-// {
-//     if (natural_width == -1 && minimum_width == -1) {
-//         naturalWidth = minimumWidth = RTScalable::scalePixelSize(70);
-//     } else if (natural_width == -1) {
-//         naturalWidth =  minimumWidth = minimum_width;
-//     } else if (minimum_width == -1) {
-//         naturalWidth = natural_width;
-//         minimumWidth = rtengine::max(naturalWidth / 2, RTScalable::scalePixelSize(20));
-//         minimumWidth = rtengine::min(naturalWidth, minimumWidth);
-//     } else {
-//         naturalWidth = natural_width;
-//         minimumWidth = minimum_width;
-//     }
-// }
-//
-// void MyComboBoxText::measure_vfunc(Gtk::Orientation orientation, int /*for_size*/,
-//                                    int& minimum, int& natural,
-//                                    int& minimum_baseline, int& natural_baseline) const
-// {
-//     if (orientation == Gtk::Orientation::HORIZONTAL) {
-//         minimum = std::max(minimumWidth, RTScalable::scalePixelSize(10));
-//         natural = std::max(naturalWidth, RTScalable::scalePixelSize(10));
-//         // Don't use baseline alignment
-//         minimum_baseline = -1;
-//         natural_baseline = -1;
-//     } else {
-//         Gtk::ComboBox::measure_vfunc(orientation, minimum, natural,
-//                                      minimum_baseline, natural_baseline);
-//     }
-// }
-//
-// MyComboBox::MyComboBox ()
-// {
-//     minimumWidth = naturalWidth = RTScalable::scalePixelSize(70);
-//
-//     controller = Gtk::EventControllerScroll::create();
-//     using Flags = Gtk::EventControllerScroll::Flags;
-//     controller->set_flags(Flags::VERTICAL | Flags::DISCRETE);
-//     controller->signal_scroll().connect(
-//         sigc::mem_fun(*this, &MyComboBox::onScroll), false);
-//     add_controller(controller);
-// }
-//
-// bool MyComboBox::onScroll(double /*dx*/, double /*dy*/)
-// {
-//     // If Shift is pressed, the widget is modified
-//     if (controller->get_current_event_state() & GDK_SHIFT_MASK) {
-//         Gtk::ComboBox::on_scroll_event(event);
-//         return true;
-//     }
-//
-//     // ... otherwise the scroll event is sent back to an upper level
-//     return false;
-// }
-//
-// void MyComboBox::setPreferredWidth (int minimum_width, int natural_width)
-// {
-//     if (natural_width == -1 && minimum_width == -1) {
-//         naturalWidth = minimumWidth = RTScalable::scalePixelSize(70);
-//     } else if (natural_width == -1) {
-//         naturalWidth =  minimumWidth = minimum_width;
-//     } else if (minimum_width == -1) {
-//         naturalWidth = natural_width;
-//         minimumWidth = rtengine::max(naturalWidth / 2, RTScalable::scalePixelSize(20));
-//         minimumWidth = rtengine::min(naturalWidth, minimumWidth);
-//     } else {
-//         naturalWidth = natural_width;
-//         minimumWidth = minimum_width;
-//     }
-// }
-//
-// void MyComboBox::measure_vfunc(Gtk::Orientation orientation, int /*for_size*/,
-//                                int& minimum, int& natural,
-//                                int& minimum_baseline, int& natural_baseline) const
-// {
-//     if (orientation == Gtk::Orientation::HORIZONTAL) {
-//         minimum = std::max(minimumWidth, RTScalable::scalePixelSize(10));
-//         natural = std::max(naturalWidth, RTScalable::scalePixelSize(10));
-//         // Don't use baseline alignment
-//         minimum_baseline = -1;
-//         natural_baseline = -1;
-//     } else {
-//         Gtk::ComboBox::measure_vfunc(orientation, minimum, natural,
-//                                      minimum_baseline, natural_baseline);
-//     }
-// }
-//
+
+MyComboBoxText::MyComboBoxText (bool has_entry) : Gtk::ComboBoxText(has_entry)
+{
+    minimumWidth = naturalWidth = RTScalable::scalePixelSize(70);
+    Gtk::CellRendererText* cellRenderer = dynamic_cast<Gtk::CellRendererText*>(get_first_cell());
+    cellRenderer->property_ellipsize() = Pango::EllipsizeMode::MIDDLE;
+
+    controller = Gtk::EventControllerScroll::create();
+    using Flags = Gtk::EventControllerScroll::Flags;
+    controller->set_flags(Flags::VERTICAL | Flags::DISCRETE);
+    controller->signal_scroll().connect(
+        sigc::mem_fun(*this, &MyComboBoxText::onScroll), false);
+    add_controller(controller);
+}
+
+bool MyComboBoxText::onScroll(double /*dx*/, double /*dy*/)
+{
+    // If Shift is pressed, the widget is modified
+    auto state = controller->get_current_event_state() & Gdk::ModifierType::SHIFT_MASK;
+    if (state != Gdk::ModifierType::NO_MODIFIER_MASK) {
+        // TODO: What is the equivalent in GTK4?
+        // Gtk::ComboBoxText::on_scroll_event(event);
+        return true;
+    }
+
+    // ... otherwise the scroll event is sent back to an upper level
+    return false;
+}
+
+void MyComboBoxText::setPreferredWidth (int minimum_width, int natural_width)
+{
+    if (natural_width == -1 && minimum_width == -1) {
+        naturalWidth = minimumWidth = RTScalable::scalePixelSize(70);
+    } else if (natural_width == -1) {
+        naturalWidth =  minimumWidth = minimum_width;
+    } else if (minimum_width == -1) {
+        naturalWidth = natural_width;
+        minimumWidth = rtengine::max(naturalWidth / 2, RTScalable::scalePixelSize(20));
+        minimumWidth = rtengine::min(naturalWidth, minimumWidth);
+    } else {
+        naturalWidth = natural_width;
+        minimumWidth = minimum_width;
+    }
+}
+
+void MyComboBoxText::measure_vfunc(Gtk::Orientation orientation, int for_size,
+                                   int& minimum, int& natural,
+                                   int& minimum_baseline, int& natural_baseline) const
+{
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        minimum = std::max(minimumWidth, RTScalable::scalePixelSize(10));
+        natural = std::max(naturalWidth, RTScalable::scalePixelSize(10));
+        // Don't use baseline alignment
+        minimum_baseline = -1;
+        natural_baseline = -1;
+    } else {
+        Gtk::ComboBox::measure_vfunc(orientation, for_size, minimum, natural,
+                                     minimum_baseline, natural_baseline);
+    }
+}
+
+MyComboBox::MyComboBox ()
+{
+    minimumWidth = naturalWidth = RTScalable::scalePixelSize(70);
+
+    controller = Gtk::EventControllerScroll::create();
+    using Flags = Gtk::EventControllerScroll::Flags;
+    controller->set_flags(Flags::VERTICAL | Flags::DISCRETE);
+    controller->signal_scroll().connect(
+        sigc::mem_fun(*this, &MyComboBox::onScroll), false);
+    add_controller(controller);
+}
+
+bool MyComboBox::onScroll(double /*dx*/, double /*dy*/)
+{
+    // If Shift is pressed, the widget is modified
+    auto state = controller->get_current_event_state() & Gdk::ModifierType::SHIFT_MASK;
+    if (state != Gdk::ModifierType::NO_MODIFIER_MASK) {
+        // TODO: What is the equivalent in GTK4?
+        // Gtk::ComboBox::on_scroll_event(event);
+        return true;
+    }
+
+    // ... otherwise the scroll event is sent back to an upper level
+    return false;
+}
+
+void MyComboBox::setPreferredWidth (int minimum_width, int natural_width)
+{
+    if (natural_width == -1 && minimum_width == -1) {
+        naturalWidth = minimumWidth = RTScalable::scalePixelSize(70);
+    } else if (natural_width == -1) {
+        naturalWidth =  minimumWidth = minimum_width;
+    } else if (minimum_width == -1) {
+        naturalWidth = natural_width;
+        minimumWidth = rtengine::max(naturalWidth / 2, RTScalable::scalePixelSize(20));
+        minimumWidth = rtengine::min(naturalWidth, minimumWidth);
+    } else {
+        naturalWidth = natural_width;
+        minimumWidth = minimum_width;
+    }
+}
+
+void MyComboBox::measure_vfunc(Gtk::Orientation orientation, int for_size,
+                               int& minimum, int& natural,
+                               int& minimum_baseline, int& natural_baseline) const
+{
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        minimum = std::max(minimumWidth, RTScalable::scalePixelSize(10));
+        natural = std::max(naturalWidth, RTScalable::scalePixelSize(10));
+        // Don't use baseline alignment
+        minimum_baseline = -1;
+        natural_baseline = -1;
+    } else {
+        Gtk::ComboBox::measure_vfunc(orientation, for_size, minimum, natural,
+                                     minimum_baseline, natural_baseline);
+    }
+}
+
 // MySpinButton::MySpinButton ()
 // {
 //     Gtk::Border border;
@@ -1281,369 +1295,387 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
 //         return Gtk::Widget::on_key_press_event(event);
 //     }
 // }
-//
-// class MyFileChooserWidget::Impl
-// {
-// public:
-//     Impl(const Glib::ustring &title, Gtk::FileChooserAction action) :
-//         title_(title),
-//         action_(action)
-//     {
-//     }
-//
-//     Glib::ustring title_;
-//     Gtk::FileChooserAction action_;
-//     std::string filename_;
-//     std::string current_folder_;
-//     std::vector<Glib::RefPtr<Gtk::FileFilter>> file_filters_;
-//     Glib::RefPtr<Gtk::FileFilter> cur_filter_;
-//     std::vector<std::string> shortcut_folders_;
-//     bool show_hidden_{false};
-//     sigc::signal<void> selection_changed_;
-// };
-//
-//
-// MyFileChooserWidget::MyFileChooserWidget(const Glib::ustring &title, Gtk::FileChooserAction action) :
-//     pimpl(new Impl(title, action))
-// {
-// }
-//
-//
-// std::unique_ptr<Gtk::Image> MyFileChooserWidget::make_folder_image()
-// {
-//     return std::unique_ptr<Gtk::Image>(new RTImage("folder-open-small", Gtk::ICON_SIZE_BUTTON));
-// }
-//
-// void MyFileChooserWidget::show_chooser(Gtk::Widget *parent)
-// {
-//     Gtk::FileChooserDialog dlg(getToplevelWindow(parent), pimpl->title_, pimpl->action_);
-//     dlg.add_button(M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
-//     dlg.add_button(M(pimpl->action_ == Gtk::FileChooser::Action::SAVE ? "GENERAL_SAVE" : "GENERAL_OPEN"), Gtk::RESPONSE_OK);
-//     dlg.set_filename(pimpl->filename_);
-//     for (auto &f : pimpl->file_filters_) {
-//         dlg.add_filter(f);
-//     }
-//     if (pimpl->cur_filter_) {
-//         dlg.set_filter(pimpl->cur_filter_);
-//     }
-//     for (auto &f : pimpl->shortcut_folders_) {
-//         dlg.add_shortcut_folder(f);
-//     }
-//     if (!pimpl->current_folder_.empty()) {
-//         dlg.set_current_folder(pimpl->current_folder_);
-//     }
-//     dlg.set_show_hidden(pimpl->show_hidden_);
-//     int res = dlg.run();
-//     if (res == Gtk::RESPONSE_OK) {
-//         pimpl->filename_ = dlg.get_filename();
-//         pimpl->current_folder_ = dlg.get_current_folder();
-//         on_filename_set();
-//         pimpl->selection_changed_.emit();
-//     }
-// }
-//
-//
-// void MyFileChooserWidget::on_filename_set()
-// {
-//     // Sub-classes decide if anything needs to be done.
-// }
-//
-//
-// sigc::signal<void> &MyFileChooserWidget::signal_selection_changed()
-// {
-//     return pimpl->selection_changed_;
-// }
-//
-//
-// sigc::signal<void> &MyFileChooserWidget::signal_file_set()
-// {
-//     return pimpl->selection_changed_;
-// }
-//
-//
-// std::string MyFileChooserWidget::get_filename() const
-// {
-//     return pimpl->filename_;
-// }
-//
-//
-// bool MyFileChooserWidget::set_filename(const std::string &filename)
-// {
-//     pimpl->filename_ = filename;
-//     on_filename_set();
-//     return true;
-// }
-//
-//
-// void MyFileChooserWidget::add_filter(const Glib::RefPtr<Gtk::FileFilter> &filter)
-// {
-//     pimpl->file_filters_.push_back(filter);
-// }
-//
-//
-// void MyFileChooserWidget::remove_filter(const Glib::RefPtr<Gtk::FileFilter> &filter)
-// {
-//     auto it = std::find(pimpl->file_filters_.begin(), pimpl->file_filters_.end(), filter);
-//     if (it != pimpl->file_filters_.end()) {
-//         pimpl->file_filters_.erase(it);
-//     }
-// }
-//
-//
-// void MyFileChooserWidget::set_filter(const Glib::RefPtr<Gtk::FileFilter> &filter)
-// {
-//     pimpl->cur_filter_ = filter;
-// }
-//
-//
-// std::vector<Glib::RefPtr<Gtk::FileFilter>> MyFileChooserWidget::list_filters() const
-// {
-//     return pimpl->file_filters_;
-// }
-//
-//
-// bool MyFileChooserWidget::set_current_folder(const std::string &filename)
-// {
-//     pimpl->current_folder_ = filename;
-//     if (pimpl->action_ == Gtk::FileChooser::Action::SELECT_FOLDER) {
-//         set_filename(filename);
-//     }
-//     return true;
-// }
-//
-// std::string MyFileChooserWidget::get_current_folder() const
-// {
-//     return pimpl->current_folder_;
-// }
-//
-//
-// bool MyFileChooserWidget::add_shortcut_folder(const std::string &folder)
-// {
-//     pimpl->shortcut_folders_.push_back(folder);
-//     return true;
-// }
-//
-//
-// bool MyFileChooserWidget::remove_shortcut_folder(const std::string &folder)
-// {
-//     auto it = std::find(pimpl->shortcut_folders_.begin(), pimpl->shortcut_folders_.end(), folder);
-//     if (it != pimpl->shortcut_folders_.end()) {
-//         pimpl->shortcut_folders_.erase(it);
-//     }
-//     return true;
-// }
-//
-//
-// void MyFileChooserWidget::unselect_all()
-// {
-//     pimpl->filename_ = "";
-//     on_filename_set();
-// }
-//
-//
-// void MyFileChooserWidget::unselect_filename(const std::string &filename)
-// {
-//     if (pimpl->filename_ == filename) {
-//         unselect_all();
-//     }
-// }
-//
-//
-// void MyFileChooserWidget::set_show_hidden(bool yes)
-// {
-//     pimpl->show_hidden_ = yes;
-// }
-//
-//
-// class MyFileChooserButton::Impl
-// {
-// public:
-//     Gtk::Box box_;
-//     Gtk::Label lbl_{"", Gtk::Align::START};
-// };
-//
-// MyFileChooserButton::MyFileChooserButton(const Glib::ustring &title, Gtk::FileChooserAction action):
-//     MyFileChooserWidget(title, action),
-//     pimpl(new Impl())
-// {
-//     pimpl->lbl_.set_ellipsize(Pango::ELLIPSIZE_MIDDLE);
-//     pimpl->lbl_.set_justify(Gtk::JUSTIFY_LEFT);
-//     on_filename_set();
-//     pimpl->box_.pack_start(pimpl->lbl_, true, true);
-//     pimpl->box_.pack_start(*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), false, false, 5);
-//     pimpl->box_.pack_start(*Gtk::manage(make_folder_image().release()), false, false);
-//     pimpl->box_.show_all_children();
-//     add(pimpl->box_);
-//     signal_clicked().connect([this]() {
-//         show_chooser(this);
-//     });
-//
-//     if (GTK_MINOR_VERSION < 20) {
-//         set_border_width(2); // margin doesn't work on GTK < 3.20
-//     }
-//
-//     set_name("MyFileChooserButton");
-//
-//     m_controller = Gtk::EventControllerScroll::create();
-//     using Flags = Gtk::EventControllerScroll::Flags;
-//     m_controller->set_flags(Flags::VERTICAL | Flags::DISCRETE);
-//     m_controller->signal_scroll().connect(
-//         sigc::mem_fun(*this, &MyFileChooserButton::onScroll), false);
-//     add_controller(m_controller);
-// }
-//
-// void MyFileChooserButton::on_filename_set()
-// {
-//     if (Glib::file_test(get_filename(), Glib::FileTest::EXISTS)) {
-//         pimpl->lbl_.set_label(Glib::path_get_basename(get_filename()));
-//     } else {
-//         pimpl->lbl_.set_label(Glib::ustring("(") + M("GENERAL_NONE") + ")");
-//     }
-// }
-//
-// // For an unknown reason (a bug ?), it doesn't work when action = FILE_CHOOSER_ACTION_SELECT_FOLDER !
-// bool MyFileChooserButton::onScroll(double /*dx*/, double /*dy*/)
-// {
-//     // If Shift is pressed, the widget is modified
-//     if (m_controller->get_current_event_state() & GDK_SHIFT_MASK) {
-//         Gtk::Button::on_scroll_event(event);
-//         return true;
-//     }
-//
-//     // ... otherwise the scroll event is sent back to an upper level
-//     return false;
-// }
-//
-// void MyFileChooseButton::measure_vfunc(Gtk::Orientation orientation, /*int for_size*/,
-//                                        int& minimum, int& natural,
-//                                        int& minimum_baseline, int& natural_baseline) const
-// {
-//     if (orientation == Gtk::Orientation::HORIZONTAL) {
-//         int width = RTScalable::scalePixelSize(35);
-//         minimum = width;
-//         natural = width;
-//         // Don't use baseline alignment
-//         minimum_baseline = -1;
-//         natural_baseline = -1;
-//     } else {
-//         Gtk::ComboBox::measure_vfunc(orientation, minimum, natural,
-//                                      minimum_baseline, natural_baseline);
-//     }
-// }
-//
-// class MyFileChooserEntry::Impl
-// {
-// public:
-//     Gtk::Entry entry;
-//     Gtk::Button file_chooser_button;
-// };
-//
-//
-// MyFileChooserEntry::MyFileChooserEntry(const Glib::ustring &title, Gtk::FileChooserAction action) :
-//     MyFileChooserWidget(title, action),
-//     pimpl(new Impl())
-// {
-//     const auto on_text_changed = [this]() {
-//         set_filename(pimpl->entry.get_text());
-//     };
-//     pimpl->entry.get_buffer()->signal_deleted_text().connect([on_text_changed](guint, guint) { on_text_changed(); });
-//     pimpl->entry.get_buffer()->signal_inserted_text().connect([on_text_changed](guint, const gchar *, guint) { on_text_changed(); });
-//
-//     pimpl->file_chooser_button.set_image(*Gtk::manage(make_folder_image().release()));
-//     pimpl->file_chooser_button.signal_clicked().connect([this]() {
-//         const auto &filename = get_filename();
-//         if (Glib::file_test(filename, Glib::FileTest::IS_DIR)) {
-//             set_current_folder(filename);
-//         }
-//         show_chooser(this);
-//     });
-//
-//     pack_start(pimpl->entry, true, true);
-//     pack_start(pimpl->file_chooser_button, false, false);
-// }
-//
-//
-// Glib::ustring MyFileChooserEntry::get_placeholder_text() const
-// {
-//     return pimpl->entry.get_placeholder_text();
-// }
-//
-//
-// void MyFileChooserEntry::set_placeholder_text(const Glib::ustring &text)
-// {
-//     pimpl->entry.set_placeholder_text(text);
-// }
-//
-//
-// void MyFileChooserEntry::on_filename_set()
-// {
-//     if (pimpl->entry.get_text() != get_filename()) {
-//         pimpl->entry.set_text(get_filename());
-//     }
-// }
-//
-//
+
+class MyFileChooserWidget::Impl
+{
+public:
+    Impl(const Glib::ustring &title, Gtk::FileChooser::Action action) :
+        title_(title),
+        action_(action)
+    {
+    }
+
+    Glib::ustring title_;
+    Gtk::FileChooser::Action action_;
+    Glib::RefPtr<Gio::File> filename_;
+    Glib::RefPtr<Gio::File> current_folder_;
+    std::vector<Glib::RefPtr<Gtk::FileFilter>> file_filters_;
+    Glib::RefPtr<Gtk::FileFilter> cur_filter_;
+    std::vector<Glib::RefPtr<Gio::File>> shortcut_folders_;
+    bool show_hidden_{false};
+    sigc::signal<void()> selection_changed_;
+};
+
+
+MyFileChooserWidget::MyFileChooserWidget(const Glib::ustring &title, Gtk::FileChooser::Action action) :
+    pimpl(new Impl(title, action))
+{
+}
+
+
+std::unique_ptr<Gtk::Image> MyFileChooserWidget::make_folder_image()
+{
+    return std::unique_ptr<Gtk::Image>(new RtImage("folder-open-small"));
+}
+
+void MyFileChooserWidget::show_chooser(Gtk::Widget *parent)
+{
+    Gtk::FileChooserDialog dlg(*getToplevelWindow(parent), pimpl->title_, pimpl->action_);
+    dlg.add_button(M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
+    dlg.add_button(M(pimpl->action_ == Gtk::FileChooser::Action::SAVE ? "GENERAL_SAVE" : "GENERAL_OPEN"), Gtk::ResponseType::OK);
+    dlg.set_file(pimpl->filename_);
+    for (auto &f : pimpl->file_filters_) {
+        dlg.add_filter(f);
+    }
+    if (pimpl->cur_filter_) {
+        dlg.set_filter(pimpl->cur_filter_);
+    }
+    for (auto &f : pimpl->shortcut_folders_) {
+        dlg.add_shortcut_folder(f);
+    }
+    if (!pimpl->current_folder_) {
+        dlg.set_current_folder(pimpl->current_folder_);
+    }
+    // dlg.set_show_hidden(pimpl->show_hidden_);
+    dlg.set_modal(true);
+    dlg.signal_response().connect([&](int res) {
+        if (res == static_cast<int>(Gtk::ResponseType::OK)) {
+            pimpl->filename_ = dlg.get_file();
+            pimpl->current_folder_ = dlg.get_current_folder();
+            on_filename_set();
+            pimpl->selection_changed_.emit();
+        }
+    });
+    dlg.present();
+}
+
+
+void MyFileChooserWidget::on_filename_set()
+{
+    // Sub-classes decide if anything needs to be done.
+}
+
+
+sigc::signal<void()> &MyFileChooserWidget::signal_selection_changed()
+{
+    return pimpl->selection_changed_;
+}
+
+
+sigc::signal<void()> &MyFileChooserWidget::signal_file_set()
+{
+    return pimpl->selection_changed_;
+}
+
+
+std::string MyFileChooserWidget::get_filename() const
+{
+    return pimpl->filename_->get_path();
+}
+
+
+bool MyFileChooserWidget::set_filename(const std::string &filename)
+{
+    pimpl->filename_ = Gio::File::create_for_path(filename);
+    on_filename_set();
+    return true;
+}
+
+
+void MyFileChooserWidget::add_filter(const Glib::RefPtr<Gtk::FileFilter> &filter)
+{
+    pimpl->file_filters_.push_back(filter);
+}
+
+
+void MyFileChooserWidget::remove_filter(const Glib::RefPtr<Gtk::FileFilter> &filter)
+{
+    auto it = std::find(pimpl->file_filters_.begin(), pimpl->file_filters_.end(), filter);
+    if (it != pimpl->file_filters_.end()) {
+        pimpl->file_filters_.erase(it);
+    }
+}
+
+
+void MyFileChooserWidget::set_filter(const Glib::RefPtr<Gtk::FileFilter> &filter)
+{
+    pimpl->cur_filter_ = filter;
+}
+
+
+std::vector<Glib::RefPtr<Gtk::FileFilter>> MyFileChooserWidget::list_filters() const
+{
+    return pimpl->file_filters_;
+}
+
+
+bool MyFileChooserWidget::set_current_folder(const std::string &filename)
+{
+    pimpl->current_folder_ = Gio::File::create_for_path(filename);
+    if (pimpl->action_ == Gtk::FileChooser::Action::SELECT_FOLDER) {
+        set_filename(filename);
+    }
+    return true;
+}
+
+std::string MyFileChooserWidget::get_current_folder() const
+{
+    return pimpl->current_folder_->get_path();
+}
+
+
+bool MyFileChooserWidget::add_shortcut_folder(const std::string &folder)
+{
+    pimpl->shortcut_folders_.push_back(Gio::File::create_for_path(folder));
+    return true;
+}
+
+
+bool MyFileChooserWidget::remove_shortcut_folder(const std::string &folder)
+{
+    auto handle = Gio::File::create_for_path(folder);
+    auto it = std::find(pimpl->shortcut_folders_.begin(), pimpl->shortcut_folders_.end(), handle);
+    if (it != pimpl->shortcut_folders_.end()) {
+        pimpl->shortcut_folders_.erase(it);
+    }
+    return true;
+}
+
+
+void MyFileChooserWidget::unselect_all()
+{
+    pimpl->filename_ = nullptr;
+    on_filename_set();
+}
+
+
+void MyFileChooserWidget::unselect_filename(const std::string &filename)
+{
+    if (pimpl->filename_->get_path() == filename) {
+        unselect_all();
+    }
+}
+
+
+void MyFileChooserWidget::set_show_hidden(bool yes)
+{
+    pimpl->show_hidden_ = yes;
+}
+
+
+class MyFileChooserButton::Impl
+{
+public:
+    Gtk::Box box_;
+    Gtk::Label lbl_{"", Gtk::Align::START};
+};
+
+MyFileChooserButton::MyFileChooserButton(const Glib::ustring &title, Gtk::FileChooser::Action action):
+    MyFileChooserWidget(title, action),
+    pimpl(new Impl())
+{
+    pimpl->lbl_.set_ellipsize(Pango::EllipsizeMode::MIDDLE);
+    pimpl->lbl_.set_justify(Gtk::Justification::LEFT);
+    on_filename_set();
+    pack_start(&(pimpl->box_), pimpl->lbl_, true, true);
+    pack_start(&(pimpl->box_), *Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), false, false, 5);
+    pack_start(&(pimpl->box_), *Gtk::manage(make_folder_image().release()), false, false);
+    set_child(pimpl->box_);
+    signal_clicked().connect([this]() {
+        show_chooser(this);
+    });
+
+    set_name("MyFileChooserButton");
+
+    m_controller = Gtk::EventControllerScroll::create();
+    using Flags = Gtk::EventControllerScroll::Flags;
+    m_controller->set_flags(Flags::VERTICAL | Flags::DISCRETE);
+    m_controller->signal_scroll().connect(
+        sigc::mem_fun(*this, &MyFileChooserButton::onScroll), false);
+    add_controller(m_controller);
+}
+
+void MyFileChooserButton::on_filename_set()
+{
+    if (Glib::file_test(get_filename(), Glib::FileTest::EXISTS)) {
+        pimpl->lbl_.set_label(Glib::path_get_basename(get_filename()));
+    } else {
+        pimpl->lbl_.set_label(Glib::ustring("(") + M("GENERAL_NONE") + ")");
+    }
+}
+
+// For an unknown reason (a bug ?), it doesn't work when action = FILE_CHOOSER_ACTION_SELECT_FOLDER !
+bool MyFileChooserButton::onScroll(double /*dx*/, double /*dy*/)
+{
+    // If Shift is pressed, the widget is modified
+    auto state = m_controller->get_current_event_state() & Gdk::ModifierType::SHIFT_MASK;
+    if (state != Gdk::ModifierType::NO_MODIFIER_MASK) {
+        // TODO: What is the equivalent in GTK4?
+        // Gtk::Button::on_scroll_event(event);
+        return true;
+    }
+
+    // ... otherwise the scroll event is sent back to an upper level
+    return false;
+}
+
+void MyFileChooserButton::measure_vfunc(Gtk::Orientation orientation, int for_size,
+                                        int& minimum, int& natural,
+                                        int& minimum_baseline, int& natural_baseline) const
+{
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        int width = RTScalable::scalePixelSize(35);
+        minimum = width;
+        natural = width;
+        // Don't use baseline alignment
+        minimum_baseline = -1;
+        natural_baseline = -1;
+    } else {
+        Gtk::Button::measure_vfunc(orientation, for_size, minimum, natural,
+                                   minimum_baseline, natural_baseline);
+    }
+}
+
+class MyFileChooserEntry::Impl
+{
+public:
+    Gtk::Entry entry;
+    ImageLabelButton file_chooser_button;
+};
+
+
+MyFileChooserEntry::MyFileChooserEntry(const Glib::ustring &title, Gtk::FileChooser::Action action) :
+    MyFileChooserWidget(title, action),
+    pimpl(new Impl())
+{
+    const auto on_text_changed = [this]() {
+        set_filename(pimpl->entry.get_text());
+    };
+    pimpl->entry.get_buffer()->signal_deleted_text().connect([on_text_changed](guint, guint) { on_text_changed(); });
+    pimpl->entry.get_buffer()->signal_inserted_text().connect([on_text_changed](guint, const gchar *, guint) { on_text_changed(); });
+
+    pimpl->file_chooser_button.set_image(*Gtk::manage(make_folder_image().release()));
+    pimpl->file_chooser_button.signal_clicked().connect([this]() {
+        const auto &filename = get_filename();
+        if (Glib::file_test(filename, Glib::FileTest::IS_DIR)) {
+            set_current_folder(filename);
+        }
+        show_chooser(this);
+    });
+
+    pack_start(this, pimpl->entry, true, true);
+    pack_start(this, pimpl->file_chooser_button, false, false);
+}
+
+
+Glib::ustring MyFileChooserEntry::get_placeholder_text() const
+{
+    return pimpl->entry.get_placeholder_text();
+}
+
+
+void MyFileChooserEntry::set_placeholder_text(const Glib::ustring &text)
+{
+    pimpl->entry.set_placeholder_text(text);
+}
+
+
+void MyFileChooserEntry::on_filename_set()
+{
+    if (pimpl->entry.get_text() != get_filename().c_str()) {
+        pimpl->entry.set_text(get_filename().c_str());
+    }
+}
+
+
 // TextOrIcon::TextOrIcon (const Glib::ustring &icon_name, const Glib::ustring &labelTx, const Glib::ustring &tooltipTx)
 // {
 //
-//     RTImage *img = Gtk::manage(new RTImage(icon_name, Gtk::ICON_SIZE_LARGE_TOOLBAR));
-//     pack_start(*img, Gtk::PACK_SHRINK, 0);
+//     RtImage *img = Gtk::manage(new RtImage(icon_name));
+//     pack_start(*img, Pack::SHRINK, 0);
 //     set_tooltip_markup("<span font_size=\"large\" font_weight=\"bold\">" + labelTx  + "</span>\n" + tooltipTx);
 //
 //     set_name("TextOrIcon");
 //     show_all();
 //
 // }
-//
-// class ImageAndLabel::Impl
-// {
-// public:
-//     RTImage* image;
-//     Gtk::Label* label;
-//
-//     Impl(RTImage* image, Gtk::Label* label) : image(image), label(label) {}
-//     static std::unique_ptr<RTImage> createImage(const Glib::ustring& iconName);
-// };
-//
-// std::unique_ptr<RTImage> ImageAndLabel::Impl::createImage(const Glib::ustring& iconName)
-// {
-//     if (iconName.empty()) {
-//         return nullptr;
-//     }
-//     return std::unique_ptr<RTImage>(new RTImage(iconName, Gtk::ICON_SIZE_LARGE_TOOLBAR));
-// }
-//
-// ImageAndLabel::ImageAndLabel(const Glib::ustring& label, const Glib::ustring& iconName) :
-//     ImageAndLabel(label, Gtk::manage(Impl::createImage(iconName).release()))
-// {
-// }
-//
-// ImageAndLabel::ImageAndLabel(const Glib::ustring& label, RTImage *image) :
-//     pimpl(new Impl(image, Gtk::manage(new Gtk::Label(label))))
-// {
-//     Gtk::Grid* grid = Gtk::manage(new Gtk::Grid());
-//     grid->set_orientation(Gtk::Orientation::HORIZONTAL);
-//
-//     if (image) {
-//         grid->attach_next_to(*image, Gtk::PositionType::LEFT, 1, 1);
-//     }
-//
-//     grid->attach_next_to(*(pimpl->label), Gtk::PositionType::RIGHT, 1, 1);
-//     grid->set_column_spacing(4);
-//     grid->set_row_spacing(0);
-//     pack_start(*grid, Gtk::PACK_SHRINK, 0);
-// }
-//
-// const RTImage* ImageAndLabel::getImage() const
-// {
-//     return pimpl->image;
-// }
-//
-// const Gtk::Label* ImageAndLabel::getLabel() const
-// {
-//     return pimpl->label;
-// }
-//
+
+class ImageAndLabel::Impl
+{
+public:
+    RtImage* image;
+    Gtk::Label* label;
+
+    Impl(RtImage* image, Gtk::Label* label) : image(image), label(label) {}
+    static std::unique_ptr<RtImage> createImage(const Glib::ustring& iconName);
+};
+
+std::unique_ptr<RtImage> ImageAndLabel::Impl::createImage(const Glib::ustring& iconName)
+{
+    if (iconName.empty()) {
+        return nullptr;
+    }
+    return std::unique_ptr<RtImage>(new RtImage(iconName));
+}
+
+ImageAndLabel::ImageAndLabel(const Glib::ustring& label, const Glib::ustring& iconName) :
+    ImageAndLabel(label, Gtk::manage(Impl::createImage(iconName).release()))
+{
+}
+
+ImageAndLabel::ImageAndLabel(const Glib::ustring& label, RtImage *image) :
+    pimpl(new Impl(image, Gtk::manage(new Gtk::Label(label))))
+{
+    Gtk::Grid* grid = Gtk::manage(new Gtk::Grid());
+    grid->set_orientation(Gtk::Orientation::HORIZONTAL);
+
+    if (image) {
+        grid->attach_next_to(*image, Gtk::PositionType::LEFT, 1, 1);
+    }
+
+    grid->attach_next_to(*(pimpl->label), Gtk::PositionType::RIGHT, 1, 1);
+    grid->set_column_spacing(4);
+    grid->set_row_spacing(0);
+    pack_start(this, *grid, Pack::SHRINK, 0);
+}
+
+const RtImage* ImageAndLabel::getImage() const
+{
+    return pimpl->image;
+}
+
+const Gtk::Label* ImageAndLabel::getLabel() const
+{
+    return pimpl->label;
+}
+
+ImageLabelButton::ImageLabelButton()
+{
+    m_box.append(m_label);
+    set_child(m_box);
+}
+
+ImageLabelButton::ImageLabelButton(const Glib::ustring& text) : m_label(text)
+{
+    m_box.append(m_label);
+    set_child(m_box);
+}
+
+void ImageLabelButton::set_image(Gtk::Image& image)
+{
+    m_box.prepend(image);
+}
+
 // class MyImageMenuItem::Impl
 // {
 // private:
@@ -1652,7 +1684,7 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
 // public:
 //     Impl(const Glib::ustring &label, const Glib::ustring &iconName) :
 //         widget(new ImageAndLabel(label, iconName)) {}
-//     Impl(const Glib::ustring &label, RTImage *itemImage) :
+//     Impl(const Glib::ustring &label, RtImage *itemImage) :
 //         widget(new ImageAndLabel(label, itemImage)) {}
 //     ImageAndLabel* getWidget() const { return widget.get(); }
 // };
@@ -1663,13 +1695,13 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
 //     add(*(pimpl->getWidget()));
 // }
 //
-// MyImageMenuItem::MyImageMenuItem(const Glib::ustring& label, RTImage* itemImage) :
+// MyImageMenuItem::MyImageMenuItem(const Glib::ustring& label, RtImage* itemImage) :
 //     pimpl(new Impl(label, itemImage))
 // {
 //     add(*(pimpl->getWidget()));
 // }
 //
-// const RTImage *MyImageMenuItem::getImage () const
+// const RtImage *MyImageMenuItem::getImage () const
 // {
 //     return pimpl->getWidget()->getImage();
 // }
@@ -1684,12 +1716,12 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
 //     std::unique_ptr<ImageAndLabel> widget;
 //
 // public:
-//     Impl(const Glib::ustring &label, RTImage *image) :
+//     Impl(const Glib::ustring &label, RtImage *image) :
 //         widget(new ImageAndLabel(label, image)) {}
 //     ImageAndLabel* getWidget() const { return widget.get(); }
 // };
 //
-// MyRadioImageMenuItem::MyRadioImageMenuItem(const Glib::ustring& label, RTImage *image, Gtk::RadioButton::Group& group) :
+// MyRadioImageMenuItem::MyRadioImageMenuItem(const Glib::ustring& label, RtImage *image, Gtk::RadioButton::Group& group) :
 //     Gtk::RadioMenuItem(group),
 //     pimpl(new Impl(label, image))
 // {
@@ -1709,7 +1741,7 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
 //     w = rtengine::max(width, RTScalable::scalePixelSize(10));
 // }
 //
-// void MyProgressBar::measure_vfunc(Gtk::Orientation orientation, /*int for_size*/,
+// void MyProgressBar::measure_vfunc(Gtk::Orientation orientation, int for_size,
 //                                   int& minimum, int& natural,
 //                                   int& minimum_baseline, int& natural_baseline) const
 // {
@@ -1721,7 +1753,7 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
 //         minimum_baseline = -1;
 //         natural_baseline = -1;
 //     } else {
-//         Gtk::ComboBox::measure_vfunc(orientation, minimum, natural,
+//         Gtk::ComboBox::measure_vfunc(orientation, for_size, minimum, natural,
 //                                      minimum_baseline, natural_baseline);
 //     }
 // }

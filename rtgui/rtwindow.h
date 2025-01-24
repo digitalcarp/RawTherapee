@@ -34,6 +34,10 @@ struct ExternalEditor;
 class FilePanel;
 class PLDBridge;
 
+namespace rtengine {
+enum RenderingIntent : int;
+}
+
 class RtWindow final :
     public Gtk::ApplicationWindow,
     // public rtengine::ProgressListener,
@@ -113,15 +117,15 @@ public:
     // void MoveFileBrowserToEditor();
     // void MoveFileBrowserToMain();
     //
-    // void updateExternalEditorWidget(int selectedIndex, const std::vector<ExternalEditor> &editors);
-    // void updateProfiles (const Glib::ustring &printerProfile, rtengine::RenderingIntent printerIntent, bool printerBPC);
-    // void updateTPVScrollbar (bool hide);
-    // void updateHistogramPosition (int oldPosition, int newPosition);
-    // void updateFBQueryTB (bool singleRow);
-    // void updateFBToolBarVisibility (bool showFilmStripToolBar);
-    // void updateShowtooltipVisibility (bool showtooltip);
-    // void updateToolPanelToolLocations(
-    //     const std::vector<Glib::ustring> &favorites, bool cloneFavoriteTools);
+    void updateExternalEditorWidget(int selectedIndex, const std::vector<ExternalEditor> &editors);
+    void updateProfiles (const Glib::ustring &printerProfile, rtengine::RenderingIntent printerIntent, bool printerBPC);
+    void updateTPVScrollbar (bool hide);
+    void updateHistogramPosition (int oldPosition, int newPosition);
+    void updateFBQueryTB (bool singleRow);
+    void updateFBToolBarVisibility (bool showFilmStripToolBar);
+    void updateShowtooltipVisibility (bool showtooltip);
+    void updateToolPanelToolLocations(
+        const std::vector<Glib::ustring> &favorites, bool cloneFavoriteTools);
     bool getIsFullscreen()
     {
         return is_fullscreen;
@@ -129,8 +133,8 @@ public:
     void setWindowSize ();
     void set_title_decorated (const Glib::ustring& fname);
     // void closeOpenEditors();
-    // void setEditorMode (bool tabbedUI);
+    void setEditorMode (bool tabbedUI);
     // void createSetmEditor();
-    //
-    // void writeToolExpandedStatus (std::vector<int> &tpOpen);
+
+    void writeToolExpandedStatus (std::vector<int> &tpOpen);
 };

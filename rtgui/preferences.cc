@@ -24,6 +24,7 @@
 
 #include "addsetids.h"
 #include "cachemanager.h"
+#include "dynamicprofilepanel.h"
 #include "externaleditorpreferences.h"
 #include "guiutils.h"
 #include "multilangmgr.h"
@@ -43,7 +44,9 @@
 #endif
 
 namespace {
-void placeSpinBox(Gtk::Container* where, Gtk::SpinButton* &spin, const std::string &labelText, int digits, int inc0, int inc1, int maxLength, int range0, int range1, const std::string &toolTip = "") {
+
+template <class Container>
+void placeSpinBox(Container where, Gtk::SpinButton* &spin, const std::string &labelText, int digits, int inc0, int inc1, int maxLength, int range0, int range1, const std::string &toolTip = "") {
     Gtk::Box* HB = Gtk::manage ( new Gtk::Box () );
     HB->set_spacing (4);
     if (!toolTip.empty()) {
@@ -53,12 +56,20 @@ void placeSpinBox(Gtk::Container* where, Gtk::SpinButton* &spin, const std::stri
     spin = Gtk::manage ( new Gtk::SpinButton () );
     spin->set_digits (digits);
     spin->set_increments (inc0, inc1);
-    spin->set_max_length (maxLength); // Will this be sufficient? :)
+    spin->set_max_width_chars (maxLength);
     spin->set_range (range0, range1);
     pack_start(HB, *label, Pack::SHRINK, 0);
     pack_end(HB, *spin, Pack::SHRINK, 0);
-    where->add(*HB);
+
+    if constexpr (std::is_same_v<Container, Gtk::Box*>) {
+        where->append(*HB);
+    } else if constexpr (std::is_same_v<Container, Gtk::Frame*>) {
+        where->set_child(*HB);
+    } else {
+        static_assert(false);
+    }
 }
+
 }
 
 extern Glib::ustring argv0;
@@ -67,7 +78,7 @@ Glib::RefPtr<Gtk::CssProvider> fontcss;
 
 Preferences::Preferences(RtWindow *rtwindow)
     : Gtk::Dialog(M("MAIN_BUTTON_PREFERENCES"), *rtwindow, true)
-    , regex(Glib::Regex::create (THEMEREGEXSTR, Glib::RegexCompileFlags::REGEX_CASELESS))
+    , regex(Glib::Regex::create (THEMEREGEXSTR, Glib::Regex::CompileFlags::CASELESS))
     , splash(nullptr)
     , rprofiles(nullptr)
     , iprofiles(nullptr)
@@ -118,9 +129,10 @@ Preferences::Preferences(RtWindow *rtwindow)
     ok->signal_clicked().connect(sigc::mem_fun(*this, &Preferences::okPressed));
     cancel->signal_clicked().connect(sigc::mem_fun(*this, &Preferences::cancelPressed));
 
-    pack_start(get_action_area(), *about);
-    pack_end(get_action_area(), *ok);
-    pack_end(get_action_area(), *cancel);
+    add_action_widget(*about, 2);
+    add_action_widget(*ok, 1);
+    add_action_widget(*cancel, 0);
+    set_response_sensitive(2, false);
 
     nb->append_page(*getGeneralPanel(), M("PREFERENCES_TAB_GENERAL"));
     nb->append_page(*getImageProcessingPanel(), M("PREFERENCES_TAB_IMPROC"));
@@ -139,8 +151,6 @@ Preferences::Preferences(RtWindow *rtwindow)
     ProfileStore::getInstance()->addListener(this);
 
     fillPreferences();
-
-    show_all_children();
 }
 
 
@@ -148,7 +158,7 @@ Preferences::~Preferences()
 {
 
     ProfileStore::getInstance()->removeListener(this);
-    get_size(options.preferencesWidth, options.preferencesHeight);
+    get_default_size(options.preferencesWidth, options.preferencesHeight);
 }
 
 int Preferences::getThemeRowNumber (const Glib::ustring& name)
@@ -178,7 +188,7 @@ Gtk::Widget* Preferences::getBatchProcPanel()
     behFrame->set_child(*vbbeh);
     pack_start(vbBatchProc, *behFrame, Pack::EXPAND_WIDGET, 4);
     Gtk::TreeView* behTreeView = Gtk::manage(new Gtk::TreeView());
-    behscrollw->add(*behTreeView);
+    behscrollw->set_child(*behTreeView);
 
     behModel = Gtk::TreeStore::create(behavColumns);
     behTreeView->set_model(behModel);
@@ -590,7 +600,7 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
     pack_start(vbpp, *defpt, Pack::SHRINK, 4);
 
     useBundledProfiles = Gtk::manage(new Gtk::CheckButton(M("PREFERENCES_USEBUNDLEDPROFILES")));
-    bpconn = useBundledProfiles->signal_clicked().connect(sigc::mem_fun(*this, &Preferences::bundledProfilesChanged));
+    bpconn = useBundledProfiles->signal_toggled().connect(sigc::mem_fun(*this, &Preferences::bundledProfilesChanged));
     pack_start(vbpp, *useBundledProfiles, Pack::SHRINK, 4);
     fpp->set_child(*vbpp);
     pack_start(vbImageProcessing, *fpp, Pack::SHRINK, 4);
@@ -748,7 +758,7 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
 
     // Crop
     Gtk::Frame *cropFrame = Gtk::manage(new Gtk::Frame(M("PREFERENCES_CROP")));
-    cropFrame->set_label_align (0.025, 0.5);
+    cropFrame->set_label_align (0.025);
     Gtk::Grid *cropGrid = Gtk::manage(new Gtk::Grid());
     Gtk::Label *cropGuidesLbl = Gtk::manage(new Gtk::Label(M("PREFERENCES_CROP_GUIDES") + ": ", Gtk::Align::START));
     cropGuidesCombo = Gtk::manage(new Gtk::ComboBoxText());
@@ -757,7 +767,7 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
     cropGuidesCombo->append(M("PREFERENCES_CROP_GUIDES_FULL"));
     cropAutoFitCB = Gtk::manage(new Gtk::CheckButton());
     Gtk::Label *cropAutoFitLbl = Gtk::manage(new Gtk::Label(M("PREFERENCES_CROP_AUTO_FIT"), Gtk::Align::START));
-    cropAutoFitLbl->set_line_wrap(true);
+    cropAutoFitLbl->set_wrap(true);
     cropAutoFitCB->set_child(*cropAutoFitLbl);
     cropGrid->attach(*cropGuidesLbl, 0, 0, 1, 1);
     cropGrid->attach(*cropGuidesCombo, 1, 0, 1, 1);
@@ -776,11 +786,11 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
     // Other: max zoom
     {
       Gtk::Frame *frame = Gtk::manage(new Gtk::Frame(M("GENERAL_OTHER")));
-      frame->set_label_align (0.025, 0.5);
+      frame->set_label_align (0.025);
       Gtk::Grid *grid = Gtk::manage(new Gtk::Grid());
 
       Gtk::Label *label = Gtk::manage(new Gtk::Label(M("PREFERENCES_MAX_ZOOM_TITLE") + ": ", Gtk::Align::START));
-      label->set_line_wrap(true);
+      label->set_wrap(true);
       grid->attach(*label, 0, 0);
 
       maxZoomCombo = Gtk::manage(new Gtk::ComboBoxText());
@@ -840,7 +850,7 @@ Gtk::Widget* Preferences::getPerformancePanel()
     pack_start(vbPerformance, *fclut, Pack::SHRINK, 4);
 
     Gtk::Frame* fchunksize = Gtk::manage ( new Gtk::Frame (M ("PREFERENCES_CHUNKSIZES")) );
-    fchunksize->set_label_align(0.025, 0.5);
+    fchunksize->set_label_align(0.025);
     Gtk::Box* chunkSizeVB = Gtk::manage ( new Gtk::Box(Gtk::Orientation::VERTICAL) );
 
     Gtk::Box* measureHB = Gtk::manage ( new Gtk::Box () );
@@ -848,7 +858,7 @@ Gtk::Widget* Preferences::getPerformancePanel()
     measureCB = Gtk::manage ( new Gtk::CheckButton (M ("PREFERENCES_PERFORMANCE_MEASURE")) );
     measureCB->set_tooltip_text (M ("PREFERENCES_PERFORMANCE_MEASURE_HINT"));
     pack_start(measureHB, *measureCB, Pack::SHRINK, 0);
-    chunkSizeVB->set_child(*measureHB);
+    chunkSizeVB->append(*measureHB);
 
     placeSpinBox(chunkSizeVB, chunkSizeAMSB, "PREFERENCES_CHUNKSIZE_RAW_AMAZE", 0, 1, 5, 2, 1, 16);
     placeSpinBox(chunkSizeVB, chunkSizeCASB, "PREFERENCES_CHUNKSIZE_RAW_CA", 0, 1, 5, 2, 1, 16);
@@ -861,7 +871,7 @@ Gtk::Widget* Preferences::getPerformancePanel()
     pack_start(vbPerformance, *fchunksize, Pack::SHRINK, 4);
 
     Gtk::Frame* finspect = Gtk::manage ( new Gtk::Frame (M ("PREFERENCES_INSPECT_LABEL")) );
-    finspect->set_label_align(0.025, 0.5);
+    finspect->set_label_align(0.025);
     Gtk::Box* inspectorvb = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     placeSpinBox(inspectorvb, maxInspectorBuffersSB, "PREFERENCES_INSPECT_MAXBUFFERS_LABEL", 0, 1, 5, 2, 1, 12, "PREFERENCES_INSPECT_MAXBUFFERS_TOOLTIP");
 
@@ -877,7 +887,7 @@ Gtk::Widget* Preferences::getPerformancePanel()
     pack_start(vbPerformance, *finspect, Pack::SHRINK, 4);
 
     Gtk::Frame* threadsFrame = Gtk::manage ( new Gtk::Frame (M ("PREFERENCES_PERFORMANCE_THREADS")) );
-    threadsFrame->set_label_align(0.025, 0.5);
+    threadsFrame->set_label_align(0.025);
     Gtk::Box* threadsVBox = Gtk::manage ( new Gtk::Box(Gtk::Orientation::VERTICAL) );
 
 #ifdef _OPENMP
@@ -921,7 +931,7 @@ Gtk::Widget* Preferences::getColorManPanel ()
     iccdgrid->attach(*iccDir, 1, 0, 1, 1);
     iccdgrid->attach (*monProfileRestartNeeded, 2, 0, 1, 1);
 
-    iccDir->signal_selection_changed().connect(sigc::mem_fun(this, &Preferences::iccDirChanged));
+    iccDir->signal_selection_changed().connect(sigc::mem_fun(*this, &Preferences::iccDirChanged));
 
     pack_start(vbColorMan, *iccdgrid, Pack::SHRINK);
 
@@ -1063,7 +1073,7 @@ Gtk::Widget* Preferences::getColorManPanel ()
 
     Gtk::Frame* fwbacorr = Gtk::manage(new Gtk::Frame(M("PREFERENCES_WBACORR")));
     fwbacorr->set_tooltip_text(M("PREFERENCES_WBACORR_TOOLTIP"));
-    fwbacorr->set_label_align(0.025, 0.5);
+    fwbacorr->set_label_align(0.025);
     Gtk::Box* wbaVB = Gtk::manage ( new Gtk::Box(Gtk::Orientation::VERTICAL) );
     Gtk::Box* wbah = Gtk::manage ( new Gtk::Box () );
     wbah->set_spacing (4);
@@ -1072,7 +1082,7 @@ Gtk::Widget* Preferences::getColorManPanel ()
     setExpandAlignProperties(mwbaena, false, false, Gtk::Align::START, Gtk::Align::CENTER);
     mwbaena->set_active(true);
     pack_start(wbah, *mwbaena, Pack::SHRINK, 0);
-    wbaVB->set_child(*wbah);
+    wbaVB->append(*wbah);
 
     fwbacorr->set_child (*wbaVB);
     pack_start(vbColorMan, *fwbacorr, Pack::SHRINK);
@@ -1108,7 +1118,7 @@ Gtk::Widget* Preferences::getGeneralPanel()
     editorLayout->append(M("PREFERENCES_MULTITABDUALMON"));
     editorLayout->set_active(2);
     Gtk::CellRendererText* cellRenderer = dynamic_cast<Gtk::CellRendererText*>(editorLayout->get_first_cell());
-    cellRenderer->property_ellipsize() = Pango::ELLIPSIZE_MIDDLE;
+    cellRenderer->property_ellipsize() = Pango::EllipsizeMode::MIDDLE;
     cellRenderer->property_ellipsize_set() = true;
     editorLayout->signal_changed().connect(sigc::mem_fun(*this, &Preferences::layoutComboChanged));
     layoutComboChanged(); // update the tooltip
@@ -1277,9 +1287,9 @@ Gtk::Widget* Preferences::getGeneralPanel()
     mainFontFB = Gtk::manage(new Gtk::FontButton());
     mainFontFB->set_use_size(true);
     if (options.fontFamily == "default") {
-        mainFontFB->set_font_name(Glib::ustring::compose("%1 %2", initialFontFamily, initialFontSize));
+        mainFontFB->set_font(Glib::ustring::compose("%1 %2", initialFontFamily, initialFontSize));
     } else {
-        mainFontFB->set_font_name(Glib::ustring::compose("%1 %2", options.fontFamily, options.fontSize));
+        mainFontFB->set_font(Glib::ustring::compose("%1 %2", options.fontFamily, options.fontSize));
     }
 
     Gtk::Label* colorPickerFontLbl = Gtk::manage(new Gtk::Label(M("PREFERENCES_APPEARANCE_COLORPICKERFONT") + ":"));
@@ -1288,22 +1298,20 @@ Gtk::Widget* Preferences::getGeneralPanel()
     colorPickerFontFB = Gtk::manage(new Gtk::FontButton());
     colorPickerFontFB->set_use_size(true);
     if (options.fontFamily == "default") {
-        colorPickerFontFB->set_font_name(Glib::ustring::compose("%1 %2", initialFontFamily, initialFontSize));
+        colorPickerFontFB->set_font(Glib::ustring::compose("%1 %2", initialFontFamily, initialFontSize));
     } else {
-        colorPickerFontFB->set_font_name(Glib::ustring::compose("%1 %2", options.CPFontFamily, options.CPFontSize));
+        colorPickerFontFB->set_font(Glib::ustring::compose("%1 %2", options.CPFontFamily, options.CPFontSize));
     }
 
     Gtk::Label* cropMaskColorLbl = Gtk::manage(new Gtk::Label(M("PREFERENCES_APPEARANCE_CROPMASKCOLOR") + ":"));
     setExpandAlignProperties(cropMaskColorLbl, false, false, Gtk::Align::START, Gtk::Align::CENTER);
 
     cropMaskColorCB = Gtk::manage(new Gtk::ColorButton());
-    cropMaskColorCB->set_use_alpha(true);
 
     Gtk::Label* navGuideColorLbl = Gtk::manage(new Gtk::Label(M("PREFERENCES_APPEARANCE_NAVGUIDECOLOR") + ":"));
     setExpandAlignProperties(navGuideColorLbl, false, false, Gtk::Align::START, Gtk::Align::CENTER);
 
     navGuideColorCB = Gtk::manage(new Gtk::ColorButton());
-    navGuideColorCB->set_use_alpha(true);
 
     Gtk::Separator *vSep = Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL));
 
@@ -1394,14 +1402,13 @@ Gtk::Widget* Preferences::getGeneralPanel()
     externalEditors->set_size_request(-1, 200);
 
  //   fdg->set_child(*externaleditorGrid);
-    editor_dir_temp = Gtk::manage(new Gtk::RadioButton(M("PREFERENCES_EXTEDITOR_DIR_TEMP")));
-    editor_dir_current = Gtk::manage(new Gtk::RadioButton(M("PREFERENCES_EXTEDITOR_DIR_CURRENT")));
-    editor_dir_custom = Gtk::manage(new Gtk::RadioButton(M("PREFERENCES_EXTEDITOR_DIR_CUSTOM") + ": "));
+    editor_dir_temp = Gtk::manage(new Gtk::CheckButton(M("PREFERENCES_EXTEDITOR_DIR_TEMP")));
+    editor_dir_current = Gtk::manage(new Gtk::CheckButton(M("PREFERENCES_EXTEDITOR_DIR_CURRENT")));
+    editor_dir_custom = Gtk::manage(new Gtk::CheckButton(M("PREFERENCES_EXTEDITOR_DIR_CUSTOM") + ": "));
     editor_dir_custom_path = Gtk::manage(new MyFileChooserButton("", Gtk::FileChooser::Action::SELECT_FOLDER));
-    Gtk::RadioButton::Group ge;
-    ge = editor_dir_temp->get_group();
-    editor_dir_current->set_group(ge);
-    editor_dir_custom->set_group(ge);
+
+    editor_dir_current->set_group(*editor_dir_temp);
+    editor_dir_custom->set_group(*editor_dir_temp);
 
     editor_float32 = Gtk::manage(new Gtk::CheckButton(M("PREFERENCES_EXTEDITOR_FLOAT32")));
     editor_bypass_output_profile = Gtk::manage(new Gtk::CheckButton(M("PREFERENCES_EXTEDITOR_BYPASS_OUTPUT_PROFILE")));
@@ -1429,8 +1436,6 @@ Gtk::Widget* Preferences::getGeneralPanel()
 //        pack_start(hb, *editor_bypass_output_profile, Pack::SHRINK, 4);
         pack_start(vb, *hb, Pack::SHRINK, 4);
 
-        vb->show_all_children();
-        vb->show();
         fdg->set_child(*vb);
     }
 
@@ -1454,16 +1459,15 @@ Gtk::Widget* Preferences::getFileBrowserPanel()
 
     Gtk::Frame* fsd = Gtk::manage(new Gtk::Frame(M("PREFERENCES_STARTUPIMDIR")));
 
-    sdcurrent  = Gtk::manage(new Gtk::RadioButton(M("PREFERENCES_DIRSOFTWARE")));
-    sdlast     = Gtk::manage(new Gtk::RadioButton(M("PREFERENCES_DIRLAST")));
-    sdhome     = Gtk::manage(new Gtk::RadioButton(M("PREFERENCES_DIRHOME")));
-    sdother    = Gtk::manage(new Gtk::RadioButton(M("PREFERENCES_DIROTHER") + ": "));
+    sdcurrent  = Gtk::manage(new Gtk::CheckButton(M("PREFERENCES_DIRSOFTWARE")));
+    sdlast     = Gtk::manage(new Gtk::CheckButton(M("PREFERENCES_DIRLAST")));
+    sdhome     = Gtk::manage(new Gtk::CheckButton(M("PREFERENCES_DIRHOME")));
+    sdother    = Gtk::manage(new Gtk::CheckButton(M("PREFERENCES_DIROTHER") + ": "));
     startupdir = Gtk::manage(new MyFileChooserEntry(M("PREFERENCES_DIRSELECTDLG"), Gtk::FileChooser::Action::SELECT_FOLDER));
 
-    Gtk::RadioButton::Group opts = sdcurrent->get_group();
-    sdlast->set_group(opts);
-    sdhome->set_group(opts);
-    sdother->set_group(opts);
+    sdlast->set_group(*sdcurrent);
+    sdhome->set_group(*sdcurrent);
+    sdother->set_group(*sdcurrent);
 
     Gtk::Box* vbsd = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     pack_start(vbsd, *sdcurrent, Pack::SHRINK, 0);
@@ -1599,8 +1603,8 @@ Gtk::Widget* Preferences::getFileBrowserPanel()
     Gtk::Image* moveExtDownImg = Gtk::manage(new RtImage("arrow-down-small"));
     addExt->set_child(*addExtImg);
     delExt->set_child(*delExtImg);
-    moveExtUp->set_image(*moveExtUpImg);
-    moveExtDown->set_image(*moveExtDownImg);
+    moveExtUp->set_child(*moveExtUpImg);
+    moveExtDown->set_child(*moveExtDownImg);
     pack_end(hb0, *moveExtDown, Pack::SHRINK, 4);
     pack_end(hb0, *moveExtUp, Pack::SHRINK, 4);
     pack_end(hb0, *delExt, Pack::SHRINK, 4);
@@ -1680,7 +1684,7 @@ Gtk::Widget* Preferences::getFileBrowserPanel()
 
     Gtk::Label* clearSafetyLbl = Gtk::manage (new Gtk::Label(M("PREFERENCES_CACHECLEAR_SAFETY")));
     setExpandAlignProperties(clearSafetyLbl, false, false, Gtk::Align::START, Gtk::Align::START);
-    clearSafetyLbl->set_line_wrap(true);
+    clearSafetyLbl->set_wrap(true);
     pack_start(vbc, *clearSafetyLbl, Pack::SHRINK, 4);
 
     Gtk::Box* hb6 = Gtk::manage(new Gtk::Box());
@@ -1869,14 +1873,14 @@ void Preferences::storePreferences()
     moptions.cutOverlayBrush[0] = cropCol.get_red();
     moptions.cutOverlayBrush[1] = cropCol.get_green();
     moptions.cutOverlayBrush[2] = cropCol.get_blue();
-    moptions.cutOverlayBrush[3] = cropMaskColorCB->get_alpha() / 65535.0;
+    moptions.cutOverlayBrush[3] = cropCol.get_alpha() / 65535.0;
 
     Gdk::RGBA NavGuideCol = navGuideColorCB->get_rgba();
     moptions.navGuideBrush[0] = NavGuideCol.get_red();
     moptions.navGuideBrush[1] = NavGuideCol.get_green();
     moptions.navGuideBrush[2] = NavGuideCol.get_blue();
-    moptions.navGuideBrush[3] = navGuideColorCB->get_alpha() / 65535.0;
-    Pango::FontDescription fd (mainFontFB->get_font_name());
+    moptions.navGuideBrush[3] = NavGuideCol.get_alpha() / 65535.0;
+    Pango::FontDescription fd (mainFontFB->get_font());
 
 
     if (newFont) {
@@ -1884,7 +1888,7 @@ void Preferences::storePreferences()
         moptions.fontSize = fd.get_size() / Pango::SCALE;
     }
 
-    Pango::FontDescription cpfd (colorPickerFontFB->get_font_name());
+    Pango::FontDescription cpfd (colorPickerFontFB->get_font());
 
     if (newCPFont) {
         moptions.CPFontFamily = cpfd.get_family();
@@ -2164,25 +2168,29 @@ void Preferences::fillPreferences()
     themeCBT->set_active (themeNbr == -1 ? 0 : themeNbr);
 
     Gdk::RGBA cropCol;
-    cropCol.set_rgba(moptions.cutOverlayBrush[0], moptions.cutOverlayBrush[1], moptions.cutOverlayBrush[2]);
+    cropCol.set_rgba(moptions.cutOverlayBrush[0],
+                     moptions.cutOverlayBrush[1],
+                     moptions.cutOverlayBrush[2],
+                     static_cast<unsigned short>(moptions.cutOverlayBrush[3] * 65535.0));
     cropMaskColorCB->set_rgba (cropCol);
-    cropMaskColorCB->set_alpha ( (unsigned short) (moptions.cutOverlayBrush[3] * 65535.0));
 
     Gdk::RGBA NavGuideCol;
-    NavGuideCol.set_rgba(moptions.navGuideBrush[0], moptions.navGuideBrush[1], moptions.navGuideBrush[2]);
+    NavGuideCol.set_rgba(moptions.navGuideBrush[0],
+                         moptions.navGuideBrush[1],
+                         moptions.navGuideBrush[2],
+                         static_cast<unsigned short>(moptions.navGuideBrush[3] * 65535.0));
     navGuideColorCB->set_rgba (NavGuideCol);
-    navGuideColorCB->set_alpha ( (unsigned short) (moptions.navGuideBrush[3] * 65535.0));
 
     if (options.fontFamily == "default") {
-        mainFontFB->set_font_name (Glib::ustring::compose ("%1, %2", initialFontFamily, initialFontSize));
+        mainFontFB->set_font (Glib::ustring::compose ("%1, %2", initialFontFamily, initialFontSize));
     } else {
-        mainFontFB->set_font_name (Glib::ustring::compose ("%1, %2", options.fontFamily, options.fontSize));
+        mainFontFB->set_font (Glib::ustring::compose ("%1, %2", options.fontFamily, options.fontSize));
     }
 
     if (options.CPFontFamily == "default") {
-        colorPickerFontFB->set_font_name (Glib::ustring::compose ("%1, %2", initialFontFamily, initialFontSize));
+        colorPickerFontFB->set_font (Glib::ustring::compose ("%1, %2", initialFontFamily, initialFontSize));
     } else {
-        colorPickerFontFB->set_font_name (Glib::ustring::compose ("%1, %2", options.CPFontFamily, options.CPFontSize));
+        colorPickerFontFB->set_font (Glib::ustring::compose ("%1, %2", options.CPFontFamily, options.CPFontSize));
     }
 
     showDateTime->set_active(moptions.fbShowDateTime);
@@ -2399,7 +2407,7 @@ void Preferences::okPressed()
     try {
         Options::save();
     } catch (Options::Error &e) {
-        Gtk::MessageDialog msgd(getToplevelWindow(this), e.get_msg(), true, Gtk::MessageType::WARNING, Gtk::ButtonsType::CLOSE, true);
+        Gtk::MessageDialog msgd(*getToplevelWindow(this), e.get_msg(), true, Gtk::MessageType::WARNING, Gtk::ButtonsType::CLOSE, true);
         msgd.present();
     }
 
@@ -2415,7 +2423,7 @@ void Preferences::cancelPressed()
     }
 
     // set the initial font back
-    Pango::FontDescription fd (mainFontFB->get_font_name());
+    Pango::FontDescription fd (mainFontFB->get_font());
 
     if (fd.get_family() != options.fontFamily || (fd.get_size() / Pango::SCALE) != options.fontSize) {
         if (options.fontFamily == "default") {
@@ -2439,7 +2447,7 @@ void Preferences::cancelPressed()
 
 void Preferences::aboutPressed()
 {
-    splash = new Splash(*this);
+    splash = new Splash();
     splash->set_transient_for(*this);
     splash->signal_close_request().connect(sigc::mem_fun(*this, &Preferences::splashClosed), true);
     splash->show();
@@ -2601,7 +2609,7 @@ void Preferences::switchThemeTo(const Glib::ustring& newTheme)
 void Preferences::fontChanged()
 {
     newFont = true;
-    Pango::FontDescription fd (mainFontFB->get_font_name());
+    Pango::FontDescription fd (mainFontFB->get_font());
     switchFontTo(fd.get_family(), fd.get_size() / Pango::SCALE);
 }
 
@@ -2715,7 +2723,8 @@ void Preferences::extensionsChanged()
 
     bool delOkay = true;
     for (auto const &x : moptions.knownExtensions) {
-        if (x == (*selected)[extensionColumns.ext]) {
+        const auto& ext = static_cast<Glib::ustring>((*selected)[extensionColumns.ext]);
+        if (x == ext.c_str()) {
             delOkay = false;
             break;
         }
@@ -2732,7 +2741,7 @@ void Preferences::extensionChanged()
 
     Gtk::TreeNodeChildren c = extensionModel->children();
     for (size_t i = 0; i < c.size(); i++) {
-        if (c[i][extensionColumns.ext] == extension->get_text()) {
+        if (static_cast<Glib::ustring>(c[i][extensionColumns.ext]) == extension->get_text()) {
             addExt->set_sensitive(false);
             return;
         }
@@ -2746,7 +2755,7 @@ void Preferences::addExtPressed()
     Gtk::TreeNodeChildren c = extensionModel->children();
 
     for (size_t i = 0; i < c.size(); i++) {
-        if (c[i][extensionColumns.ext] == extension->get_text()) {
+        if (static_cast<Glib::ustring>(c[i][extensionColumns.ext]) == extension->get_text()) {
             return;
         }
     }
@@ -2860,7 +2869,7 @@ void Preferences::updateFFinfos()
     ffLabel->set_text(s);
 }
 
-bool Preferences::splashClosed(GdkEventAny* event)
+bool Preferences::splashClosed()
 {
     delete splash;
     splash = nullptr;

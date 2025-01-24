@@ -27,6 +27,8 @@
 #include "rtimage.h"
 #include "rtscalable.h"
 
+#include "rtengine/procparams.h"
+
 #include <gtkmm.h>
 
 // #include "cachemanager.h"
@@ -743,9 +745,9 @@ void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 //     return false;
 // }
 //
-//
-// void RtWindow::writeToolExpandedStatus (std::vector<int> &tpOpen)
-// {
+
+void RtWindow::writeToolExpandedStatus (std::vector<int> &tpOpen)
+{
 //     if ((isSingleTabMode() || gimpPlugin) && epanel->isRealized()) {
 //         epanel->writeToolExpandedStatus (tpOpen);
 //     } else {
@@ -770,7 +772,7 @@ void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 //             }
 //         }
 //     }
-// }
+}
 
 void RtWindow::showRawPedia()
 {
@@ -895,8 +897,8 @@ void RtWindow::toggle_fullscreen ()
 //     }
 // }
 //
-// void RtWindow::updateExternalEditorWidget(int selectedIndex, const std::vector<ExternalEditor> & editors)
-// {
+void RtWindow::updateExternalEditorWidget(int selectedIndex, const std::vector<ExternalEditor> & editors)
+{
 //     if (epanel) {
 //         epanel->updateExternalEditorWidget(selectedIndex, editors);
 //     }
@@ -909,10 +911,10 @@ void RtWindow::toggle_fullscreen ()
 //         EditWindow::getInstance(this)
 //             ->updateExternalEditorWidget(selectedIndex, editors);
 //     }
-// }
-//
-// void RtWindow::updateProfiles (const Glib::ustring &printerProfile, rtengine::RenderingIntent printerIntent, bool printerBPC)
-// {
+}
+
+void RtWindow::updateProfiles (const Glib::ustring &printerProfile, rtengine::RenderingIntent printerIntent, bool printerBPC)
+{
 //     if (epanel) {
 //         epanel->updateProfiles (printerProfile, printerIntent, printerBPC);
 //     }
@@ -920,10 +922,10 @@ void RtWindow::toggle_fullscreen ()
 //     for (auto panel : epanels) {
 //         panel.second->updateProfiles (printerProfile, printerIntent, printerBPC);
 //     }
-// }
-//
-// void RtWindow::updateTPVScrollbar (bool hide)
-// {
+}
+
+void RtWindow::updateTPVScrollbar (bool hide)
+{
 //     fpanel->updateTPVScrollbar (hide);
 //
 //     if (epanel) {
@@ -933,20 +935,20 @@ void RtWindow::toggle_fullscreen ()
 //     for (auto panel : epanels) {
 //         panel.second->updateTPVScrollbar (hide);
 //     }
-// }
-//
-// void RtWindow::updateFBQueryTB (bool singleRow)
-// {
+}
+
+void RtWindow::updateFBQueryTB (bool singleRow)
+{
 //     fpanel->fileCatalog->updateFBQueryTB (singleRow);
-// }
-//
-// void RtWindow::updateFBToolBarVisibility (bool showFilmStripToolBar)
-// {
+}
+
+void RtWindow::updateFBToolBarVisibility (bool showFilmStripToolBar)
+{
 //     fpanel->fileCatalog->updateFBToolBarVisibility (showFilmStripToolBar);
-// }
-//
-// void RtWindow::updateShowtooltipVisibility (bool showtooltip)
-// {
+}
+
+void RtWindow::updateShowtooltipVisibility (bool showtooltip)
+{
 //     if (epanel) {
 //         epanel->updateShowtooltipVisibility (showtooltip);
 //     }
@@ -954,10 +956,10 @@ void RtWindow::toggle_fullscreen ()
 //     for (auto panel : epanels) {
 //         panel.second->updateShowtooltipVisibility (showtooltip);
 //     }
-// }
-//
-// void RtWindow::updateHistogramPosition (int oldPosition, int newPosition)
-// {
+}
+
+void RtWindow::updateHistogramPosition (int oldPosition, int newPosition)
+{
 //     if (epanel) {
 //         epanel->updateHistogramPosition (oldPosition, newPosition);
 //     }
@@ -965,11 +967,11 @@ void RtWindow::toggle_fullscreen ()
 //     for (auto panel : epanels) {
 //         panel.second->updateHistogramPosition (oldPosition, newPosition);
 //     }
-// }
-//
-// void RtWindow::updateToolPanelToolLocations(
-//     const std::vector<Glib::ustring> &favorites, bool cloneFavoriteTools)
-// {
+}
+
+void RtWindow::updateToolPanelToolLocations(
+    const std::vector<Glib::ustring> &favorites, bool cloneFavoriteTools)
+{
 //     if (fpanel) {
 //         fpanel->updateToolPanelToolLocations(favorites, cloneFavoriteTools);
 //     }
@@ -986,7 +988,7 @@ void RtWindow::toggle_fullscreen ()
 //         EditWindow::getInstance(this)
 //             ->updateToolPanelToolLocations(favorites, cloneFavoriteTools);
 //     }
-// }
+}
 
 bool RtWindow::splashClosed()
 {
@@ -1042,9 +1044,9 @@ void RtWindow::set_title_decorated (const Glib::ustring& fname)
 // {
 //     return isEditorPanel (mainNB->get_nth_page (pageNum));
 // }
-//
-// void RtWindow::setEditorMode (bool tabbedUI)
-// {
+
+void RtWindow::setEditorMode (bool tabbedUI)
+{
 //     MoveFileBrowserToMain();
 //     closeOpenEditors();
 //     SetMainCurrent();
@@ -1058,8 +1060,8 @@ void RtWindow::set_title_decorated (const Glib::ustring& fname)
 //         epanel->show_all();
 //         set_title_decorated ("");
 //     }
-// }
-//
+}
+
 // void RtWindow::createSetmEditor()
 // {
 //     // Editor panel, single-tab mode only

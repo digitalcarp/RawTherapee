@@ -69,6 +69,7 @@ enum class Pack {
     EXPAND_WIDGET
 };
 void pack_start(Gtk::Box* box, Gtk::Widget& child, Pack pack = Pack::EXPAND_WIDGET, int padding = 0);
+void pack_start(Gtk::Box* box, Gtk::Widget& child, bool expand, bool fill, int padding = 0);
 void pack_end(Gtk::Box* box, Gtk::Widget& child, Pack pack = Pack::EXPAND_WIDGET, int padding = 0);
 void setExpandAlignProperties(Gtk::Widget *widget, bool hExpand, bool vExpand, enum Gtk::Align hAlign, enum Gtk::Align vAlign);
 Gtk::Border getPadding(const Glib::RefPtr<Gtk::StyleContext> style);
@@ -145,139 +146,139 @@ private:
 // private:
 //     ToolPanel* panel;
 // };
-//
-// /**
-//  * @brief Glue box to control visibility of the MyExpender's content ; also handle the frame around it
-//  */
-// class ExpanderBox final : public Gtk::Box
-// {
-// public:
-//     ExpanderBox();
-//
-//     void setLevel(int level);
-//
-//     void show() {}
-//     void show_all();
-//     void hide() {}
-//     void set_visible(bool isVisible = true) {}
-//
-//     void showBox();
-//     void hideBox();
-// };
-//
-// /**
-//  * @brief A custom Expander class, that can handle widgets in the title bar
-//  *
-//  * Custom made expander for responsive widgets in the header. It also handle a "enabled/disabled" property that display
-//  * a different arrow depending on this boolean value.
-//  *
-//  * Warning: once you've instantiated this class with a text label or a widget label, you won't be able to revert to the other solution.
-//  */
-// class MyExpander final : public Gtk::Box
-// {
-// public:
-//     typedef sigc::signal<void()> type_signal_enabled_toggled;
-// private:
-//     type_signal_enabled_toggled titleButtonRelease;
-//     type_signal_enabled_toggled message;
-//
-//     const Glib::ustring inconsistentImage; /// "inconsistent" image, displayed when useEnabled is true ; in this case, nothing will tell that an expander is opened/closed
-//     const Glib::ustring enabledImage;      ///      "enabled" image, displayed when useEnabled is true ; in this case, nothing will tell that an expander is opened/closed
-//     const Glib::ustring disabledImage;     ///     "disabled" image, displayed when useEnabled is true ; in this case, nothing will tell that an expander is opened/closed
-//     const Glib::ustring openedImage;       ///       "opened" image, displayed when useEnabled is false
-//     const Glib::ustring closedImage;       ///       "closed" image, displayed when useEnabled is false
-//     bool enabled;          /// Enabled feature (default to true)
-//     bool inconsistent;     /// True if the enabled button is inconsistent
-//     Gtk::Box *titleEvBox;  /// EventBox of the title, to get a connector from it
-//     Gtk::Box *headerHBox;
-//     bool flushEvent;       /// Flag to control the weird event mechanism of Gtk (please prove me wrong!)
-//     ExpanderBox* expBox;   /// Frame that includes the child and control its visibility
-//     Gtk::Box *imageEvBox;  /// Enable/Disable or Open/Close arrow event box
-//
-//     void setupPart1();
-//     void setupPart2();
-//
-//     /// Triggered on opened/closed event
-//     void onToggle(int n_press, double x, double y);
-//     /// Triggered on enabled/disabled change -> will emit a toggle event to the connected objects
-//     void onEnabledChange(int n_press, double x, double y);
-//     /// Used to handle the colored background for the whole Title
-//     void onEnterTitle();
-//     void onLeaveTitle();
-//     /// Used to handle the colored background for the Enable button
-//     void onEnterEnable();
-//     void onLeaveEnable();
-//
-//     void updateStyle();
-//
-// protected:
-//     Gtk::Widget* child;         /// Widget to display below the expander's title
-//     Gtk::Widget* headerWidget;  /// Widget to display in the header, next to the arrow image ; can be NULL if the "string" version of the ctor has been used
-//     RTImage* statusImage;       /// Image to display the opened/closed status (if useEnabled is false) of the enabled/disabled status (if useEnabled is true)
-//     Gtk::Label* label;          /// Text to display in the header, next to the arrow image ; can be NULL if the "widget" version of the ctor has been used
-//     bool useEnabled;            /// Set whether to handle an enabled/disabled feature and display the appropriate images
-//
-// public:
-//
-//     /** @brief Create a custom expander with a simple header made of a label.
-//      * @param useEnabled Set whether to handle an enabled/disabled toggle button and display the appropriate image
-//      * @param titleLabel A string to display in the header. Warning: you won't be able to switch to a widget label.
-//      */
-//     MyExpander(bool useEnabled, Glib::ustring titleLabel);
-//
-//     /** Create a custom expander with a custom - and responsive - widget
-//      * @param useEnabled Set whether to handle an enabled/disabled toggle button and display the appropriate image
-//      * @param titleWidget A widget to display in the header. Warning: you won't be able to switch to a string label.
-//      */
-//     MyExpander(bool useEnabled, Gtk::Widget* titleWidget);
-//
-//     type_signal_enabled_toggled signal_button_release_event();
-//     type_signal_enabled_toggled signal_enabled_toggled();
-//
-//     /// Set the nesting level of the Expander to adapt its style accordingly
-//     void setLevel(int level);
-//
-//     /// Set a new label string. If it has been instantiated with a Gtk::Widget, this method will do nothing
-//     void setLabel (Glib::ustring newLabel);
-//     /// Set a new label string. If it has been instantiated with a Gtk::Widget, this method will do nothing
-//     void setLabel (Gtk::Widget *newWidget);
-//
-//     /// Get whether the enabled option is set (to true or false) or unset (i.e. undefined)
-//     bool get_inconsistent();
-//     /// Set whether the enabled option is set (to true or false) or unset (i.e. undefined)
-//     void set_inconsistent(bool isInconsistent);
-//
-//     /// Get whether the enabled button is used or not
-//     bool getUseEnabled();
-//     /// Get whether the enabled button is on or off
-//     bool getEnabled();
-//     /// If not inconsistent, set the enabled button to true or false and emit the message if the state is different
-//     /// If inconsistent, set the internal value to true or false, but do not update the image and do not emit the message
-//     void setEnabled(bool isEnabled);
-//     /// Adds a Tooltip to the Enabled button, if it exist ; do nothing otherwise
-//     void setEnabledTooltipMarkup(Glib::ustring tooltipMarkup);
-//     void setEnabledTooltipText(Glib::ustring tooltipText);
-//
-//     /// Get the header widget. It'll send back the Gtk::Label* if it has been instantiated with a simple text
-//     Gtk::Widget* getLabelWidget() const
-//     {
-//         return headerWidget ? headerWidget : label;
-//     }
-//
-//     /// Set the collapsed/expanded state of the expander
-//     void set_expanded( bool expanded );
-//
-//     /// Get the collapsed/expanded state of the expander
-//     bool get_expanded();
-//
-//     /// Add a widget for the content of the expander
-//     /// Warning: do not manually Show/Hide the widget, because this parameter is handled by the click on the Expander's title
-//     void add(Gtk::Widget& widget, bool setChild = true);
-//
-//     void updateVScrollbars(bool hide);
-// };
-//
-//
+
+/**
+ * @brief Glue box to control visibility of the MyExpender's content ; also handle the frame around it
+ */
+class ExpanderBox final : public Gtk::Box
+{
+public:
+    ExpanderBox();
+
+    void setLevel(int level);
+
+    void show() {}
+    void show_all();
+    void hide() {}
+    void set_visible(bool isVisible = true) {}
+
+    void showBox();
+    void hideBox();
+};
+
+/**
+ * @brief A custom Expander class, that can handle widgets in the title bar
+ *
+ * Custom made expander for responsive widgets in the header. It also handle a "enabled/disabled" property that display
+ * a different arrow depending on this boolean value.
+ *
+ * Warning: once you've instantiated this class with a text label or a widget label, you won't be able to revert to the other solution.
+ */
+class MyExpander final : public Gtk::Box
+{
+public:
+    typedef sigc::signal<void()> type_signal_enabled_toggled;
+private:
+    type_signal_enabled_toggled titleButtonRelease;
+    type_signal_enabled_toggled message;
+
+    const Glib::ustring inconsistentImage; /// "inconsistent" image, displayed when useEnabled is true ; in this case, nothing will tell that an expander is opened/closed
+    const Glib::ustring enabledImage;      ///      "enabled" image, displayed when useEnabled is true ; in this case, nothing will tell that an expander is opened/closed
+    const Glib::ustring disabledImage;     ///     "disabled" image, displayed when useEnabled is true ; in this case, nothing will tell that an expander is opened/closed
+    const Glib::ustring openedImage;       ///       "opened" image, displayed when useEnabled is false
+    const Glib::ustring closedImage;       ///       "closed" image, displayed when useEnabled is false
+    bool enabled;          /// Enabled feature (default to true)
+    bool inconsistent;     /// True if the enabled button is inconsistent
+    Gtk::Box *titleEvBox;  /// EventBox of the title, to get a connector from it
+    Gtk::Box *headerHBox;
+    bool flushEvent;       /// Flag to control the weird event mechanism of Gtk (please prove me wrong!)
+    ExpanderBox* expBox;   /// Frame that includes the child and control its visibility
+    Gtk::Box *imageEvBox;  /// Enable/Disable or Open/Close arrow event box
+
+    void setupPart1();
+    void setupPart2();
+
+    /// Triggered on opened/closed event
+    void onToggle(int n_press, double x, double y);
+    /// Triggered on enabled/disabled change -> will emit a toggle event to the connected objects
+    void onEnabledChange(int n_press, double x, double y);
+    /// Used to handle the colored background for the whole Title
+    void onEnterTitle(double x, double y);
+    void onLeaveTitle();
+    /// Used to handle the colored background for the Enable button
+    void onEnterEnable(double x, double y);
+    void onLeaveEnable();
+
+    void updateStyle();
+
+protected:
+    Gtk::Widget* child;         /// Widget to display below the expander's title
+    Gtk::Widget* headerWidget;  /// Widget to display in the header, next to the arrow image ; can be NULL if the "string" version of the ctor has been used
+    RtImage* statusImage;       /// Image to display the opened/closed status (if useEnabled is false) of the enabled/disabled status (if useEnabled is true)
+    Gtk::Label* label;          /// Text to display in the header, next to the arrow image ; can be NULL if the "widget" version of the ctor has been used
+    bool useEnabled;            /// Set whether to handle an enabled/disabled feature and display the appropriate images
+
+public:
+
+    /** @brief Create a custom expander with a simple header made of a label.
+     * @param useEnabled Set whether to handle an enabled/disabled toggle button and display the appropriate image
+     * @param titleLabel A string to display in the header. Warning: you won't be able to switch to a widget label.
+     */
+    MyExpander(bool useEnabled, Glib::ustring titleLabel);
+
+    /** Create a custom expander with a custom - and responsive - widget
+     * @param useEnabled Set whether to handle an enabled/disabled toggle button and display the appropriate image
+     * @param titleWidget A widget to display in the header. Warning: you won't be able to switch to a string label.
+     */
+    MyExpander(bool useEnabled, Gtk::Widget* titleWidget);
+
+    type_signal_enabled_toggled signal_button_release_event();
+    type_signal_enabled_toggled signal_enabled_toggled();
+
+    /// Set the nesting level of the Expander to adapt its style accordingly
+    void setLevel(int level);
+
+    /// Set a new label string. If it has been instantiated with a Gtk::Widget, this method will do nothing
+    void setLabel (Glib::ustring newLabel);
+    /// Set a new label string. If it has been instantiated with a Gtk::Widget, this method will do nothing
+    void setLabel (Gtk::Widget *newWidget);
+
+    /// Get whether the enabled option is set (to true or false) or unset (i.e. undefined)
+    bool get_inconsistent();
+    /// Set whether the enabled option is set (to true or false) or unset (i.e. undefined)
+    void set_inconsistent(bool isInconsistent);
+
+    /// Get whether the enabled button is used or not
+    bool getUseEnabled();
+    /// Get whether the enabled button is on or off
+    bool getEnabled();
+    /// If not inconsistent, set the enabled button to true or false and emit the message if the state is different
+    /// If inconsistent, set the internal value to true or false, but do not update the image and do not emit the message
+    void setEnabled(bool isEnabled);
+    /// Adds a Tooltip to the Enabled button, if it exist ; do nothing otherwise
+    void setEnabledTooltipMarkup(Glib::ustring tooltipMarkup);
+    void setEnabledTooltipText(Glib::ustring tooltipText);
+
+    /// Get the header widget. It'll send back the Gtk::Label* if it has been instantiated with a simple text
+    Gtk::Widget* getLabelWidget() const
+    {
+        return headerWidget ? headerWidget : label;
+    }
+
+    /// Set the collapsed/expanded state of the expander
+    void set_expanded( bool expanded );
+
+    /// Get the collapsed/expanded state of the expander
+    bool get_expanded();
+
+    /// Add a widget for the content of the expander
+    /// Warning: do not manually Show/Hide the widget, because this parameter is handled by the click on the Expander's title
+    void add(Gtk::Widget& widget, bool setChild = true);
+
+    void updateVScrollbars(bool hide);
+};
+
+
 // /**
 //  * @brief subclass of Gtk::ScrolledWindow in order to handle the scrollwheel
 //  */
@@ -305,48 +306,48 @@ private:
 // public:
 //     MyScrolledToolbar();
 // };
-//
-// /**
-//  * @brief subclass of Gtk::ComboBox in order to handle the scrollwheel
-//  */
-// class MyComboBox : public Gtk::ComboBox
-// {
-//     int naturalWidth, minimumWidth;
-//     Glib::RefPtr<Gtk::EventControllerScroll> controller;
-//
-//     bool onScroll(double dx, double dy);
-//
-//     void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
-//                        int& minimum_baseline, int& natural_baseline) const override;
-//
-// public:
-//     MyComboBox ();
-//
-//     void setPreferredWidth (int minimum_width, int natural_width);
-// };
-//
-// /**
-//  * @brief subclass of Gtk::ComboBoxText in order to handle the scrollwheel
-//  */
-// class MyComboBoxText final : public Gtk::ComboBoxText
-// {
-//     int naturalWidth, minimumWidth;
-//     sigc::connection myConnection;
-//     Glib::RefPtr<Gtk::EventControllerScroll> controller;
-//
-//     bool onScroll(double dx, double dy);
-//
-//     void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
-//                        int& minimum_baseline, int& natural_baseline) const override;
-//
-// public:
-//     explicit MyComboBoxText (bool has_entry = false);
-//
-//     void setPreferredWidth (int minimum_width, int natural_width);
-//     void connect(const sigc::connection &connection) { myConnection = connection; }
-//     void block(bool blocked) { myConnection.block(blocked); }
-// };
-//
+
+/**
+ * @brief subclass of Gtk::ComboBox in order to handle the scrollwheel
+ */
+class MyComboBox : public Gtk::ComboBox
+{
+    int naturalWidth, minimumWidth;
+    Glib::RefPtr<Gtk::EventControllerScroll> controller;
+
+    bool onScroll(double dx, double dy);
+
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
+
+public:
+    MyComboBox ();
+
+    void setPreferredWidth (int minimum_width, int natural_width);
+};
+
+/**
+ * @brief subclass of Gtk::ComboBoxText in order to handle the scrollwheel
+ */
+class MyComboBoxText final : public Gtk::ComboBoxText
+{
+    int naturalWidth, minimumWidth;
+    sigc::connection myConnection;
+    Glib::RefPtr<Gtk::EventControllerScroll> controller;
+
+    bool onScroll(double dx, double dy);
+
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
+
+public:
+    explicit MyComboBoxText (bool has_entry = false);
+
+    void setPreferredWidth (int minimum_width, int natural_width);
+    void connect(const sigc::connection &connection) { myConnection = connection; }
+    void block(bool blocked) { myConnection.block(blocked); }
+};
+
 // /**
 //  * @brief subclass of Gtk::SpinButton in order to handle the scrollwheel
 //  */
@@ -375,108 +376,121 @@ private:
 // public:
 //     MyHScale();
 // };
-//
-// class MyFileChooserWidget
-// {
-// public:
-//     virtual ~MyFileChooserWidget() = default;
-//
-//     sigc::signal<void> &signal_selection_changed();
-//     sigc::signal<void> &signal_file_set();
-//
-//     std::string get_filename() const;
-//     bool set_filename(const std::string &filename);
-//
-//     void add_filter(const Glib::RefPtr<Gtk::FileFilter> &filter);
-//     void remove_filter(const Glib::RefPtr<Gtk::FileFilter> &filter);
-//     void set_filter(const Glib::RefPtr<Gtk::FileFilter> &filter);
-//     std::vector<Glib::RefPtr<Gtk::FileFilter>> list_filters() const;
-//
-//     bool set_current_folder(const std::string &filename);
-//     std::string get_current_folder() const;
-//
-//     bool add_shortcut_folder(const std::string &folder);
-//     bool remove_shortcut_folder(const std::string &folder);
-//
-//     void unselect_all();
-//     void unselect_filename(const std::string &filename);
-//
-//     void set_show_hidden(bool yes);
-//
-// protected:
-//     explicit MyFileChooserWidget(const Glib::ustring &title,
-//                                  Gtk::FileChooser::Action action = Gtk::FileChooser::Action::OPEN);
-//
-//     static std::unique_ptr<Gtk::Image> make_folder_image();
-//
-//     void show_chooser(Gtk::Widget *parent);
-//     virtual void on_filename_set();
-//
-// private:
-//     class Impl;
-//
-//     std::unique_ptr<Impl> pimpl;
-// };
-//
-// /**
-//  * @brief subclass of Gtk::FileChooserButton in order to handle the scrollwheel
-//  */
-// class MyFileChooserButton final : public Gtk::Button, public MyFileChooserWidget
-// {
-// private:
-//     class Impl;
-//
-//     std::unique_ptr<Impl> pimpl;
-//     Glib::RefPtr<Gtk::EventControllerScroll> m_controller;
-//
-//     bool onScroll(double dx, double dy);
-//
-// protected:
-//     void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
-//                        int& minimum_baseline, int& natural_baseline) const override;
-//
-//     void on_filename_set() override;
-//
-// public:
-//     explicit MyFileChooserButton(const Glib::ustring &title,
-//                                  Gtk::FileChooser::Action action = Gtk::FileChooser::Action::OPEN);
-// };
-//
-// class MyFileChooserEntry : public Gtk::Box, public MyFileChooserWidget
-// {
-// public:
-//     explicit MyFileChooserEntry(const Glib::ustring &title,
-//                                 Gtk::FileChooser::Action action = Gtk::FileChooser::Action::OPEN);
-//
-//     Glib::ustring get_placeholder_text() const;
-//     void set_placeholder_text(const Glib::ustring &text);
-//
-// protected:
-//     void on_filename_set() override;
-//
-// private:
-//     class Impl;
-//
-//     std::unique_ptr<Impl> pimpl;
-// };
-//
-// /**
-//  * @brief A helper method to connect the current folder property of a file chooser to an arbitrary variable.
-//  */
-// template <class FileChooser>
-// void bindCurrentFolder (FileChooser& chooser, Glib::ustring& variable)
-// {
-//     chooser.signal_selection_changed ().connect ([&]()
-//     {
-//         const auto current_folder = chooser.get_current_folder ();
-//
-//         if (!current_folder.empty ())
-//             variable = current_folder;
-//     });
-//
-//     if (!variable.empty ())
-//         chooser.set_current_folder (variable);
-// }
+
+class ImageLabelButton : public Gtk::Button
+{
+public:
+    ImageLabelButton();
+    explicit ImageLabelButton(const Glib::ustring& text);
+
+    void set_image(Gtk::Image& image);
+
+private:
+    Gtk::Box m_box;
+    Gtk::Label m_label;
+};
+
+class MyFileChooserWidget
+{
+public:
+    virtual ~MyFileChooserWidget() = default;
+
+    sigc::signal<void()> &signal_selection_changed();
+    sigc::signal<void()> &signal_file_set();
+
+    std::string get_filename() const;
+    bool set_filename(const std::string &filename);
+
+    void add_filter(const Glib::RefPtr<Gtk::FileFilter> &filter);
+    void remove_filter(const Glib::RefPtr<Gtk::FileFilter> &filter);
+    void set_filter(const Glib::RefPtr<Gtk::FileFilter> &filter);
+    std::vector<Glib::RefPtr<Gtk::FileFilter>> list_filters() const;
+
+    bool set_current_folder(const std::string &filename);
+    std::string get_current_folder() const;
+
+    bool add_shortcut_folder(const std::string &folder);
+    bool remove_shortcut_folder(const std::string &folder);
+
+    void unselect_all();
+    void unselect_filename(const std::string &filename);
+
+    void set_show_hidden(bool yes);
+
+protected:
+    explicit MyFileChooserWidget(const Glib::ustring &title,
+                                 Gtk::FileChooser::Action action = Gtk::FileChooser::Action::OPEN);
+
+    static std::unique_ptr<Gtk::Image> make_folder_image();
+
+    void show_chooser(Gtk::Widget *parent);
+    virtual void on_filename_set();
+
+private:
+    class Impl;
+
+    std::unique_ptr<Impl> pimpl;
+};
+
+/**
+ * @brief subclass of Gtk::FileChooserButton in order to handle the scrollwheel
+ */
+class MyFileChooserButton final : public ImageLabelButton, public MyFileChooserWidget
+{
+private:
+    class Impl;
+
+    std::unique_ptr<Impl> pimpl;
+    Glib::RefPtr<Gtk::EventControllerScroll> m_controller;
+
+    bool onScroll(double dx, double dy);
+
+protected:
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
+
+    void on_filename_set() override;
+
+public:
+    explicit MyFileChooserButton(const Glib::ustring &title,
+                                 Gtk::FileChooser::Action action = Gtk::FileChooser::Action::OPEN);
+};
+
+class MyFileChooserEntry : public Gtk::Box, public MyFileChooserWidget
+{
+public:
+    explicit MyFileChooserEntry(const Glib::ustring &title,
+                                Gtk::FileChooser::Action action = Gtk::FileChooser::Action::OPEN);
+
+    Glib::ustring get_placeholder_text() const;
+    void set_placeholder_text(const Glib::ustring &text);
+
+protected:
+    void on_filename_set() override;
+
+private:
+    class Impl;
+
+    std::unique_ptr<Impl> pimpl;
+};
+
+/**
+ * @brief A helper method to connect the current folder property of a file chooser to an arbitrary variable.
+ */
+template <class FileChooser>
+void bindCurrentFolder (FileChooser& chooser, Glib::ustring& variable)
+{
+    chooser.signal_selection_changed ().connect ([&]()
+    {
+        const auto current_folder = chooser.get_current_folder ();
+
+        if (!current_folder.empty ())
+            variable = current_folder;
+    });
+
+    if (!variable.empty ())
+        chooser.set_current_folder (variable);
+}
 
 typedef enum RTUpdatePolicy {
     RTUP_STATIC,
@@ -505,22 +519,22 @@ typedef enum RTNav {
 // public:
 //     TextOrIcon (const Glib::ustring &icon_name, const Glib::ustring &labelTx, const Glib::ustring &tooltipTx);
 // };
-//
-// /**
-//  * Widget with image and label placed horizontally.
-//  */
-// class ImageAndLabel final : public Gtk::Box
-// {
-//     class Impl;
-//     std::unique_ptr<Impl> pimpl;
-//
-// public:
-//     ImageAndLabel(const Glib::ustring& label, const Glib::ustring& iconName);
-//     ImageAndLabel(const Glib::ustring& label, RTImage* image);
-//     const RTImage* getImage() const;
-//     const Gtk::Label* getLabel() const;
-// };
-//
+
+/**
+ * Widget with image and label placed horizontally.
+ */
+class ImageAndLabel final : public Gtk::Box
+{
+    class Impl;
+    std::unique_ptr<Impl> pimpl;
+
+public:
+    ImageAndLabel(const Glib::ustring& label, const Glib::ustring& iconName);
+    ImageAndLabel(const Glib::ustring& label, RtImage* image);
+    const RtImage* getImage() const;
+    const Gtk::Label* getLabel() const;
+};
+
 // class MyProgressBar final : public Gtk::ProgressBar
 // {
 // private:
@@ -643,7 +657,7 @@ public:
 //     void deleteSurface()
 //     {
 //         if (surface) {
-//             surface.reset();
+//             surface = nullptr;
 //         }
 //
 //         dirty = true;
@@ -730,21 +744,21 @@ public:
 //      */
 //     void register_button(Gtk::ToggleButton &button);
 // };
-//
-// inline void setActiveTextOrIndex(Gtk::ComboBoxText &comboBox, const Glib::ustring &text, int index)
-// {
-//     bool valueSet = false;
-//     if (!text.empty()) {
-//         comboBox.set_active_text (text);
-//         valueSet = true;
-//     }
-//
-//     if (!valueSet || comboBox.get_active_row_number () < 0) {
-//         comboBox.set_active (index);
-//     }
-// }
-//
-// inline Gtk::Window* getToplevelWindow(Gtk::Widget* widget)
-// {
-//     return dynamic_cast<Gtk::Window*>(widget->get_root());
-// }
+
+inline void setActiveTextOrIndex(Gtk::ComboBoxText &comboBox, const Glib::ustring &text, int index)
+{
+    bool valueSet = false;
+    if (!text.empty()) {
+        comboBox.set_active_text (text);
+        valueSet = true;
+    }
+
+    if (!valueSet || comboBox.get_active_row_number () < 0) {
+        comboBox.set_active (index);
+    }
+}
+
+inline Gtk::Window* getToplevelWindow(Gtk::Widget* widget)
+{
+    return dynamic_cast<Gtk::Window*>(widget->get_root());
+}

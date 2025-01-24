@@ -27,6 +27,7 @@
 
 class DynamicProfilePanel;
 class ExternalEditorPreferences;
+class ProfileStoreComboBox;
 class RtWindow;
 class Splash;
 class ToolLocationPreference;
@@ -77,9 +78,9 @@ class Preferences final :
     Glib::MatchInfo matchInfo;
     Splash* splash;
     ProfileStoreComboBox* rprofiles;
-    Gtk::TreeIter currRawRow; // :)
+    Gtk::TreeIter<Gtk::TreeRow> currRawRow; // :)
     ProfileStoreComboBox* iprofiles;
-    Gtk::TreeIter currImgRow;
+    Gtk::TreeIter<Gtk::TreeRow> currImgRow;
     Gtk::ComboBoxText* languages;
     Gtk::CheckButton* ckbLangAutoDetect;
     Gtk::Entry* dateformat;

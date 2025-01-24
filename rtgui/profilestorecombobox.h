@@ -68,12 +68,11 @@ private:
 
     Glib::RefPtr<Gtk::TreeStore> refTreeModel;
     MethodColumns methodColumns;
-    void refreshProfileList_ (Gtk::TreeModel::Row *parentRow, int parentFolderId, bool initial, const std::vector<const ProfileStoreEntry*> *entryList);
-    Gtk::TreeIter findRowFromEntry_ (Gtk::TreeModel::Children childs, const ProfileStoreEntry *pse) const;
-    Gtk::TreeIter findRowFromFullPath_ (Gtk::TreeModel::Children childs, int parentFolderId, const Glib::ustring &name) const;
-    Gtk::TreeIter findRowFromEntry (const ProfileStoreEntry *pse) const;
-    Gtk::TreeIter findRowFromFullPath (const Glib::ustring &path) const;
-
+    void refreshProfileList_ (Gtk::TreeRow *parentRow, int parentFolderId, bool initial, const std::vector<const ProfileStoreEntry*> *entryList);
+    Gtk::TreeIter<Gtk::TreeRow> findRowFromEntry_ (Gtk::TreeModel::Children childs, const ProfileStoreEntry *pse) const;
+    Gtk::TreeIter<Gtk::TreeRow> findRowFromFullPath_ (Gtk::TreeModel::Children childs, int parentFolderId, const Glib::ustring &name) const;
+    Gtk::TreeIter<Gtk::TreeRow> findRowFromEntry (const ProfileStoreEntry *pse) const;
+    Gtk::TreeIter<Gtk::TreeRow> findRowFromFullPath (const Glib::ustring &path) const;
 
 public:
     ProfileStoreComboBox();
@@ -84,7 +83,7 @@ public:
     bool setActiveRowFromFullPath (const Glib::ustring &oldPath);
     bool setActiveRowFromEntry (const ProfileStoreEntry *pse);
     bool setInternalEntry ();
-    Gtk::TreeIter getRowFromLabel (const Glib::ustring &name) const;
-    Gtk::TreeIter addRow (const ProfileStoreEntry *profileStoreEntry);
+    Gtk::TreeIter<Gtk::TreeRow> getRowFromLabel (const Glib::ustring &name) const;
+    Gtk::TreeIter<Gtk::TreeRow> addRow (const ProfileStoreEntry *profileStoreEntry);
     void deleteRow (const ProfileStoreEntry *profileStoreEntry);
 };

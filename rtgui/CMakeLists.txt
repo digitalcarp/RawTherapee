@@ -130,7 +130,7 @@ set(NONCLISOURCEFILES
     # previewmodepanel.cc
     # previewwindow.cc
     # profilepanel.cc
-    # profilestorecombobox.cc
+    profilestorecombobox.cc
     # prsharpening.cc
     # rawcacorrection.cc
     # rawexposure.cc

@@ -134,7 +134,7 @@ private:
     Gtk::TreeView treeview_;
     Glib::RefPtr<Gtk::ListStore> treemodel_;
 
-    Gtk::ButtonBox buttonbox_;
+    Gtk::Box buttonbox_;
     Gtk::Button button_up_;
     Gtk::Button button_down_;
     Gtk::Button button_new_;

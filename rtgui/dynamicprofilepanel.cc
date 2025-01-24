@@ -36,9 +36,9 @@ DynamicProfilePanel::EditDialog::EditDialog (const Glib::ustring &title, Gtk::Wi
 {
     profilepath_ = Gtk::manage (new ProfileStoreComboBox());
     Gtk::Box *hb = Gtk::manage (new Gtk::Box());
-    hb->pack_start (*Gtk::manage (new Gtk::Label (M ("DYNPROFILEEDITOR_PROFILE"))), false, false, 4);
-    hb->pack_start (*profilepath_, true, true, 2);
-    get_content_area()->pack_start (*hb, Gtk::PACK_SHRINK, 4);
+    pack_start(hb, *Gtk::manage (new Gtk::Label (M ("DYNPROFILEEDITOR_PROFILE"))), false, false, 4);
+    pack_start(hb, *profilepath_, true, true, 2);
+    pack_start(get_content_area(), *hb, Pack::SHRINK, 4);
 
     add_optional (M ("EXIFFILTER_CAMERA"), has_camera_, camera_);
     add_optional (M ("EXIFFILTER_LENS"), has_lens_, lens_);
@@ -51,9 +51,9 @@ DynamicProfilePanel::EditDialog::EditDialog (const Glib::ustring &title, Gtk::Wi
     imagetype_->append(M("DYNPROFILEEDITOR_IMGTYPE_PS"));
     imagetype_->set_active(0);
     hb = Gtk::manage (new Gtk::Box());
-    hb->pack_start (*Gtk::manage (new Gtk::Label (M ("EXIFFILTER_IMAGETYPE"))), false, false, 4);
-    hb->pack_start (*imagetype_, true, true, 2);
-    get_content_area()->pack_start (*hb, Gtk::PACK_SHRINK, 4);
+    pack_start(hb, *Gtk::manage (new Gtk::Label (M ("EXIFFILTER_IMAGETYPE"))), false, false, 4);
+    pack_start(hb, *imagetype_, true, true, 2);
+    pack_start(get_content_area(), *hb, Pack::SHRINK, 4);
 
     add_range (M ("EXIFFILTER_ISO"), iso_min_, iso_max_);
     add_range (M ("EXIFFILTER_APERTURE"), fnumber_min_, fnumber_max_);
@@ -65,8 +65,6 @@ DynamicProfilePanel::EditDialog::EditDialog (const Glib::ustring &title, Gtk::Wi
     add_button (M ("GENERAL_CANCEL"), 2);
 
     set_ranges();
-
-    show_all_children();
 }
 
 
@@ -203,25 +201,25 @@ void DynamicProfilePanel::EditDialog::add_range (const Glib::ustring &name,
         Gtk::SpinButton *&from, Gtk::SpinButton *&to)
 {
     Gtk::Box *hb = Gtk::manage (new Gtk::Box());
-    hb->pack_start (*Gtk::manage (new Gtk::Label (name)), false, false, 4);
+    pack_start(hb, *Gtk::manage (new Gtk::Label (name)), false, false, 4);
     from = Gtk::manage (new Gtk::SpinButton());
     to = Gtk::manage (new Gtk::SpinButton());
     from->set_numeric (true);
     to->set_numeric (true);
-    hb->pack_start (*from, true, true, 2);
-    hb->pack_start (*Gtk::manage (new Gtk::Label (" - ")), false, false, 4);
-    hb->pack_start (*to, true, true, 2);
-    get_content_area()->pack_start (*hb, Gtk::PACK_SHRINK, 4);
+    pack_start(hb, *from, true, true, 2);
+    pack_start(hb, *Gtk::manage (new Gtk::Label (" - ")), false, false, 4);
+    pack_start(hb, *to, true, true, 2);
+    pack_start(get_content_area(), *hb, Pack::SHRINK, 4);
 }
 
 void DynamicProfilePanel::EditDialog::add_optional (const Glib::ustring &name, Gtk::CheckButton *&check, Gtk::Entry *&field)
 {
     check = Gtk::manage (new Gtk::CheckButton (name));
     Gtk::Box *hb = Gtk::manage (new Gtk::Box());
-    hb->pack_start (*check, Gtk::PACK_SHRINK, 4);
+    pack_start(hb, *check, Pack::SHRINK, 4);
     field = Gtk::manage (new Gtk::Entry());
-    hb->pack_start (*field, true, true, 2);
-    get_content_area()->pack_start (*hb, Gtk::PACK_SHRINK, 4);
+    pack_start(hb, *field, true, true, 2);
+    pack_start(get_content_area(), *hb, Pack::SHRINK, 4);
     field->set_tooltip_text (M ("DYNPROFILEEDITOR_ENTRY_TOOLTIP"));
 }
 
@@ -240,24 +238,22 @@ DynamicProfilePanel::DynamicProfilePanel():
 {
     set_orientation(Gtk::Orientation::VERTICAL);
     
-    add (vbox_);
+    append (vbox_);
 
     treeview_.set_grid_lines (Gtk::TREE_VIEW_GRID_LINES_VERTICAL);
-    scrolledwindow_.add (treeview_);
+    scrolledwindow_.set_child (treeview_);
     scrolledwindow_.set_vexpand();
 
     scrolledwindow_.set_policy (Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
 
-    vbox_.pack_start (scrolledwindow_);
-    vbox_.pack_start (buttonbox_, Gtk::PACK_SHRINK);
+    pack_start(&vbox_, scrolledwindow_);
+    pack_start(&vbox_, buttonbox_, Pack::SHRINK);
 
-    buttonbox_.pack_start (button_new_, Gtk::PACK_SHRINK);
-    buttonbox_.pack_start (button_edit_, Gtk::PACK_SHRINK);
-    buttonbox_.pack_start (button_delete_, Gtk::PACK_SHRINK);
-    buttonbox_.pack_start (button_up_, Gtk::PACK_SHRINK);
-    buttonbox_.pack_start (button_down_, Gtk::PACK_SHRINK);
-    buttonbox_.set_border_width (5);
-    buttonbox_.set_layout (Gtk::BUTTONBOX_END);
+    pack_start(&buttonbox_, button_new_, Pack::SHRINK);
+    pack_start(&buttonbox_, button_edit_, Pack::SHRINK);
+    pack_start(&buttonbox_, button_delete_, Pack::SHRINK);
+    pack_start(&buttonbox_, button_up_, Pack::SHRINK);
+    pack_start(&buttonbox_, button_down_, Pack::SHRINK);
     button_up_.signal_clicked().connect (
         sigc::mem_fun (*this, &DynamicProfilePanel::on_button_up));
     button_down_.signal_clicked().connect (
@@ -373,8 +369,6 @@ DynamicProfilePanel::DynamicProfilePanel():
             *cell, sigc::mem_fun (
                 *this, &DynamicProfilePanel::render_expcomp));
     }
-
-    show_all_children();
 
     for (auto &r : ProfileStore::getInstance()->getRules()) {
         add_rule (r);
@@ -602,7 +596,8 @@ void DynamicProfilePanel::on_button_new()
 {
     EditDialog d (M ("DYNPROFILEEDITOR_NEW_RULE"),
                   static_cast<Gtk::Window &> (*get_toplevel()));
-    int status = d.run();
+    d.set_modal(true);
+    int status = d.present();
 
     if (status == 1) {
         DynamicProfileRule rule = d.get_rule();
@@ -623,7 +618,8 @@ void DynamicProfilePanel::on_button_edit()
                   static_cast<Gtk::Window &> (*get_toplevel()));
     Gtk::TreeModel::Row row = * (s->get_selected());
     d.set_rule (to_rule (row));
-    int status = d.run();
+    d.set_modal(true);
+    int status = d.present();
 
     if (status == 1) {
         update_rule (row, d.get_rule());
