@@ -19,6 +19,12 @@
 #include <windows.h>
 #endif
 
+#ifdef _WIN32
+#define PATH_SEPARATOR '\\';
+#else
+#define PATH_SEPARATOR '/';
+#endif
+
 #include "cachemanager.h"
 #include "multilangmgr.h"
 #include "thumbnail.h"
@@ -38,7 +44,6 @@
 #include "rtengine/profilestore.h"
 #include "rtengine/settings.h"
 #include "guiutils.h"
-#include "batchqueue.h"
 #include "extprog.h"
 #include "md5helper.h"
 #include "pathutils.h"
@@ -50,6 +55,7 @@
 
 namespace {
 
+[[maybe_unused]]
 bool CPBDump(
     const Glib::ustring& commFName,
     const Glib::ustring& imageFName,
@@ -59,11 +65,7 @@ bool CPBDump(
     bool flagMode
 )
 {
-    const std::unique_ptr<Glib::KeyFile> kf(new Glib::KeyFile);
-
-    if (!kf) {
-        return false;
-    }
+    auto kf = Glib::KeyFile::create();
 
     // open the file in write mode
     const std::unique_ptr<FILE, int (*)(FILE *)> f(g_fopen(commFName.c_str(), "wt"), &std::fclose);
@@ -145,6 +147,65 @@ const std::map<int, std::string> defaultColors = {
 
 auto defaultColorMapper = ColorMapper(defaultColors);
 
+// Look for N or -N in templateText at position ix, meaning "index from end" and "index from start".
+// For N, return Nth index from the end, and for -N return the Nth index from the start.
+// N is a digit 1 through 9. The returned value is not range-checked, so it may be >=numPathElements.
+// or negative. The caller performs any required range-checking.
+int decodePathIndex(unsigned int& ix, Glib::ustring& templateText, size_t numPathElements)
+{
+    int pathIndex = static_cast<int>(numPathElements);    // a value that means input was invalid
+    bool fromStart = false;
+    if (ix < templateText.size()) {
+        if (templateText[ix] == '-') {
+            fromStart = true;   // minus sign means N is from the start rather than the end of the path
+            ix++;
+        }
+    }
+    if (ix < templateText.size()) {
+        pathIndex = templateText[ix] - '1';
+        if (!fromStart) {
+            pathIndex = numPathElements - pathIndex - 1;
+        }
+    }
+    return pathIndex;
+}
+
+// Extract the initial characters from a canonical absolute path, and append
+// those to a path string. Initial characters are '/' for Unix/Linux paths and
+// '\\' or '//' for UNC paths. A single backslash is also accepted, for driveless
+// Windows paths.
+void appendAbsolutePathPrefix(Glib::ustring& path, const Glib::ustring& absolutePath)
+{
+    if (absolutePath[0] == '/') {
+        if (absolutePath.size() > 1 && absolutePath[1] == '/') {
+            path += "//"; // Start of a Samba UNC path
+        } else {
+            path += '/';    // Start of a Unix/Linux path
+        }
+    } else if (absolutePath[0] == '\\') {
+        if (absolutePath.size() > 1 && absolutePath[1] == '\\') {
+            path += "\\\\"; // Start of a UNC path
+        } else {
+            path += '\\';   // Start of a Windows path that does not include a drive letter
+        }
+    }
+}
+
+// Look in templateText at index ix for quoted string containing a time format string, and
+// use that string to format dateTime. Append the formatted time to path.
+void appendFormattedTime(Glib::ustring& path, unsigned int& ix, const Glib::ustring& templateText, const Glib::DateTime& dateTime)
+{
+    constexpr gunichar quoteMark('"');
+    if ((ix + 1) < templateText.size() && templateText[ix] == quoteMark) {
+        const auto endPos = templateText.find_first_of(quoteMark, ++ix);
+        if (endPos != Glib::ustring::npos) {
+            Glib::ustring formatString(templateText, ix, endPos-ix);
+            path += dateTime.format(formatString);
+            ix = endPos;
+        }
+    }
+}
+
 } // namespace
 
 using namespace rtengine::procparams;
@@ -224,6 +285,185 @@ Thumbnail::Thumbnail(CacheManager* cm, const Glib::ustring& fname, const std::st
 Glib::ustring Thumbnail::xmpSidecarPath(const Glib::ustring &imagePath)
 {
     return rtengine::Exiv2Metadata::xmpSidecarPath(imagePath);
+}
+
+// Calculates automatic filename of processed batch entry, but just the base name
+// example output: "c:\out\converted\dsc0121"
+Glib::ustring Thumbnail::calcAutoFileNameBase (const Glib::ustring& origFileName, int sequence)
+{
+
+    std::vector<Glib::ustring> da;
+
+    for (size_t i = 0; i < origFileName.size(); i++) {
+        while ((i < origFileName.size()) && (origFileName[i] == '\\' || origFileName[i] == '/')) {
+            i++;
+        }
+
+        if (i >= origFileName.size()) {
+            break;
+        }
+
+        Glib::ustring tok;
+
+        while ((i < origFileName.size()) && !(origFileName[i] == '\\' || origFileName[i] == '/')) {
+            tok = tok + origFileName[i++];
+        }
+
+        if (i < origFileName.size()) {  // omit the last token, which is the file name
+            da.push_back (tok);
+        }
+    }
+
+//    for (unsigned i=0; i<da.size(); i++)
+//        printf ("da[%u]: \"%s\"\n", i, da[i].c_str());
+
+    // extracting filebase
+    Glib::ustring filename;
+
+    int extpos = origFileName.size() - 1;
+
+    for (; extpos >= 0 && origFileName[extpos] != '.'; extpos--);
+
+    for (int k = extpos - 1; k >= 0 && origFileName[k] != '/' && origFileName[k] != '\\'; k--) {
+        filename = origFileName[k] + filename;
+    }
+
+//    printf ("%d, |%s|\n", extpos, filename.c_str());
+
+    // constructing full output path
+//    printf ("path=|%s|\n", options.savePath.c_str());
+
+    Glib::ustring path;
+
+    if (options.saveUsePathTemplate) {
+        unsigned int ix = 0;
+
+        while (ix < options.savePathTemplate.size()) {
+            if (options.savePathTemplate[ix] == '%') {
+                ix++;
+
+                if (options.savePathTemplate[ix] == 'P') {
+                    // insert path elements from given index to the end
+                    ix++;
+                    int n = decodePathIndex(ix, options.savePathTemplate, da.size());
+                    if (n < 0) {
+                        n = 0;  // if too many elements specified, return all available elements
+                    }
+                    if (n < static_cast<int>(da.size())) {
+                        if (n == 0) {
+                            appendAbsolutePathPrefix(path, origFileName);
+                        }
+                        for (unsigned int i = static_cast<unsigned int>(n); i < da.size(); i++) {
+                            path += da[i] + PATH_SEPARATOR;
+                        }
+                    }
+                    // If the next template character is a separator, skip it, because path already has one
+                    ix++;
+                    if (ix < options.savePathTemplate.size() && options.savePathTemplate[ix] != '/' && options.savePathTemplate[ix] != '\\') {
+                        ix--;
+                    }
+                } else if (options.savePathTemplate[ix] == 'p') {
+                    // insert path elements from the start of the path up to the given index
+                    ix++;
+                    int n = decodePathIndex(ix, options.savePathTemplate, da.size());
+                    if (n >= 0) {
+                        appendAbsolutePathPrefix(path, origFileName);
+                    }
+                    for (unsigned int i=0; static_cast<int>(i) <= n && i < da.size(); i++) {
+                        path += da[i] + PATH_SEPARATOR;
+                    }
+                    // If the next template character is a separator, skip it, because path already has one
+                    ix++;
+                    if (ix < options.savePathTemplate.size() && options.savePathTemplate[ix] != '/' && options.savePathTemplate[ix] != '\\') {
+                        ix--;
+                    }
+                } else if (options.savePathTemplate[ix] == 'd') {
+                    // insert a single directory name from the file's path
+                    ix++;
+                    int n = decodePathIndex(ix, options.savePathTemplate, da.size());
+                    if (n >= 0 && n < static_cast<int>(da.size())) {
+                        path += da[n];
+                    }
+                } else if (options.savePathTemplate[ix] == 'f') {
+                    path += filename;
+                } else if (options.savePathTemplate[ix] == 'r') { // rank from pparams
+                    char rank;
+                    rtengine::procparams::ProcParams pparams;
+
+                    if( pparams.load(origFileName + paramFileExtension) == 0 ) {
+                        if (!pparams.inTrash) {
+                            rank = pparams.rank + '0';
+                        } else {
+                            rank = 'x';
+                        }
+                    } else {
+                        rank = '0';    // if param file not loaded (e.g. does not exist), default to rank=0
+                    }
+
+                    path += rank;
+                } else if (options.savePathTemplate[ix] == 's') { // sequence
+                    std::ostringstream seqstr;
+
+                    int w = options.savePathTemplate[ix + 1] - '0';
+
+                    if (w >= 1 && w <= 9) {
+                        ix++;
+                        seqstr << std::setw (w) << std::setfill ('0');
+                    }
+
+                    seqstr << sequence;
+                    path += seqstr.str ();
+                } else if (options.savePathTemplate[ix] == 't') {
+                    // Insert formatted date/time value. Character after 't' defines time source
+                    if (++ix < options.savePathTemplate.size()) {
+                        Glib::DateTime dateTime;
+                        switch(options.savePathTemplate[ix++])
+                        {
+                            case 'E':   // (approximate) time when export started
+                            {
+                                dateTime = Glib::DateTime::create_now_local();
+                                break;
+                            }
+                            case 'F': // time when file was last saved
+                            {
+                                Glib::RefPtr<Gio::File> file = Gio::File::create_for_path(origFileName);
+                                if (file) {
+                                    Glib::RefPtr<Gio::FileInfo> info = file->query_info(G_FILE_ATTRIBUTE_TIME_MODIFIED);
+                                    if (info) {
+                                        dateTime = info->get_modification_date_time();
+                                    }
+                                }
+                                break;
+                            }
+                            case 'P':   // time when picture was taken
+                            {
+                                const auto timestamp = rtengine::FramesData(origFileName).getDateTimeAsTS();
+                                dateTime = Glib::DateTime::create_now_local(timestamp);
+                                break;
+                            }
+                            default:
+                            {
+                                break;
+                            }
+                        }
+                        if (dateTime) {
+                            appendFormattedTime(path, ix, options.savePathTemplate, dateTime);
+                        }
+                    }
+                }
+            }
+
+            else {
+                path += options.savePathTemplate[ix];
+            }
+
+            ix++;
+        }
+    } else {
+        path = Glib::build_filename (options.savePathFolder, filename);
+    }
+
+    return path;
 }
 
 void Thumbnail::_generateThumbnailImage()
@@ -391,7 +631,7 @@ rtengine::procparams::ProcParams* Thumbnail::createProcParamsForUpdate(bool retu
         Glib::ustring tmpFileName( Glib::build_filename(options.cacheBaseDir, Glib::ustring::compose("CPB_temp_%1.txt", index++)) );
 
         CPBDump(tmpFileName, fname, outFName,
-                defaultPparamsPath == DEFPROFILE_INTERNAL ? DEFPROFILE_INTERNAL : Glib::build_filename(defaultPparamsPath, Glib::path_get_basename(defProf) + paramFileExtension), cfs, flaggingMode);
+                defaultPparamsPath == DEFPROFILE_INTERNAL ? DEFPROFILE_INTERNAL : Glib::build_filename(defaultPparamsPath.c_str(), Glib::path_get_basename(defProf.c_str()) + paramFileExtension), cfs, flaggingMode);
 
         // For the filename etc. do NOT use streams, since they are not UTF8 safe
         Glib::ustring cmdLine = options.CPBPath + Glib::ustring(" \"") + tmpFileName + Glib::ustring("\"");

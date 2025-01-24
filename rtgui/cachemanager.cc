@@ -110,7 +110,7 @@ Thumbnail* CacheManager::getEntry (const Glib::ustring& fname)
 
         if (error == 0 && imageData.supported) {
 
-            if (xmpSidecarMd5 != imageData.xmpSidecarMd5) {
+            if (xmpSidecarMd5 != imageData.xmpSidecarMd5.c_str()) {
                 updateImageInfo(fname, imageData, xmpSidecarMd5);
                 imageData.save(cacheName);
             }
@@ -332,7 +332,7 @@ std::string CacheManager::getMD5 (const Glib::ustring& fname)
             if (info) {
                 // We only use name and size to identify a file.
                 const auto identifier = Glib::ustring::compose("%1%2", fname, info->get_size());
-                return Glib::Checksum::compute_checksum(Glib::Checksum::CHECKSUM_MD5, identifier);
+                return Glib::Checksum::compute_checksum(Glib::Checksum::Type::MD5, identifier);
             }
 
         } catch(Gio::Error&) {}
@@ -349,7 +349,7 @@ Glib::ustring CacheManager::getCacheFileName (const Glib::ustring& subDir,
         const Glib::ustring& md5) const
 {
     const auto dirName = Glib::build_filename (baseDir, subDir);
-    const auto baseName = Glib::path_get_basename (fname) + "." + md5;
+    const auto baseName = Glib::path_get_basename (fname.c_str()) + "." + md5;
     return Glib::build_filename (dirName, baseName + fext);
 }
 
@@ -375,7 +375,7 @@ void CacheManager::applyCacheSizeLimitation () const
         return;
     }
 
-    using FNameMTime = std::pair<Glib::ustring, Glib::TimeVal>;
+    using FNameMTime = std::pair<Glib::ustring, Glib::DateTime>;
 
     std::vector<FNameMTime> files;
     files.reserve(numFiles);
@@ -389,7 +389,7 @@ void CacheManager::applyCacheSizeLimitation () const
         while (const auto file = enumerator->next_file()) {
             const auto name = file->get_name();
             if (name.size() >= md5_size + 5) {
-                files.emplace_back(name, file->modification_time());
+                files.emplace_back(name, file->get_modification_date_time());
             }
         }
 
@@ -408,7 +408,7 @@ void CacheManager::applyCacheSizeLimitation () const
         files.end(),
         [](const FNameMTime& lhs, const FNameMTime& rhs) -> bool
         {
-            return lhs.second < rhs.second;
+            return lhs.second.to_unix_usec() < rhs.second.to_unix_usec();
         }
     );
 

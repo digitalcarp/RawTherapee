@@ -44,7 +44,7 @@ std::string getMD5 (const Glib::ustring& fname)
         if (GetFileAttributesExW (wfname.get (), GetFileExInfoStandard, &fileAttr)) {
             // We use name, size and creation time to identify a file.
             const auto identifier = Glib::ustring::compose ("%1-%2-%3-%4", fileAttr.nFileSizeLow, fileAttr.ftCreationTime.dwHighDateTime, fileAttr.ftCreationTime.dwLowDateTime, fname);
-            return Glib::Checksum::compute_checksum (Glib::Checksum::CHECKSUM_MD5, identifier);
+            return Glib::Checksum::compute_checksum (Glib::Checksum::Type::MD5, identifier);
         }
 
 #else
@@ -54,7 +54,7 @@ std::string getMD5 (const Glib::ustring& fname)
             if (auto info = file->query_info ()) {
                 // We only use name and size to identify a file.
                 const auto identifier = Glib::ustring::compose ("%1%2", fname, info->get_size ());
-                return Glib::Checksum::compute_checksum (Glib::Checksum::CHECKSUM_MD5, identifier);
+                return Glib::Checksum::compute_checksum (Glib::Checksum::Type::MD5, identifier);
             }
 
         } catch (Gio::Error&) {}

@@ -25,8 +25,8 @@ set(NONCLISOURCEFILES
     # blackwhite.cc
     # bqentryupdater.cc
     # browserfilter.cc
-    # cacheimagedata.cc
-    # cachemanager.cc
+    cacheimagedata.cc
+    cachemanager.cc
     # cacorrection.cc
     # checkbox.cc
     # chmixer.cc
@@ -164,7 +164,7 @@ set(NONCLISOURCEFILES
     # thumbbrowserbase.cc
     # thumbbrowserentrybase.cc
     # thumbimageupdater.cc
-    # thumbnail.cc
+    thumbnail.cc
     # tonecurve.cc
     # toneequalizer.cc
     # toolbar.cc

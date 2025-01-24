@@ -125,6 +125,7 @@ public:
 
     static int infoFromImage(const Glib::ustring &fname, CacheImageData &cfs);
     static Glib::ustring xmpSidecarPath(const Glib::ustring &imagePath);
+    static Glib::ustring calcAutoFileNameBase(const Glib::ustring& origFilename, int sequence = 0);
 
     bool              hasProcParams () const;
     const rtengine::procparams::ProcParams& getProcParams ();
