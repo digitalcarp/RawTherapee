@@ -947,7 +947,7 @@ void ICCProfileCreator::savePressed()
 
     // -------------------------------------------- Asking the file name
 
-    Gtk::FileChooserDialog dialog(getToplevelWindow(this), M("ICCPROFCREATOR_SAVEDIALOG_TITLE"), Gtk::FILE_CHOOSER_ACTION_SAVE);
+    Gtk::FileChooserDialog dialog(getToplevelWindow(this), M("ICCPROFCREATOR_SAVEDIALOG_TITLE"), Gtk::FileChooser::Action::SAVE);
     bindCurrentFolder(dialog, options.lastICCProfCreatorDir);
     dialog.set_current_name(fName);
     //dialog.set_current_folder(lastPath);

@@ -672,7 +672,7 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
     // Dark Frames Dir
     Gtk::Label *dfLab = Gtk::manage(new Gtk::Label(M("PREFERENCES_DIRDARKFRAMES") + ":"));
     setExpandAlignProperties(dfLab, false, false, Gtk::Align::START, Gtk::Align::CENTER);
-    darkFrameDir = Gtk::manage(new MyFileChooserButton(M("PREFERENCES_DIRDARKFRAMES"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER));
+    darkFrameDir = Gtk::manage(new MyFileChooserButton(M("PREFERENCES_DIRDARKFRAMES"), Gtk::FileChooser::Action::SELECT_FOLDER));
     setExpandAlignProperties(darkFrameDir, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     dfLabel = Gtk::manage(new Gtk::Label("Found:"));
     setExpandAlignProperties(dfLabel, false, false, Gtk::Align::START, Gtk::Align::CENTER);
@@ -686,7 +686,7 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
     // Flatfield Dir
     Gtk::Label *ffLab = Gtk::manage(new Gtk::Label(M("PREFERENCES_FLATFIELDSDIR") + ":"));
     setExpandAlignProperties(ffLab, false, false, Gtk::Align::START, Gtk::Align::CENTER);
-    flatFieldDir = Gtk::manage(new MyFileChooserButton(M("PREFERENCES_FLATFIELDSDIR"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER));
+    flatFieldDir = Gtk::manage(new MyFileChooserButton(M("PREFERENCES_FLATFIELDSDIR"), Gtk::FileChooser::Action::SELECT_FOLDER));
     setExpandAlignProperties(flatFieldDir, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     ffLabel = Gtk::manage(new Gtk::Label("Found:"));
     setExpandAlignProperties(ffLabel, false, false, Gtk::Align::START, Gtk::Align::CENTER);
@@ -700,7 +700,7 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
     //Cluts Dir
     Gtk::Label *clutsDirLabel = Gtk::manage(new Gtk::Label(M("PREFERENCES_CLUTSDIR") + ":"));
     setExpandAlignProperties(clutsDirLabel, false, false, Gtk::Align::START, Gtk::Align::CENTER);
-    clutsDir = Gtk::manage(new MyFileChooserButton(M("PREFERENCES_CLUTSDIR"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER));
+    clutsDir = Gtk::manage(new MyFileChooserButton(M("PREFERENCES_CLUTSDIR"), Gtk::FileChooser::Action::SELECT_FOLDER));
     setExpandAlignProperties(clutsDir, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     Gtk::Label* clutsRestartNeeded = Gtk::manage(new Gtk::Label(Glib::ustring(" (") + M("PREFERENCES_APPLNEXTSTARTUP") + ")"));
     setExpandAlignProperties(clutsRestartNeeded, false, false, Gtk::Align::START, Gtk::Align::CENTER);
@@ -712,7 +712,7 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
     //Camera Profiles Dir
     Gtk::Label *cameraProfilesDirLabel = Gtk::manage(new Gtk::Label(M("PREFERENCES_CAMERAPROFILESDIR") + ":"));
     setExpandAlignProperties(cameraProfilesDirLabel, false, false, Gtk::Align::START, Gtk::Align::CENTER);
-    cameraProfilesDir = Gtk::manage(new MyFileChooserButton(M("PREFERENCES_CAMERAPROFILESDIR"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER));
+    cameraProfilesDir = Gtk::manage(new MyFileChooserButton(M("PREFERENCES_CAMERAPROFILESDIR"), Gtk::FileChooser::Action::SELECT_FOLDER));
     setExpandAlignProperties(cameraProfilesDir, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
     dirgrid->attach_next_to(*cameraProfilesDirLabel, *clutsDirLabel, Gtk::PositionType::BOTTOM, 1, 1);
@@ -722,7 +722,7 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
     Gtk::Label *lensProfilesDirLabel = Gtk::manage(new Gtk::Label(M("PREFERENCES_LENSPROFILESDIR") + ":"));
     lensProfilesDirLabel->set_tooltip_text(M("PREFERENCES_LENSPROFILESDIR_TOOLTIP"));
     setExpandAlignProperties(lensProfilesDirLabel, false, false, Gtk::Align::START, Gtk::Align::CENTER);
-    lensProfilesDir = Gtk::manage(new MyFileChooserButton(M("PREFERENCES_LENSPROFILESDIR"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER));
+    lensProfilesDir = Gtk::manage(new MyFileChooserButton(M("PREFERENCES_LENSPROFILESDIR"), Gtk::FileChooser::Action::SELECT_FOLDER));
     setExpandAlignProperties(lensProfilesDir, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
     dirgrid->attach_next_to(*lensProfilesDirLabel, *cameraProfilesDirLabel, Gtk::PositionType::BOTTOM, 1, 1);
@@ -732,7 +732,7 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
     Gtk::Label *lensfunDbDirLabel = Gtk::manage(new Gtk::Label(M("PREFERENCES_LENSFUNDBDIR") + ":"));
     lensfunDbDirLabel->set_tooltip_text(M("PREFERENCES_LENSFUNDBDIR_TOOLTIP"));
     setExpandAlignProperties(lensfunDbDirLabel, false, false, Gtk::Align::START, Gtk::Align::CENTER);
-    lensfunDbDir = Gtk::manage(new MyFileChooserEntry(M("PREFERENCES_LENSFUNDBDIR"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER));
+    lensfunDbDir = Gtk::manage(new MyFileChooserEntry(M("PREFERENCES_LENSFUNDBDIR"), Gtk::FileChooser::Action::SELECT_FOLDER));
     lensfunDbDir->set_placeholder_text(Glib::ustring::compose("(%1)", M("GENERAL_AUTO")));
     setExpandAlignProperties(lensfunDbDir, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     Gtk::Label* lensfunDbDirRestartNeededLabel = Gtk::manage(new Gtk::Label(Glib::ustring(" (") + M("PREFERENCES_APPLNEXTSTARTUP") + ")"));
@@ -905,7 +905,7 @@ Gtk::Widget* Preferences::getColorManPanel ()
     Gtk::Box* vbColorMan = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     vbColorMan->set_spacing (4);
 
-    iccDir = Gtk::manage(new MyFileChooserButton(M("PREFERENCES_ICCDIR"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER));
+    iccDir = Gtk::manage(new MyFileChooserButton(M("PREFERENCES_ICCDIR"), Gtk::FileChooser::Action::SELECT_FOLDER));
     setExpandAlignProperties(iccDir, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     Gtk::Label* pdlabel = Gtk::manage(new Gtk::Label(M("PREFERENCES_ICCDIR") + ":", Gtk::Align::START));
     setExpandAlignProperties(pdlabel, false, false, Gtk::Align::FILL, Gtk::Align::CENTER);
@@ -1397,7 +1397,7 @@ Gtk::Widget* Preferences::getGeneralPanel()
     editor_dir_temp = Gtk::manage(new Gtk::RadioButton(M("PREFERENCES_EXTEDITOR_DIR_TEMP")));
     editor_dir_current = Gtk::manage(new Gtk::RadioButton(M("PREFERENCES_EXTEDITOR_DIR_CURRENT")));
     editor_dir_custom = Gtk::manage(new Gtk::RadioButton(M("PREFERENCES_EXTEDITOR_DIR_CUSTOM") + ": "));
-    editor_dir_custom_path = Gtk::manage(new MyFileChooserButton("", Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER));
+    editor_dir_custom_path = Gtk::manage(new MyFileChooserButton("", Gtk::FileChooser::Action::SELECT_FOLDER));
     Gtk::RadioButton::Group ge;
     ge = editor_dir_temp->get_group();
     editor_dir_current->set_group(ge);
@@ -1458,7 +1458,7 @@ Gtk::Widget* Preferences::getFileBrowserPanel()
     sdlast     = Gtk::manage(new Gtk::RadioButton(M("PREFERENCES_DIRLAST")));
     sdhome     = Gtk::manage(new Gtk::RadioButton(M("PREFERENCES_DIRHOME")));
     sdother    = Gtk::manage(new Gtk::RadioButton(M("PREFERENCES_DIROTHER") + ": "));
-    startupdir = Gtk::manage(new MyFileChooserEntry(M("PREFERENCES_DIRSELECTDLG"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER));
+    startupdir = Gtk::manage(new MyFileChooserEntry(M("PREFERENCES_DIRSELECTDLG"), Gtk::FileChooser::Action::SELECT_FOLDER));
 
     Gtk::RadioButton::Group opts = sdcurrent->get_group();
     sdlast->set_group(opts);

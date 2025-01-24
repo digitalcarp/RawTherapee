@@ -1075,7 +1075,7 @@ void FileCatalog::copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe, b
         fc_title = M("FILEBROWSER_POPUPCOPYTO");
     }
 
-    Gtk::FileChooserDialog fc (getToplevelWindow (this), fc_title, Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER );
+    Gtk::FileChooserDialog fc (getToplevelWindow (this), fc_title, Gtk::FileChooser::Action::SELECT_FOLDER );
     fc.add_button( M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
     fc.add_button( M("GENERAL_OK"), Gtk::RESPONSE_OK);
     if (!options.lastCopyMovePath.empty() && Glib::file_test(options.lastCopyMovePath, Glib::FileTest::IS_DIR)) {

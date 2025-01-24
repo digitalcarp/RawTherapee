@@ -97,7 +97,7 @@ BatchQueuePanel::BatchQueuePanel (FileCatalog* aFileCatalog) : parent(nullptr)
     outdirFolderButton->set_image (*folderImg);
     outdirFolder = nullptr;
 #else
-    outdirFolder = Gtk::manage (new MyFileChooserButton (M("QUEUE_LOCATION_FOLDER"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER));
+    outdirFolder = Gtk::manage (new MyFileChooserButton (M("QUEUE_LOCATION_FOLDER"), Gtk::FileChooser::Action::SELECT_FOLDER));
     hb3->pack_start (*outdirFolder);
     outdirFolder->signal_selection_changed().connect (sigc::mem_fun(*this, &BatchQueuePanel::pathFolderChanged));
 
@@ -507,7 +507,7 @@ void BatchQueuePanel::setDestinationPreviewText(const Glib::ustring &destination
 void BatchQueuePanel::pathFolderButtonPressed ()
 {
 
-    Gtk::FileChooserDialog fc (getToplevelWindow (this), M("QUEUE_LOCATION_FOLDER"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER );
+    Gtk::FileChooserDialog fc (getToplevelWindow (this), M("QUEUE_LOCATION_FOLDER"), Gtk::FileChooser::Action::SELECT_FOLDER );
     fc.add_button( "_Cancel", Gtk::RESPONSE_CANCEL); // STOCKICON WAS THERE
     fc.add_button( "_OK", Gtk::RESPONSE_OK); // STOCKICON WAS THERE
     fc.set_filename(options.savePathFolder);

@@ -50,7 +50,7 @@ SaveAsDialog::SaveAsDialog (const Glib::ustring &initialDir, Gtk::Window* parent
 {
     Gtk::Box* box = get_content_area ();
 
-    fchooser = Gtk::manage( new Gtk::FileChooserWidget (Gtk::FILE_CHOOSER_ACTION_SAVE) );
+    fchooser = Gtk::manage( new Gtk::FileChooserWidget (Gtk::FileChooser::Action::SAVE) );
     fchooser->set_current_folder (initialDir);
     fchooser->signal_file_activated().connect(sigc::mem_fun(*this, &SaveAsDialog::okPressed));
 

@@ -1318,7 +1318,7 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
 // {
 //     Gtk::FileChooserDialog dlg(getToplevelWindow(parent), pimpl->title_, pimpl->action_);
 //     dlg.add_button(M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
-//     dlg.add_button(M(pimpl->action_ == Gtk::FILE_CHOOSER_ACTION_SAVE ? "GENERAL_SAVE" : "GENERAL_OPEN"), Gtk::RESPONSE_OK);
+//     dlg.add_button(M(pimpl->action_ == Gtk::FileChooser::Action::SAVE ? "GENERAL_SAVE" : "GENERAL_OPEN"), Gtk::RESPONSE_OK);
 //     dlg.set_filename(pimpl->filename_);
 //     for (auto &f : pimpl->file_filters_) {
 //         dlg.add_filter(f);
@@ -1405,7 +1405,7 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
 // bool MyFileChooserWidget::set_current_folder(const std::string &filename)
 // {
 //     pimpl->current_folder_ = filename;
-//     if (pimpl->action_ == Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER) {
+//     if (pimpl->action_ == Gtk::FileChooser::Action::SELECT_FOLDER) {
 //         set_filename(filename);
 //     }
 //     return true;

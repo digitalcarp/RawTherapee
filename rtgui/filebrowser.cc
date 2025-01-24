@@ -868,7 +868,7 @@ void FileBrowser::menuItemActivated (Gtk::MenuItem* m)
     } else if (m == selectDF) {
         if( !mselected.empty() ) {
             rtengine::procparams::ProcParams pp = mselected[0]->thumbnail->getProcParams();
-            Gtk::FileChooserDialog fc (getToplevelWindow (this), "Dark Frame", Gtk::FILE_CHOOSER_ACTION_OPEN );
+            Gtk::FileChooserDialog fc (getToplevelWindow (this), "Dark Frame", Gtk::FileChooser::Action::OPEN );
             bindCurrentFolder (fc, options.lastDarkframeDir);
             fc.add_button( M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
             fc.add_button( M("GENERAL_APPLY"), Gtk::RESPONSE_APPLY);
@@ -944,7 +944,7 @@ void FileBrowser::menuItemActivated (Gtk::MenuItem* m)
     } else if (m == selectFF) {
         if( !mselected.empty() ) {
             rtengine::procparams::ProcParams pp = mselected[0]->thumbnail->getProcParams();
-            Gtk::FileChooserDialog fc (getToplevelWindow (this), "Flat Field", Gtk::FILE_CHOOSER_ACTION_OPEN );
+            Gtk::FileChooserDialog fc (getToplevelWindow (this), "Flat Field", Gtk::FileChooser::Action::OPEN );
             bindCurrentFolder (fc, options.lastFlatfieldDir);
             fc.add_button( M("GENERAL_CANCEL"), Gtk::RESPONSE_CANCEL);
             fc.add_button( M("GENERAL_APPLY"), Gtk::RESPONSE_APPLY);
