@@ -402,6 +402,30 @@ Glib::ustring escapeHtmlChars(const Glib::ustring &src)
     return dst;
 }
 
+void pack_start(Gtk::Box* box, Gtk::Widget& child, Pack pack, int /*padding*/)
+{
+    if (box->get_orientation() == Gtk::Orientation::HORIZONTAL) {
+        child.set_halign(Gtk::Align::START);
+        child.set_hexpand(pack == Pack::EXPAND_WIDGET);
+    } else {
+        child.set_valign(Gtk::Align::START);
+        child.set_vexpand(pack == Pack::EXPAND_WIDGET);
+    }
+    box->append(child);
+}
+
+void pack_end(Gtk::Box* box, Gtk::Widget& child, Pack pack, int /*padding*/)
+{
+    if (box->get_orientation() == Gtk::Orientation::HORIZONTAL) {
+        child.set_halign(Gtk::Align::END);
+        child.set_hexpand(pack == Pack::EXPAND_WIDGET);
+    } else {
+        child.set_valign(Gtk::Align::END);
+        child.set_vexpand(pack == Pack::EXPAND_WIDGET);
+    }
+    box->append(child);
+}
+
 void setExpandAlignProperties(Gtk::Widget *widget, bool hExpand, bool vExpand, enum Gtk::Align hAlign, enum Gtk::Align vAlign)
 {
     widget->set_hexpand(hExpand);

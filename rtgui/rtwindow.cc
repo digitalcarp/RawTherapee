@@ -20,16 +20,16 @@
 #include "rtwindow.h"
 
 #include "guiutils.h"
+// #include "iccprofilecreator.h"
 #include "multilangmgr.h"
 #include "options.h"
+#include "preferences.h"
 #include "rtimage.h"
 #include "rtscalable.h"
 
 #include <gtkmm.h>
 
 // #include "cachemanager.h"
-// #include "preferences.h"
-// #include "iccprofilecreator.h"
 // #include "cursormanager.h"
 // #include "editwindow.h"
 // #include "thumbnail.h"
@@ -196,7 +196,7 @@ RtWindow::RtWindow ()
 
         // decorate tab
         Gtk::Grid* fpanelLabelGrid = Gtk::manage (new Gtk::Grid ());
-//         setExpandAlignProperties (fpanelLabelGrid, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
+        setExpandAlignProperties (fpanelLabelGrid, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
         Gtk::Label* fpl = Gtk::manage (new Gtk::Label ( Glib::ustring (" ") + M ("MAIN_FRAME_EDITOR") ));
 
         if (options.mainNBVertical) {
@@ -237,40 +237,40 @@ RtWindow::RtWindow ()
         iFullscreen_exit = new RtImage("fullscreen-leave");
 
         Gtk::Button* iccProfileCreator = Gtk::manage (new Gtk::Button ());
-//         setExpandAlignProperties (iccProfileCreator, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
+        setExpandAlignProperties (iccProfileCreator, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
         iccProfileCreator->set_child (*Gtk::manage (new RtImage("gamut-plus")));
         iccProfileCreator->set_has_frame(false);
         iccProfileCreator->set_tooltip_markup (M ("MAIN_BUTTON_ICCPROFCREATOR"));
-//         iccProfileCreator->signal_clicked().connect ( sigc::mem_fun (*this, &RtWindow::showICCProfileCreator) );
+        iccProfileCreator->signal_clicked().connect ( sigc::mem_fun (*this, &RtWindow::showICCProfileCreator) );
 
         Gtk::Button* helpBtn = Gtk::manage (new Gtk::Button ());
-//         setExpandAlignProperties (helpBtn, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
+        setExpandAlignProperties (helpBtn, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
         helpBtn->set_child (*Gtk::manage (new RtImage("questionmark")));
         helpBtn->set_has_frame(false);
         helpBtn->set_tooltip_markup (M ("GENERAL_HELP"));
-//         helpBtn->signal_clicked().connect (sigc::mem_fun (*this, &RtWindow::showRawPedia));
+        helpBtn->signal_clicked().connect (sigc::mem_fun (*this, &RtWindow::showRawPedia));
 
         Gtk::Button* preferences = Gtk::manage (new Gtk::Button ());
-//         setExpandAlignProperties (preferences, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
+        setExpandAlignProperties (preferences, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
         preferences->set_child (*Gtk::manage (new RtImage("preferences")));
         preferences->set_has_frame(false);
         preferences->set_tooltip_markup (M ("MAIN_BUTTON_PREFERENCES"));
-//         preferences->signal_clicked().connect ( sigc::mem_fun (*this, &RtWindow::showPreferences) );
+        preferences->signal_clicked().connect ( sigc::mem_fun (*this, &RtWindow::showPreferences) );
 
         btn_fullscreen = Gtk::manage ( new Gtk::Button());
-//         setExpandAlignProperties (btn_fullscreen, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
+        setExpandAlignProperties (btn_fullscreen, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
         btn_fullscreen->set_tooltip_markup (M ("MAIN_BUTTON_FULLSCREEN"));
         btn_fullscreen->set_child (*iFullscreen);
         btn_fullscreen->set_has_frame(false);
         btn_fullscreen->signal_clicked().connect ( sigc::mem_fun (*this, &RtWindow::toggle_fullscreen) );
-//         setExpandAlignProperties (&prProgBar, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
+        setExpandAlignProperties (&prProgBar, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
         prProgBar.set_show_text (true);
 
         Gtk::Grid* actionGrid = Gtk::manage (new Gtk::Grid ());
         actionGrid->set_row_spacing (2);
         actionGrid->set_column_spacing (2);
 
-//         setExpandAlignProperties (actionGrid, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
+        setExpandAlignProperties (actionGrid, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
 
         if (options.mainNBVertical) {
             prProgBar.set_orientation (Gtk::Orientation::VERTICAL);
@@ -771,19 +771,16 @@ void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 //         }
 //     }
 // }
-//
-//
-// void RtWindow::showRawPedia()
-// {
-//     GError* gerror = nullptr;
-//     gtk_show_uri(nullptr, "https://rawpedia.rawtherapee.com/", GDK_CURRENT_TIME, &gerror);
-// }
-//
-// void RtWindow::showICCProfileCreator ()
-// {
-//     ICCProfileCreator *iccpc = new ICCProfileCreator (this);
-//     iccpc->run ();
-//     delete iccpc;
+
+void RtWindow::showRawPedia()
+{
+    gtk_show_uri(nullptr, "https://rawpedia.rawtherapee.com/", GDK_CURRENT_TIME);
+}
+
+void RtWindow::showICCProfileCreator ()
+{
+//     ICCProfileCreator iccpc(this);
+//     iccpc.present ();
 //
 //     fpanel->optionsChanged ();
 //
@@ -794,14 +791,13 @@ void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 //     for (const auto &p : epanels) {
 //         p.second->defaultMonitorProfileChanged (options.rtSettings.monitorProfile, options.rtSettings.autoMonitorProfile);
 //     }
-// }
-//
-// void RtWindow::showPreferences ()
-// {
-//     Preferences *pref = new Preferences (this);
-//     pref->run ();
-//     delete pref;
-//
+}
+
+void RtWindow::showPreferences ()
+{
+    Preferences pref(this);
+    pref.present ();
+
 //     fpanel->optionsChanged ();
 //
 //     if (epanel) {
@@ -811,8 +807,8 @@ void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 //     for (const auto &p : epanels) {
 //         p.second->defaultMonitorProfileChanged (options.rtSettings.monitorProfile, options.rtSettings.autoMonitorProfile);
 //     }
-// }
-//
+}
+
 // void RtWindow::setProgress(double p)
 // {
 //     prProgBar.set_fraction(p);
@@ -1015,17 +1011,17 @@ void RtWindow::setWindowSize ()
     ignoreDefaultSizeChange = false;
 }
 
-// void RtWindow::set_title_decorated (Glib::ustring fname)
-// {
-//     Glib::ustring subtitle;
-//
-//     if (!fname.empty()) {
-//         subtitle = " - " + fname;
-//     }
-//
-//     set_title (versionStr + subtitle);
-// }
-//
+void RtWindow::set_title_decorated (const Glib::ustring& fname)
+{
+    Glib::ustring subtitle;
+
+    if (!fname.empty()) {
+        subtitle = " - " + fname;
+    }
+
+    set_title (versionStr + subtitle);
+}
+
 // void RtWindow::closeOpenEditors()
 // {
 //     std::map<Glib::ustring, EditorPanel*>::const_iterator itr;

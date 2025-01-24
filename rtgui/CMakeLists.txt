@@ -122,7 +122,7 @@ set(NONCLISOURCEFILES
     # popupbutton.cc
     # popupcommon.cc
     # popuptogglebutton.cc
-    # preferences.cc
+    preferences.cc
     # preprocess.cc
     # preprocesswb.cc
     # previewhandler.cc

@@ -22,12 +22,12 @@
 
 #include <gtkmm.h>
 
-#include "dynamicprofilepanel.h"
 #include "options.h"
 #include "rtengine/profilestore.h"
 
+class DynamicProfilePanel;
 class ExternalEditorPreferences;
-class RTWindow;
+class RtWindow;
 class Splash;
 class ToolLocationPreference;
 
@@ -84,21 +84,21 @@ class Preferences final :
     Gtk::CheckButton* ckbLangAutoDetect;
     Gtk::Entry* dateformat;
     MyFileChooserEntry* startupdir;
-    Gtk::RadioButton* sdcurrent;
-    Gtk::RadioButton* sdlast;
-    Gtk::RadioButton* sdhome;
-    Gtk::RadioButton* sdother;
+    Gtk::CheckButton* sdcurrent;
+    Gtk::CheckButton* sdlast;
+    Gtk::CheckButton* sdhome;
+    Gtk::CheckButton* sdother;
     MyFileChooserButton* gimpDir;
     MyFileChooserButton* psDir;
     Gtk::Entry* editorToSendTo;
-    Gtk::RadioButton* edGimp;
-    Gtk::RadioButton* edPS;
-    Gtk::RadioButton* edOther;
+    Gtk::CheckButton* edGimp;
+    Gtk::CheckButton* edPS;
+    Gtk::CheckButton* edOther;
     ExternalEditorPreferences *externalEditors;
 
-    Gtk::RadioButton *editor_dir_temp;
-    Gtk::RadioButton *editor_dir_current;
-    Gtk::RadioButton *editor_dir_custom;
+    Gtk::CheckButton *editor_dir_temp;
+    Gtk::CheckButton *editor_dir_current;
+    Gtk::CheckButton *editor_dir_custom;
     MyFileChooserButton *editor_dir_custom_path;
     Gtk::CheckButton *editor_float32;
     Gtk::CheckButton *editor_bypass_output_profile;
@@ -217,7 +217,7 @@ class Preferences final :
     Gtk::CheckButton* useBundledProfiles;
     Gtk::ComboBoxText* loadParamsPreference;
     Gtk::ComboBoxText* editorLayout;
-    RTWindow* parent;
+    RtWindow* parent;
 
     Gtk::CheckButton* ckbSndEnable;
     Gtk::Entry* txtSndBatchQueueDone;
@@ -268,8 +268,8 @@ class Preferences final :
 
     void fillPreferences ();
     void storePreferences ();
-    void parseDir       (Glib::ustring dirname, std::vector<Glib::ustring>& items, Glib::ustring ext);
-    void parseThemeDir  (Glib::ustring dirname);
+    void parseDir       (const Glib::ustring& dirname, std::vector<Glib::ustring>& items, const Glib::ustring& ext);
+    void parseThemeDir  (const Glib::ustring& dirname);
     void updateDFinfos ();
     void updateFFinfos ();
     void workflowUpdate();
@@ -281,13 +281,13 @@ class Preferences final :
     void layoutComboChanged ();
     void bundledProfilesChanged ();
     void iccDirChanged ();
-    void switchThemeTo (Glib::ustring newTheme);
+    void switchThemeTo (const Glib::ustring& newTheme);
     void switchFontTo  (const Glib::ustring &newFontFamily, const int newFontSize);
-    bool splashClosed (GdkEventAny* event);
+    bool splashClosed ();
 
     int getThemeRowNumber (const Glib::ustring& name);
 
-    void appendBehavList (Gtk::TreeModel::iterator& parent, Glib::ustring label, int id, bool set);
+    void appendBehavList (Gtk::TreeModel::iterator& parent, const Glib::ustring& label, int id, bool set);
 
     Gtk::ScrolledWindow *swGeneral;
     Gtk::ScrolledWindow *swImageProcessing;
@@ -310,7 +310,7 @@ class Preferences final :
     Gtk::Widget *getSoundsPanel();
 
 public:
-    explicit Preferences (RTWindow *rtwindow);
+    explicit Preferences (RtWindow *rtwindow);
     ~Preferences () override;
 
     void savePressed ();

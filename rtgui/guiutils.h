@@ -46,7 +46,7 @@ struct CropParams;
 }
 
 class Adjuster;
-class RTImage;
+class RtImage;
 class ToolPanel;
 
 Glib::ustring escapeHtmlChars(const Glib::ustring &src);
@@ -63,6 +63,13 @@ void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
                const rtengine::procparams::CropParams& cparams,
                bool drawGuide = true, bool useBgColor = true, bool fullImageVisible = true);
 gboolean acquireGUI(void* data);
+
+enum class Pack {
+    SHRINK,
+    EXPAND_WIDGET
+};
+void pack_start(Gtk::Box* box, Gtk::Widget& child, Pack pack = Pack::EXPAND_WIDGET, int padding = 0);
+void pack_end(Gtk::Box* box, Gtk::Widget& child, Pack pack = Pack::EXPAND_WIDGET, int padding = 0);
 void setExpandAlignProperties(Gtk::Widget *widget, bool hExpand, bool vExpand, enum Gtk::Align hAlign, enum Gtk::Align vAlign);
 Gtk::Border getPadding(const Glib::RefPtr<Gtk::StyleContext> style);
 
