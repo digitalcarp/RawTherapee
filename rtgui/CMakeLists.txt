@@ -54,7 +54,7 @@ set(NONCLISOURCEFILES
     # dirpyrdenoise.cc
     # dirpyrequalizer.cc
     # distortion.cc
-    # dynamicprofilepanel.cc
+    dynamicprofilepanel.cc
     # editbuffer.cc
     editcallbacks.cc
     # editorpanel.cc
@@ -65,7 +65,7 @@ set(NONCLISOURCEFILES
     # exiffiltersettings.cc
     # exifpanel.cc
     # exportpanel.cc
-    # externaleditorpreferences.cc
+    externaleditorpreferences.cc
     extprog.cc
     # fattaltonemap.cc
     # filebrowser.cc
@@ -140,7 +140,7 @@ set(NONCLISOURCEFILES
     # retinex.cc
     # rgbcurves.cc
     # rotate.cc
-    # rtappchooserdialog.cc
+    rtappchooserdialog.cc
     rtimage.cc
     rtscalable.cc
     rtwindow.cc

@@ -21,16 +21,15 @@
 #include <giomm/contenttype.h>
 #include <glibmm/shell.h>
 #include <gtkmm/filechooserdialog.h>
-#include <gtkmm/stock.h>
 
 #include "externaleditorpreferences.h"
 #include "multilangmgr.h"
 
 
 ExternalEditorPreferences::ExternalEditorPreferences():
-    Box(Gtk::Orientation::ORIENTATION_VERTICAL),
+    Box(Gtk::Orientation::VERTICAL),
     list_model(Gtk::ListStore::create(model_columns)),
-    toolbar(Gtk::Orientation::ORIENTATION_HORIZONTAL)
+    toolbar(Gtk::Orientation::HORIZONTAL)
 {
     // List view.
     list_view = Gtk::manage(new Gtk::TreeView());
@@ -42,16 +41,16 @@ ExternalEditorPreferences::ExternalEditorPreferences():
     list_view->append_column(*Gtk::manage(makeCommandColumn()));
 
     for (auto &&column : list_view->get_columns()) {
-        column->set_sizing(Gtk::TreeViewColumnSizing::TREE_VIEW_COLUMN_FIXED);
+        column->set_sizing(Gtk::TreeViewColumn::Sizing::FIXED);
     }
 
-    list_view->set_grid_lines(Gtk::TREE_VIEW_GRID_LINES_VERTICAL);
+    list_view->set_grid_lines(Gtk::TreeView::GridLines::VERTICAL);
     list_view->set_reorderable();
 
     // List scroll area.
     list_scroll_area.set_hexpand();
     list_scroll_area.set_vexpand();
-    list_scroll_area.add(*list_view);
+    list_scroll_area.set_child(*list_view);
 
     // Toolbar buttons.
     button_add = Gtk::manage(new Gtk::Button());
@@ -67,14 +66,14 @@ ExternalEditorPreferences::ExternalEditorPreferences():
     button_file_chooser = Gtk::manage(new Gtk::Button(M("PREFERENCES_EXTERNALEDITOR_CHANGE_FILE")));
 
     if (button_app_chooser) {
-        button_app_chooser->signal_pressed().connect(sigc::mem_fun(
+        button_app_chooser->signal_clicked().connect(sigc::mem_fun(
                     *this, &ExternalEditorPreferences::openAppChooserDialog));
     }
-    button_add->signal_pressed().connect(sigc::mem_fun(
+    button_add->signal_clicked().connect(sigc::mem_fun(
             *this, &ExternalEditorPreferences::addEditor));
-    button_file_chooser->signal_pressed().connect(sigc::mem_fun(
+    button_file_chooser->signal_clicked().connect(sigc::mem_fun(
         *this, &ExternalEditorPreferences::openFileChooserDialog));
-    button_remove->signal_pressed().connect(sigc::mem_fun(
+    button_remove->signal_clicked().connect(sigc::mem_fun(
             *this, &ExternalEditorPreferences::removeSelectedEditors));
 
     list_view->get_selection()->signal_changed().connect(sigc::mem_fun(
@@ -82,18 +81,17 @@ ExternalEditorPreferences::ExternalEditorPreferences():
     updateToolbarSensitivity();
 
     // Toolbar.
-    toolbar.set_halign(Gtk::Align::ALIGN_END);
+    toolbar.set_halign(Gtk::Align::END);
     if (button_app_chooser) {
-        toolbar.add(*button_app_chooser);
+        toolbar.append(*button_app_chooser);
     }
-    toolbar.add(*button_file_chooser);
-    toolbar.add(*button_add);
-    toolbar.add(*button_remove);
+    toolbar.append(*button_file_chooser);
+    toolbar.append(*button_add);
+    toolbar.append(*button_remove);
 
     // This widget's children.
-    add(list_scroll_area);
-    add(toolbar);
-    show_all();
+    append(list_scroll_area);
+    append(toolbar);
 }
 
 std::vector<ExternalEditorPreferences::EditorInfo>
@@ -154,20 +152,25 @@ void ExternalEditorPreferences::setEditors(
 
 void ExternalEditorPreferences::addEditor()
 {
-    Gtk::TreeModel::Row row;
+    Gtk::TreeIter<Gtk::TreeConstRow> iter;
+    Gtk::TreeRow row;
     auto selected = list_view->get_selection()->get_selected_rows();
 
     if (selected.size()) {
-        row = *list_model->insert_after(list_model->get_iter(selected.back()));
+        auto res = list_model->insert_after(list_model->get_iter(selected.back()));
+        row = *res;
+        iter = res;
     } else {
-        row = *list_model->append();
+        auto res = list_model->append();
+        row = *res;
+        iter = res;
     }
 
     row[model_columns.name] = "-";
 #ifdef __APPLE__
     row[model_columns.native_command] = true;
 #endif
-    list_view->get_selection()->select(row);
+    list_view->get_selection()->select(iter);
 }
 
 Gtk::TreeViewColumn *ExternalEditorPreferences::makeAppColumn()
@@ -263,9 +266,9 @@ void ExternalEditorPreferences::onFileChooserDialogResponse(
 #endif
                 row[model_columns.command] =
 #ifdef _WIN32
-                    '"' + dialog->get_filename() + '"';
+                    '"' + dialog->get_file()->get_path() + '"';
 #else
-                    Glib::shell_quote(dialog->get_filename());
+                    Glib::shell_quote(dialog->get_file()->get_path());
 #endif
             }
 
@@ -310,13 +313,12 @@ void ExternalEditorPreferences::openFileChooserDialog()
 
     const auto exe_filter = Gtk::FileFilter::create();
     exe_filter->set_name(M("FILECHOOSER_FILTER_EXECUTABLE"));
-    exe_filter->add_custom(Gtk::FILE_FILTER_MIME_TYPE, [](const Gtk::FileFilter::Info &info) {
 #ifdef _WIN32
-        return info.mime_type == "application/x-msdownload";
+    exe_filter->add_mime_type("application/x-msdownload");
 #else
-        return Gio::content_type_can_be_executable(info.mime_type);
+    // TODO: How do you do this in GTK4?
+    // exe_filter->add_mime_type(Gio::content_type_can_be_executable(info.mime_type));
 #endif
-    });
     const auto all_filter = Gtk::FileFilter::create();
     all_filter->set_name(M("FILECHOOSER_FILTER_ANY"));
     all_filter->add_pattern("*");

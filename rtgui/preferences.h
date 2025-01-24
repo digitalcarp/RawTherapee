@@ -302,7 +302,7 @@ class Preferences final :
 
     Gtk::Widget *getGeneralPanel();
     Gtk::Widget *getImageProcessingPanel();
-    Gtk::Widget *getFavoritesPanel();
+//     Gtk::Widget *getFavoritesPanel();
     Gtk::Widget *getDynamicProfilePanel();
     Gtk::Widget *getFileBrowserPanel();
     Gtk::Widget *getColorManPanel();

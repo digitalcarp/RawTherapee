@@ -18,11 +18,15 @@
  */
 
 #include "dynamicprofilepanel.h"
+
+#include "guiutils.h"
 #include "multilangmgr.h"
+
 #include "rtengine/profilestore.h"
 #include "rtengine/rtengine.h"
 #include "rtengine/dynamicprofile.h"
 #include "rtengine/settings.h"
+
 #include <sstream>
 #include <iomanip>
 
@@ -240,7 +244,7 @@ DynamicProfilePanel::DynamicProfilePanel():
     
     append (vbox_);
 
-    treeview_.set_grid_lines (Gtk::TREE_VIEW_GRID_LINES_VERTICAL);
+    treeview_.set_grid_lines (Gtk::TreeView::GridLines::VERTICAL);
     scrolledwindow_.set_child (treeview_);
     scrolledwindow_.set_vexpand();
 
@@ -418,7 +422,7 @@ DynamicProfileRule DynamicProfilePanel::to_rule (Gtk::TreeModel::Row row,
 
 
 void DynamicProfilePanel::render_profilepath (
-    Gtk::CellRenderer *cell, const Gtk::TreeModel::iterator &iter)
+    Gtk::CellRenderer *cell, const Gtk::TreeModel::const_iterator &iter)
 {
     auto row = *iter;
     Gtk::CellRendererText *ct = static_cast<Gtk::CellRendererText *> (cell);
@@ -460,14 +464,14 @@ Glib::ustring to_str (V n, int precision = 1)
 } // namespace
 
 void DynamicProfilePanel::render_iso (
-    Gtk::CellRenderer *cell, const Gtk::TreeModel::iterator &iter)
+    Gtk::CellRenderer *cell, const Gtk::TreeModel::const_iterator &iter)
 {
     RENDER_RANGE_ (int, iso, to_str);
 }
 
 
 void DynamicProfilePanel::render_fnumber (
-    Gtk::CellRenderer *cell, const Gtk::TreeModel::iterator &iter)
+    Gtk::CellRenderer *cell, const Gtk::TreeModel::const_iterator &iter)
 {
     RENDER_RANGE_ (double, fnumber,
     [] (double f) {
@@ -478,14 +482,14 @@ void DynamicProfilePanel::render_fnumber (
 
 
 void DynamicProfilePanel::render_focallen (
-    Gtk::CellRenderer *cell, const Gtk::TreeModel::iterator &iter)
+    Gtk::CellRenderer *cell, const Gtk::TreeModel::const_iterator &iter)
 {
     RENDER_RANGE_ (double, focallen, to_str);
 }
 
 
 void DynamicProfilePanel::render_shutterspeed (
-    Gtk::CellRenderer *cell, const Gtk::TreeModel::iterator &iter)
+    Gtk::CellRenderer *cell, const Gtk::TreeModel::const_iterator &iter)
 {
     RENDER_RANGE_ (double, shutterspeed,
                    rtengine::FramesMetaData::shutterToString);
@@ -493,7 +497,7 @@ void DynamicProfilePanel::render_shutterspeed (
 
 
 void DynamicProfilePanel::render_expcomp (
-    Gtk::CellRenderer *cell, const Gtk::TreeModel::iterator &iter)
+    Gtk::CellRenderer *cell, const Gtk::TreeModel::const_iterator &iter)
 {
     RENDER_RANGE_ (double, expcomp, to_str);
 }
@@ -511,26 +515,26 @@ void DynamicProfilePanel::render_expcomp (
     }
 
 void DynamicProfilePanel::render_camera (
-    Gtk::CellRenderer *cell, const Gtk::TreeModel::iterator &iter)
+    Gtk::CellRenderer *cell, const Gtk::TreeModel::const_iterator &iter)
 {
     RENDER_OPTIONAL_ (camera);
 }
 
 
 void DynamicProfilePanel::render_lens (
-    Gtk::CellRenderer *cell, const Gtk::TreeModel::iterator &iter)
+    Gtk::CellRenderer *cell, const Gtk::TreeModel::const_iterator &iter)
 {
     RENDER_OPTIONAL_ (lens);
 }
 
 void DynamicProfilePanel::render_path (
-    Gtk::CellRenderer *cell, const Gtk::TreeModel::iterator &iter)
+    Gtk::CellRenderer *cell, const Gtk::TreeModel::const_iterator &iter)
 {
     RENDER_OPTIONAL_ (path);
 }
 
 void DynamicProfilePanel::render_imagetype (
-    Gtk::CellRenderer *cell, const Gtk::TreeModel::iterator &iter)
+    Gtk::CellRenderer *cell, const Gtk::TreeModel::const_iterator &iter)
 {
     auto row = *iter;
     Gtk::CellRendererText *ct = static_cast<Gtk::CellRendererText *>(cell);
@@ -595,14 +599,15 @@ void DynamicProfilePanel::on_button_delete()
 void DynamicProfilePanel::on_button_new()
 {
     EditDialog d (M ("DYNPROFILEEDITOR_NEW_RULE"),
-                  static_cast<Gtk::Window &> (*get_toplevel()));
+                  *getToplevelWindow(this));
     d.set_modal(true);
-    int status = d.present();
-
-    if (status == 1) {
-        DynamicProfileRule rule = d.get_rule();
-        add_rule (rule);
-    }
+    d.signal_response().connect([&](int response) {
+        if (response == 1) {
+            DynamicProfileRule rule = d.get_rule();
+            add_rule(rule);
+        }
+    });
+    d.present();
 }
 
 
@@ -614,16 +619,16 @@ void DynamicProfilePanel::on_button_edit()
         return;
     }
 
-    EditDialog d (M ("DYNPROFILEEDITOR_EDIT_RULE"),
-                  static_cast<Gtk::Window &> (*get_toplevel()));
+    EditDialog d (M ("DYNPROFILEEDITOR_EDIT_RULE"), *getToplevelWindow(this));
     Gtk::TreeModel::Row row = * (s->get_selected());
     d.set_rule (to_rule (row));
     d.set_modal(true);
-    int status = d.present();
-
-    if (status == 1) {
-        update_rule (row, d.get_rule());
-    }
+    d.signal_response().connect([&](int response) {
+        if (response == 1) {
+            update_rule (row, d.get_rule());
+        }
+    });
+    d.present();
 }
 
 

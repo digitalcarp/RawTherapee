@@ -136,7 +136,7 @@ Preferences::Preferences(RtWindow *rtwindow)
 
     nb->append_page(*getGeneralPanel(), M("PREFERENCES_TAB_GENERAL"));
     nb->append_page(*getImageProcessingPanel(), M("PREFERENCES_TAB_IMPROC"));
-    nb->append_page(*getFavoritesPanel(), M("PREFERENCES_TAB_FAVORITES"));
+    // nb->append_page(*getFavoritesPanel(), M("PREFERENCES_TAB_FAVORITES"));
     nb->append_page(*getDynamicProfilePanel(), M("PREFERENCES_TAB_DYNAMICPROFILE"));
     nb->append_page(*getFileBrowserPanel(), M("PREFERENCES_TAB_BROWSER"));
     nb->append_page(*getColorManPanel(), M("PREFERENCES_TAB_COLORMGR"));
@@ -543,18 +543,19 @@ void Preferences::behSetRadioToggled(const Glib::ustring& path)
     behAddSetRadioToggled(path, false);
 }
 
-Gtk::Widget *Preferences::getFavoritesPanel()
-{
-    if (!toolLocationPreference) {
-        toolLocationPreference = Gtk::manage(new ToolLocationPreference(moptions));
-    }
-    if (!swFavorites) {
-        swFavorites = Gtk::manage(new Gtk::ScrolledWindow());
-        swFavorites->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::NEVER);
-        swFavorites->set_child(*toolLocationPreference);
-    }
-    return swFavorites;
-}
+// TODO: Re-enable after all tool panels are buildable
+// Gtk::Widget *Preferences::getFavoritesPanel()
+// {
+//     if (!toolLocationPreference) {
+//         toolLocationPreference = Gtk::manage(new ToolLocationPreference(moptions));
+//     }
+//     if (!swFavorites) {
+//         swFavorites = Gtk::manage(new Gtk::ScrolledWindow());
+//         swFavorites->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::NEVER);
+//         swFavorites->set_child(*toolLocationPreference);
+//     }
+//     return swFavorites;
+// }
 
 Gtk::Widget *Preferences::getDynamicProfilePanel()
 {
@@ -2083,7 +2084,8 @@ void Preferences::storePreferences()
 
     moptions.rtSettings.enableLibRaw = enableLibRaw->get_active();
 
-    toolLocationPreference->updateOptions();
+// TODO
+//     toolLocationPreference->updateOptions();
 
     moptions.rtSettings.metadata_xmp_sync = rtengine::Settings::MetadataXmpSync(metadataSyncCombo->get_active_row_number());
     moptions.rtSettings.xmp_sidecar_style = rtengine::Settings::XmpSidecarStyle(xmpSidecarCombo->get_active_row_number());

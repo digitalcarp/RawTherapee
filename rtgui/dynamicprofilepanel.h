@@ -73,16 +73,16 @@ private:
     };
 
     // cell renderers
-    void render_iso (Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter);
-    void render_fnumber (Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter);
-    void render_focallen (Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter);
-    void render_shutterspeed (Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter);
-    void render_expcomp (Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter);
-    void render_camera (Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter);
-    void render_lens (Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter);
-    void render_path (Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter);
-    void render_imagetype (Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter);
-    void render_profilepath (Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter);
+    void render_iso (Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter);
+    void render_fnumber (Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter);
+    void render_focallen (Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter);
+    void render_shutterspeed (Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter);
+    void render_expcomp (Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter);
+    void render_camera (Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter);
+    void render_lens (Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter);
+    void render_path (Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter);
+    void render_imagetype (Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter);
+    void render_profilepath (Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter);
 
     class EditDialog: public Gtk::Dialog
     {
