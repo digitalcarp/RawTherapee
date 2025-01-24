@@ -23,7 +23,6 @@
 #include <sigc++/signal.h>
 
 // #include "progressconnector.h"
-#include "splash.h"
 
 #include "rtengine/noncopyable.h"
 
@@ -52,7 +51,6 @@ private:
     //
     // sigc::signal<void> externalEditorChangedSignal;
 
-    Splash* splash;
     Gtk::ProgressBar prProgBar;
     // PLDBridge* pldBridge;
     bool is_fullscreen;

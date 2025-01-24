@@ -26,6 +26,7 @@
 #include "preferences.h"
 #include "rtimage.h"
 #include "rtscalable.h"
+#include "splash.h"
 
 #include "rtengine/procparams.h"
 
@@ -49,7 +50,6 @@ Glib::RefPtr<Gtk::CssProvider> cssRT;
 RtWindow::RtWindow ()
     : mainNB (nullptr)
 //     , bpanel (nullptr)
-    , splash (nullptr)
     , btn_fullscreen (nullptr)
     , iFullscreen (nullptr)
     , iFullscreen_exit (nullptr)
@@ -344,18 +344,15 @@ void RtWindow::on_realize ()
         // Update the version parameter with the right value
         options.version = versionString;
 
-        splash = new Splash();
+        auto splash = Gtk::make_managed<Splash>();
         splash->set_transient_for(*this);
-        splash->signal_close_request().connect(sigc::mem_fun(*this, &RtWindow::splashClosed), true);
+        splash->signal_close_request().connect(sigc::mem_fun(*this, &RtWindow::splashClosed), false);
 
         if (splash->hasReleaseNotes()) {
             waitForSplash = true;
             splash->set_modal(true);
             splash->showReleaseNotes();
             splash->present();
-        } else {
-            delete splash;
-            splash = nullptr;
         }
     }
 
@@ -797,8 +794,10 @@ void RtWindow::showICCProfileCreator ()
 
 void RtWindow::showPreferences ()
 {
-    Preferences pref(this);
-    pref.present ();
+    auto pref = Gtk::make_managed<Preferences>(this);
+    pref->set_transient_for(*this);
+    pref->set_modal(true);
+    pref->present ();
 
 //     fpanel->optionsChanged ();
 //
@@ -992,10 +991,8 @@ void RtWindow::updateToolPanelToolLocations(
 
 bool RtWindow::splashClosed()
 {
-    delete splash;
-    splash = nullptr;
     showErrors();
-    return true;
+    return false;
 }
 
 void RtWindow::setWindowSize ()

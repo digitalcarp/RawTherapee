@@ -79,7 +79,6 @@ Glib::RefPtr<Gtk::CssProvider> fontcss;
 Preferences::Preferences(RtWindow *rtwindow)
     : Gtk::Dialog(M("MAIN_BUTTON_PREFERENCES"), *rtwindow, true)
     , regex(Glib::Regex::create (THEMEREGEXSTR, Glib::Regex::CompileFlags::CASELESS))
-    , splash(nullptr)
     , rprofiles(nullptr)
     , iprofiles(nullptr)
     , parent(rtwindow)
@@ -121,18 +120,14 @@ Preferences::Preferences(RtWindow *rtwindow)
     nb->set_name("PrefNotebook");
     pack_start(mainBox, *nb);
 
-    Gtk::Button* about  = Gtk::manage(new Gtk::Button(M("GENERAL_ABOUT")));
     Gtk::Button* ok     = Gtk::manage(new Gtk::Button(M("GENERAL_OK")));
     Gtk::Button* cancel = Gtk::manage(new Gtk::Button(M("GENERAL_CANCEL")));
 
-    about->signal_clicked().connect(sigc::mem_fun(*this, &Preferences::aboutPressed));
     ok->signal_clicked().connect(sigc::mem_fun(*this, &Preferences::okPressed));
     cancel->signal_clicked().connect(sigc::mem_fun(*this, &Preferences::cancelPressed));
 
-    add_action_widget(*about, 2);
     add_action_widget(*ok, 1);
     add_action_widget(*cancel, 0);
-    set_response_sensitive(2, false);
 
     nb->append_page(*getGeneralPanel(), M("PREFERENCES_TAB_GENERAL"));
     nb->append_page(*getImageProcessingPanel(), M("PREFERENCES_TAB_IMPROC"));
@@ -1447,6 +1442,10 @@ Gtk::Widget* Preferences::getGeneralPanel()
     fconn = mainFontFB->signal_font_set().connect ( sigc::mem_fun (*this, &Preferences::fontChanged) );
     cpfconn = colorPickerFontFB->signal_font_set().connect ( sigc::mem_fun (*this, &Preferences::cpFontChanged) );
 
+    Gtk::Button* about  = Gtk::manage(new Gtk::Button(M("GENERAL_ABOUT")));
+    vbGeneral->attach_next_to(*about, *fdg, Gtk::PositionType::BOTTOM);
+    about->signal_clicked().connect(sigc::mem_fun(*this, &Preferences::aboutPressed));
+
     swGeneral->set_child(*vbGeneral);
     return swGeneral;
 }
@@ -2449,9 +2448,8 @@ void Preferences::cancelPressed()
 
 void Preferences::aboutPressed()
 {
-    splash = new Splash();
+    auto splash = Gtk::make_managed<Splash>();
     splash->set_transient_for(*this);
-    splash->signal_close_request().connect(sigc::mem_fun(*this, &Preferences::splashClosed), true);
     splash->show();
 }
 
@@ -2869,13 +2867,6 @@ void Preferences::updateFFinfos()
     rtengine::ffm.getStat(t1, t2);
     Glib::ustring s = Glib::ustring::compose("%1: %2 %3, %4 %5", M("PREFERENCES_FLATFIELDFOUND"), t1, M("PREFERENCES_FLATFIELDSHOTS"), t2, M("PREFERENCES_FLATFIELDTEMPLATES"));
     ffLabel->set_text(s);
-}
-
-bool Preferences::splashClosed()
-{
-    delete splash;
-    splash = nullptr;
-    return true;
 }
 
 void Preferences::behAddSetAllPressed(bool add)

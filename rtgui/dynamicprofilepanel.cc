@@ -598,16 +598,17 @@ void DynamicProfilePanel::on_button_delete()
 
 void DynamicProfilePanel::on_button_new()
 {
-    EditDialog d (M ("DYNPROFILEEDITOR_NEW_RULE"),
-                  *getToplevelWindow(this));
-    d.set_modal(true);
-    d.signal_response().connect([&](int response) {
+    auto d = Gtk::make_managed<EditDialog>(M("DYNPROFILEEDITOR_NEW_RULE"),
+                                           *getToplevelWindow(this));
+    d->set_modal(true);
+    d->signal_response().connect([&, d](int response) {
         if (response == 1) {
-            DynamicProfileRule rule = d.get_rule();
+            DynamicProfileRule rule = d->get_rule();
             add_rule(rule);
         }
+        d->destroy();
     });
-    d.present();
+    d->present();
 }
 
 
@@ -619,16 +620,18 @@ void DynamicProfilePanel::on_button_edit()
         return;
     }
 
-    EditDialog d (M ("DYNPROFILEEDITOR_EDIT_RULE"), *getToplevelWindow(this));
+    auto d = Gtk::make_managed<EditDialog>(M("DYNPROFILEEDITOR_EDIT_RULE"),
+                                           *getToplevelWindow(this));
     Gtk::TreeModel::Row row = * (s->get_selected());
-    d.set_rule (to_rule (row));
-    d.set_modal(true);
-    d.signal_response().connect([&](int response) {
+    d->set_rule (to_rule (row));
+    d->set_modal(true);
+    d->signal_response().connect([&, row, d](int response) {
         if (response == 1) {
-            update_rule (row, d.get_rule());
+            update_rule (row, d->get_rule());
         }
+        d->destroy();
     });
-    d.present();
+    d->present();
 }
 
 

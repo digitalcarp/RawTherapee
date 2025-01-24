@@ -76,7 +76,6 @@ class Preferences final :
     std::vector<Glib::ustring> themeNames;
     Glib::RefPtr<Glib::Regex> regex;
     Glib::MatchInfo matchInfo;
-    Splash* splash;
     ProfileStoreComboBox* rprofiles;
     Gtk::TreeIter<Gtk::TreeRow> currRawRow; // :)
     ProfileStoreComboBox* iprofiles;
@@ -284,7 +283,6 @@ class Preferences final :
     void iccDirChanged ();
     void switchThemeTo (const Glib::ustring& newTheme);
     void switchFontTo  (const Glib::ustring &newFontFamily, const int newFontSize);
-    bool splashClosed ();
 
     int getThemeRowNumber (const Glib::ustring& name);
 

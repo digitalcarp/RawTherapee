@@ -405,11 +405,21 @@ Glib::ustring escapeHtmlChars(const Glib::ustring &src)
 void pack_start(Gtk::Box* box, Gtk::Widget& child, Pack pack, int /*padding*/)
 {
     if (box->get_orientation() == Gtk::Orientation::HORIZONTAL) {
-        child.set_halign(Gtk::Align::START);
-        child.set_hexpand(pack == Pack::EXPAND_WIDGET);
+        if (pack == Pack::EXPAND_WIDGET) {
+            child.set_halign(Gtk::Align::FILL);
+            child.set_hexpand(true);
+        } else {
+            child.set_halign(Gtk::Align::START);
+            child.set_hexpand(false);
+        }
     } else {
-        child.set_valign(Gtk::Align::START);
-        child.set_vexpand(pack == Pack::EXPAND_WIDGET);
+        if (pack == Pack::EXPAND_WIDGET) {
+            child.set_valign(Gtk::Align::FILL);
+            child.set_vexpand(true);
+        } else {
+            child.set_valign(Gtk::Align::START);
+            child.set_vexpand(false);
+        }
     }
     box->append(child);
 }
@@ -429,11 +439,21 @@ void pack_start(Gtk::Box* box, Gtk::Widget& child, bool expand, bool fill, int /
 void pack_end(Gtk::Box* box, Gtk::Widget& child, Pack pack, int /*padding*/)
 {
     if (box->get_orientation() == Gtk::Orientation::HORIZONTAL) {
-        child.set_halign(Gtk::Align::END);
-        child.set_hexpand(pack == Pack::EXPAND_WIDGET);
+        if (pack == Pack::EXPAND_WIDGET) {
+            child.set_halign(Gtk::Align::FILL);
+            child.set_hexpand(true);
+        } else {
+            child.set_halign(Gtk::Align::END);
+            child.set_hexpand(false);
+        }
     } else {
-        child.set_valign(Gtk::Align::END);
-        child.set_vexpand(pack == Pack::EXPAND_WIDGET);
+        if (pack == Pack::EXPAND_WIDGET) {
+            child.set_valign(Gtk::Align::FILL);
+            child.set_vexpand(true);
+        } else {
+            child.set_valign(Gtk::Align::END);
+            child.set_vexpand(false);
+        }
     }
     box->append(child);
 }
@@ -1330,33 +1350,35 @@ std::unique_ptr<Gtk::Image> MyFileChooserWidget::make_folder_image()
 
 void MyFileChooserWidget::show_chooser(Gtk::Widget *parent)
 {
-    Gtk::FileChooserDialog dlg(*getToplevelWindow(parent), pimpl->title_, pimpl->action_);
-    dlg.add_button(M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
-    dlg.add_button(M(pimpl->action_ == Gtk::FileChooser::Action::SAVE ? "GENERAL_SAVE" : "GENERAL_OPEN"), Gtk::ResponseType::OK);
-    dlg.set_file(pimpl->filename_);
+    auto dlg = Gtk::make_managed<Gtk::FileChooserDialog>(
+        *getToplevelWindow(parent), pimpl->title_, pimpl->action_);
+    dlg->add_button(M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
+    dlg->add_button(M(pimpl->action_ == Gtk::FileChooser::Action::SAVE ? "GENERAL_SAVE" : "GENERAL_OPEN"), Gtk::ResponseType::OK);
+    dlg->set_file(pimpl->filename_);
     for (auto &f : pimpl->file_filters_) {
-        dlg.add_filter(f);
+        dlg->add_filter(f);
     }
     if (pimpl->cur_filter_) {
-        dlg.set_filter(pimpl->cur_filter_);
+        dlg->set_filter(pimpl->cur_filter_);
     }
     for (auto &f : pimpl->shortcut_folders_) {
-        dlg.add_shortcut_folder(f);
+        dlg->add_shortcut_folder(f);
     }
     if (!pimpl->current_folder_) {
-        dlg.set_current_folder(pimpl->current_folder_);
+        dlg->set_current_folder(pimpl->current_folder_);
     }
-    // dlg.set_show_hidden(pimpl->show_hidden_);
-    dlg.set_modal(true);
-    dlg.signal_response().connect([&](int res) {
+    // dlg->set_show_hidden(pimpl->show_hidden_);
+    dlg->set_modal(true);
+    dlg->signal_response().connect([&, dlg](int res) {
         if (res == static_cast<int>(Gtk::ResponseType::OK)) {
-            pimpl->filename_ = dlg.get_file();
-            pimpl->current_folder_ = dlg.get_current_folder();
+            pimpl->filename_ = dlg->get_file();
+            pimpl->current_folder_ = dlg->get_current_folder();
             on_filename_set();
             pimpl->selection_changed_.emit();
         }
+        dlg->destroy();
     });
-    dlg.present();
+    dlg->present();
 }
 
 
@@ -1380,7 +1402,7 @@ sigc::signal<void()> &MyFileChooserWidget::signal_file_set()
 
 std::string MyFileChooserWidget::get_filename() const
 {
-    return pimpl->filename_->get_path();
+    return pimpl->filename_ ? pimpl->filename_->get_path() : "";
 }
 
 
