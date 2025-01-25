@@ -149,7 +149,7 @@ IPTCPanel::IPTCPanel():
     Gtk::Label* keyl = Gtk::manage(new Gtk::Label(M("IPTCPANEL_KEYWORDS") + ":"));
     setExpandAlignProperties(keyl, true, false, Gtk::Align::START, Gtk::Align::CENTER);
     keyl->set_tooltip_text(M("IPTCPANEL_KEYWORDSHINT"));
-    keywords = Gtk::manage(new Gtk::ListViewText(1, false, Gtk::SELECTION_MULTIPLE));
+    keywords = Gtk::manage(new Gtk::ListViewText(1, false, Gtk::SelectionMode::MULTIPLE));
     setExpandAlignProperties(keywords, true, false, Gtk::Align::FILL, Gtk::Align::START);
     keywords->set_headers_visible(false);
     keywords->set_size_request(50, 95);
@@ -198,7 +198,7 @@ IPTCPanel::IPTCPanel():
     category->set_tooltip_text(M("IPTCPANEL_CATEGORYHINT"));
     Gtk::Label* scl = Gtk::manage(new Gtk::Label(M("IPTCPANEL_SUPPCATEGORIES") + ":"));
     setExpandAlignProperties(scl, true, false, Gtk::Align::START, Gtk::Align::CENTER);
-    suppCategories = Gtk::manage(new Gtk::ListViewText(1, false, Gtk::SELECTION_MULTIPLE));
+    suppCategories = Gtk::manage(new Gtk::ListViewText(1, false, Gtk::SelectionMode::MULTIPLE));
     setExpandAlignProperties(suppCategories, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     suppCategories->set_headers_visible(false);
     suppCategories->set_size_request(50, 95);
