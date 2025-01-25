@@ -199,11 +199,11 @@ RtWindow::RtWindow ()
         // decorate tab
         Gtk::Grid* fpanelLabelGrid = Gtk::manage (new Gtk::Grid ());
         setExpandAlignProperties (fpanelLabelGrid, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-        Gtk::Label* fpl = Gtk::manage (new Gtk::Label ( Glib::ustring (" ") + M ("MAIN_FRAME_EDITOR") ));
+        RotateLabel* fpl = Gtk::manage (new RotateLabel ( Glib::ustring (" ") + M ("MAIN_FRAME_EDITOR") ));
 
         if (options.mainNBVertical) {
             mainNB->set_tab_pos (Gtk::PositionType::LEFT);
-            // fpl->set_angle (90);
+            fpl->rotate90();
             RtImage* folderIcon = Gtk::manage (new RtImage("folder-closed"));
             fpanelLabelGrid->attach_next_to (*folderIcon, Gtk::PositionType::TOP, 1, 1);
             fpanelLabelGrid->attach_next_to (*fpl, Gtk::PositionType::TOP, 1, 1);
@@ -221,9 +221,9 @@ RtWindow::RtWindow ()
 //         bpanel = Gtk::manage ( new BatchQueuePanel (fpanel->fileCatalog) );
 
         // decorate tab, the label is unimportant since its updated in batchqueuepanel anyway
-        Gtk::Label* lbq = Gtk::manage ( new Gtk::Label (M ("MAIN_FRAME_QUEUE")) );
+        RotateLabel* lbq = Gtk::manage ( new RotateLabel (M ("MAIN_FRAME_QUEUE")) );
         if (options.mainNBVertical) {
-            // lbq->set_angle (90);
+            lbq->rotate90();
         }
         // mainNB->append_page (*bpanel, *lbq);
         mainNB->append_page (*Gtk::manage(new Gtk::Box()), *lbq);

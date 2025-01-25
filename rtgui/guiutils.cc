@@ -2186,3 +2186,70 @@ void ImageLabelButton::set_image(Gtk::Image& image)
 //         &button));
 //     onButtonToggled(&button);
 // }
+
+RotateLabel::RotateLabel() : m_rotate90(false)
+{
+    m_label.set_parent(*this);
+}
+
+RotateLabel::RotateLabel(const Glib::ustring& text) : m_label(text), m_rotate90(false)
+{
+    m_label.set_parent(*this);
+}
+
+void RotateLabel::rotate90(bool val)
+{
+    m_rotate90 = val;
+    queue_allocate();
+}
+
+void RotateLabel::size_allocate_vfunc(int width, int height, int baseline)
+{
+    if (m_rotate90) {
+        Gtk::Allocation alloc(0, 0, height, width);
+        m_label.size_allocate(alloc, -1);
+    } else {
+        Gtk::Allocation alloc(0, 0, width, height);
+        m_label.size_allocate(alloc, -1);
+    }
+}
+
+Gtk::SizeRequestMode RotateLabel::get_request_mode_vfunc() const
+{
+    return m_rotate90 ?
+        Gtk::SizeRequestMode::WIDTH_FOR_HEIGHT :
+        Gtk::SizeRequestMode::HEIGHT_FOR_WIDTH;
+}
+
+void RotateLabel::measure_vfunc(Gtk::Orientation orientation, int for_size,
+                                int& minimum, int& natural,
+                                int& minimum_baseline, int& natural_baseline) const
+{
+    auto rotated_orient = orientation;
+    if (m_rotate90) {
+        if (rotated_orient == Gtk::Orientation::HORIZONTAL) {
+            rotated_orient = Gtk::Orientation::VERTICAL;
+        } else {
+            rotated_orient = Gtk::Orientation::HORIZONTAL;
+        }
+    }
+
+    int dummy1 = 0;
+    int dummy2 = 0;
+    m_label.measure(rotated_orient, for_size, minimum, natural,
+                    dummy1, dummy2);
+
+    minimum_baseline = -1;
+    natural_baseline = -1;
+}
+
+void RotateLabel::snapshot_vfunc(const Glib::RefPtr<Gtk::Snapshot>& snapshot)
+{
+    if (m_rotate90) {
+        std::optional<Gdk::Graphene::Rect> bounds = compute_bounds(*this);
+        double h = bounds->get_height();
+        snapshot->translate(Gdk::Graphene::Point(0.0, h));
+        snapshot->rotate(-90);
+    }
+    snapshot_child(m_label, snapshot);
+}
