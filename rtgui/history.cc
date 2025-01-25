@@ -47,16 +47,16 @@ History::History (bool bookmarkSupport) : historyVPaned (nullptr), blistener (nu
 
     Gtk::Frame* histFrame = Gtk::manage (new Gtk::Frame (M ("HISTORY_LABEL")));
     histFrame->set_name ("HistoryPanel");
-    histFrame->add (*hscrollw);
+    histFrame->set_child (*hscrollw);
 
     hTreeView = Gtk::manage (new Gtk::TreeView ());
-    hscrollw->add (*hTreeView);
+    hscrollw->set_child (*hTreeView);
 
     historyModel = Gtk::ListStore::create (historyColumns);
     hTreeView->set_model (historyModel);
     hTreeView->set_headers_visible (false);
-    hTreeView->set_hscroll_policy (Gtk::SCROLL_MINIMUM);
-    hTreeView->set_vscroll_policy (Gtk::SCROLL_NATURAL);
+    hTreeView->set_hscroll_policy (Gtk::Scrollable::Policy::MINIMUM);
+    hTreeView->set_vscroll_policy (Gtk::Scrollable::Policy::NATURAL);
     hTreeView->set_size_request (80, -1);
 
     Gtk::CellRendererText *changecrt = Gtk::manage (new Gtk::CellRendererText());
@@ -70,7 +70,7 @@ History::History (bool bookmarkSupport) : historyVPaned (nullptr), blistener (nu
     hviewcol->set_resizable (true);
     hviewcol->set_fixed_width (35);
     hviewcol->set_min_width (35);
-    hviewcol->set_sizing (Gtk::TREE_VIEW_COLUMN_AUTOSIZE);
+    hviewcol->set_sizing (Gtk::TreeViewColumn::Sizing::AUTOSIZE);
 
     Gtk::TreeView::Column *hviewcol2 = Gtk::manage (new Gtk::TreeView::Column (""));
     hviewcol2->pack_start (*valuecrt, true);
@@ -79,11 +79,11 @@ History::History (bool bookmarkSupport) : historyVPaned (nullptr), blistener (nu
     hviewcol2->set_resizable (true);
     hviewcol2->set_fixed_width (35);
     hviewcol2->set_min_width (35);
-    hviewcol2->set_sizing (Gtk::TREE_VIEW_COLUMN_AUTOSIZE);
+    hviewcol2->set_sizing (Gtk::TreeViewColumn::Sizing::AUTOSIZE);
     valuecrt->set_alignment (1.f, 0.f);
 
     hTreeView->set_has_tooltip (true);
-    hTreeView->signal_query_tooltip().connect ( sigc::mem_fun (*this, &History::on_query_tooltip) );
+    hTreeView->signal_query_tooltip().connect ( sigc::mem_fun (*this, &History::on_query_tooltip), false );
     hTreeView->append_column (*hviewcol);
     hTreeView->append_column (*hviewcol2);
 
@@ -98,17 +98,17 @@ History::History (bool bookmarkSupport) : historyVPaned (nullptr), blistener (nu
     //addBookmark->get_style_context()->set_junction_sides(Gtk::JUNCTION_RIGHT);
     addBookmark->get_style_context()->add_class ("Left");
     addBookmark->set_tooltip_markup (M ("HISTORY_NEWSNAPSHOT_TOOLTIP"));
-    Gtk::Image* addimg = Gtk::manage (new RTImage ("add-small", Gtk::ICON_SIZE_BUTTON));
-    addBookmark->set_image (*addimg);
-    ahbox->pack_start (*addBookmark);
+    Gtk::Image* addimg = Gtk::manage (new RtImage ("add-small"));
+    addBookmark->set_child (*addimg);
+    pack_start(ahbox, *addBookmark);
 
     delBookmark = Gtk::manage (new Gtk::Button ());  // M("HISTORY_DELSNAPSHOT")
     setExpandAlignProperties (delBookmark, true, false, Gtk::Align::FILL, Gtk::Align::START);
     //delBookmark->get_style_context()->set_junction_sides(Gtk::JUNCTION_LEFT);
     delBookmark->get_style_context()->add_class ("Right");
-    Gtk::Image* delimg = Gtk::manage (new RTImage ("remove-small", Gtk::ICON_SIZE_BUTTON));
-    delBookmark->set_image (*delimg);
-    ahbox->pack_start (*delBookmark);
+    Gtk::Image* delimg = Gtk::manage (new RtImage ("remove-small"));
+    delBookmark->set_child (*delimg);
+    pack_start(ahbox, *delBookmark);
 
     bscrollw = Gtk::manage (new Gtk::ScrolledWindow ());
 //    bscrollw->set_policy (Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
@@ -118,23 +118,27 @@ History::History (bool bookmarkSupport) : historyVPaned (nullptr), blistener (nu
     Gtk::Frame* bmFrame = Gtk::manage (new Gtk::Frame (M ("HISTORY_SNAPSHOTS")));
     bmFrame->set_name ("Snapshots");
     Gtk::Box* bmBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
-    bmFrame->add (*bmBox);
-    bmBox->pack_start (*bscrollw, Pack::EXPAND_WIDGET, 4);
-    bmBox->pack_end (*ahbox, Pack::SHRINK, 4);
+    bmFrame->set_child (*bmBox);
+    pack_start(bmBox, *bscrollw, Pack::EXPAND_WIDGET, 4);
+    pack_start(bmBox, *ahbox, Pack::SHRINK, 4);
     bmBox->set_size_request (-1, 60);
 
     if (bookmarkSupport) {
         historyVPaned = Gtk::manage ( new Gtk::Paned (Gtk::Orientation::VERTICAL) );
-        historyVPaned->pack1 (*histFrame, true, false);
-        historyVPaned->pack2 (*bmFrame, false, false);
-        pack_start (*historyVPaned);
+        historyVPaned->set_start_child (*histFrame);
+        historyVPaned->set_resize_start_child(true);
+        historyVPaned->set_shrink_start_child(false);
+        historyVPaned->set_end_child (*bmFrame);
+        historyVPaned->set_resize_end_child(false);
+        historyVPaned->set_shrink_end_child(false);
+        pack_start (this, *historyVPaned);
     } else {
-        pack_start (*histFrame);
+        pack_start (this, *histFrame);
     }
 
 
     bTreeView = Gtk::manage (new Gtk::TreeView ());
-    bscrollw->add (*bTreeView);
+    bscrollw->set_child (*bTreeView);
 
     bookmarkModel = Gtk::ListStore::create (bookmarkColumns);
     bTreeView->set_model (bookmarkModel);
@@ -146,14 +150,11 @@ History::History (bool bookmarkSupport) : historyVPaned (nullptr), blistener (nu
     addBookmark->signal_clicked().connect ( sigc::mem_fun (*this, &History::addBookmarkPressed) );
     delBookmark->signal_clicked().connect ( sigc::mem_fun (*this, &History::delBookmarkPressed) );
 
-    //hTreeView->set_grid_lines (Gtk::TREE_VIEW_GRID_LINES_HORIZONTAL);
-    hTreeView->set_grid_lines (Gtk::TREE_VIEW_GRID_LINES_BOTH);
+    hTreeView->set_grid_lines (Gtk::TreeView::GridLines::BOTH);
     //hTreeView->signal_size_allocate().connect( sigc::mem_fun(*this, &History::resized) );
 
     hTreeView->set_enable_search (false);
     bTreeView->set_enable_search (false);
-
-    show_all_children ();
 }
 
 void History::initHistory ()
@@ -171,7 +172,7 @@ void History::historySelectionChanged ()
     Gtk::TreeModel::iterator iter = selection->get_selected();
 
     if (iter) {
-        Gtk::TreeModel::Row row = *iter;
+        Gtk::TreeRow row = *iter;
 
         if (row) {
             bTreeView->get_selection()->unselect_all ();
@@ -206,7 +207,7 @@ void History::bookmarkSelectionChanged ()
     Gtk::TreeModel::iterator iter = selection->get_selected();
 
     if (iter) {
-        Gtk::TreeModel::Row row = *iter;
+        Gtk::TreeRow row = *iter;
 
         if (row) {
             hTreeView->get_selection()->unselect_all ();
@@ -258,7 +259,7 @@ void History::procParamsChanged(
 
     // lookup the last remaining item in the list
     const int size = historyModel->children().size();
-    Gtk::TreeModel::Row row;
+    Gtk::TreeRow row;
 
     if (size > 0) {
         row = historyModel->children()[size - 1];
@@ -267,7 +268,8 @@ void History::procParamsChanged(
     // if there is no last item or its chev!=ev, create a new one
     if (size == 0 || !row || row[historyColumns.chev] != ev || ev == EvProfileChanged
             || ev == EvLocallabSpotCreated || ev == EvLocallabSpotDeleted) { // Special cases: If Locallab spot is created , deleted or duplicated several times in a row, a new history row is used
-        Gtk::TreeModel::Row newrow = * (historyModel->append());
+        auto newIter = historyModel->append();
+        Gtk::TreeRow newrow = *newIter;
         newrow[historyColumns.text] = ProcEventMapper::getInstance()->getHistoryMsg(ev);
         newrow[historyColumns.value] = g_markup_escape_text (descr.c_str(), -1);
         newrow[historyColumns.chev] = ev;
@@ -275,7 +277,7 @@ void History::procParamsChanged(
         newrow[historyColumns.paramsEdited] = paramsEdited ? *paramsEdited : defParamsEdited;
 
         if (ev != EvBookmarkSelected) {
-            selection->select(newrow);
+            selection->select(newIter);
         }
 
         if (blistener && row && !blistenerLock) {
@@ -289,7 +291,7 @@ void History::procParamsChanged(
         row[historyColumns.paramsEdited] = paramsEdited ? *paramsEdited : defParamsEdited;
 
         if (ev != EvBookmarkSelected) {
-            selection->select(row);
+            selection->select(row.get_iter());
         }
     }
 
@@ -312,20 +314,20 @@ void History::clearParamChanges ()
     initHistory ();
 }
 
-void History::addBookmarkWithText (Glib::ustring text)
+void History::addBookmarkWithText (const Glib::ustring& text)
 {
 
     // lookup the selected item in the history
     Glib::RefPtr<Gtk::TreeSelection> selection = hTreeView->get_selection();
     Gtk::TreeModel::iterator iter = selection->get_selected();
-    Gtk::TreeModel::Row row = *iter;
+    Gtk::TreeRow row = *iter;
 
     if (!row) {
         return;
     }
 
     // append new row to bookmarks
-    Gtk::TreeModel::Row newrow = * (bookmarkModel->append());
+    Gtk::TreeRow newrow = * (bookmarkModel->append());
     newrow[bookmarkColumns.text] = text;
     ProcParams params = row[historyColumns.params];
     newrow[bookmarkColumns.params] = params;
@@ -356,8 +358,8 @@ void History::delBookmarkPressed ()
     bookmarkModel->erase (iter);
     // select last item in history
     int size = historyModel->children().size ();
-    Gtk::TreeModel::Row row = historyModel->children()[size - 1];
-    hTreeView->get_selection()->select (row);
+    Gtk::TreeRow row = historyModel->children()[size - 1];
+    hTreeView->get_selection()->select (row.get_iter());
 }
 
 void History::undo ()
@@ -372,7 +374,7 @@ void History::undo ()
         int size = historyModel->children().size ();
 
         if (size > 1) {
-            selection->select (historyModel->children().operator [] (size - 2));
+            selection->select (historyModel->children().operator [] (size - 2).get_iter());
         }
     }
 }
@@ -393,7 +395,7 @@ void History::redo ()
         int size = historyModel->children().size ();
 
         if (size > 1) {
-            selection->select (historyModel->children().operator [] (size - 2));
+            selection->select (historyModel->children().operator [] (size - 2).get_iter());
         }
     }
 }
@@ -413,7 +415,7 @@ bool History::getBeforeLineParams (rtengine::procparams::ProcParams& params)
         return false;
     }
 
-    Gtk::TreeModel::Row row;
+    Gtk::TreeRow row;
     row = historyModel->children()[size == 1 ? 0 : size - 2];
     params = row[historyColumns.params];
     return true;
@@ -453,8 +455,8 @@ bool History::on_query_tooltip (int x, int y, bool keyboard_tooltip, const Glib:
                 right->set_justify(Gtk::JUSTIFY_LEFT);
                 Gtk::Box *hbox = Gtk::manage (new Gtk::Box());
                 hbox->set_spacing(5);
-                hbox->pack_start(*left, Pack::SHRINK, 0);
-                hbox->pack_start(*right, Pack::SHRINK, 0);
+                pack_start(hbox, *left, Pack::SHRINK, 0);
+                pack_start(hbox, *right, Pack::SHRINK, 0);
                 tooltip->set_custom(*hbox);
                 */
 

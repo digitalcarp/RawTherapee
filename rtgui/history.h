@@ -121,7 +121,7 @@ public:
 
     bool getBeforeLineParams (rtengine::procparams::ProcParams& params);
 
-    void addBookmarkWithText (Glib::ustring text);
+    void addBookmarkWithText (const Glib::ustring& text);
     void addBookmarkPressed ();
     void delBookmarkPressed ();
 
