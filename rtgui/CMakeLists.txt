@@ -11,7 +11,7 @@ set(CLISOURCEFILES
 )
 
 set(NONCLISOURCEFILES
-    # adjuster.cc
+    adjuster.cc
     # alignedmalloc.cc
     # aspectratios.cc
     # batchqueue.cc
@@ -85,7 +85,7 @@ set(NONCLISOURCEFILES
     # histogrampanel.cc
     # history.cc
     # hsvequalizer.cc
-    # iccprofilecreator.cc
+    iccprofilecreator.cc
     # icmpanel.cc
     # imagearea.cc
     # imageareapanel.cc

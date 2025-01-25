@@ -94,17 +94,16 @@ Adjuster::Adjuster(
 
     reset = Gtk::manage(new Gtk::Button());
 
-    reset->add(*Gtk::manage(new RTImage("undo-small", Gtk::ICON_SIZE_BUTTON)));
+    reset->set_child(*Gtk::manage(new RtImage("undo-small")));
     setExpandAlignProperties(reset, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-    reset->set_relief(Gtk::RELIEF_NONE);
+    reset->set_has_frame(false);
     reset->set_tooltip_markup(M("ADJUSTER_RESET_TO_DEFAULT"));
-    reset->get_style_context()->add_class(GTK_STYLE_CLASS_FLAT);
     reset->set_can_focus(false);
 
     spin = Gtk::manage(new MySpinButton());
 
     setExpandAlignProperties(spin, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-    spin->set_input_purpose(Gtk::INPUT_PURPOSE_DIGITS);
+    spin->set_numeric();
 
     reset->set_size_request(-1, RTScalable::scalePixelSize(spin->get_height() > MIN_RESET_BUTTON_HEIGHT ? spin->get_height() : MIN_RESET_BUTTON_HEIGHT));
     slider = Gtk::manage(new MyHScale());
@@ -176,9 +175,11 @@ Adjuster::Adjuster(
             spinChange.unblock();
         }
     );
-    reset->signal_button_release_event().connect_notify( sigc::mem_fun(*this, &Adjuster::resetPressed) );
 
-    show_all();
+    resetClickController = Gtk::GestureClick::create();
+    resetClickController->signal_released().connect(
+        sigc::mem_fun(*this, &Adjuster::resetPressed), false);
+    reset->add_controller(resetClickController);
 }
 
 Adjuster::~Adjuster ()
@@ -194,7 +195,7 @@ void Adjuster::addAutoButton (const Glib::ustring &tooltip)
 {
     if (!automatic) {
         automatic = Gtk::manage(new Gtk::CheckButton());
-        //automatic->add (*Gtk::manage (new RTImage ("gears")));
+        //automatic->add (*Gtk::manage (new RtImage ("gears")));
         automatic->set_tooltip_markup(tooltip.length() ? Glib::ustring::compose("<b>%1</b>\n\n%2", M("GENERAL_AUTO"), tooltip) : M("GENERAL_AUTO"));
         setExpandAlignProperties(automatic, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
         autoChange = automatic->signal_toggled().connect( sigc::mem_fun(*this, &Adjuster::autoToggled) );
@@ -214,11 +215,17 @@ void Adjuster::throwOnButtonRelease(bool throwOnBRelease)
 
     if (throwOnBRelease) {
         if (!buttonReleaseSlider.connected()) {
-            buttonReleaseSlider = slider->signal_button_release_event().connect_notify( sigc::mem_fun(*this, &Adjuster::sliderReleased) );
+            auto controller = Gtk::GestureClick::create();
+            buttonReleaseSlider = controller->signal_released().connect(
+                sigc::mem_fun(*this, &Adjuster::sliderReleased), false);
+            slider->add_controller(controller);
         }
 
         if (!buttonReleaseSpin.connected()) {
-            buttonReleaseSpin = spin->signal_button_release_event().connect_notify( sigc::mem_fun(*this, &Adjuster::spinReleased) );    // Use the same callback hook
+            auto controller = Gtk::GestureClick::create();
+            buttonReleaseSpin = controller->signal_released().connect(
+                sigc::mem_fun(*this, &Adjuster::spinReleased), false);
+            spin->add_controller(controller);
         }
     } else {
         if (buttonReleaseSlider.connected()) {
@@ -251,24 +258,16 @@ void Adjuster::autoToggled ()
     }
 }
 
-void Adjuster::sliderReleased (GdkEventButton* event)
+void Adjuster::sliderReleased (int /*n_press*/, double /*x*/, double /*y*/)
 {
-
-    if ((event != nullptr) && (event->button == 1)) {
-        sliderChange.cancel();
-
-        notifyListener();
-    }
+    sliderChange.cancel();
+    notifyListener();
 }
 
-void Adjuster::spinReleased (GdkEventButton* event)
+void Adjuster::spinReleased (int /*n_press*/, double /*x*/, double /*y*/)
 {
-
-    if (event) {
-        spinChange.cancel();
-
-        notifyListener();
-    }
+    spinChange.cancel();
+    notifyListener();
 }
 
 void Adjuster::resetValue (bool toInitial)
@@ -300,10 +299,10 @@ void Adjuster::resetValue (bool toInitial)
 }
 
 // Please note that it won't change the "Auto" CheckBox's state, if there
-void Adjuster::resetPressed (GdkEventButton* event)
+void Adjuster::resetPressed (int /*n_press*/, double /*x*/, double /*y*/)
 {
-
-    if ((event != nullptr) && (event->state & GDK_CONTROL_MASK) && (event->button == 1)) {
+    auto state = resetClickController->get_current_event_state();
+    if ((state & Gdk::ModifierType::CONTROL_MASK) != Gdk::ModifierType::NO_MODIFIER_MASK) {
         resetValue(true);
     } else {
         resetValue(false);
@@ -690,10 +689,8 @@ void Adjuster::showIcons(bool yes)
 {
     if (imageIcon1) {
         imageIcon1->set_visible(yes);
-        imageIcon1->set_no_show_all(!yes);
     }
     if (imageIcon2) {
         imageIcon2->set_visible(yes);
-        imageIcon2->set_no_show_all(!yes);
     }
 }

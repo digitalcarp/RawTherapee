@@ -20,7 +20,7 @@
 #include "rtwindow.h"
 
 #include "guiutils.h"
-// #include "iccprofilecreator.h"
+#include "iccprofilecreator.h"
 #include "multilangmgr.h"
 #include "options.h"
 #include "preferences.h"
@@ -790,9 +790,11 @@ void RtWindow::showRawPedia()
 
 void RtWindow::showICCProfileCreator ()
 {
-//     ICCProfileCreator iccpc(this);
-//     iccpc.present ();
-//
+    auto iccpc = Gtk::make_managed<ICCProfileCreator>(this);
+    iccpc->set_transient_for(*this);
+    iccpc->set_modal(true);
+    iccpc->present ();
+
 //     fpanel->optionsChanged ();
 //
 //     if (epanel) {

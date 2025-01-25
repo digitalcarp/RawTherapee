@@ -158,7 +158,7 @@ public:
     {
     }
 
-    void connect(Glib::SignalProxy<void, Ts...> signal, const sigc::slot<void, Ts...>& slot, const sigc::slot<void, Ts...>& immediate_slot = {})
+    void connect(Glib::SignalProxy<void(), Ts...> signal, const sigc::slot<void(), Ts...>& slot, const sigc::slot<void(), Ts...>& immediate_slot = {})
     {
         this->slot = slot;
         this->immediate_slot = immediate_slot;
@@ -233,8 +233,8 @@ private:
     sigc::connection min_timeout;
     sigc::connection max_timeout;
 
-    sigc::slot<void, Ts...> slot;
-    sigc::slot<void, Ts...> immediate_slot;
+    sigc::slot<void(), Ts...> slot;
+    sigc::slot<void(), Ts...> immediate_slot;
 
     std::tuple<Ts...> params;
 };

@@ -54,8 +54,7 @@ Glib::ustring escapeHtmlChars(const Glib::ustring &src);
 bool removeIfThere(Gtk::Box* box, Gtk::Widget* w, bool increference = true);
 bool removeIfThere(Gtk::Grid* grid, Gtk::Widget* w, bool increference = true);
 
-// bool confirmOverwrite (Gtk::Window& parent, const std::string& filename);
-void writeFailed (Gtk::Window& parent, const std::string& filename);
+bool confirmOverwrite (Gtk::Window& parent, const std::string& filename);
 void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
                double imx, double imy, double imw, double imh,
                double clipWidth, double clipHeight,
@@ -363,19 +362,19 @@ public:
     void updateSize();
 };
 
-// /**
-//  * @brief subclass of Gtk::Scale in order to handle the scrollwheel
-//  */
-// class MyHScale final : public Gtk::Scale
-// {
-//     Glib::RefPtr<Gtk::EventControllerScroll> m_controller;
-//
-//     bool onScroll(double dx, double dy);
-//     bool onKeyPress(guint keyval, guint keycode, Gdk::ModifierType state);
-//
-// public:
-//     MyHScale();
-// };
+/**
+ * @brief subclass of Gtk::Scale in order to handle the scrollwheel
+ */
+class MyHScale final : public Gtk::Scale
+{
+    Glib::RefPtr<Gtk::EventControllerScroll> m_controller;
+
+    bool onScroll(double dx, double dy);
+    bool onKeyPress(guint keyval, guint keycode, Gdk::ModifierType state);
+
+public:
+    MyHScale();
+};
 
 class ImageLabelButton : public Gtk::Button
 {
@@ -480,16 +479,16 @@ private:
 template <class FileChooser>
 void bindCurrentFolder (FileChooser& chooser, Glib::ustring& variable)
 {
-    chooser.signal_selection_changed ().connect ([&]()
+    chooser->signal_selection_changed ().connect ([&]()
     {
         const auto current_folder = chooser.get_current_folder ();
 
-        if (!current_folder.empty ())
+        if (current_folder)
             variable = current_folder;
     });
 
     if (!variable.empty ())
-        chooser.set_current_folder (variable);
+        chooser->set_current_folder (Gio::File::create_for_path(variable));
 }
 
 typedef enum RTUpdatePolicy {

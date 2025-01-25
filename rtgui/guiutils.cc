@@ -496,19 +496,25 @@ bool removeIfThere(Gtk::Grid* grid, Gtk::Widget* w, bool increference)
     return removeIfThere(grid, w, increference, [&]() { grid->remove(*w); });
 }
 
-// bool confirmOverwrite (Gtk::Window& parent, const std::string& filename)
-// {
-//     bool safe = true;
-//
-//     if (Glib::file_test (filename, Glib::FileTest::EXISTS)) {
-//         Glib::ustring msg_ = Glib::ustring ("<b>\"") + escapeHtmlChars(Glib::path_get_basename (filename)) + "\": "
-//                              + M("MAIN_MSG_ALREADYEXISTS") + "</b>\n" + M("MAIN_MSG_QOVERWRITE");
-//         Gtk::MessageDialog msgd (parent, msg_, true, Gtk::MessageType::WARNING, Gtk::ButtonsType::YES_NO, true);
-//         safe = (msgd.run () == Gtk::ResponseType::YES);
-//     }
-//
-//     return safe;
-// }
+// TODO(gtk4): Make this and callers async safe
+bool confirmOverwrite (Gtk::Window& parent, const std::string& filename)
+{
+    bool safe = true;
+
+    if (Glib::file_test (filename, Glib::FileTest::EXISTS)) {
+        Glib::ustring msg_ = Glib::ustring ("<b>\"") + escapeHtmlChars(Glib::path_get_basename (filename)) + "\": "
+                             + M("MAIN_MSG_ALREADYEXISTS") + "</b>\n" + M("MAIN_MSG_QOVERWRITE");
+        auto msgd = Gtk::make_managed<RtMessageDialog>(
+            msg_,
+            RtMessageDialog::Type::WARNING,
+            RtMessageDialog::ButtonSet::YES_NO);
+        // TODO(gtk4)
+        // safe = (msgd.run () == Gtk::ResponseType::YES);
+        msgd->show();
+    }
+
+    return safe;
+}
 
 void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
                double imx, double imy, double imw, double imh,
@@ -1279,41 +1285,45 @@ bool MySpinButton::onScroll(double /*dx*/, double /*dy*/)
     return false;
 }
 
-// MyHScale::MyHScale()
-// {
-//     auto keyPress = Gtk::EventControllerKey::create();
-//     keyPress->signal_key_pressed().connect(
-//         sigc::mem_fun(*this, &MyHScale::onKeyPress), false);
-//     add_controller(keyPress);
-//
-//     m_controller = Gtk::EventControllerScroll::create();
-//     using Flags = Gtk::EventControllerScroll::Flags;
-//     m_controller->set_flags(Flags::VERTICAL);
-//     m_controller->signal_scroll().connect(
-//         sigc::mem_fun(*this, &MyHScale::onScroll), false);
-//     add_controller(m_controller);
-// }
-//
-// bool MyHScale::onScroll(double /*dx*/, double /*dy*/)
-// {
-//     // If Shift is pressed, the widget is modified
-//     if (m_controller->get_current_event_state() & GDK_SHIFT_MASK) {
-//         Gtk::Scale::on_scroll_event(event);
-//         return true;
-//     }
-//
-//     // ... otherwise the scroll event is sent back to an upper level
-//     return false;
-// }
-//
-// bool MyHScale::onKeyPress(guint keyval, guint /*keycode*/, Gdk::ModifierType /*state*/)
-// {
-//     if (keyval == GDK_KEY_plus || keyval == GDK_KEY_minus) {
-//         return false;
-//     } else {
-//         return Gtk::Widget::on_key_press_event(event);
-//     }
-// }
+MyHScale::MyHScale()
+{
+    auto keyPress = Gtk::EventControllerKey::create();
+    keyPress->signal_key_pressed().connect(
+        sigc::mem_fun(*this, &MyHScale::onKeyPress), false);
+    add_controller(keyPress);
+
+    m_controller = Gtk::EventControllerScroll::create();
+    using Flags = Gtk::EventControllerScroll::Flags;
+    m_controller->set_flags(Flags::VERTICAL);
+    m_controller->signal_scroll().connect(
+        sigc::mem_fun(*this, &MyHScale::onScroll), false);
+    add_controller(m_controller);
+}
+
+bool MyHScale::onScroll(double /*dx*/, double /*dy*/)
+{
+    // If Shift is pressed, the widget is modified
+    auto state = m_controller->get_current_event_state() & Gdk::ModifierType::SHIFT_MASK;
+    if (state != Gdk::ModifierType::NO_MODIFIER_MASK) {
+        // TODO(gtk4): What is the equivalent in GTK4?
+        // Gtk::Scale::on_scroll_event(event);
+        return true;
+    }
+
+    // ... otherwise the scroll event is sent back to an upper level
+    return false;
+}
+
+bool MyHScale::onKeyPress(guint keyval, guint /*keycode*/, Gdk::ModifierType /*state*/)
+{
+    if (keyval == GDK_KEY_plus || keyval == GDK_KEY_minus) {
+        return false;
+    } else {
+        // TODO(gtk4)
+        // return Gtk::Widget::on_key_press_event(event);
+        return false;
+    }
+}
 
 class MyFileChooserWidget::Impl
 {

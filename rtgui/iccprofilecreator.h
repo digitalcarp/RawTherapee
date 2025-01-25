@@ -25,7 +25,7 @@
 #include "adjuster.h"
 #include <vector>
 
-class RTWindow;
+class RtWindow;
 
 class ICCProfileCreator final : public Gtk::Dialog, public AdjusterListener
 {
@@ -57,9 +57,23 @@ private:
     Glib::ustring illuminant;
     Glib::ustring description;
     Glib::ustring copyright;
+
+    struct SaveInfo {
+        cmsHPROFILE profile_v2_except;
+        cmsHPROFILE newProfile;
+        Glib::ustring profileDesc;
+        Glib::ustring sGammaSlopeParam;
+        Glib::ustring sGammaSlopeDesc;
+        bool isD65 = false;
+        bool isD60 = false;
+        bool isD50 = false;
+    };
+    std::optional<SaveInfo> saveInfo;
+    Glib::RefPtr<Gtk::FileDialog> dialog;
+
     //-------------------------------------------------------
 
-    RTWindow *parent;
+    RtWindow *parent;
 
     Adjuster* aGamma;
     Adjuster* aSlope;
@@ -100,9 +114,10 @@ private:
     Glib::ustring getGammaPresetName(const Glib::ustring &preset);
     void getGamma(const Glib::ustring &preset, double &gamma, double &slope);
     void savePressed();
+    void onSaveFileResponse(Glib::RefPtr<Gio::AsyncResult>& result);
     void closePressed();
     void onResetCopyright();
 
 public:
-    explicit ICCProfileCreator (RTWindow *rtwindow);
+    explicit ICCProfileCreator (RtWindow *rtwindow);
 };

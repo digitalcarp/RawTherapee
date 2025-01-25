@@ -51,7 +51,7 @@ cmsToneCurve *make_trc(size_t size, float (*trcFunc)(float, bool))
 }
 ///
 
-ICCProfileCreator::ICCProfileCreator(RTWindow *rtwindow)
+ICCProfileCreator::ICCProfileCreator(RtWindow *rtwindow)
     : Gtk::Dialog(M("MAIN_BUTTON_ICCPROFCREATOR"), *rtwindow, true)
     , primariesPreset(options.ICCPC_primariesPreset)
     , redPrimaryX(options.ICCPC_redPrimaryX)
@@ -221,18 +221,17 @@ ICCProfileCreator::ICCProfileCreator(RTWindow *rtwindow)
     setExpandAlignProperties(eCopyright, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     copygrid->attach(*eCopyright, 0, 0, 1, 1);
     resetCopyright = Gtk::manage(new Gtk::Button());
-    resetCopyright->add(*Gtk::manage(new RTImage("undo-small", Gtk::ICON_SIZE_BUTTON)));
+    resetCopyright->set_child(*Gtk::manage(new RtImage("undo-small")));
     setExpandAlignProperties(resetCopyright, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-    resetCopyright->set_relief(Gtk::RELIEF_NONE);
+    resetCopyright->set_has_frame(false);
     resetCopyright->set_tooltip_markup(M("ICCPROFCREATOR_COPYRIGHT_RESET_TOOLTIP"));
-    resetCopyright->get_style_context()->add_class(GTK_STYLE_CLASS_FLAT);
     resetCopyright->set_can_focus(false);
     copygrid->attach(*resetCopyright, 1, 0, 1, 1);
     mainGrid->attach(*copygrid, 1, 9, 1, 1);
 
     //--------------------------------- Adding the mainGrid
 
-    get_content_area()->add(*mainGrid);
+    get_content_area()->append(*mainGrid);
 
     //--------------------------------- Setting default values for Adjusters
 
@@ -326,15 +325,11 @@ ICCProfileCreator::ICCProfileCreator(RTWindow *rtwindow)
 
     Gtk::Button* save = Gtk::manage(new Gtk::Button(M("GENERAL_SAVE_AS")));
     save->signal_clicked().connect(sigc::mem_fun(*this, &ICCProfileCreator::savePressed));
-    get_action_area()->pack_start(*save);
+    add_action_widget(*save, 0);
 
     Gtk::Button* close = Gtk::manage(new Gtk::Button(M("GENERAL_CLOSE")));
     close->signal_clicked().connect(sigc::mem_fun(*this, &ICCProfileCreator::closePressed));
-    get_action_area()->pack_start(*close);
-
-    //--------------- Show children
-
-    show_all_children();
+    add_action_widget(*close, 1);
 
     //--------------- Connecting the signals
 
@@ -945,52 +940,59 @@ void ICCProfileCreator::savePressed()
     sGammaSlopeParam = Glib::ustring::compose("g%1s%2!", sGamma, sSlope);
     sGammaSlopeDesc = Glib::ustring::compose("g=%1 s=%2", sGamma, sSlope);
 
+    saveInfo = SaveInfo{};
+    saveInfo->profile_v2_except = profile_v2_except;
+    saveInfo->newProfile = newProfile;
+    saveInfo->profileDesc = std::move(profileDesc);
+    saveInfo->sGammaSlopeParam = std::move(sGammaSlopeParam);
+    saveInfo->sGammaSlopeDesc = std::move(sGammaSlopeDesc);
+    saveInfo->isD65 = isD65;
+    saveInfo->isD60 = isD60;
+    saveInfo->isD50 = isD50;
+
     // -------------------------------------------- Asking the file name
 
-    Gtk::FileChooserDialog dialog(getToplevelWindow(this), M("ICCPROFCREATOR_SAVEDIALOG_TITLE"), Gtk::FileChooser::Action::SAVE);
-    bindCurrentFolder(dialog, options.lastICCProfCreatorDir);
-    dialog.set_current_name(fName);
-    //dialog.set_current_folder(lastPath);
-
-    dialog.add_button(M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
-    dialog.add_button(M("GENERAL_SAVE"), Gtk::ResponseType::OK);
+    dialog = Gtk::FileDialog::create();
+    dialog->set_title(M("ICCPROFCREATOR_SAVEDIALOG_TITLE"));
+    dialog->set_modal();
+    dialog->set_initial_name(fName);
+    if (!options.lastICCProfCreatorDir.empty()) {
+        dialog->set_initial_folder(Gio::File::create_for_path(options.lastICCProfCreatorDir));
+    }
 
     Glib::RefPtr<Gtk::FileFilter> filter_icc = Gtk::FileFilter::create();
     filter_icc->set_name(M("FILECHOOSER_FILTER_COLPROF"));
     filter_icc->add_pattern("*.icc");
-    dialog.add_filter(filter_icc);
 
-    /*
-    Glib::RefPtr<Gtk::FileFilter> filter_any = Gtk::FileFilter::create();
-    filter_any->set_name(M("FILECHOOSER_FILTER_ANY"));
-    filter_any->add_pattern("*");
-    dialog.add_filter(filter_any);
-    */
+    auto filters = Gio::ListStore<Gtk::FileFilter>::create();
+    filters->append(filter_icc);
 
-    dialog.show_all_children();
-    //dialog.set_do_overwrite_confirmation (true);
+    dialog->set_filters(filters);
+    dialog->set_default_filter(filter_icc);
 
-    Glib::ustring absoluteFName;
+    dialog->set_accept_label(M("GENERAL_SAVE"));
+    dialog->save(*this, sigc::mem_fun(*this, &ICCProfileCreator::onSaveFileResponse));
+}
 
-    do {
-        int result = dialog.run();
+void ICCProfileCreator::onSaveFileResponse(Glib::RefPtr<Gio::AsyncResult>& result)
+{
+    Glib::RefPtr<Gio::File> file = dialog->save_finish(result);
+    if (!file) {
+        saveInfo = std::nullopt;
+        return;
+    }
 
-        if (result != Gtk::ResponseType::OK) {
-            return;
-        } else {
-            absoluteFName = dialog.get_filename();
-            Glib::ustring ext = getExtension(absoluteFName);
+    if (!saveInfo) {
+        std::cerr << "Missing saveInfo\n";
+        return;
+    }
 
-            if (ext != "icc") {
-                absoluteFName += ".icc";
-            }
+    auto folder = file->get_parent();
+    if (folder) {
+        options.lastICCProfCreatorDir = folder->get_path();
+    }
 
-            if (confirmOverwrite(dialog, absoluteFName)) {
-                //lastPath = Glib::path_get_dirname(absoluteFName);
-                break;
-            }
-        }
-    } while (1);
+    std::string absoluteFName = file->get_path();
 
     // --------------- main tags ------------------
     /*
@@ -1016,9 +1018,9 @@ void ICCProfileCreator::savePressed()
     };
 
     if (v2except) {
-        cmsSetDeviceClass(profile_v2_except, cmsSigDisplayClass);
-        cmsSetPCS(profile_v2_except, cmsSigXYZData);
-        cmsSetHeaderRenderingIntent(profile_v2_except, 0);
+        cmsSetDeviceClass(saveInfo->profile_v2_except, cmsSigDisplayClass);
+        cmsSetPCS(saveInfo->profile_v2_except, cmsSigXYZData);
+        cmsSetHeaderRenderingIntent(saveInfo->profile_v2_except, 0);
     }
 
 
@@ -1086,7 +1088,7 @@ void ICCProfileCreator::savePressed()
                     XYZ = {Wx, 1.0, Wz};//white D60
                 }
 
-                if (isD50) {
+                if (saveInfo->isD50) {
                     Wx = 0.964295676;
                     Wz = 0.825104603;
                     XYZ = {Wx, 1.0, Wz};//white D50 room (prophoto) near LCMS values but not perfect...it's a compromise!!
@@ -1128,8 +1130,8 @@ void ICCProfileCreator::savePressed()
                 blackpoint  =  {0., 0., 0.};
             }
 
-            cmsWriteTag(profile_v2_except, cmsSigMediaBlackPointTag, &blackpoint);
-            cmsWriteTag(profile_v2_except, cmsSigMediaWhitePointTag, &XYZ);
+            cmsWriteTag(saveInfo->profile_v2_except, cmsSigMediaBlackPointTag, &blackpoint);
+            cmsWriteTag(saveInfo->profile_v2_except, cmsSigMediaWhitePointTag, &XYZ);
             cmsCIEXYZ rt;
             cmsCIEXYZ bt;
             cmsCIEXYZ gt;
@@ -1284,11 +1286,11 @@ void ICCProfileCreator::savePressed()
 
             //write tags
             rt =  {mat_xyz_brad[0][0], mat_xyz_brad[0][1], mat_xyz_brad[0][2]};
-            cmsWriteTag(profile_v2_except, cmsSigRedColorantTag, &rt);
+            cmsWriteTag(saveInfo->profile_v2_except, cmsSigRedColorantTag, &rt);
             gt =  {mat_xyz_brad[1][0], mat_xyz_brad[1][1], mat_xyz_brad[1][2]};
-            cmsWriteTag(profile_v2_except, cmsSigGreenColorantTag, &gt);
+            cmsWriteTag(saveInfo->profile_v2_except, cmsSigGreenColorantTag, &gt);
             bt =  {mat_xyz_brad[2][0], mat_xyz_brad[2][1], mat_xyz_brad[2][2]};
-            cmsWriteTag(profile_v2_except, cmsSigBlueColorantTag, &bt);
+            cmsWriteTag(saveInfo->profile_v2_except, cmsSigBlueColorantTag, &bt);
 
 
         } else {
@@ -1297,15 +1299,15 @@ void ICCProfileCreator::savePressed()
     }
 
 
-    if (isD65 && illuminant == "DEF") {
+    if (saveInfo->isD65 && illuminant == "DEF") {
         xyD = {0.312700492, 0.329000939, 1.0};
     }
 
-    if (isD60 && illuminant == "DEF") {
+    if (saveInfo->isD60 && illuminant == "DEF") {
         xyD = {0.32168, 0.33767, 1.0};
     }
 
-    if (isD50 && illuminant == "DEF") {
+    if (saveInfo->isD50 && illuminant == "DEF") {
         xyD = {0.3457, 0.3585, 1.0};
     }
 
@@ -1333,23 +1335,23 @@ void ICCProfileCreator::savePressed()
 
 
     if (profileVersion == "v4") {
-        newProfile = cmsCreateRGBProfile(&xyD, &Primaries, GammaTRC);
+        saveInfo->newProfile = cmsCreateRGBProfile(&xyD, &Primaries, GammaTRC);
     } else if (profileVersion == "v2") {
         if (v2except) {
-            cmsSetProfileVersion(profile_v2_except, 2.2);
+            cmsSetProfileVersion(saveInfo->profile_v2_except, 2.2);
         } else {
-            cmsSetProfileVersion(newProfile, 2.2);
+            cmsSetProfileVersion(saveInfo->newProfile, 2.2);
         }
     }
 
     if (!v2except) {
-        cmsWriteTag(newProfile, cmsSigRedTRCTag, GammaTRC[0]);
-        cmsWriteTag(newProfile, cmsSigGreenTRCTag, GammaTRC[1]);
-        cmsWriteTag(newProfile, cmsSigBlueTRCTag, GammaTRC[2]);
+        cmsWriteTag(saveInfo->newProfile, cmsSigRedTRCTag, GammaTRC[0]);
+        cmsWriteTag(saveInfo->newProfile, cmsSigGreenTRCTag, GammaTRC[1]);
+        cmsWriteTag(saveInfo->newProfile, cmsSigBlueTRCTag, GammaTRC[2]);
     } else {
-        cmsWriteTag(profile_v2_except, cmsSigRedTRCTag, GammaTRC[0]);
-        cmsWriteTag(profile_v2_except, cmsSigGreenTRCTag, GammaTRC[1]);
-        cmsWriteTag(profile_v2_except, cmsSigBlueTRCTag, GammaTRC[2]);
+        cmsWriteTag(saveInfo->profile_v2_except, cmsSigRedTRCTag, GammaTRC[0]);
+        cmsWriteTag(saveInfo->profile_v2_except, cmsSigGreenTRCTag, GammaTRC[1]);
+        cmsWriteTag(saveInfo->profile_v2_except, cmsSigBlueTRCTag, GammaTRC[2]);
     }
 
     // --------------- set dmnd tag ------------------
@@ -1359,9 +1361,9 @@ void ICCProfileCreator::savePressed()
     cmsMLUsetASCII(dmnd, "en", "US", "RawTherapee");
 
     if (!v2except) {
-        cmsWriteTag(newProfile, cmsSigDeviceMfgDescTag, dmnd);
+        cmsWriteTag(saveInfo->newProfile, cmsSigDeviceMfgDescTag, dmnd);
     } else {
-        cmsWriteTag(profile_v2_except, cmsSigDeviceMfgDescTag, dmnd);
+        cmsWriteTag(saveInfo->profile_v2_except, cmsSigDeviceMfgDescTag, dmnd);
     }
 
     cmsMLUfree(dmnd);
@@ -1373,20 +1375,20 @@ void ICCProfileCreator::savePressed()
     if (profileVersion == "v2") {
         //write in tag 'dmdd' values of current gamma and slope to retrieve after in Output profile
         std::wostringstream wGammaSlopeParam;
-        wGammaSlopeParam << sGammaSlopeParam;
+        wGammaSlopeParam << saveInfo->sGammaSlopeParam;
 
         cmsMLU *dmdd = cmsMLUalloc(nullptr, 1);
 
         // Language code (2 letters code) : https://www.iso.org/obp/ui/
         // Country code (2 letters code)  : http://www.loc.gov/standards/iso639-2/php/code_list.php
-        if (sGammaSlopeParam.is_ascii()) {
-            if (cmsMLUsetASCII(dmdd, "en", "US", sGammaSlopeParam.c_str())) {
+        if (saveInfo->sGammaSlopeParam.is_ascii()) {
+            if (cmsMLUsetASCII(dmdd, "en", "US", saveInfo->sGammaSlopeParam.c_str())) {
                 if (!v2except) {
-                    if (!cmsWriteTag(newProfile, cmsSigProfileDescriptionTag, dmdd)) {
+                    if (!cmsWriteTag(saveInfo->newProfile, cmsSigProfileDescriptionTag, dmdd)) {
                         printf("Error: Can't write cmsSigProfileDescriptionTag!\n");
                     }
                 } else {
-                    if (!cmsWriteTag(profile_v2_except, cmsSigDeviceModelDescTag, dmdd)) {
+                    if (!cmsWriteTag(saveInfo->profile_v2_except, cmsSigDeviceModelDescTag, dmdd)) {
                         printf("Error: Can't write cmsSigProfileDescriptionTag!\n");
                     }
 
@@ -1394,16 +1396,16 @@ void ICCProfileCreator::savePressed()
             }
         } else if (cmsMLUsetWide(dmdd, "en", "US", wGammaSlopeParam.str().c_str())) {
             if (!v2except) {
-                if (!cmsWriteTag(newProfile, cmsSigDeviceModelDescTag, dmdd)) {
+                if (!cmsWriteTag(saveInfo->newProfile, cmsSigDeviceModelDescTag, dmdd)) {
                     printf("Error: Can't write cmsSigDeviceModelDescTag!\n");
                 }
             } else {
-                if (!cmsWriteTag(profile_v2_except, cmsSigDeviceModelDescTag, dmdd)) {
+                if (!cmsWriteTag(saveInfo->profile_v2_except, cmsSigDeviceModelDescTag, dmdd)) {
                     printf("Error: Can't write cmsSigDeviceModelDescTag!\n");
                 }
             }
         } else {
-            printf("Error: cmsMLUsetWide failed for dmdd \"%s\" !\n", sGammaSlopeParam.c_str());
+            printf("Error: cmsMLUsetWide failed for dmdd \"%s\" !\n", saveInfo->sGammaSlopeParam.c_str());
         }
 
         cmsMLUfree(dmdd);
@@ -1415,15 +1417,15 @@ void ICCProfileCreator::savePressed()
 
     if (!description.empty()) {
         if (cAppendParamsToDesc->get_active()) {
-            sDescription = description + " / " + sGammaSlopeDesc;
+            sDescription = description + " / " + saveInfo->sGammaSlopeDesc;
         } else {
             sDescription = description;
         }
     } else {
         if (cAppendParamsToDesc->get_active()) {
-            sDescription = profileDesc + " / " + sGammaSlopeDesc;
+            sDescription = saveInfo->profileDesc + " / " + saveInfo->sGammaSlopeDesc;
         } else {
-            sDescription = profileDesc;
+            sDescription = saveInfo->profileDesc;
         }
     }
 
@@ -1438,11 +1440,11 @@ void ICCProfileCreator::savePressed()
     if (sDescription.is_ascii()) {
         if (cmsMLUsetASCII(descMLU, "en", "US", sDescription.c_str())) {
             if (!v2except) {
-                if (!cmsWriteTag(newProfile, cmsSigProfileDescriptionTag, descMLU)) {
+                if (!cmsWriteTag(saveInfo->newProfile, cmsSigProfileDescriptionTag, descMLU)) {
                     printf("Error: Can't write cmsSigProfileDescriptionTag!\n");
                 }
             } else {
-                if (!cmsWriteTag(profile_v2_except, cmsSigProfileDescriptionTag, descMLU)) {
+                if (!cmsWriteTag(saveInfo->profile_v2_except, cmsSigProfileDescriptionTag, descMLU)) {
                     printf("Error: Can't write cmsSigProfileDescriptionTag!\n");
                 }
             }
@@ -1451,11 +1453,11 @@ void ICCProfileCreator::savePressed()
     } else if (cmsMLUsetWide(descMLU, "en", "US", wDescription.str().c_str())) {
         if (!v2except) {
 
-            if (!cmsWriteTag(newProfile, cmsSigProfileDescriptionTag, descMLU)) {
+            if (!cmsWriteTag(saveInfo->newProfile, cmsSigProfileDescriptionTag, descMLU)) {
                 printf("Error: Can't write cmsSigProfileDescriptionTag!\n");
             }
         } else {
-            if (!cmsWriteTag(profile_v2_except, cmsSigProfileDescriptionTag, descMLU)) {
+            if (!cmsWriteTag(saveInfo->profile_v2_except, cmsSigProfileDescriptionTag, descMLU)) {
                 printf("Error: Can't write cmsSigProfileDescriptionTag!\n");
             }
         }
@@ -1475,11 +1477,11 @@ void ICCProfileCreator::savePressed()
     if (cmsMLUsetWide(copyMLU, "en", "US", wCopyright.str().c_str())) {
         if (!v2except) {
 
-            if (!cmsWriteTag(newProfile, cmsSigCopyrightTag, copyMLU)) {
+            if (!cmsWriteTag(saveInfo->newProfile, cmsSigCopyrightTag, copyMLU)) {
                 printf("Error: Can't write cmsSigCopyrightTag!\n");
             }
         } else {
-            if (!cmsWriteTag(profile_v2_except, cmsSigCopyrightTag, copyMLU)) {
+            if (!cmsWriteTag(saveInfo->profile_v2_except, cmsSigCopyrightTag, copyMLU)) {
                 printf("Error: Can't write cmsSigCopyrightTag!\n");
             }
 
@@ -1498,11 +1500,12 @@ void ICCProfileCreator::savePressed()
         printf("rx=%f gx=%f bx=%f ry=%f gy=%f by=%f rz=%f gz=%f bz=%f\n", redT->X, greenT->X, blueT->X, redT->Y, greenT->Y, blueT->Y, redT->Z, greenT->Z, blueT->Z);
     */
     if (!v2except) {
-        cmsSaveProfileToFile(newProfile,  absoluteFName.c_str());
+        cmsSaveProfileToFile(saveInfo->newProfile,  absoluteFName.c_str());
     } else {
-        cmsSaveProfileToFile(profile_v2_except,  absoluteFName.c_str());
+        cmsSaveProfileToFile(saveInfo->profile_v2_except,  absoluteFName.c_str());
 
     }
 
     cmsFreeToneCurve(GammaTRC[0]);
+    saveInfo = std::nullopt;
 }

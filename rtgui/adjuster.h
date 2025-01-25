@@ -45,6 +45,7 @@ protected:
     MyHScale* slider;
     MySpinButton* spin;
     Gtk::Button* reset;
+    Glib::RefPtr<Gtk::GestureClick> resetClickController;
     Gtk::CheckButton* automatic;
     AdjusterListener* adjusterListener;
     DelayedConnection<> spinChange;
@@ -124,10 +125,10 @@ public:
     void spinChanged ();
     void sliderChanged ();
     bool notifyListener ();
-    void sliderReleased (GdkEventButton* event);
-    void spinReleased (GdkEventButton* event);
+    void sliderReleased (int n_press, double x, double y);
+    void spinReleased (int n_press, double x, double y);
     void resetValue (bool toInitial);
-    void resetPressed (GdkEventButton* event);
+    void resetPressed (int n_press, double x, double y);
     void editedToggled ();
     void trimValue (double &val) const;
     void trimValue (float &val) const;
