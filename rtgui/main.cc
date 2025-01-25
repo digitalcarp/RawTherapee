@@ -27,6 +27,7 @@
 #include "extprog.h"
 #include "multilangmgr.h"
 #include "options.h"
+#include "rtmessagedialog.h"
 #include "rtwindow.h"
 #include "pathutils.h"
 #include "version.h"
@@ -193,7 +194,7 @@ void cleanup_rt()
     rtengine::cleanup();
 }
 
-RtWindow *create_rt_window()
+std::unique_ptr<RtWindow> create_rt_window()
 {
     Glib::ustring icon_path = Glib::build_filename (argv0, "icons");
 
@@ -201,30 +202,30 @@ RtWindow *create_rt_window()
     auto theme = Gtk::IconTheme::get_for_display(display);
     theme->add_search_path(icon_path);
 
-    RtWindow *rtWindow = new RtWindow();
-    rtWindow->setWindowSize(); // Need to be called after RTWindow creation to work with all OS Windows Manager
-    return rtWindow;
+    auto window = std::make_unique<RtWindow>();
+    window->setWindowSize(); // Need to be called after RTWindow creation to work with all OS Windows Manager
+    return window;
 }
 
 class RtApplication final : public Gtk::Application
 {
 public:
-    static Glib::RefPtr<RtApplication> create();
+    static Glib::RefPtr<RtApplication> create(const Glib::ustring& fatal_error);
 
-    RtApplication() :
+    RtApplication(const Glib::ustring& fatal_error) :
         Gtk::Application("com.rawtherapee.application", Gio::Application::Flags::HANDLES_OPEN),
-        m_window(nullptr)
+        m_fatal_error(fatal_error),
+        m_window(nullptr),
+        m_return_code(0)
     {
     }
 
     ~RtApplication()
     {
-        if (m_window) {
-            delete m_window;
-        }
-
         cleanup_rt();
     }
+
+    int returnCode() const { return m_return_code; }
 
 private:
     bool create_window();
@@ -271,7 +272,9 @@ private:
     // }
 
 private:
-    RtWindow* m_window;
+    Glib::ustring m_fatal_error;
+    std::unique_ptr<RtWindow> m_window;
+    int m_return_code;
 };
 
 void show_gimp_plugin_info_dialog(Gtk::Window *parent)
@@ -288,9 +291,9 @@ void show_gimp_plugin_info_dialog(Gtk::Window *parent)
 
 } // namespace
 
-Glib::RefPtr<RtApplication> RtApplication::create()
+Glib::RefPtr<RtApplication> RtApplication::create(const Glib::ustring& fatal_error)
 {
-    return Glib::make_refptr_for_instance<RtApplication>(new RtApplication());
+    return std::make_shared<RtApplication>(fatal_error);
 }
 
 bool RtApplication::create_window()
@@ -298,26 +301,36 @@ bool RtApplication::create_window()
     if (m_window) return true;
 
     if (!init_rt()) {
-        Gtk::MessageDialog msgd(
-            "Fatal error!\nThe RT_SETTINGS and/or RT_PATH environment variables are set, but use a relative path. The path must be absolute!",
-            true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-        add_window(msgd);
-        msgd.present();
+        m_fatal_error = "The RT_SETTINGS and/or RT_PATH environment variables are set, but use a relative path. The path must be absolute!";
+        m_return_code = -1;
         return false;
     } else {
         m_window = create_rt_window();
+        m_window->signal_close_request().connect([&]() {
+            // TODO(gtk4)
+            // if (gimpPlugin && m_window->epanel && m_window->epanel->isRealized()) {
+            //     if (!m_window->epanel->saveImmediately(argv2, SaveFormat())) {
+            //         m_return_code = -2;
+            //     }
+            // }
+            return false;
+        }, false);
         // Make sure that the application runs for as long this window is still open
         add_window(*m_window);
-        // Delete the window when it is hidden
-        m_window->signal_hide().connect([&](){ delete m_window; });
         return true;
     }
 }
 
 void RtApplication::on_activate()
 {
-    if (create_window()) {
+    if (m_fatal_error.empty() && create_window()) {
         m_window->present();
+    } else {
+        auto msgd = Gtk::make_managed<RtMessageDialog>(m_fatal_error,
+            RtMessageDialog::Type::FATAL_ERROR,
+            RtMessageDialog::ButtonSet::CLOSE);
+        add_window(*msgd);
+        msgd->show();
     }
 }
 
@@ -495,41 +508,18 @@ int main (int argc, char **argv)
         simpleEditor = true;
     }
 
-    int ret = 0;
+    char *app_argv[2] = { const_cast<char *> (argv0.c_str()) };
+    int app_argc = 1;
 
-    if (fatalError.empty()) {
-        char *app_argv[2] = { const_cast<char *> (argv0.c_str()) };
-        int app_argc = 1;
+    if (!argv1.empty()) {
+        app_argc = 2;
+        app_argv[1] = const_cast<char *> (argv1.c_str());
+    }
 
-        if (!argv1.empty()) {
-            app_argc = 2;
-            app_argv[1] = const_cast<char *> (argv1.c_str());
-        }
-
-        auto app = RtApplication::create();
-        ret = app->run(app_argc, app_argv);
-    } else {
-        // if (fatalError.empty() && init_rt()) {
-        //     Gtk::Main m (&argc, &argv);
-        //     const std::unique_ptr<RTWindow> rtWindow (create_rt_window());
-        //     if (gimpPlugin) {
-        //         show_gimp_plugin_info_dialog(rtWindow.get());
-        //     }
-        //     m.run (*rtWindow);
-        //
-        //     if (gimpPlugin && rtWindow->epanel && rtWindow->epanel->isRealized()) {
-        //         if (!rtWindow->epanel->saveImmediately(argv2, SaveFormat())) {
-        //             ret = -2;
-        //         }
-        //     }
-        //
-        //     cleanup_rt();
-        // } else {
-        //     Gtk::Main m (&argc, &argv);
-        //     Gtk::MessageDialog msgd (Glib::ustring::compose("FATAL ERROR!\n\n%1", fatalError), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-        //     msgd.present ();
-        //     ret = -2;
-        // }
+    auto app = RtApplication::create(fatalError);
+    int ret = app->run(app_argc, app_argv);
+    if (ret == 0) {
+        ret = app->returnCode();
     }
 
 #ifdef _WIN32

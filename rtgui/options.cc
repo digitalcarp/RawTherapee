@@ -28,7 +28,6 @@
 #include <sstream>
 #include "multilangmgr.h"
 #include "addsetids.h"
-#include "guiutils.h"
 #include "pathutils.h"
 #include "version.h"
 

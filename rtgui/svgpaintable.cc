@@ -206,7 +206,7 @@ extern Glib::ustring argv0;
 
 Glib::RefPtr<SvgPaintableWrapper>
 SvgPaintableWrapper::createFromFilename(const Glib::ustring& filepath, bool cached) {
-    // TODO: Caching?
+    // TODO(gtk4): Caching?
 
     if (!Glib::file_test(filepath.c_str(), Glib::FileTest::EXISTS)) {
         std::cerr << "Failed to load SVG file \"" << filepath << "\"\n";

@@ -25,6 +25,7 @@
 #include "paramsedited.h"
 #include "pathutils.h"
 #include "rtimage.h"
+#include "rtmessagedialog.h"
 
 #include "rtengine/procparams.h"
 #include "rtengine/procevents.h"
@@ -340,6 +341,7 @@ void ProfilePanel::save_clicked (GdkEventButton* event)
     filter_any->add_pattern("*");
     dialog.add_filter(filter_any);
 
+    // TODO(gtk4): Fix async dialog behavior for dialog and message dialog
     while (true) {
 
         // Run the saving dialog and let the user select a path and filename.
@@ -396,7 +398,12 @@ void ProfilePanel::save_clicked (GdkEventButton* event)
             } else {
                 // Saving the profile was not successfull.
 
-                writeFailed(dialog, fname);
+                Glib::ustring msg_str = Glib::ustring::compose(M("MAIN_MSG_WRITEFAILED"), escapeHtmlChars(fname));
+                auto msgd = Gtk::make_managed<RtMessageDialog>(
+                    msg_str,
+                    RtMessageDialog::Type::ERROR,
+                    RtMessageDialog::ButtonSet::OK);
+                msgd->show(dialog);
 
                 // In case the saving process was not successfull (missing permissions, ...)
                 // reopen the dialog and try again.

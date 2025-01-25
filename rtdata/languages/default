@@ -250,6 +250,7 @@ GENERAL_SAVE_AS;Save as...
 GENERAL_SLIDER;Slider
 GENERAL_UNCHANGED;(Unchanged)
 GENERAL_WARNING;Warning
+GENERAL_YES;Yes
 GIMP_PLUGIN_INFO;Welcome to the RawTherapee GIMP plugin!\nOnce you are done editing, simply close the main RawTherapee window and the image will be automatically imported in GIMP.
 HISTOGRAM_TOOLTIP_B;Show/Hide blue histogram.
 HISTOGRAM_TOOLTIP_BAR;Show/Hide RGB indicator bar.
@@ -1832,6 +1833,10 @@ MAIN_TOOLTIP_SHOWHIDERP1;Show/Hide the right panel.\nShortcut: <b>Alt-l</b>
 MAIN_TOOLTIP_SHOWHIDETP1;Show/Hide the top panel.\nShortcut: <b>Shift-l</b>
 MAIN_TOOLTIP_THRESHOLD;Threshold
 MAIN_TOOLTIP_TOGGLE;Toggle the <b>Before</b>/<b>After</b> view.\nShortcut: <b>Shift-b</b>
+MESSAGE_ERROR;<b>Error</b>
+MESSAGE_FATAL_ERROR;<b>Fatal Error</b>
+MESSAGE_INFO;<b>Info</b>
+MESSAGE_WARNING;<b>Warning</b>
 MONITOR_PROFILE_SYSTEM;System default
 NAVIGATOR_B;B:
 NAVIGATOR_G;G:

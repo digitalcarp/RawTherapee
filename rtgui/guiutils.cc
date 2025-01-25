@@ -27,6 +27,7 @@
 #include "multilangmgr.h"
 #include "options.h"
 #include "rtimage.h"
+#include "rtmessagedialog.h"
 #include "rtscalable.h"
 // #include "toolpanel.h"
 
@@ -508,13 +509,6 @@ bool removeIfThere(Gtk::Grid* grid, Gtk::Widget* w, bool increference)
 //
 //     return safe;
 // }
-
-void writeFailed (Gtk::Window& parent, const std::string& filename)
-{
-    Glib::ustring msg_ = Glib::ustring::compose(M("MAIN_MSG_WRITEFAILED"), escapeHtmlChars(filename));
-    Gtk::MessageDialog msgd (parent, msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-    msgd.present ();
-}
 
 void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
                double imx, double imy, double imw, double imh,
@@ -1097,7 +1091,7 @@ bool MyComboBoxText::onScroll(double /*dx*/, double /*dy*/)
     // If Shift is pressed, the widget is modified
     auto state = controller->get_current_event_state() & Gdk::ModifierType::SHIFT_MASK;
     if (state != Gdk::ModifierType::NO_MODIFIER_MASK) {
-        // TODO: What is the equivalent in GTK4?
+        // TODO(gtk4): What is the equivalent in GTK4?
         // Gtk::ComboBoxText::on_scroll_event(event);
         return true;
     }
@@ -1155,7 +1149,7 @@ bool MyComboBox::onScroll(double /*dx*/, double /*dy*/)
     // If Shift is pressed, the widget is modified
     auto state = controller->get_current_event_state() & Gdk::ModifierType::SHIFT_MASK;
     if (state != Gdk::ModifierType::NO_MODIFIER_MASK) {
-        // TODO: What is the equivalent in GTK4?
+        // TODO(gtk4): What is the equivalent in GTK4?
         // Gtk::ComboBox::on_scroll_event(event);
         return true;
     }
@@ -1542,7 +1536,7 @@ bool MyFileChooserButton::onScroll(double /*dx*/, double /*dy*/)
     // If Shift is pressed, the widget is modified
     auto state = m_controller->get_current_event_state() & Gdk::ModifierType::SHIFT_MASK;
     if (state != Gdk::ModifierType::NO_MODIFIER_MASK) {
-        // TODO: What is the equivalent in GTK4?
+        // TODO(gtk4): What is the equivalent in GTK4?
         // Gtk::Button::on_scroll_event(event);
         return true;
     }

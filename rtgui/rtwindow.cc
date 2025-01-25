@@ -25,6 +25,7 @@
 #include "options.h"
 #include "preferences.h"
 #include "rtimage.h"
+#include "rtmessagedialog.h"
 #include "rtscalable.h"
 #include "splash.h"
 
@@ -366,24 +367,35 @@ void RtWindow::showErrors()
     // alerting users if the default raw and image profiles are missing
     if (options.is_defProfRawMissing()) {
         options.defProfRaw = DEFPROFILE_RAW;
-        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_DEFRAW_MISSING"), escapeHtmlChars(options.defProfRaw)), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-        msgd.present ();
+        auto msgd = Gtk::make_managed<RtMessageDialog>(
+            Glib::ustring::compose(M("OPTIONS_DEFRAW_MISSING"), escapeHtmlChars(options.defProfRaw)),
+            RtMessageDialog::Type::ERROR,
+            RtMessageDialog::ButtonSet::OK);
+        msgd->show(this);
     }
     if (options.is_bundledDefProfRawMissing()) {
-        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_BUNDLED_MISSING"), escapeHtmlChars(options.defProfRaw)), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-        msgd.present ();
         options.defProfRaw = DEFPROFILE_INTERNAL;
+        auto msgd = Gtk::make_managed<RtMessageDialog>(
+            Glib::ustring::compose(M("OPTIONS_BUNDLED_MISSING"), escapeHtmlChars(options.defProfRaw)),
+            RtMessageDialog::Type::ERROR,
+            RtMessageDialog::ButtonSet::OK);
+        msgd->show(this);
     }
-
     if (options.is_defProfImgMissing()) {
         options.defProfImg = DEFPROFILE_IMG;
-        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_DEFIMG_MISSING"), escapeHtmlChars(options.defProfImg)), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-        msgd.present ();
+        auto msgd = Gtk::make_managed<RtMessageDialog>(
+            Glib::ustring::compose(M("OPTIONS_DEFIMG_MISSING"), escapeHtmlChars(options.defProfImg)),
+            RtMessageDialog::Type::ERROR,
+            RtMessageDialog::ButtonSet::OK);
+        msgd->show(this);
     }
     if (options.is_bundledDefProfImgMissing()) {
-        Gtk::MessageDialog msgd (*this, Glib::ustring::compose (M ("OPTIONS_BUNDLED_MISSING"), escapeHtmlChars(options.defProfImg)), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-        msgd.present ();
         options.defProfImg = DEFPROFILE_INTERNAL;
+        auto msgd = Gtk::make_managed<RtMessageDialog>(
+            Glib::ustring::compose(M("OPTIONS_BUNDLED_MISSING"), escapeHtmlChars(options.defProfImg)),
+            RtMessageDialog::Type::ERROR,
+            RtMessageDialog::ButtonSet::OK);
+        msgd->show(this);
     }
 }
 

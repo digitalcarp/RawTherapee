@@ -142,6 +142,7 @@ set(NONCLISOURCEFILES
     # rotate.cc
     rtappchooserdialog.cc
     rtimage.cc
+    rtmessagedialog.cc
     rtscalable.cc
     rtwindow.cc
     # saveasdlg.cc
