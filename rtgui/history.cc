@@ -119,8 +119,8 @@ History::History (bool bookmarkSupport) : historyVPaned (nullptr), blistener (nu
     bmFrame->set_name ("Snapshots");
     Gtk::Box* bmBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     bmFrame->add (*bmBox);
-    bmBox->pack_start (*bscrollw, Gtk::PACK_EXPAND_WIDGET, 4);
-    bmBox->pack_end (*ahbox, Gtk::PACK_SHRINK, 4);
+    bmBox->pack_start (*bscrollw, Pack::EXPAND_WIDGET, 4);
+    bmBox->pack_end (*ahbox, Pack::SHRINK, 4);
     bmBox->set_size_request (-1, 60);
 
     if (bookmarkSupport) {
@@ -453,8 +453,8 @@ bool History::on_query_tooltip (int x, int y, bool keyboard_tooltip, const Glib:
                 right->set_justify(Gtk::JUSTIFY_LEFT);
                 Gtk::Box *hbox = Gtk::manage (new Gtk::Box());
                 hbox->set_spacing(5);
-                hbox->pack_start(*left, Gtk::PACK_SHRINK, 0);
-                hbox->pack_start(*right, Gtk::PACK_SHRINK, 0);
+                hbox->pack_start(*left, Pack::SHRINK, 0);
+                hbox->pack_start(*right, Pack::SHRINK, 0);
                 tooltip->set_custom(*hbox);
                 */
 

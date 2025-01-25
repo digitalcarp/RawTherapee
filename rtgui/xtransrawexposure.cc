@@ -57,10 +57,10 @@ XTransRAWExposure::XTransRAWExposure () : FoldableToolPanel(this, TOOL_NAME, M("
     Dehablackx->set_active (false);
     Dehablackx->setCheckBoxListener (this);
 
-    pack_start( *PexBlackRed, Gtk::PACK_SHRINK, 0);//black
-    pack_start( *PexBlackGreen, Gtk::PACK_SHRINK, 0);//black
-    pack_start( *PexBlackBlue, Gtk::PACK_SHRINK, 0);//black
-    pack_start( *Dehablackx, Gtk::PACK_SHRINK, 0);//black Dehaze
+    pack_start( *PexBlackRed, Pack::SHRINK, 0);//black
+    pack_start( *PexBlackGreen, Pack::SHRINK, 0);//black
+    pack_start( *PexBlackBlue, Pack::SHRINK, 0);//black
+    pack_start( *Dehablackx, Pack::SHRINK, 0);//black Dehaze
 
     PexBlackRed->setLogScale(100, 0);
     PexBlackGreen->setLogScale(100, 0);

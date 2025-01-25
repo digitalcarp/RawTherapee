@@ -29,7 +29,7 @@ ImageAreaPanel::ImageAreaPanel () : before(nullptr), after(nullptr)
 
     frame->add (*imageArea);
     frame->set_shadow_type (Gtk::SHADOW_IN );
-    hb1->pack_start (*frame, Gtk::PACK_EXPAND_WIDGET);
+    hb1->pack_start (*frame, Pack::EXPAND_WIDGET);
 
     pack_start (*hb1);
     frame->show ();

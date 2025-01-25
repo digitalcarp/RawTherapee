@@ -257,7 +257,7 @@ WhiteBalance::WhiteBalance () : FoldableToolPanel(this, TOOL_NAME, M("TP_WBALANC
     methodgrid->attach (*lab, 0, 0, 1, 1);
     methodgrid->attach (*method, 1, 0, 1, 1);
     methodgrid->attach (*resetButton, 2, 0, 1, 1);
-    pack_start (*methodgrid, Gtk::PACK_SHRINK, 0 );
+    pack_start (*methodgrid, Pack::SHRINK, 0 );
     opt = 0;
 
     Gtk::Grid* spotgrid = Gtk::manage(new Gtk::Grid());
@@ -314,11 +314,11 @@ WhiteBalance::WhiteBalance () : FoldableToolPanel(this, TOOL_NAME, M("TP_WBALANC
     spotgrid->attach (*spotbutton, 0, 0, 1, 1);
     spotgrid->attach (*slab, 1, 0, 1, 1);
     spotgrid->attach (*wbsizehelper, 2, 0, 1, 1);
-    pack_start (*spotgrid, Gtk::PACK_SHRINK, 0 );
+    pack_start (*spotgrid, Pack::SHRINK, 0 );
 
     Gtk::Separator *separator = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     separator->get_style_context()->add_class("grid-row-separator");
-    pack_start (*separator, Gtk::PACK_SHRINK, 0);
+    pack_start (*separator, Pack::SHRINK, 0);
 
     Gtk::Image* itempL =  Gtk::manage (new RTImage ("circle-blue-small", Gtk::ICON_SIZE_BUTTON));
     Gtk::Image* itempR =  Gtk::manage (new RTImage ("circle-yellow-small", Gtk::ICON_SIZE_BUTTON));

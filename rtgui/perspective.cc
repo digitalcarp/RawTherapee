@@ -142,7 +142,7 @@ PerspCorrection::PerspCorrection () : FoldableToolPanel(this, TOOL_NAME, M("TP_P
     method = Gtk::manage (new MyComboBoxText ());
     method->append (M("TP_PERSPECTIVE_METHOD_SIMPLE"));
     method->append (M("TP_PERSPECTIVE_METHOD_CAMERA_BASED"));
-    method_hbox->pack_start(*method_label, Gtk::PACK_SHRINK);
+    method_hbox->pack_start(*method_label, Pack::SHRINK);
     method_hbox->pack_start(*method);
     pack_start(*method_hbox);
 
@@ -212,7 +212,7 @@ PerspCorrection::PerspCorrection () : FoldableToolPanel(this, TOOL_NAME, M("TP_P
     Gtk::Box* control_lines_box = Gtk::manage (new Gtk::Box());
     Gtk::Label* control_lines_label = Gtk::manage (new Gtk::Label (M("TP_PERSPECTIVE_CONTROL_LINES") + ": "));
     control_lines_label->set_tooltip_markup( M("TP_PERSPECTIVE_CONTROL_LINES_TOOLTIP") );
-    control_lines_box->pack_start(*control_lines_label, Gtk::PACK_SHRINK);
+    control_lines_box->pack_start(*control_lines_label, Pack::SHRINK);
     control_lines_box->pack_start(*lines_button_edit);
     control_lines_box->pack_start(*lines_button_apply);
     control_lines_box->pack_start(*lines_button_erase);
@@ -232,7 +232,7 @@ PerspCorrection::PerspCorrection () : FoldableToolPanel(this, TOOL_NAME, M("TP_P
 
     Gtk::Box* auto_hbox = Gtk::manage (new Gtk::Box());
     Gtk::Label* auto_label = Gtk::manage (new Gtk::Label (M("GENERAL_AUTO") + ": "));
-    auto_hbox->pack_start(*auto_label, Gtk::PACK_SHRINK);
+    auto_hbox->pack_start(*auto_label, Pack::SHRINK);
 
     Gtk::Frame* pca_frame = Gtk::manage (new Gtk::Frame
             (M("TP_PERSPECTIVE_POST_CORRECTION_ADJUSTMENT_FRAME")));

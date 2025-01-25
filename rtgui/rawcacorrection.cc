@@ -67,14 +67,14 @@ RAWCACorr::RAWCACorr () : FoldableToolPanel(this, TOOL_NAME, M("TP_RAWCACORR_LAB
     caRed->setLogScale(10, 0);
     caBlue->setLogScale(10, 0);
 
-    pack_start( *caAutocorrect, Gtk::PACK_SHRINK, 4);
-    pack_start( *caAutoiterations, Gtk::PACK_SHRINK, 4);
-    pack_start( *caRed, Gtk::PACK_SHRINK, 4);
-    pack_start( *caBlue, Gtk::PACK_SHRINK, 4);
+    pack_start( *caAutocorrect, Pack::SHRINK, 4);
+    pack_start( *caAutoiterations, Pack::SHRINK, 4);
+    pack_start( *caRed, Pack::SHRINK, 4);
+    pack_start( *caBlue, Pack::SHRINK, 4);
 
     caAvoidcolourshift = Gtk::manage (new CheckBox(M("TP_RAWCACORR_AVOIDCOLORSHIFT"), multiImage));
     caAvoidcolourshift->setCheckBoxListener (this);
-    pack_start( *caAvoidcolourshift, Gtk::PACK_SHRINK, 4);
+    pack_start( *caAvoidcolourshift, Pack::SHRINK, 4);
 
 
 }

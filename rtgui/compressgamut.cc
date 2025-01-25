@@ -84,7 +84,7 @@ Compressgamut::Compressgamut () : FoldableToolPanel(this, TOOL_NAME, M("TP_COMPR
     thVBox->pack_start (*th_m);
     thVBox->pack_start (*th_y);
     thFrame->add(*thVBox);
-    pack_start(*thFrame, Gtk::PACK_SHRINK);
+    pack_start(*thFrame, Pack::SHRINK);
     // from ACES https://docs.acescentral.com/specifications/rgc/#appendix-c-illustrations
     // https://docs.acescentral.com/specifications/rgc/#appendix-d-ctl-reference-implementation
     // Distance from achromatic which will be compressed to the gamut boundary
@@ -102,7 +102,7 @@ Compressgamut::Compressgamut () : FoldableToolPanel(this, TOOL_NAME, M("TP_COMPR
     limVBox->pack_start (*d_m);
     limVBox->pack_start (*d_y);
     limFrame->add(*limVBox);
-    pack_start(*limFrame, Gtk::PACK_SHRINK);
+    pack_start(*limFrame, Pack::SHRINK);
 
     // Aggressiveness of the compression curve Pwr
     rolloff = Gtk::manage(new Gtk::CheckButton(M("TP_COMPRESSGAMUT_ROLLOFF")));
@@ -118,7 +118,7 @@ Compressgamut::Compressgamut () : FoldableToolPanel(this, TOOL_NAME, M("TP_COMPR
 
     rollVBox->pack_start (*pwr);
     rollFrame->add(*rollVBox);
-    pack_start(*rollFrame, Gtk::PACK_SHRINK);
+    pack_start(*rollFrame, Pack::SHRINK);
     th_c->setAdjusterListener (this);
     th_m->setAdjusterListener (this);
     th_y->setAdjusterListener (this);

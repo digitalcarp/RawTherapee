@@ -60,7 +60,7 @@ DirPyrDenoise::DirPyrDenoise () : FoldableToolPanel(this, TOOL_NAME, M("TP_DIRPY
 
     ctboxL = Gtk::manage (new Gtk::Box ());
     Gtk::Label* labmL = Gtk::manage (new Gtk::Label (M("TP_DIRPYRDENOISE_LUMINANCE_CONTROL") + ":"));
-    ctboxL->pack_start (*labmL, Gtk::PACK_SHRINK, 1);
+    ctboxL->pack_start (*labmL, Pack::SHRINK, 1);
 
     Lmethod = Gtk::manage (new MyComboBoxText ());
     Lmethod->append (M("CURVEEDITOR_CURVE"));
@@ -95,7 +95,7 @@ DirPyrDenoise::DirPyrDenoise () : FoldableToolPanel(this, TOOL_NAME, M("TP_DIRPY
 
     ctboxC = Gtk::manage (new Gtk::Box ());
     Gtk::Label* labmC = Gtk::manage (new Gtk::Label (M("TP_DIRPYRDENOISE_CHROMINANCE_METHOD") + ":"));
-    ctboxC->pack_start (*labmC, Gtk::PACK_SHRINK, 1);
+    ctboxC->pack_start (*labmC, Pack::SHRINK, 1);
 
     Cmethod = Gtk::manage (new MyComboBoxText ());
     Cmethod->append (M("TP_DIRPYRDENOISE_CHROMINANCE_MANUAL"));
@@ -108,7 +108,7 @@ DirPyrDenoise::DirPyrDenoise () : FoldableToolPanel(this, TOOL_NAME, M("TP_DIRPY
 
     ctboxC2 = Gtk::manage (new Gtk::Box ());
     Gtk::Label* labmC2 = Gtk::manage (new Gtk::Label (M("TP_DIRPYRDENOISE_CHROMINANCE_METHOD") + ":"));
-    ctboxC2->pack_start (*labmC2, Gtk::PACK_SHRINK, 1);
+    ctboxC2->pack_start (*labmC2, Pack::SHRINK, 1);
     ctboxC2->set_tooltip_markup (M("TP_DIRPYRDENOISE_CHROMINANCE_METHODADVANCED_TOOLTIP"));
 
     C2method = Gtk::manage (new MyComboBoxText ());
@@ -129,15 +129,15 @@ DirPyrDenoise::DirPyrDenoise () : FoldableToolPanel(this, TOOL_NAME, M("TP_DIRPY
     bluechro    = Gtk::manage (new Adjuster (M("TP_DIRPYRDENOISE_CHROMINANCE_BLUEYELLOW"), -100, 100, 0.1, 0));
 
     Gtk::Box* hb1 = Gtk::manage (new Gtk::Box ());
-    hb1->pack_start (*Gtk::manage (new Gtk::Label ( M("TP_DIRPYRDENOISE_MAIN_COLORSPACE") + ": ")), Gtk::PACK_SHRINK, 1);
+    hb1->pack_start (*Gtk::manage (new Gtk::Label ( M("TP_DIRPYRDENOISE_MAIN_COLORSPACE") + ": ")), Pack::SHRINK, 1);
     hb1->set_tooltip_markup (M("TP_DIRPYRDENOISE_MAIN_COLORSPACE_TOOLTIP"));
 
     dmethod = Gtk::manage (new MyComboBoxText ());
     dmethod->append (M("TP_DIRPYRDENOISE_MAIN_COLORSPACE_LAB"));
     dmethod->append (M("TP_DIRPYRDENOISE_MAIN_COLORSPACE_RGB"));
     dmethod->set_active(0);
-    hb1->pack_end (*dmethod, Gtk::PACK_EXPAND_WIDGET, 1);
-    pack_start(*hb1, Gtk::PACK_SHRINK, 1);
+    hb1->pack_end (*dmethod, Pack::EXPAND_WIDGET, 1);
+    pack_start(*hb1, Pack::SHRINK, 1);
 
     dmethodconn = dmethod->signal_changed().connect ( sigc::mem_fun(*this, &DirPyrDenoise::dmethodChanged) );
 
@@ -212,38 +212,38 @@ DirPyrDenoise::DirPyrDenoise () : FoldableToolPanel(this, TOOL_NAME, M("TP_DIRPY
 
     ctboxm = Gtk::manage (new Gtk::Box ());
     Gtk::Label* labmm = Gtk::manage (new Gtk::Label (M("TP_DIRPYRDENOISE_MEDIAN_METHOD") + ":"));
-    ctboxm->pack_start (*labmm, Gtk::PACK_SHRINK, 1);
+    ctboxm->pack_start (*labmm, Pack::SHRINK, 1);
 
     ctbox = Gtk::manage (new Gtk::Box ());
     Gtk::Label* labm = Gtk::manage (new Gtk::Label (M("TP_DIRPYRDENOISE_MEDIAN_TYPE") + ":"));
-    ctbox->pack_start (*labm, Gtk::PACK_SHRINK, 1);
+    ctbox->pack_start (*labm, Pack::SHRINK, 1);
 
     ctboxrgb = Gtk::manage (new Gtk::Box ());
     Gtk::Label* labrgb = Gtk::manage (new Gtk::Label (M("TP_DIRPYRDENOISE_MEDIAN_TYPE") + ":"));
-    ctboxrgb->pack_start (*labrgb, Gtk::PACK_SHRINK, 1);
+    ctboxrgb->pack_start (*labrgb, Pack::SHRINK, 1);
 
     Gtk::Box* hb11 = Gtk::manage (new Gtk::Box ());
-    hb11->pack_start (*Gtk::manage (new Gtk::Label ( M("TP_DIRPYRDENOISE_MAIN_MODE") + ": ")), Gtk::PACK_SHRINK, 1);
+    hb11->pack_start (*Gtk::manage (new Gtk::Label ( M("TP_DIRPYRDENOISE_MAIN_MODE") + ": ")), Pack::SHRINK, 1);
     hb11->set_tooltip_markup (M("TP_DIRPYRDENOISE_MAIN_MODE_TOOLTIP"));
 
     smethod = Gtk::manage (new MyComboBoxText ());
     smethod->append (M("TP_DIRPYRDENOISE_MAIN_MODE_CONSERVATIVE"));
     smethod->append (M("TP_DIRPYRDENOISE_MAIN_MODE_AGGRESSIVE"));
     smethod->set_active(1);
-    hb11->pack_start (*smethod, Gtk::PACK_EXPAND_WIDGET, 1);
-    pack_start( *hb11, Gtk::PACK_SHRINK, 1);
+    hb11->pack_start (*smethod, Pack::EXPAND_WIDGET, 1);
+    pack_start( *hb11, Pack::SHRINK, 1);
     smethodconn = smethod->signal_changed().connect ( sigc::mem_fun(*this, &DirPyrDenoise::smethodChanged) );
 
     autoGain = Gtk::manage(new CheckBox(M("TP_DIRPYRDENOISE_MAIN_AUTO_GAIN"), multiImage));
     autoGain->set_tooltip_text(M("TP_DIRPYRDENOISE_MAIN_AUTO_GAIN_TOOLTIP"));
     autoGain->setCheckBoxListener(this);
-    pack_start(*autoGain, Gtk::PACK_SHRINK, 0);
+    pack_start(*autoGain, Pack::SHRINK, 0);
 
     gamma = Gtk::manage (new Adjuster (M("TP_DIRPYRDENOISE_MAIN_GAMMA"), 1.0, 3.0, 0.01, 1.7));
     gamma->set_tooltip_text (M("TP_DIRPYRDENOISE_MAIN_GAMMA_TOOLTIP"));
     gamma->setAdjusterListener (this);
     gamma->show();
-    pack_start (*gamma, Gtk::PACK_EXPAND_WIDGET, 1);
+    pack_start (*gamma, Pack::EXPAND_WIDGET, 1);
 
     passes  = Gtk::manage (new Adjuster (M("TP_DIRPYRDENOISE_MEDIAN_PASSES"), 1.0, 3.0, 1., 1.));
     passes->set_tooltip_text (M("TP_DIRPYRDENOISE_MEDIAN_PASSES_TOOLTIP"));
@@ -252,7 +252,7 @@ DirPyrDenoise::DirPyrDenoise () : FoldableToolPanel(this, TOOL_NAME, M("TP_DIRPY
     ctboxL->pack_start (*Lmethod);
     lumaVBox->pack_start (*ctboxL);
     lumaVBox->pack_start (*luma);
-    lumaVBox->pack_start (*NoiscurveEditorG, Gtk::PACK_SHRINK, 4);
+    lumaVBox->pack_start (*NoiscurveEditorG, Pack::SHRINK, 4);
     lumaVBox->pack_start (*Ldetail);
     lumaFrame->add(*lumaVBox);
     pack_start (*lumaFrame);
@@ -273,7 +273,7 @@ DirPyrDenoise::DirPyrDenoise () : FoldableToolPanel(this, TOOL_NAME, M("TP_DIRPY
     chromaVBox->pack_start (*chroma);
     chromaVBox->pack_start (*redchro);
     chromaVBox->pack_start (*bluechro);
-    chromaVBox->pack_start (*CCcurveEditorG, Gtk::PACK_SHRINK, 4);
+    chromaVBox->pack_start (*CCcurveEditorG, Pack::SHRINK, 4);
     chromaFrame->add(*chromaVBox);
     pack_start (*chromaFrame);
 

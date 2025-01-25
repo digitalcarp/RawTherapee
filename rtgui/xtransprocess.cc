@@ -37,7 +37,7 @@ XTransProcess::XTransProcess () : FoldableToolPanel(this, TOOL_NAME, M("TP_RAW_L
     EvDemosaicAutoContrast = m->newEvent(DEMOSAIC, "HISTORY_MSG_DUALDEMOSAIC_AUTO_CONTRAST");
 
     Gtk::Box* hb1 = Gtk::manage (new Gtk::Box ());
-    hb1->pack_start (*Gtk::manage (new Gtk::Label ( M("TP_RAW_DMETHOD") + ": ")), Gtk::PACK_SHRINK, 4);
+    hb1->pack_start (*Gtk::manage (new Gtk::Label ( M("TP_RAW_DMETHOD") + ": ")), Pack::SHRINK, 4);
     method = Gtk::manage (new MyComboBoxText ());
 
     for (const auto method_string : RAWParams::XTransSensor::getMethodStrings()) {
@@ -71,8 +71,8 @@ XTransProcess::XTransProcess () : FoldableToolPanel(this, TOOL_NAME, M("TP_RAW_L
     method->set_active(0);
     hb1->set_tooltip_markup (M("TP_RAW_SENSOR_XTRANS_DMETHOD_TOOLTIP"));
 
-    hb1->pack_end (*method, Gtk::PACK_EXPAND_WIDGET, 4);
-    pack_start( *hb1, Gtk::PACK_SHRINK, 4);
+    hb1->pack_end (*method, Pack::EXPAND_WIDGET, 4);
+    pack_start( *hb1, Pack::SHRINK, 4);
 
     dualDemosaicOptions = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
 
@@ -85,7 +85,7 @@ XTransProcess::XTransProcess () : FoldableToolPanel(this, TOOL_NAME, M("TP_RAW_L
 
     dualDemosaicContrast->show();
     dualDemosaicOptions->pack_start(*dualDemosaicContrast);
-    pack_start( *dualDemosaicOptions, Gtk::PACK_SHRINK, 4);
+    pack_start( *dualDemosaicOptions, Pack::SHRINK, 4);
 
     borderbox = Gtk::manage(new Gtk::Box());
     border = Gtk::manage(new Adjuster(M("TP_RAW_BORDER"), 0, 16, 1, 7));
@@ -95,16 +95,16 @@ XTransProcess::XTransProcess () : FoldableToolPanel(this, TOOL_NAME, M("TP_RAW_L
 
     border->show();
     borderbox->pack_start(*border);
-    pack_start(*borderbox, Gtk::PACK_SHRINK, 4);
+    pack_start(*borderbox, Pack::SHRINK, 4);
 
-    pack_start( *Gtk::manage( new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Gtk::PACK_SHRINK, 0 );
+    pack_start( *Gtk::manage( new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Pack::SHRINK, 0 );
     ccSteps = Gtk::manage (new Adjuster (M("TP_RAW_FALSECOLOR"), 0, 5, 1, 0 ));
     ccSteps->setAdjusterListener (this);
 
     ccSteps->setDelay(std::max(options.adjusterMinDelay, options.adjusterMaxDelay));
 
     ccSteps->show();
-    pack_start( *ccSteps, Gtk::PACK_SHRINK, 4);
+    pack_start( *ccSteps, Pack::SHRINK, 4);
 
     methodconn = method->signal_changed().connect( sigc::mem_fun(*this, &XTransProcess::methodChanged) );
 }

@@ -61,7 +61,7 @@ DirPyrEqualizer::DirPyrEqualizer () : FoldableToolPanel(this, TOOL_NAME, M("TP_D
 
     cdbox = Gtk::manage (new Gtk::Box ());
     labmcd = Gtk::manage (new Gtk::Label (M("TP_CBDL_METHOD") + ":"));
-    cdbox->pack_start (*labmcd, Gtk::PACK_SHRINK, 1);
+    cdbox->pack_start (*labmcd, Pack::SHRINK, 1);
 
     cbdlMethod = Gtk::manage (new MyComboBoxText ());
     cbdlMethod->append (M("TP_CBDL_BEF"));
@@ -93,7 +93,7 @@ DirPyrEqualizer::DirPyrEqualizer () : FoldableToolPanel(this, TOOL_NAME, M("TP_D
     buttonBox1->show_all_children();
 
     Gtk::Separator *separator2 = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
-    pack_start(*separator2, Gtk::PACK_SHRINK, 2);
+    pack_start(*separator2, Pack::SHRINK, 2);
 
     for(int i = 0; i < 6; i++) {
         Glib::ustring ss;
@@ -111,21 +111,21 @@ DirPyrEqualizer::DirPyrEqualizer () : FoldableToolPanel(this, TOOL_NAME, M("TP_D
     }
 
     Gtk::Separator *separator3 = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
-    pack_start(*separator3, Gtk::PACK_SHRINK, 2);
+    pack_start(*separator3, Pack::SHRINK, 2);
 
     threshold = Gtk::manage ( new Adjuster (M("TP_DIRPYREQUALIZER_THRESHOLD"), 0, 1, 0.01, 0.2) );
     threshold->setAdjusterListener(this);
     pack_start(*threshold);
 
     Gtk::Separator *separator4 = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
-    pack_start(*separator4, Gtk::PACK_SHRINK, 2);
+    pack_start(*separator4, Pack::SHRINK, 2);
     /*
         algoHBox = Gtk::manage (new Gtk::Box ());
         algoHBox->set_spacing (2);
         algoHBox->set_tooltip_markup (M("TP_DIRPYREQUALIZER_ALGO_TOOLTIP"));
     */
 //    alLabel = Gtk::manage (new Gtk::Label (M("TP_DIRPYREQUALIZER_ALGO")+":"));
-//  algoHBox->pack_start (*alLabel, Gtk::PACK_SHRINK);
+//  algoHBox->pack_start (*alLabel, Pack::SHRINK);
     /*
         algo = Gtk::manage (new MyComboBoxText ());
         algo->append (M("TP_DIRPYREQUALIZER_ALGO_FI"));

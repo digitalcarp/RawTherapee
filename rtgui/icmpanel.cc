@@ -91,27 +91,27 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
 
     inone = Gtk::manage(new Gtk::RadioButton(M("TP_ICM_INPUTNONE")));
     inone->set_tooltip_text(M("TP_ICM_INPUTNONE_TOOLTIP"));
-    iVBox->pack_start(*inone, Gtk::PACK_SHRINK);
+    iVBox->pack_start(*inone, Pack::SHRINK);
 
     iembedded = Gtk::manage(new Gtk::RadioButton(M("TP_ICM_INPUTEMBEDDED")));
     iembedded->set_tooltip_text(M("TP_ICM_INPUTEMBEDDED_TOOLTIP"));
-    iVBox->pack_start(*iembedded, Gtk::PACK_SHRINK);
+    iVBox->pack_start(*iembedded, Pack::SHRINK);
 
     icamera = Gtk::manage(new Gtk::RadioButton(M("TP_ICM_INPUTCAMERA")));
     icamera->set_tooltip_text(M("TP_ICM_INPUTCAMERA_TOOLTIP"));
-    iVBox->pack_start(*icamera, Gtk::PACK_SHRINK);
+    iVBox->pack_start(*icamera, Pack::SHRINK);
 
     icameraICC = Gtk::manage(new Gtk::RadioButton(M("TP_ICM_INPUTCAMERAICC")));
     icameraICC->set_tooltip_text(M("TP_ICM_INPUTCAMERAICC_TOOLTIP"));
-    iVBox->pack_start(*icameraICC, Gtk::PACK_SHRINK);
+    iVBox->pack_start(*icameraICC, Pack::SHRINK);
 
     ifromfile = Gtk::manage(new Gtk::RadioButton(M("TP_ICM_INPUTCUSTOM") + ":"));
     Gtk::Box* ffbox = Gtk::manage(new Gtk::Box());
     ifromfile->set_tooltip_text(M("TP_ICM_INPUTCUSTOM_TOOLTIP"));
-    ffbox->pack_start(*ifromfile, Gtk::PACK_SHRINK);
+    ffbox->pack_start(*ifromfile, Pack::SHRINK);
     ffbox->pack_start(*ipDialog);
 
-    iVBox->pack_start(*ffbox, Gtk::PACK_SHRINK);
+    iVBox->pack_start(*ffbox, Pack::SHRINK);
 
     opts = icamera->get_group();
     icameraICC->set_group(opts);
@@ -184,10 +184,10 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     saveRef->set_image(*Gtk::manage(new RTImage("save-small", Gtk::ICON_SIZE_BUTTON)));
     saveRef->set_alignment(0.5f, 0.5f);
     saveRef->set_tooltip_markup(M("TP_ICM_SAVEREFERENCE_TOOLTIP"));
-    iVBox->pack_start(*saveRef, Gtk::PACK_SHRINK);
+    iVBox->pack_start(*saveRef, Pack::SHRINK);
 
     iFrame->add(*iVBox);
-    pack_start(*iFrame, Gtk::PACK_EXPAND_WIDGET);
+    pack_start(*iFrame, Pack::EXPAND_WIDGET);
 
 
     // ---------------------------- Working profile
@@ -199,7 +199,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     Gtk::Box* wProfVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     wProfNames = Gtk::manage(new MyComboBoxText());
-    wProfVBox->pack_start(*wProfNames, Gtk::PACK_SHRINK);
+    wProfVBox->pack_start(*wProfNames, Pack::SHRINK);
 
     std::vector<Glib::ustring> wpnames = rtengine::ICCStore::getInstance()->getWorkingProfiles();
 
@@ -224,8 +224,8 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     wTRCBox = Gtk::manage(new Gtk::Box());
 
     wTRC = Gtk::manage(new MyComboBoxText());
-    wTRCBox->pack_start(*wTRC, Gtk::PACK_EXPAND_WIDGET);
-    trcProfVBox->pack_start(*wTRCBox, Gtk::PACK_EXPAND_WIDGET);
+    wTRCBox->pack_start(*wTRC, Pack::EXPAND_WIDGET);
+    trcProfVBox->pack_start(*wTRCBox, Pack::EXPAND_WIDGET);
     wTRC->append(M("TP_ICM_WORKING_TRC_NONE"));
     wTRC->append(M("TP_ICM_WORKING_TRC_CUSTOM"));
     wTRC->append(M("TP_ICM_WORKING_TRC_BT709"));
@@ -244,14 +244,14 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     wSlope = Gtk::manage(new Adjuster(M("TP_ICM_WORKING_TRC_SLOPE"), 0., 300., 0.01, 4.5));
     wmidtcie = Gtk::manage(new Adjuster(M("TP_LOCALLAB_MIDTCIE"), -100., 100., 1., 0.));
     wsmoothcie = Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_SMOOTHCIE")));
-    trcProfVBox->pack_start(*wGamma, Gtk::PACK_SHRINK);
+    trcProfVBox->pack_start(*wGamma, Pack::SHRINK);
     wGamma->show();
 
-    trcProfVBox->pack_start(*wSlope, Gtk::PACK_SHRINK);
+    trcProfVBox->pack_start(*wSlope, Pack::SHRINK);
     wSlope->show();
-    trcProfVBox->pack_start(*wmidtcie, Gtk::PACK_SHRINK);
+    trcProfVBox->pack_start(*wmidtcie, Pack::SHRINK);
     wmidtcie->show();
-    trcProfVBox->pack_start(*wsmoothcie, Gtk::PACK_SHRINK);
+    trcProfVBox->pack_start(*wsmoothcie, Pack::SHRINK);
     wsmoothcie->show();
     wsmoothcieconn = wsmoothcie->signal_toggled().connect(sigc::mem_fun(*this, &ICMPanel::wsmoothcieChanged));
     wsmoothcie->set_active(false);
@@ -259,10 +259,10 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     willuBox = Gtk::manage(new Gtk::Box());
     willulab = Gtk::manage(new Gtk::Label(M("TP_ICM_WORKING_ILLU") + ":"));
 
-    willuBox->pack_start(*willulab, Gtk::PACK_SHRINK);
+    willuBox->pack_start(*willulab, Pack::SHRINK);
     will = Gtk::manage(new MyComboBoxText());
-    willuBox->pack_start(*will, Gtk::PACK_EXPAND_WIDGET);
-    trcProfVBox->pack_start(*willuBox, Gtk::PACK_EXPAND_WIDGET);
+    willuBox->pack_start(*will, Pack::EXPAND_WIDGET);
+    trcProfVBox->pack_start(*willuBox, Pack::EXPAND_WIDGET);
     will->append(M("TP_ICM_WORKING_ILLU_NONE"));
     will->append(M("TP_ICM_WORKING_ILLU_D41"));
     will->append(M("TP_ICM_WORKING_ILLU_D50"));
@@ -282,17 +282,17 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     wprimBox = Gtk::manage(new Gtk::Box());
     wprimlab = Gtk::manage(new Gtk::Label(M("TP_ICM_WORKING_PRIM") + ":"));
 
-    wprimBox->pack_start(*wprimlab, Gtk::PACK_SHRINK);
+    wprimBox->pack_start(*wprimlab, Pack::SHRINK);
     wprim = Gtk::manage(new MyComboBoxText());
-    wprimBox->pack_start(*wprim, Gtk::PACK_EXPAND_WIDGET);
+    wprimBox->pack_start(*wprim, Pack::EXPAND_WIDGET);
     fbw = Gtk::manage(new Gtk::CheckButton((M("TP_ICM_FBW"))));
     fbw->set_active(true);
     gamut = Gtk::manage(new Gtk::CheckButton((M("TP_ICM_GAMUT"))));
     gamut->set_active(true);
 
-    trcProfVBox->pack_start(*wprimBox, Gtk::PACK_EXPAND_WIDGET);
-    trcProfVBox->pack_start(*fbw, Gtk::PACK_EXPAND_WIDGET);
-//    trcProfVBox->pack_start(*gamut, Gtk::PACK_EXPAND_WIDGET);
+    trcProfVBox->pack_start(*wprimBox, Pack::EXPAND_WIDGET);
+    trcProfVBox->pack_start(*fbw, Pack::EXPAND_WIDGET);
+//    trcProfVBox->pack_start(*gamut, Pack::EXPAND_WIDGET);
 
     neutral = Gtk::manage (new Gtk::Button (M ("TP_ICM_NEUTRAL")));
     setExpandAlignProperties (neutral, true, false, Gtk::Align::FILL, Gtk::Align::START);
@@ -359,7 +359,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     primCoordGrid->attach_next_to(*grey, *grex, Gtk::PositionType::POS_RIGHT, 1, 1);
     primCoordGrid->attach_next_to(*blux, *grex, Gtk::PositionType::POS_BOTTOM, 1, 1);
     primCoordGrid->attach_next_to(*bluy, *blux, Gtk::PositionType::POS_RIGHT, 1, 1);
-    redVBox->pack_start(*primCoordGrid, Gtk::PACK_EXPAND_WIDGET);
+    redVBox->pack_start(*primCoordGrid, Pack::EXPAND_WIDGET);
 
     Gtk::Separator* const separator1 = Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL));
     Gtk::Separator* const separator2 = Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL));
@@ -368,17 +368,17 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     preser->setAdjusterListener(this);
 
     preBox = Gtk::manage(new Gtk::Box());
-    preBox->pack_start(*preser, Gtk::PACK_EXPAND_WIDGET);
-    redVBox->pack_start(*separator1, Gtk::PACK_SHRINK);
-    redVBox->pack_start(*preBox, Gtk::PACK_EXPAND_WIDGET);
-    redVBox->pack_start(*separator2, Gtk::PACK_SHRINK);
+    preBox->pack_start(*preser, Pack::EXPAND_WIDGET);
+    redVBox->pack_start(*separator1, Pack::SHRINK);
+    redVBox->pack_start(*preBox, Pack::EXPAND_WIDGET);
+    redVBox->pack_start(*separator2, Pack::SHRINK);
 
     cielab = Gtk::manage(new Gtk::Label(M("TP_ICM_WORKING_CIEDIAG") + ":"));
 
-    redVBox->pack_start(*cielab, Gtk::PACK_SHRINK);
+    redVBox->pack_start(*cielab, Pack::SHRINK);
 
-    redVBox->pack_start(*labgridcie, Gtk::PACK_EXPAND_WIDGET, 4);
-    redVBox->pack_start(*gamut, Gtk::PACK_EXPAND_WIDGET);
+    redVBox->pack_start(*labgridcie, Pack::EXPAND_WIDGET, 4);
+    redVBox->pack_start(*gamut, Pack::EXPAND_WIDGET);
 
     refi = Gtk::manage(new Adjuster(M("TC_PRIM_REFI"), -0.5, 1., 0.0001, 0.));
     shiftx = Gtk::manage(new Adjuster(M("TC_LOCALLAB_PRIM_SHIFTX"), -0.2, 0.2, 0.0001, 0.));
@@ -386,9 +386,9 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
 
     wcatBox = Gtk::manage(new Gtk::Box());
     wcatlab = Gtk::manage(new Gtk::Label(M("TP_ICM_WORKING_CAT") + ":"));
-    wcatBox->pack_start(*wcatlab, Gtk::PACK_SHRINK);
+    wcatBox->pack_start(*wcatlab, Pack::SHRINK);
     wcat = Gtk::manage(new MyComboBoxText());
-    wcatBox->pack_start(*wcat, Gtk::PACK_EXPAND_WIDGET);
+    wcatBox->pack_start(*wcat, Pack::EXPAND_WIDGET);
 
     wcat->append(M("TP_ICM_WORKING_CAT_BRAD"));
     wcat->append(M("TP_ICM_WORKING_CAT_CAT16"));
@@ -396,13 +396,13 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     wcat->append(M("TP_ICM_WORKING_CAT_VK"));
     wcat->append(M("TP_ICM_WORKING_CAT_XYZ"));
     wcat->set_active(0);
-    redVBox->pack_start(*wcatBox, Gtk::PACK_SHRINK); 
+    redVBox->pack_start(*wcatBox, Pack::SHRINK); 
 
     ToolParamBlock* const colorBox = Gtk::manage(new ToolParamBlock());
 
-    colorBox->pack_start(*refi, Gtk::PACK_EXPAND_WIDGET);
-    colorBox->pack_start(*shiftx, Gtk::PACK_EXPAND_WIDGET);
-    colorBox->pack_start(*shifty, Gtk::PACK_EXPAND_WIDGET);
+    colorBox->pack_start(*refi, Pack::EXPAND_WIDGET);
+    colorBox->pack_start(*shiftx, Pack::EXPAND_WIDGET);
+    colorBox->pack_start(*shifty, Pack::EXPAND_WIDGET);
     colorFramecie->add(*colorBox); 
     redVBox->pack_start(*colorFramecie);
     redFrame->add(*redVBox);
@@ -429,7 +429,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     // Rendering intent
     riaHBox = Gtk::manage(new Gtk::Box());
     Gtk::Label* abIntentLbl = Gtk::manage(new Gtk::Label(M("TP_ICM_PROFILEINTENT")));
-    riaHBox->pack_start(*abIntentLbl, Gtk::PACK_SHRINK);
+    riaHBox->pack_start(*abIntentLbl, Pack::SHRINK);
     aRendIntent.reset(new PopUpButton());
     aRendIntent->addEntry("intent-perceptual", M("PREFERENCES_INTENT_PERCEPTUAL"));
     aRendIntent->addEntry("intent-relative", M("PREFERENCES_INTENT_RELATIVE"));
@@ -437,14 +437,14 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     aRendIntent->addEntry("intent-absolute", M("PREFERENCES_INTENT_ABSOLUTE"));
     aRendIntent->setSelected(1);
     aRendIntent->show();
-    riaHBox->pack_start(*aRendIntent->buttonGroup, Gtk::PACK_EXPAND_PADDING);
+    riaHBox->pack_start(*aRendIntent->buttonGroup, Pack::EXPAND_PADDING);
 
 
-    pack_start(*wFrame, Gtk::PACK_EXPAND_WIDGET);
-    trcProfVBox->pack_start(*redFrame, Gtk::PACK_EXPAND_WIDGET);
+    pack_start(*wFrame, Pack::EXPAND_WIDGET);
+    trcProfVBox->pack_start(*redFrame, Pack::EXPAND_WIDGET);
     trcExp->add(*trcProfVBox, false);
     trcExp->setLevel (2);
-    pack_start(*trcExp, Gtk::PACK_EXPAND_WIDGET);
+    pack_start(*trcExp, Pack::EXPAND_WIDGET);
     trcExp->set_expanded(false);
 
 
@@ -458,7 +458,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     Gtk::Box* oProfVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     oProfNames = Gtk::manage(new MyComboBoxText());
-    oProfVBox->pack_start(*oProfNames, Gtk::PACK_SHRINK);
+    oProfVBox->pack_start(*oProfNames, Pack::SHRINK);
 
     oProfNames->append(M("TP_ICM_NOICM"));
     oProfNames->set_active(0);
@@ -474,7 +474,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     // Rendering intent
     Gtk::Box *riHBox = Gtk::manage(new Gtk::Box());
     Gtk::Label* outputIntentLbl = Gtk::manage(new Gtk::Label(M("TP_ICM_PROFILEINTENT")));
-    riHBox->pack_start(*outputIntentLbl, Gtk::PACK_SHRINK);
+    riHBox->pack_start(*outputIntentLbl, Pack::SHRINK);
     oRendIntent.reset(new PopUpButton());
     oRendIntent->addEntry("intent-perceptual", M("PREFERENCES_INTENT_PERCEPTUAL"));
     oRendIntent->addEntry("intent-relative", M("PREFERENCES_INTENT_RELATIVE"));
@@ -482,17 +482,17 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     oRendIntent->addEntry("intent-absolute", M("PREFERENCES_INTENT_ABSOLUTE"));
     oRendIntent->setSelected(1);
     oRendIntent->show();
-    riHBox->pack_start(*oRendIntent->buttonGroup, Gtk::PACK_EXPAND_PADDING);
-    oProfVBox->pack_start(*riHBox, Gtk::PACK_SHRINK);
+    riHBox->pack_start(*oRendIntent->buttonGroup, Pack::EXPAND_PADDING);
+    oProfVBox->pack_start(*riHBox, Pack::SHRINK);
 
     // Black Point Compensation
     obpc = Gtk::manage(new Gtk::CheckButton((M("TP_ICM_BPC"))));
     obpc->set_active(true);
-    oProfVBox->pack_start(*obpc, Gtk::PACK_SHRINK);
+    oProfVBox->pack_start(*obpc, Pack::SHRINK);
 
     oFrame->add(*oProfVBox);
 
-    pack_start(*oFrame, Gtk::PACK_EXPAND_WIDGET);
+    pack_start(*oFrame, Pack::EXPAND_WIDGET);
 
     // ---------------------------- Output gamma list entries
 
@@ -2450,9 +2450,9 @@ void ICMPanel::saveReferencePressed()
     Gtk::CheckButton applyWB(M("TP_ICM_SAVEREFERENCE_APPLYWB"));
     applyWB.set_tooltip_text(M("TP_ICM_SAVEREFERENCE_APPLYWB_TOOLTIP"));
     Gtk::Box* hbox = Gtk::manage(new Gtk::Box());
-    hbox->pack_end(applyWB, Gtk::PACK_SHRINK, 2);
+    hbox->pack_end(applyWB, Pack::SHRINK, 2);
     Gtk::Box *box = dialog.get_content_area();
-    box->pack_end(*hbox, Gtk::PACK_SHRINK, 2);
+    box->pack_end(*hbox, Pack::SHRINK, 2);
 
     Glib::RefPtr<Gtk::FileFilter> filter_tif = Gtk::FileFilter::create();
     filter_tif->set_name(M("FILECHOOSER_FILTER_TIFF"));
@@ -2501,7 +2501,7 @@ void ICMPanel::setBatchMode(bool batchMode)
     ToolPanel::setBatchMode(batchMode);
     iunchanged = Gtk::manage(new Gtk::RadioButton(M("GENERAL_UNCHANGED")));
     iunchanged->set_group(opts);
-    iVBox->pack_start(*iunchanged, Gtk::PACK_SHRINK, 4);
+    iVBox->pack_start(*iunchanged, Pack::SHRINK, 4);
     iVBox->reorder_child(*iunchanged, 5);
     removeIfThere(this, saveRef);
     oProfNames->append(M("GENERAL_UNCHANGED"));

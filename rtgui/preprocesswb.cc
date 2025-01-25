@@ -37,7 +37,7 @@ PreprocessWB::PreprocessWB() :
     mode(Gtk::manage(new MyComboBoxText()))
 {
     Gtk::Box *hb = Gtk::manage(new Gtk::Box());
-    hb->pack_start(*Gtk::manage(new Gtk::Label(M("TP_PREPROCWB_MODE") + ": ")), Gtk::PACK_SHRINK, 0);
+    hb->pack_start(*Gtk::manage(new Gtk::Label(M("TP_PREPROCWB_MODE") + ": ")), Pack::SHRINK, 0);
 
     mode->append(M("TP_PREPROCWB_MODE_CAMERA"));
     mode->append(M("TP_PREPROCWB_MODE_AUTO"));
@@ -49,7 +49,7 @@ PreprocessWB::PreprocessWB() :
 
     mode->show();
 
-    pack_start(*hb, Gtk::PACK_SHRINK, 4);
+    pack_start(*hb, Pack::SHRINK, 4);
 }
 
 void PreprocessWB::read(const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited)

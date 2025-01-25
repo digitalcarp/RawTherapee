@@ -45,7 +45,7 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
     complexmethod->set_tooltip_text(M("TP_WAVELET_COMPLEX_TOOLTIP"));
     Gtk::Box* const complexHBox = Gtk::manage(new Gtk::Box());
     Gtk::Label* const complexLabel = Gtk::manage(new Gtk::Label(M("TP_WAVELET_COMPLEXLAB") + ":"));
-    complexHBox->pack_start(*complexLabel, Gtk::PACK_SHRINK, 4);
+    complexHBox->pack_start(*complexLabel, Pack::SHRINK, 4);
     complexHBox->pack_start(*complexmethod);
     pack_start(*complexHBox);
 
@@ -206,7 +206,7 @@ Retinex::Retinex () : FoldableToolPanel (this, TOOL_NAME, M ("TP_RETINEX_LABEL")
     //-------------
 
     maskFrame->add (*maskGrid);
-    pack_start (*maskFrame, Gtk::PACK_EXPAND_WIDGET, 4);
+    pack_start (*maskFrame, Pack::EXPAND_WIDGET, 4);
 
 
 

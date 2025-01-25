@@ -92,11 +92,11 @@ Navigator::Navigator() :
     set_name("Navigator");
     Gtk::Box* mbox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     previewWindow = Gtk::manage (new PreviewWindow ());
-    mbox->pack_start (*previewWindow, Gtk::PACK_EXPAND_WIDGET, 2);
+    mbox->pack_start (*previewWindow, Pack::EXPAND_WIDGET, 2);
     dimension = Gtk::manage (new Gtk::Label ());
-    mbox->pack_start (*dimension, Gtk::PACK_SHRINK, 2);
+    mbox->pack_start (*dimension, Pack::SHRINK, 2);
     position = Gtk::manage (new Gtk::Label ());
-    mbox->pack_start (*position, Gtk::PACK_SHRINK, 2);
+    mbox->pack_start (*position, Pack::SHRINK, 2);
 
     //labels
     lR = Gtk::manage (new Gtk::Label (M("NAVIGATOR_R")));
@@ -219,8 +219,8 @@ Navigator::Navigator() :
     evBox1->add (*table1);
     evBox1->signal_button_release_event().connect_notify( sigc::mem_fun(*this, &Navigator::cycleUnitsRGB));
 
-    hbox1->pack_start (*evBox1, Gtk::PACK_EXPAND_WIDGET, 4);
-    hbox1->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL)), Gtk::PACK_SHRINK, 4);
+    hbox1->pack_start (*evBox1, Pack::EXPAND_WIDGET, 4);
+    hbox1->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
     table0->attach(*hbox1, 0, 0, 1, 1);
 
     // HSV
@@ -238,8 +238,8 @@ Navigator::Navigator() :
     evBox2->add (*table2);
     evBox2->signal_button_release_event().connect_notify( sigc::mem_fun(*this, &Navigator::cycleUnitsHSV));
 
-    hbox2->pack_start (*evBox2, Gtk::PACK_EXPAND_WIDGET, 4);
-    hbox2->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL)), Gtk::PACK_SHRINK, 4);
+    hbox2->pack_start (*evBox2, Pack::EXPAND_WIDGET, 4);
+    hbox2->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
     table0->attach(*hbox2, 1, 0, 1, 1);
 
     // LAB
@@ -253,13 +253,13 @@ Navigator::Navigator() :
     table3->attach(*lLAB_B, 0, 2, 1, 1);
     table3->attach(*LAB_B, 1, 2, 1, 1);
 
-    hbox3->pack_start (*table3, Gtk::PACK_EXPAND_WIDGET, 4);
-    hbox3->pack_start (*Gtk::manage (new  Gtk::Box()), Gtk::PACK_SHRINK, 2);
+    hbox3->pack_start (*table3, Pack::EXPAND_WIDGET, 4);
+    hbox3->pack_start (*Gtk::manage (new  Gtk::Box()), Pack::SHRINK, 2);
     table0->attach(*hbox3, 2, 0, 1, 1);
 
     table0->set_column_homogeneous(true); // all cells will have equal width
 
-    mbox->pack_start (*table0, Gtk::PACK_SHRINK, 2);
+    mbox->pack_start (*table0, Pack::SHRINK, 2);
     add (*mbox);
 
     setInvalid ();

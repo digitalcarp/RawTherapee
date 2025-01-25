@@ -69,7 +69,7 @@ HSVEqualizer::HSVEqualizer () : FoldableToolPanel(this, TOOL_NAME, M("TP_HSVEQUA
     // This will add the reset button at the end of the curveType buttons
     curveEditorG->curveListComplete();
 
-    pack_start (*curveEditorG, Gtk::PACK_SHRINK, 4);
+    pack_start (*curveEditorG, Pack::SHRINK, 4);
 
     //curveEditorG->show();
 }

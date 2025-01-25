@@ -169,8 +169,8 @@ LensProfilePanel::LensProfilePanel() :
     nodesFrame->add(*modesGrid);
     distFrame->add(*distGrid);
 
-    pack_start(*nodesFrame, Gtk::PACK_EXPAND_WIDGET);
-    pack_start(*distFrame, Gtk::PACK_EXPAND_WIDGET);
+    pack_start(*nodesFrame, Pack::EXPAND_WIDGET);
+    pack_start(*distFrame, Pack::EXPAND_WIDGET);
 
     // Signals:
 

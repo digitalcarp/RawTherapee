@@ -43,29 +43,29 @@ Vibrance::Vibrance () : FoldableToolPanel(this, TOOL_NAME, M("TP_VIBRANCE_LABEL"
     saturated = Gtk::manage(new Adjuster (M("TP_VIBRANCE_SATURATED"), -100., 100., 1., 0.));
     saturated->setAdjusterListener (this);
     saturated->set_sensitive(false);
-    pack_start( *saturated, Gtk::PACK_SHRINK, 0);
+    pack_start( *saturated, Pack::SHRINK, 0);
 
     pastels = Gtk::manage(new Adjuster (M("TP_VIBRANCE_PASTELS"), -100., 100., 1., 0.));
     pastels->setAdjusterListener (this);
-    pack_start( *pastels, Gtk::PACK_SHRINK, 0);
+    pack_start( *pastels, Pack::SHRINK, 0);
 
     psThreshold = Gtk::manage (new ThresholdAdjuster (M("TP_VIBRANCE_PSTHRESHOLD"), -100., 100., 0., M("TP_VIBRANCE_PSTHRESHOLD_WEIGTHING"), 0, 0., 100., 75., M("TP_VIBRANCE_PSTHRESHOLD_SATTHRESH"), 0, this, false));
     psThreshold->setAdjusterListener (this);
     psThreshold->set_tooltip_markup(M("TP_VIBRANCE_PSTHRESHOLD_TOOLTIP"));
     psThreshold->set_sensitive(false);
-    pack_start( *psThreshold, Gtk::PACK_SHRINK, 0);
+    pack_start( *psThreshold, Pack::SHRINK, 0);
 
     protectSkins = Gtk::manage (new Gtk::CheckButton (M("TP_VIBRANCE_PROTECTSKINS")));
     protectSkins->set_active (true);
-    pack_start(*protectSkins, Gtk::PACK_SHRINK, 0);
+    pack_start(*protectSkins, Pack::SHRINK, 0);
 
     avoidColorShift = Gtk::manage (new Gtk::CheckButton (M("TP_VIBRANCE_AVOIDCOLORSHIFT")));
     avoidColorShift->set_active (true);
-    pack_start(*avoidColorShift, Gtk::PACK_SHRINK, 0);
+    pack_start(*avoidColorShift, Pack::SHRINK, 0);
 
     pastSatTog = Gtk::manage (new Gtk::CheckButton (M("TP_VIBRANCE_PASTSATTOG")));
     pastSatTog->set_active (true);
-    pack_start(*pastSatTog, Gtk::PACK_SHRINK, 0);
+    pack_start(*pastSatTog, Pack::SHRINK, 0);
 
     curveEditorGG = new CurveEditorGroup (options.lastVibranceCurvesDir, M("TP_VIBRANCE_CURVEEDITOR_SKINTONES_LABEL"));
     curveEditorGG->setCurveListener (this);
@@ -81,7 +81,7 @@ Vibrance::Vibrance () : FoldableToolPanel(this, TOOL_NAME, M("TP_VIBRANCE_LABEL"
     skinTonesCurve->setRangeDefaultMilestones(0.1, 0.4, 0.85);
     curveEditorGG->curveListComplete();
 
-    pack_start (*curveEditorGG, Gtk::PACK_SHRINK, 4);
+    pack_start (*curveEditorGG, Pack::SHRINK, 4);
 
     pskinsconn = protectSkins->signal_toggled().connect( sigc::mem_fun(*this, &Vibrance::protectskins_toggled) );
     ashiftconn = avoidColorShift->signal_toggled().connect( sigc::mem_fun(*this, &Vibrance::avoidcolorshift_toggled) );

@@ -742,7 +742,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     ppframe->set_name ("ProfilePanel");
     ppframe->add (*profilep);
     ppframe->set_label(M("PROFILEPANEL_LABEL"));
-    //leftsubpaned->pack_start (*ppframe, Gtk::PACK_SHRINK, 4);
+    //leftsubpaned->pack_start (*ppframe, Pack::SHRINK, 4);
 
     navigator = Gtk::manage(new Navigator());
     navigator->previewWindow->set_size_request(-1, RTScalable::scalePixelSize(150));
@@ -831,30 +831,30 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
 
     Gtk::Box* toolBarPanel = Gtk::manage (new Gtk::Box (Gtk::Orientation::HORIZONTAL));
     toolBarPanel->set_name ("EditorTopPanel");
-    toolBarPanel->pack_start (*hidehp, Gtk::PACK_SHRINK, 1);
-    toolBarPanel->pack_start (*vseph, Gtk::PACK_SHRINK, 2);
-    toolBarPanel->pack_start (*info, Gtk::PACK_SHRINK, 1);
-    toolBarPanel->pack_start (*beforeAfter, Gtk::PACK_SHRINK, 1);
-    toolBarPanel->pack_start (*vsepi, Gtk::PACK_SHRINK, 2);
-    toolBarPanel->pack_start (*tpc->getToolBar(), Gtk::PACK_SHRINK, 1);
-    toolBarPanel->pack_start (*vsept, Gtk::PACK_SHRINK, 2);
+    toolBarPanel->pack_start (*hidehp, Pack::SHRINK, 1);
+    toolBarPanel->pack_start (*vseph, Pack::SHRINK, 2);
+    toolBarPanel->pack_start (*info, Pack::SHRINK, 1);
+    toolBarPanel->pack_start (*beforeAfter, Pack::SHRINK, 1);
+    toolBarPanel->pack_start (*vsepi, Pack::SHRINK, 2);
+    toolBarPanel->pack_start (*tpc->getToolBar(), Pack::SHRINK, 1);
+    toolBarPanel->pack_start (*vsept, Pack::SHRINK, 2);
 
     if (tbTopPanel_1) {
         Gtk::Separator* vsep = Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL));
-        toolBarPanel->pack_end   (*tbTopPanel_1, Gtk::PACK_SHRINK, 1);
-        toolBarPanel->pack_end   (*vsep, Gtk::PACK_SHRINK, 2);
+        toolBarPanel->pack_end   (*tbTopPanel_1, Pack::SHRINK, 1);
+        toolBarPanel->pack_end   (*vsep, Pack::SHRINK, 2);
     }
 
-    toolBarPanel->pack_end   (*tpc->coarse, Gtk::PACK_SHRINK, 2);
-    toolBarPanel->pack_end   (*vsepcl, Gtk::PACK_SHRINK, 2);
+    toolBarPanel->pack_end   (*tpc->coarse, Pack::SHRINK, 2);
+    toolBarPanel->pack_end   (*vsepcl, Pack::SHRINK, 2);
     // Histogram profile toggle
-    toolBarPanel->pack_end (*toggleHistogramProfile, Gtk::PACK_SHRINK, 1);
-    toolBarPanel->pack_end (*vsep3, Gtk::PACK_SHRINK, 2);
+    toolBarPanel->pack_end (*toggleHistogramProfile, Pack::SHRINK, 1);
+    toolBarPanel->pack_end (*vsep3, Pack::SHRINK, 2);
 
-    toolBarPanel->pack_end   (*iareapanel->imageArea->indClippedPanel, Gtk::PACK_SHRINK, 0);
-    toolBarPanel->pack_end   (*vsepz, Gtk::PACK_SHRINK, 2);
-    toolBarPanel->pack_end   (*iareapanel->imageArea->previewModePanel, Gtk::PACK_SHRINK, 0);
-    toolBarPanel->pack_end   (*vsepz4, Gtk::PACK_SHRINK, 2);
+    toolBarPanel->pack_end   (*iareapanel->imageArea->indClippedPanel, Pack::SHRINK, 0);
+    toolBarPanel->pack_end   (*vsepz, Pack::SHRINK, 2);
+    toolBarPanel->pack_end   (*iareapanel->imageArea->previewModePanel, Pack::SHRINK, 0);
+    toolBarPanel->pack_end   (*vsepz4, Pack::SHRINK, 2);
 
     afterBox = Gtk::manage (new Gtk::Box (Gtk::Orientation::VERTICAL));
     afterBox->pack_start (*iareapanel);
@@ -866,7 +866,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     MyScrolledToolbar *stb1 = Gtk::manage(new MyScrolledToolbar());
     stb1->set_name("EditorToolbarTop");
     stb1->add(*toolBarPanel);
-    editbox->pack_start (*stb1, Gtk::PACK_SHRINK, 2);
+    editbox->pack_start (*stb1, Pack::SHRINK, 2);
     editbox->pack_start (*beforeAfterBox);
 
     // build right side panel
@@ -877,7 +877,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
 //    vsubboxright->set_size_request (rightsize, rightsize - 50);
     vsubboxright->set_size_request (300, 250);
 
-    vsubboxright->pack_start (*ppframe, Gtk::PACK_SHRINK, 2);
+    vsubboxright->pack_start (*ppframe, Pack::SHRINK, 2);
     // main notebook
     vsubboxright->pack_start (*tpc->toolPanelNotebook);
 
@@ -1011,7 +1011,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     stb2->set_name("EditorToolbarBottom");
     stb2->add(*iops);
 
-    editbox->pack_start (*stb2, Gtk::PACK_SHRINK, 0);
+    editbox->pack_start (*stb2, Pack::SHRINK, 0);
     editbox->show_all ();
 
     // build screen
@@ -2552,23 +2552,23 @@ void EditorPanel::beforeAfterToggled ()
         tbBeforeLock->signal_toggled().connect ( sigc::mem_fun (*this, &EditorPanel::tbBeforeLock_toggled) );
         beforeHeaderBox = Gtk::manage (new Gtk::Box (Gtk::Orientation::HORIZONTAL));
         beforeHeaderBox->get_style_context()->add_class("smallbuttonbox");
-        beforeHeaderBox->pack_end (*tbBeforeLock, Gtk::PACK_SHRINK, 2);
-        beforeHeaderBox->pack_end (*beforeLabel, Gtk::PACK_SHRINK, 2);
+        beforeHeaderBox->pack_end (*tbBeforeLock, Pack::SHRINK, 2);
+        beforeHeaderBox->pack_end (*beforeLabel, Pack::SHRINK, 2);
         beforeHeaderBox->set_size_request (0, HeaderBoxHeight);
 
         history->blistenerLock ? tbBeforeLock->set_image (*iBeforeLockON) : tbBeforeLock->set_image (*iBeforeLockOFF);
         tbBeforeLock->set_active (history->blistenerLock);
 
         beforeBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
-        beforeBox->pack_start (*beforeHeaderBox, Gtk::PACK_SHRINK, 2);
+        beforeBox->pack_start (*beforeHeaderBox, Pack::SHRINK, 2);
         beforeBox->pack_start (*beforeIarea);
 
         afterLabel = Gtk::manage (new Gtk::Label ());
         afterLabel->set_markup (Glib::ustring ("<b>") + M ("GENERAL_AFTER") + "</b>");
         afterHeaderBox = Gtk::manage (new Gtk::Box (Gtk::Orientation::HORIZONTAL));
         afterHeaderBox->set_size_request (0, HeaderBoxHeight);
-        afterHeaderBox->pack_end (*afterLabel, Gtk::PACK_SHRINK, 2);
-        afterBox->pack_start (*afterHeaderBox, Gtk::PACK_SHRINK, 2);
+        afterHeaderBox->pack_end (*afterLabel, Pack::SHRINK, 2);
+        afterBox->pack_start (*afterHeaderBox, Pack::SHRINK, 2);
         afterBox->reorder_child (*afterHeaderBox, 0);
 
         beforeAfterBox->pack_start (*beforeBox);

@@ -55,7 +55,7 @@ PlacesBrowser::PlacesBrowser ()
     buttonBox->attach_next_to(*add, Gtk::PositionType::LEFT, 1, 1);
     buttonBox->attach_next_to(*del, *add, Gtk::PositionType::RIGHT, 1, 1);
 
-    pack_start (*buttonBox, Gtk::PACK_SHRINK, 2);
+    pack_start (*buttonBox, Pack::SHRINK, 2);
 
     treeView = Gtk::manage (new Gtk::TreeView ());
     treeView->set_can_focus(false);

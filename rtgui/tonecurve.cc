@@ -112,12 +112,12 @@ ToneCurve::ToneCurve() : FoldableToolPanel(this, TOOL_NAME, M("TP_EXPOSURE_LABEL
 
     hlrbox = Gtk::manage (new Gtk::Box ());
     Gtk::Label* lab = Gtk::manage (new Gtk::Label (M("TP_HLREC_METHOD")));
-    hlrbox->pack_start (*lab, Gtk::PACK_SHRINK);
+    hlrbox->pack_start (*lab, Pack::SHRINK);
     hlrbox->pack_start (*method);
     hlbl = Gtk::manage(new Adjuster(M("TP_HLREC_HLBLUR"), 0, 4, 1, 0));
     hlth = Gtk::manage(new Adjuster(M("TP_HLREC_HLTH"), 0.25, 1.75, 0.01, 1.));
 
-    hrVBox->pack_start(*hlrbox, Gtk::PACK_SHRINK);
+    hrVBox->pack_start(*hlrbox, Pack::SHRINK);
     hrVBox->pack_start(*hlbl);
     hrVBox->pack_start(*hlth);
     hrFrame->add(*hrVBox);
@@ -189,7 +189,7 @@ ToneCurve::ToneCurve() : FoldableToolPanel(this, TOOL_NAME, M("TP_EXPOSURE_LABEL
     // This will add the reset button at the end of the curveType buttons
     curveEditorG->curveListComplete();
 
-    pack_start(*curveEditorG, Gtk::PACK_SHRINK, 2);
+    pack_start(*curveEditorG, Pack::SHRINK, 2);
 
     tcmodeconn = toneCurveMode->signal_changed().connect(sigc::mem_fun(*this, &ToneCurve::curveMode1Changed), true);
 
@@ -217,7 +217,7 @@ ToneCurve::ToneCurve() : FoldableToolPanel(this, TOOL_NAME, M("TP_EXPOSURE_LABEL
     curveEditorG2->curveListComplete();
     curveEditorG2->setTooltip(M("TP_EXPOSURE_CURVEEDITOR2_TOOLTIP"));
 
-    pack_start(*curveEditorG2, Gtk::PACK_SHRINK, 2);
+    pack_start(*curveEditorG2, Pack::SHRINK, 2);
 
     tcmode2conn = toneCurveMode2->signal_changed().connect(sigc::mem_fun(*this, &ToneCurve::curveMode2Changed), true);
 

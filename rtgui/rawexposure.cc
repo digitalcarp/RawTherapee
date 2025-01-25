@@ -38,7 +38,7 @@ RAWExposure::RAWExposure () : FoldableToolPanel(this, TOOL_NAME, M("TP_EXPOS_WHI
     PexPos->setDelay(std::max(options.adjusterMinDelay, options.adjusterMaxDelay));
 
     PexPos->show();
-    pack_start( *PexPos, Gtk::PACK_SHRINK, 4);//exposi
+    pack_start( *PexPos, Pack::SHRINK, 4);//exposi
     PexPos->setLogScale(100, 0);
 }
 

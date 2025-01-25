@@ -329,136 +329,136 @@ PartialPasteDlg::PartialPasteDlg (const Glib::ustring &title, Gtk::Window* paren
     }
 
     //BASIC
-    vboxes[0]->pack_start (*basic, Gtk::PACK_SHRINK, 2);
-    vboxes[0]->pack_start (*hseps[0], Gtk::PACK_SHRINK, 2);
-    vboxes[0]->pack_start (*wb, Gtk::PACK_SHRINK, 2);
-    vboxes[0]->pack_start (*exposure, Gtk::PACK_SHRINK, 2);
-    vboxes[0]->pack_start (*sh, Gtk::PACK_SHRINK, 2);
-    vboxes[0]->pack_start (*toneEqualizer, Gtk::PACK_SHRINK, 2);
-    vboxes[0]->pack_start (*epd, Gtk::PACK_SHRINK, 2);
-    vboxes[0]->pack_start (*fattal, Gtk::PACK_SHRINK, 2);
-    vboxes[0]->pack_start (*pcvignette, Gtk::PACK_SHRINK, 2);
-    vboxes[0]->pack_start (*gradient, Gtk::PACK_SHRINK, 2);
-    vboxes[0]->pack_start (*labcurve, Gtk::PACK_SHRINK, 2);
+    vboxes[0]->pack_start (*basic, Pack::SHRINK, 2);
+    vboxes[0]->pack_start (*hseps[0], Pack::SHRINK, 2);
+    vboxes[0]->pack_start (*wb, Pack::SHRINK, 2);
+    vboxes[0]->pack_start (*exposure, Pack::SHRINK, 2);
+    vboxes[0]->pack_start (*sh, Pack::SHRINK, 2);
+    vboxes[0]->pack_start (*toneEqualizer, Pack::SHRINK, 2);
+    vboxes[0]->pack_start (*epd, Pack::SHRINK, 2);
+    vboxes[0]->pack_start (*fattal, Pack::SHRINK, 2);
+    vboxes[0]->pack_start (*pcvignette, Pack::SHRINK, 2);
+    vboxes[0]->pack_start (*gradient, Pack::SHRINK, 2);
+    vboxes[0]->pack_start (*labcurve, Pack::SHRINK, 2);
 
     //DETAIL
-    vboxes[1]->pack_start (*detail, Gtk::PACK_SHRINK, 2);
-    vboxes[1]->pack_start (*hseps[1], Gtk::PACK_SHRINK, 2);
-    vboxes[1]->pack_start (*spot, Gtk::PACK_SHRINK, 2);
-    vboxes[1]->pack_start (*sharpen, Gtk::PACK_SHRINK, 2);
-    vboxes[1]->pack_start (*localcontrast, Gtk::PACK_SHRINK, 2);
-    vboxes[1]->pack_start (*sharpenedge, Gtk::PACK_SHRINK, 2);
-    vboxes[1]->pack_start (*sharpenmicro, Gtk::PACK_SHRINK, 2);
-    vboxes[1]->pack_start (*impden, Gtk::PACK_SHRINK, 2);
-    vboxes[1]->pack_start (*dirpyrden, Gtk::PACK_SHRINK, 2);
-    vboxes[1]->pack_start (*defringe, Gtk::PACK_SHRINK, 2);
-    vboxes[1]->pack_start (*dirpyreq, Gtk::PACK_SHRINK, 2);
-    vboxes[1]->pack_start (*dehaze, Gtk::PACK_SHRINK, 2);
+    vboxes[1]->pack_start (*detail, Pack::SHRINK, 2);
+    vboxes[1]->pack_start (*hseps[1], Pack::SHRINK, 2);
+    vboxes[1]->pack_start (*spot, Pack::SHRINK, 2);
+    vboxes[1]->pack_start (*sharpen, Pack::SHRINK, 2);
+    vboxes[1]->pack_start (*localcontrast, Pack::SHRINK, 2);
+    vboxes[1]->pack_start (*sharpenedge, Pack::SHRINK, 2);
+    vboxes[1]->pack_start (*sharpenmicro, Pack::SHRINK, 2);
+    vboxes[1]->pack_start (*impden, Pack::SHRINK, 2);
+    vboxes[1]->pack_start (*dirpyrden, Pack::SHRINK, 2);
+    vboxes[1]->pack_start (*defringe, Pack::SHRINK, 2);
+    vboxes[1]->pack_start (*dirpyreq, Pack::SHRINK, 2);
+    vboxes[1]->pack_start (*dehaze, Pack::SHRINK, 2);
 
     //COLOR
-    vboxes[2]->pack_start (*color, Gtk::PACK_SHRINK, 2);
-    vboxes[2]->pack_start (*hseps[2], Gtk::PACK_SHRINK, 2);
-    vboxes[2]->pack_start (*icm, Gtk::PACK_SHRINK, 2);
-    vboxes[2]->pack_start (*vibrance, Gtk::PACK_SHRINK, 2);
-    vboxes[2]->pack_start (*chmixer, Gtk::PACK_SHRINK, 2);
-    vboxes[2]->pack_start (*blackwhite, Gtk::PACK_SHRINK, 2);
-    vboxes[2]->pack_start (*hsveq, Gtk::PACK_SHRINK, 2);
-    vboxes[2]->pack_start (*filmSimulation, Gtk::PACK_SHRINK, 2);
-    vboxes[2]->pack_start (*filmNegative, Gtk::PACK_SHRINK, 2);
-    vboxes[2]->pack_start (*softlight, Gtk::PACK_SHRINK, 2);
-    vboxes[2]->pack_start (*rgbcurves, Gtk::PACK_SHRINK, 2);
-    vboxes[2]->pack_start (*colortoning, Gtk::PACK_SHRINK, 2);
+    vboxes[2]->pack_start (*color, Pack::SHRINK, 2);
+    vboxes[2]->pack_start (*hseps[2], Pack::SHRINK, 2);
+    vboxes[2]->pack_start (*icm, Pack::SHRINK, 2);
+    vboxes[2]->pack_start (*vibrance, Pack::SHRINK, 2);
+    vboxes[2]->pack_start (*chmixer, Pack::SHRINK, 2);
+    vboxes[2]->pack_start (*blackwhite, Pack::SHRINK, 2);
+    vboxes[2]->pack_start (*hsveq, Pack::SHRINK, 2);
+    vboxes[2]->pack_start (*filmSimulation, Pack::SHRINK, 2);
+    vboxes[2]->pack_start (*filmNegative, Pack::SHRINK, 2);
+    vboxes[2]->pack_start (*softlight, Pack::SHRINK, 2);
+    vboxes[2]->pack_start (*rgbcurves, Pack::SHRINK, 2);
+    vboxes[2]->pack_start (*colortoning, Pack::SHRINK, 2);
 
     //LENS
-    vboxes[3]->pack_start (*lens, Gtk::PACK_SHRINK, 2);
-    vboxes[3]->pack_start (*hseps[3], Gtk::PACK_SHRINK, 2);
-    vboxes[3]->pack_start (*distortion, Gtk::PACK_SHRINK, 2);
-    vboxes[3]->pack_start (*cacorr, Gtk::PACK_SHRINK, 2);
-    vboxes[3]->pack_start (*vignetting, Gtk::PACK_SHRINK, 2);
-    vboxes[3]->pack_start (*lcp, Gtk::PACK_SHRINK, 2);
+    vboxes[3]->pack_start (*lens, Pack::SHRINK, 2);
+    vboxes[3]->pack_start (*hseps[3], Pack::SHRINK, 2);
+    vboxes[3]->pack_start (*distortion, Pack::SHRINK, 2);
+    vboxes[3]->pack_start (*cacorr, Pack::SHRINK, 2);
+    vboxes[3]->pack_start (*vignetting, Pack::SHRINK, 2);
+    vboxes[3]->pack_start (*lcp, Pack::SHRINK, 2);
 
     //COMPOSITION
-    vboxes[4]->pack_start (*composition, Gtk::PACK_SHRINK, 2);
-    vboxes[4]->pack_start (*hseps[4], Gtk::PACK_SHRINK, 2);
-    vboxes[4]->pack_start (*coarserot, Gtk::PACK_SHRINK, 2);
-    vboxes[4]->pack_start (*finerot, Gtk::PACK_SHRINK, 2);
-    vboxes[4]->pack_start (*crop, Gtk::PACK_SHRINK, 2);
-    vboxes[4]->pack_start (*resize, Gtk::PACK_SHRINK, 2);
-    vboxes[4]->pack_start (*prsharpening, Gtk::PACK_SHRINK, 2);
-    vboxes[4]->pack_start (*framing, Gtk::PACK_SHRINK, 2);
-    vboxes[4]->pack_start (*perspective, Gtk::PACK_SHRINK, 2);
-    vboxes[4]->pack_start (*commonTrans, Gtk::PACK_SHRINK, 2);
+    vboxes[4]->pack_start (*composition, Pack::SHRINK, 2);
+    vboxes[4]->pack_start (*hseps[4], Pack::SHRINK, 2);
+    vboxes[4]->pack_start (*coarserot, Pack::SHRINK, 2);
+    vboxes[4]->pack_start (*finerot, Pack::SHRINK, 2);
+    vboxes[4]->pack_start (*crop, Pack::SHRINK, 2);
+    vboxes[4]->pack_start (*resize, Pack::SHRINK, 2);
+    vboxes[4]->pack_start (*prsharpening, Pack::SHRINK, 2);
+    vboxes[4]->pack_start (*framing, Pack::SHRINK, 2);
+    vboxes[4]->pack_start (*perspective, Pack::SHRINK, 2);
+    vboxes[4]->pack_start (*commonTrans, Pack::SHRINK, 2);
 
     //ADVANCED
-    vboxes[5]->pack_start (*advanced, Gtk::PACK_SHRINK, 2);
-    vboxes[5]->pack_start (*hseps[5], Gtk::PACK_SHRINK, 2);
-    vboxes[5]->pack_start (*retinex, Gtk::PACK_SHRINK, 2);
-    vboxes[5]->pack_start (*colorappearance, Gtk::PACK_SHRINK, 2);
-    vboxes[5]->pack_start (*wavelet, Gtk::PACK_SHRINK, 2);
+    vboxes[5]->pack_start (*advanced, Pack::SHRINK, 2);
+    vboxes[5]->pack_start (*hseps[5], Pack::SHRINK, 2);
+    vboxes[5]->pack_start (*retinex, Pack::SHRINK, 2);
+    vboxes[5]->pack_start (*colorappearance, Pack::SHRINK, 2);
+    vboxes[5]->pack_start (*wavelet, Pack::SHRINK, 2);
 
     //LOCALLAB
-    vboxes[6]->pack_start(*locallab, Gtk::PACK_SHRINK, 2);
-    vboxes[6]->pack_start(*spots, Gtk::PACK_SHRINK, 2);
-    vboxes[6]->pack_start (*hseps[6], Gtk::PACK_SHRINK, 2);
+    vboxes[6]->pack_start(*locallab, Pack::SHRINK, 2);
+    vboxes[6]->pack_start(*spots, Pack::SHRINK, 2);
+    vboxes[6]->pack_start (*hseps[6], Pack::SHRINK, 2);
 
     //META
-    vboxes[7]->pack_start (*meta, Gtk::PACK_SHRINK, 2);
-    vboxes[7]->pack_start (*hseps[7], Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_method, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_border, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_imagenum, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_pixelshift, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_ccSteps, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_dcb_iterations, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_dcb_enhance, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_lmmse_iterations, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Gtk::PACK_SHRINK, 0);
-    vboxes[8]->pack_start (*raw_linenoise, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_greenthresh, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_hotpix_filt, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_deadpix_filt, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_pdaf_lines_filter, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Gtk::PACK_SHRINK, 0);
-    vboxes[8]->pack_start (*raw_expos, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_black, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_preprocwb, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Gtk::PACK_SHRINK, 0);
-    vboxes[8]->pack_start (*df_file, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*df_AutoSelect, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Gtk::PACK_SHRINK, 0);
-    vboxes[8]->pack_start (*ff_file, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*ff_AutoSelect, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*ff_FromMetaData, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*ff_BlurType, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*ff_BlurRadius, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*ff_ClipControl, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Gtk::PACK_SHRINK, 0);
-    vboxes[8]->pack_start (*raw_ca_autocorrect, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_caredblue, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*raw_ca_avoid_colourshift, Gtk::PACK_SHRINK, 2);
-    vboxes[8]->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Gtk::PACK_SHRINK, 0);
-    vboxes[8]->pack_start (*captureSharpening, Gtk::PACK_SHRINK, 2);
+    vboxes[7]->pack_start (*meta, Pack::SHRINK, 2);
+    vboxes[7]->pack_start (*hseps[7], Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_method, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_border, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_imagenum, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_pixelshift, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_ccSteps, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_dcb_iterations, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_dcb_enhance, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_lmmse_iterations, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Pack::SHRINK, 0);
+    vboxes[8]->pack_start (*raw_linenoise, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_greenthresh, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_hotpix_filt, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_deadpix_filt, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_pdaf_lines_filter, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Pack::SHRINK, 0);
+    vboxes[8]->pack_start (*raw_expos, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_black, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_preprocwb, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Pack::SHRINK, 0);
+    vboxes[8]->pack_start (*df_file, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*df_AutoSelect, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Pack::SHRINK, 0);
+    vboxes[8]->pack_start (*ff_file, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*ff_AutoSelect, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*ff_FromMetaData, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*ff_BlurType, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*ff_BlurRadius, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*ff_ClipControl, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Pack::SHRINK, 0);
+    vboxes[8]->pack_start (*raw_ca_autocorrect, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_caredblue, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*raw_ca_avoid_colourshift, Pack::SHRINK, 2);
+    vboxes[8]->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Pack::SHRINK, 0);
+    vboxes[8]->pack_start (*captureSharpening, Pack::SHRINK, 2);
 
     Gtk::Box* vbCol1 = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Box* vbCol2 = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Box* vbCol3 = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
 
     for (int i = 0; i < 3; i++) {
-        vbCol1->pack_start (*vboxes[i], Gtk::PACK_SHRINK, 2);
+        vbCol1->pack_start (*vboxes[i], Pack::SHRINK, 2);
     }
 
     for (int i = 3; i < 8; i++) {
-        vbCol2->pack_start (*vboxes[i], Gtk::PACK_SHRINK, 2);
+        vbCol2->pack_start (*vboxes[i], Pack::SHRINK, 2);
     }
 
     for (int i = 8; i < 9; i++) {
-        vbCol3->pack_start (*vboxes[i], Gtk::PACK_SHRINK, 2);
+        vbCol3->pack_start (*vboxes[i], Pack::SHRINK, 2);
     }
 
     Gtk::Box* vbtop = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
-    vbtop->pack_start (*everything, Gtk::PACK_SHRINK, 2);
+    vbtop->pack_start (*everything, Pack::SHRINK, 2);
 
-    Gtk::Dialog::get_content_area()->pack_start (*vbtop, Gtk::PACK_SHRINK, 2);
+    Gtk::Dialog::get_content_area()->pack_start (*vbtop, Pack::SHRINK, 2);
 
     Gtk::Box* hbmain = Gtk::manage (new Gtk::Box ());
     hbmain->pack_start (*vbCol1);
@@ -480,7 +480,7 @@ PartialPasteDlg::PartialPasteDlg (const Glib::ustring &title, Gtk::Window* paren
 
     scrolledwindow->add(*hbmain);
 
-    Gtk::Dialog::get_content_area()->pack_start (*scrolledwindow, Gtk::PACK_EXPAND_WIDGET, 2);
+    Gtk::Dialog::get_content_area()->pack_start (*scrolledwindow, Pack::EXPAND_WIDGET, 2);
 
     hbmain->show();
     scrolledwindow->show ();

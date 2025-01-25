@@ -50,7 +50,7 @@ PrSharpening::PrSharpening () : FoldableToolPanel(this, TOOL_NAME, M("TP_PRSHARP
     method->append (M("TP_SHARPENING_USM"));
     method->append (M("TP_SHARPENING_RLD"));
     method->show ();
-    hb->pack_start(*ml, Gtk::PACK_SHRINK, 4);
+    hb->pack_start(*ml, Pack::SHRINK, 4);
     hb->pack_start(*method);
     pack_start (*hb);
 
@@ -78,7 +78,7 @@ PrSharpening::PrSharpening () : FoldableToolPanel(this, TOOL_NAME, M("TP_PRSHARP
     threshold = Gtk::manage (new ThresholdAdjuster (M("TP_SHARPENING_THRESHOLD"), 0., 2000., 20., 80., 2000., 1200., 0, false));
     threshold->setAdjusterListener (this);
     threshold->setBgGradient(milestones);
-    pack_start(*hsep6a, Gtk::PACK_SHRINK, 2);
+    pack_start(*hsep6a, Pack::SHRINK, 2);
 
     pack_start (*usm);
 
@@ -96,7 +96,7 @@ PrSharpening::PrSharpening () : FoldableToolPanel(this, TOOL_NAME, M("TP_PRSHARP
     edgebox = new Gtk::Box(Gtk::Orientation::VERTICAL);
     eradius = Gtk::manage (new Adjuster (M("TP_SHARPENING_EDRADIUS"), 0.5, 2.5, 0.1, 1.9));
     etolerance = Gtk::manage (new Adjuster (M("TP_SHARPENING_EDTOLERANCE"), 10, 10000, 100, 1800));
-    usm->pack_start(*hsep6, Gtk::PACK_SHRINK, 2);
+    usm->pack_start(*hsep6, Pack::SHRINK, 2);
     usm->pack_start(*edgesonly);
     edgebox->pack_start(*eradius);
     edgebox->pack_start(*etolerance);
@@ -114,7 +114,7 @@ PrSharpening::PrSharpening () : FoldableToolPanel(this, TOOL_NAME, M("TP_PRSHARP
     halocontrol->set_active (false);
     hcbox = new Gtk::Box(Gtk::Orientation::VERTICAL);
     hcamount = Gtk::manage (new Adjuster (M("TP_SHARPENING_HCAMOUNT"), 1, 100, 1, 75));
-    usm->pack_start(*hsep6b, Gtk::PACK_SHRINK, 2);
+    usm->pack_start(*hsep6b, Pack::SHRINK, 2);
     usm->pack_start(*halocontrol);
     hcbox->pack_start(*hcamount);
     hcbox->show ();

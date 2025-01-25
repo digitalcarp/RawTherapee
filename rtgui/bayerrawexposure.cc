@@ -66,12 +66,12 @@ BayerRAWExposure::BayerRAWExposure () : FoldableToolPanel(this, TOOL_NAME, M("TP
     Dehablack->set_active (false);
     Dehablack->setCheckBoxListener (this);
 
-    pack_start( *PexBlack1, Gtk::PACK_SHRINK, 0);//black R
-    pack_start( *PexBlack0, Gtk::PACK_SHRINK, 0);//black G1
-    pack_start( *PexBlack3, Gtk::PACK_SHRINK, 0);//black G2
-    pack_start( *PexBlack2, Gtk::PACK_SHRINK, 0);//black B
-    pack_start( *PextwoGreen, Gtk::PACK_SHRINK, 0);//black 2 green
-    pack_start( *Dehablack, Gtk::PACK_SHRINK, 0);//black Dehaze
+    pack_start( *PexBlack1, Pack::SHRINK, 0);//black R
+    pack_start( *PexBlack0, Pack::SHRINK, 0);//black G1
+    pack_start( *PexBlack3, Pack::SHRINK, 0);//black G2
+    pack_start( *PexBlack2, Pack::SHRINK, 0);//black B
+    pack_start( *PextwoGreen, Pack::SHRINK, 0);//black 2 green
+    pack_start( *Dehablack, Pack::SHRINK, 0);//black Dehaze
 
     PexBlack0->setLogScale(100, 0);
     PexBlack1->setLogScale(100, 0);

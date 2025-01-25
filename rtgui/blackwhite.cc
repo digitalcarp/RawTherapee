@@ -49,7 +49,7 @@ BlackWhite::BlackWhite (): FoldableToolPanel(this, TOOL_NAME, M("TP_BWMIX_LABEL"
     Gtk::Box* metHBox = Gtk::manage (new Gtk::Box ());
     metHBox->set_spacing (2);
     Gtk::Label* metLabel = Gtk::manage (new Gtk::Label (M("TP_BWMIX_MET") + ":"));
-    metHBox->pack_start (*metLabel, Gtk::PACK_SHRINK);
+    metHBox->pack_start (*metLabel, Pack::SHRINK);
    
 	method = Gtk::manage (new MyComboBoxText ());
     method->append (M("TP_BWMIX_MET_DESAT"));
@@ -86,13 +86,13 @@ BlackWhite::BlackWhite (): FoldableToolPanel(this, TOOL_NAME, M("TP_BWMIX_LABEL"
     luminanceCurve->setTooltip(M("TP_BWMIX_CURVEEDITOR_LH_TOOLTIP"));
 
     luminanceCEG->curveListComplete();
-    pack_start (*luminanceCEG, Gtk::PACK_SHRINK, 4);
+    pack_start (*luminanceCEG, Pack::SHRINK, 4);
 
     //----------- Auto and Reset buttons ------------------------------
 
     mixerFrame = Gtk::manage (new Gtk::Frame (M("TP_BWMIX_MET_CHANMIX")));
     mixerFrame->set_label_align(0.025, 0.5);
-    pack_start (*mixerFrame, Gtk::PACK_SHRINK, 0);
+    pack_start (*mixerFrame, Pack::SHRINK, 0);
 
     mixerVBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     mixerVBox->set_spacing(4);
@@ -120,7 +120,7 @@ BlackWhite::BlackWhite (): FoldableToolPanel(this, TOOL_NAME, M("TP_BWMIX_LABEL"
     settingHBox->set_tooltip_markup (M("TP_BWMIX_SETTING_TOOLTIP"));
     Gtk::Label *settingLabel = Gtk::manage (new Gtk::Label (M("TP_BWMIX_SETTING") + ":"));
 
-    settingHBox->pack_start (*settingLabel, Gtk::PACK_SHRINK);
+    settingHBox->pack_start (*settingLabel, Pack::SHRINK);
     setting = Gtk::manage (new MyComboBoxText ());
     setting->append (M("TP_BWMIX_SET_NORMCONTAST"));
     setting->append (M("TP_BWMIX_SET_HIGHCONTAST"));
@@ -157,7 +157,7 @@ BlackWhite::BlackWhite (): FoldableToolPanel(this, TOOL_NAME, M("TP_BWMIX_LABEL"
     enabledcc->set_active (true);
     enabledcc->set_tooltip_markup (M("TP_BWMIX_CC_TOOLTIP"));
 
-    mixerVBox->pack_start(*enabledcc, Gtk::PACK_SHRINK, 0);
+    mixerVBox->pack_start(*enabledcc, Pack::SHRINK, 0);
     enabledcc->show ();
     enaccconn = enabledcc->signal_toggled().connect( sigc::mem_fun(*this, &BlackWhite::enabledcc_toggled) );
 
@@ -170,7 +170,7 @@ BlackWhite::BlackWhite (): FoldableToolPanel(this, TOOL_NAME, M("TP_BWMIX_LABEL"
     filterHBox->set_spacing (2);
     filterHBox->set_tooltip_markup (M("TP_BWMIX_FILTER_TOOLTIP"));
     Gtk::Label *filterLabel = Gtk::manage (new Gtk::Label (M("TP_BWMIX_FILTER") + ":"));
-    filterHBox->pack_start (*filterLabel, Gtk::PACK_SHRINK);
+    filterHBox->pack_start (*filterLabel, Pack::SHRINK);
     filter = Gtk::manage (new MyComboBoxText ());
     filter->append (M("TP_BWMIX_FILTER_NONE"));
     filter->append (M("TP_BWMIX_FILTER_RED"));
@@ -209,21 +209,21 @@ BlackWhite::BlackWhite (): FoldableToolPanel(this, TOOL_NAME, M("TP_BWMIX_LABEL"
     mixerRed->setAdjusterListener (this);
     mixerRed->set_tooltip_markup (M("TP_BWMIX_RGB_TOOLTIP"));
     mixerRed->show();
-    mixerVBox->pack_start( *mixerRed, Gtk::PACK_SHRINK, 0);
+    mixerVBox->pack_start( *mixerRed, Pack::SHRINK, 0);
 
     mixerGreen = Gtk::manage(new Adjuster (/*M("TP_BWMIX_GREEN")*/"", -100, 200, 1, 33, imgIcon[3]));
 
     mixerGreen->setAdjusterListener (this);
     mixerGreen->set_tooltip_markup (M("TP_BWMIX_RGB_TOOLTIP"));
     mixerGreen->show();
-    mixerVBox->pack_start( *mixerGreen, Gtk::PACK_SHRINK, 0);
+    mixerVBox->pack_start( *mixerGreen, Pack::SHRINK, 0);
 
     mixerBlue = Gtk::manage(new Adjuster (/*M("TP_BWMIX_BLUE")*/"", -100, 200, 1, 33, imgIcon[5]));
 
     mixerBlue->setAdjusterListener (this);
     mixerBlue->set_tooltip_markup (M("TP_BWMIX_RGB_TOOLTIP"));
     mixerBlue->show();
-    mixerVBox->pack_start( *mixerBlue, Gtk::PACK_SHRINK, 0);
+    mixerVBox->pack_start( *mixerBlue, Pack::SHRINK, 0);
 
     filterSep2 = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     mixerVBox->pack_start (*filterSep2);
@@ -233,7 +233,7 @@ BlackWhite::BlackWhite (): FoldableToolPanel(this, TOOL_NAME, M("TP_BWMIX_LABEL"
     algoHBox->set_tooltip_markup (M("TP_BWMIX_ALGO_TOOLTIP"));
 
     alLabel = Gtk::manage (new Gtk::Label (M("TP_BWMIX_ALGO") + ":"));
-    algoHBox->pack_start (*alLabel, Gtk::PACK_SHRINK);
+    algoHBox->pack_start (*alLabel, Pack::SHRINK);
 
     algo = Gtk::manage (new MyComboBoxText ());
     algo->append (M("TP_BWMIX_ALGO_LI"));
@@ -248,35 +248,35 @@ BlackWhite::BlackWhite (): FoldableToolPanel(this, TOOL_NAME, M("TP_BWMIX_LABEL"
     mixerOrange->setAdjusterListener (this);
     mixerOrange->set_tooltip_markup (M("TP_BWMIX_RGB_TOOLTIP"));
     mixerOrange->show();
-    mixerVBox->pack_start( *mixerOrange, Gtk::PACK_SHRINK, 0);
+    mixerVBox->pack_start( *mixerOrange, Pack::SHRINK, 0);
 
     mixerYellow = Gtk::manage(new Adjuster (/*M("TP_BWMIX_YELLOW")*/"", -100, 200, 1, 33, imgIcon[2]));
 
     mixerYellow->setAdjusterListener (this);
     mixerYellow->set_tooltip_markup (M("TP_BWMIX_RGB_TOOLTIP"));
     mixerYellow->show();
-    mixerVBox->pack_start( *mixerYellow, Gtk::PACK_SHRINK, 0);
+    mixerVBox->pack_start( *mixerYellow, Pack::SHRINK, 0);
 
     mixerCyan = Gtk::manage(new Adjuster (/*M("TP_BWMIX_CYAN")*/"", -100, 200, 1, 33, imgIcon[4]));
 
     mixerCyan->setAdjusterListener (this);
     mixerCyan->set_tooltip_markup (M("TP_BWMIX_RGB_TOOLTIP"));
     mixerCyan->show();
-    mixerVBox->pack_start( *mixerCyan, Gtk::PACK_SHRINK, 0);
+    mixerVBox->pack_start( *mixerCyan, Pack::SHRINK, 0);
 
     mixerPurple = Gtk::manage(new Adjuster (/*M("TP_BWMIX_PURPLE")*/"", -100, 200, 1, 33, imgIcon[6]));
 
     mixerPurple->setAdjusterListener (this);
     mixerPurple->set_tooltip_markup (M("TP_BWMIX_RGB_TOOLTIP"));
     mixerPurple->show();
-    mixerVBox->pack_start( *mixerPurple, Gtk::PACK_SHRINK, 0);
+    mixerVBox->pack_start( *mixerPurple, Pack::SHRINK, 0);
 
     mixerMagenta = Gtk::manage(new Adjuster (/*M("TP_BWMIX_MAGENTA")*/"", -100, 200, 1, 33, imgIcon[7]));
 
     mixerMagenta->setAdjusterListener (this);
     mixerMagenta->set_tooltip_markup (M("TP_BWMIX_RGB_TOOLTIP"));
     mixerMagenta->show();
-    mixerVBox->pack_start( *mixerMagenta, Gtk::PACK_SHRINK, 0);
+    mixerVBox->pack_start( *mixerMagenta, Pack::SHRINK, 0);
 
     mixerFrame->add(*mixerVBox);
 
@@ -284,7 +284,7 @@ BlackWhite::BlackWhite (): FoldableToolPanel(this, TOOL_NAME, M("TP_BWMIX_LABEL"
 
     gammaFrame = Gtk::manage (new Gtk::Frame (M("TP_BWMIX_GAMMA")));
     gammaFrame->set_label_align(0.025, 0.5);
-    pack_start (*gammaFrame, Gtk::PACK_SHRINK, 0);
+    pack_start (*gammaFrame, Pack::SHRINK, 0);
 
     Gtk::Box* gammaVBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     gammaVBox->set_spacing(4);
@@ -295,21 +295,21 @@ BlackWhite::BlackWhite (): FoldableToolPanel(this, TOOL_NAME, M("TP_BWMIX_LABEL"
     gammaRed->setAdjusterListener (this);
     gammaRed->set_tooltip_markup (M("TP_BWMIX_GAM_TOOLTIP"));
     gammaRed->show();
-    gammaVBox->pack_start( *gammaRed, Gtk::PACK_SHRINK, 0);
+    gammaVBox->pack_start( *gammaRed, Pack::SHRINK, 0);
 
     gammaGreen = Gtk::manage(new Adjuster (/*M("TP_BWMIX_GAM_GREEN")*/"", -100, 100, 1, 0, imgIcon[9]));
 
     gammaGreen->setAdjusterListener (this);
     gammaGreen->set_tooltip_markup (M("TP_BWMIX_GAM_TOOLTIP"));
     gammaGreen->show();
-    gammaVBox->pack_start( *gammaGreen, Gtk::PACK_SHRINK, 0);
+    gammaVBox->pack_start( *gammaGreen, Pack::SHRINK, 0);
 
     gammaBlue = Gtk::manage(new Adjuster (/*M("TP_BWMIX_GAM_BLUE")*/"", -100, 100, 1, 0, imgIcon[10]));
 
     gammaBlue->setAdjusterListener (this);
     gammaBlue->set_tooltip_markup (M("TP_BWMIX_GAM_TOOLTIP"));
     gammaBlue->show();
-    gammaVBox->pack_start( *gammaBlue, Gtk::PACK_SHRINK, 0);
+    gammaVBox->pack_start( *gammaBlue, Pack::SHRINK, 0);
 
     gammaFrame->add(*gammaVBox);
 
@@ -338,7 +338,7 @@ BlackWhite::BlackWhite (): FoldableToolPanel(this, TOOL_NAME, M("TP_BWMIX_LABEL"
     // This will add the reset button at the end of the curveType buttons
     beforeCurveCEG->curveListComplete();
 
-    pack_start( *beforeCurveCEG, Gtk::PACK_SHRINK, 2);
+    pack_start( *beforeCurveCEG, Pack::SHRINK, 2);
 
     tcmodeconn = beforeCurveMode->signal_changed().connect( sigc::mem_fun(*this, &BlackWhite::curveMode1Changed), true );
 
@@ -361,7 +361,7 @@ BlackWhite::BlackWhite (): FoldableToolPanel(this, TOOL_NAME, M("TP_BWMIX_LABEL"
 
     afterCurveCEG->curveListComplete();
 
-    pack_start( *afterCurveCEG, Gtk::PACK_SHRINK, 2);
+    pack_start( *afterCurveCEG, Pack::SHRINK, 2);
 
 //  tcmodeconn2 = afterCurveMode->signal_changed().connect( sigc::mem_fun(*this, &BlackWhite::curveMode1Changed2), true );
 

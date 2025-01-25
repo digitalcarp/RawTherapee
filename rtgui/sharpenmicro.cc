@@ -49,13 +49,13 @@ SharpenMicro::SharpenMicro () : FoldableToolPanel(this, TOOL_NAME, M("TP_SHARPEN
     uniformity->setAdjusterListener (this);
     uniformity->show();
 
-    pack_start( *contrast, Gtk::PACK_SHRINK, 0);
-    pack_start( *amount, Gtk::PACK_SHRINK, 0);
-    pack_start( *uniformity, Gtk::PACK_SHRINK, 0);
+    pack_start( *contrast, Pack::SHRINK, 0);
+    pack_start( *amount, Pack::SHRINK, 0);
+    pack_start( *uniformity, Pack::SHRINK, 0);
 
     matrix = Gtk::manage (new Gtk::CheckButton (M("TP_SHARPENMICRO_MATRIX")));
     matrix->set_active (true);
-    pack_start(*matrix, Gtk::PACK_SHRINK, 0);
+    pack_start(*matrix, Pack::SHRINK, 0);
     matrix->show ();
 
     matrixconn = matrix->signal_toggled().connect( sigc::mem_fun(*this, &SharpenMicro::matrix_toggled) );

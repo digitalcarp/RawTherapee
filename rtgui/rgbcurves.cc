@@ -73,7 +73,7 @@ RGBCurves::RGBCurves () : FoldableToolPanel(this, TOOL_NAME, M("TP_RGBCURVES_LAB
     // This will add the reset button at the end of the curveType buttons
     curveEditorG->curveListComplete();
 
-    pack_start (*curveEditorG, Gtk::PACK_SHRINK, 4);
+    pack_start (*curveEditorG, Pack::SHRINK, 4);
 
 }
 

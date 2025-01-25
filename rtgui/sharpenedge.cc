@@ -45,9 +45,9 @@ SharpenEdge::SharpenEdge () : FoldableToolPanel(this, TOOL_NAME, M("TP_SHARPENED
 
     threechannels = Gtk::manage(new Gtk::CheckButton((M("TP_SHARPENEDGE_THREE"))));// L + a + b
     threechannels->set_active (false);
-    pack_start( *passes, Gtk::PACK_SHRINK, 0);//passes
-    pack_start( *amount, Gtk::PACK_SHRINK, 0);//amount
-    pack_start( *threechannels, Gtk::PACK_SHRINK, 0);//one or 3 channels Lab
+    pack_start( *passes, Pack::SHRINK, 0);//passes
+    pack_start( *amount, Pack::SHRINK, 0);//amount
+    pack_start( *threechannels, Pack::SHRINK, 0);//one or 3 channels Lab
 
     chanthreeconn = threechannels->signal_toggled().connect( sigc::mem_fun(*this, &SharpenEdge::chanthree_toggled) );
 }

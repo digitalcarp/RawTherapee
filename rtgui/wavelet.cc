@@ -323,7 +323,7 @@ Wavelet::Wavelet() :
     complexmethod->set_tooltip_text(M("TP_WAVELET_COMPLEX_TOOLTIP"));
     Gtk::Box* const complexHBox = Gtk::manage(new Gtk::Box());
     Gtk::Label* const complexLabel = Gtk::manage(new Gtk::Label(M("TP_WAVELET_COMPLEXLAB") + ":"));
-    complexHBox->pack_start(*complexLabel, Gtk::PACK_SHRINK, 4);
+    complexHBox->pack_start(*complexLabel, Pack::SHRINK, 4);
     complexHBox->pack_start(*complexmethod);
 
 
@@ -334,7 +334,7 @@ Wavelet::Wavelet() :
     Tilesmethod->set_tooltip_text(M("TP_WAVELET_TILES_TOOLTIP"));
     Gtk::Box* const tilesizeHBox = Gtk::manage(new Gtk::Box());
     Gtk::Label* const tilesizeLabel = Gtk::manage(new Gtk::Label(M("TP_WAVELET_TILESIZE") + ":"));
-    tilesizeHBox->pack_start(*tilesizeLabel, Gtk::PACK_SHRINK, 4);
+    tilesizeHBox->pack_start(*tilesizeLabel, Pack::SHRINK, 4);
     tilesizeHBox->pack_start(*Tilesmethod);
 
     daubcoeffmethod->set_sensitive(true);
@@ -347,7 +347,7 @@ Wavelet::Wavelet() :
     daubcoeffmethod->set_tooltip_text(M("TP_WAVELET_DAUB_TOOLTIP"));
     Gtk::Label* const daubcoeffLabel = Gtk::manage(new Gtk::Label(M("TP_WAVELET_DAUB") + ":"));
     Gtk::Box* const daubcoeffHBox = Gtk::manage(new Gtk::Box());
-    daubcoeffHBox->pack_start(*daubcoeffLabel, Gtk::PACK_SHRINK, 4);
+    daubcoeffHBox->pack_start(*daubcoeffLabel, Pack::SHRINK, 4);
     daubcoeffHBox->pack_start(*daubcoeffmethod);
 
     Backmethod->append(M("TP_WAVELET_B0"));
@@ -356,7 +356,7 @@ Wavelet::Wavelet() :
     Backmethodconn = Backmethod->signal_changed().connect(sigc::mem_fun(*this, &Wavelet::BackmethodChanged));
     Gtk::Box* const backgroundHBox = Gtk::manage(new Gtk::Box());
     Gtk::Label* const backgroundLabel = Gtk::manage(new Gtk::Label(M("TP_WAVELET_BACKGROUND") + ":"));
-    backgroundHBox->pack_start(*backgroundLabel, Gtk::PACK_SHRINK, 4);
+    backgroundHBox->pack_start(*backgroundLabel, Pack::SHRINK, 4);
     backgroundHBox->pack_start(*Backmethod);
 
     CLmethod->append(M("TP_WAVELET_LEVDIR_ONE"));
@@ -366,7 +366,7 @@ Wavelet::Wavelet() :
     CLmethodconn = CLmethod->signal_changed().connect(sigc::mem_fun(*this, &Wavelet::CLmethodChanged));
     Gtk::Box* const levdirMainHBox = Gtk::manage(new Gtk::Box());
     Gtk::Label* const levdirMainLabel = Gtk::manage(new Gtk::Label(M("TP_WAVELET_PROC") + ":"));
-    levdirMainHBox->pack_start(*levdirMainLabel, Gtk::PACK_SHRINK, 4);
+    levdirMainHBox->pack_start(*levdirMainLabel, Pack::SHRINK, 4);
     levdirMainHBox->pack_start(*CLmethod); //same
 
     Lmethod->set_sensitive(false);
@@ -391,7 +391,7 @@ Wavelet::Wavelet() :
     Dirmethodconn = Dirmethod->signal_changed().connect(sigc::mem_fun(*this, &Wavelet::DirmethodChanged));
     Gtk::Box* const levdirSubHBox = Gtk::manage(new Gtk::Box());
     levdirSubHBox->pack_start(*Lmethod);
-    levdirSubHBox->pack_start(*Dirmethod, Gtk::PACK_EXPAND_WIDGET, 2); // same, but 2 not 4?
+    levdirSubHBox->pack_start(*Dirmethod, Pack::EXPAND_WIDGET, 2); // same, but 2 not 4?
 
     settingsBox->pack_start(*complexHBox);
     settingsBox->pack_start(*strength);
@@ -408,7 +408,7 @@ Wavelet::Wavelet() :
     Gtk::Box* const buttonBox = Gtk::manage(new Gtk::Box());
     buttonBox->set_spacing(10);
     buttonBox->set_homogeneous(true);
-    levBox->pack_start(*buttonBox, Gtk::PACK_SHRINK, 2);
+    levBox->pack_start(*buttonBox, Pack::SHRINK, 2);
 
     Gtk::Button* const contrastMinusButton = Gtk::manage(new Gtk::Button(M("TP_WAVELET_CONTRAST_MINUS")));
     buttonBox->pack_start(*contrastMinusButton);
@@ -450,14 +450,14 @@ Wavelet::Wavelet() :
     levBox->pack_start(*separatorcont);
 
     sigma->setAdjusterListener(this);
-    levBox->pack_start(*sigma, Gtk::PACK_SHRINK);
+    levBox->pack_start(*sigma, Pack::SHRINK);
     offset->setAdjusterListener(this);
-    levBox->pack_start(*offset, Gtk::PACK_SHRINK);
+    levBox->pack_start(*offset, Pack::SHRINK);
     sigma->set_tooltip_text(M("TP_WAVELET_SIGMA_TOOLTIP"));
     offset->set_tooltip_text(M("TP_WAVELET_OFFSET_TOOLTIP"));
     lowthr->setAdjusterListener(this);
     lowthr->set_tooltip_text(M("TP_WAVELET_LOWTHR_TOOLTIP"));
-    levBox->pack_start(*lowthr, Gtk::PACK_SHRINK);
+    levBox->pack_start(*lowthr, Pack::SHRINK);
 
     wavLabels->show();
     levBox->pack_start(*wavLabels);
@@ -514,7 +514,7 @@ Wavelet::Wavelet() :
 
     Gtk::Label* const labmch = Gtk::manage(new Gtk::Label(M("TP_WAVELET_CHTYPE") + ":"));
 //    Gtk::Box* const ctboxch = Gtk::manage(new Gtk::Box());
-    ctboxch->pack_start(*labmch, Gtk::PACK_SHRINK, 1);
+    ctboxch->pack_start(*labmch, Pack::SHRINK, 1);
 
     CHmethod->append(M("TP_WAVELET_CH1"));
     CHmethod->append(M("TP_WAVELET_CH2"));
@@ -524,7 +524,7 @@ Wavelet::Wavelet() :
     chBox->pack_start(*ctboxch);
 
     Gtk::Box* const ctboxCH = Gtk::manage(new Gtk::Box());
-    ctboxCH->pack_start(*labmC, Gtk::PACK_SHRINK, 1);
+    ctboxCH->pack_start(*labmC, Pack::SHRINK, 1);
 
     CHSLmethod->append(M("TP_WAVELET_CHSL"));
     CHSLmethod->append(M("TP_WAVELET_CHCU"));
@@ -532,7 +532,7 @@ Wavelet::Wavelet() :
     ctboxCH->pack_start(*CHSLmethod);
 
     Gtk::Separator* const separatorChromaMethod = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
-    chBox->pack_start(*separatorChromaMethod, Gtk::PACK_SHRINK, 2);
+    chBox->pack_start(*separatorChromaMethod, Pack::SHRINK, 2);
 
     chroma->set_tooltip_text(M("TP_WAVELET_CHRO_TOOLTIP"));
     chBox->pack_start(*chroma);
@@ -557,10 +557,10 @@ Wavelet::Wavelet() :
     buttonchBox->set_spacing(10);
     buttonchBox->set_homogeneous(true);
     neutralchPressedConn = neutralchButton->signal_pressed().connect(sigc::mem_fun(*this, &Wavelet::neutralchPressed));
-    chBox->pack_start(*separatorNeutral, Gtk::PACK_SHRINK, 2);
+    chBox->pack_start(*separatorNeutral, Pack::SHRINK, 2);
     buttonchBox->pack_start(*neutralchButton);
     buttonchBox->show_all_children();
-    chBox->pack_start(*buttonchBox, Gtk::PACK_SHRINK, 2);
+    chBox->pack_start(*buttonchBox, Pack::SHRINK, 2);
 
     for (int i = 0; i < 9; i++) {
         Glib::ustring ss;
@@ -609,13 +609,13 @@ Wavelet::Wavelet() :
 
     tonFrame->set_label_align(0.025, 0.5);
     ToolParamBlock* const ton2Box = Gtk::manage(new ToolParamBlock());
-    ton2Box->pack_start(*labgrid, Gtk::PACK_EXPAND_WIDGET, 2);
+    ton2Box->pack_start(*labgrid, Pack::EXPAND_WIDGET, 2);
     ton2Box->pack_start(*rangeab);
     ton2Box->pack_start(*protab);
     tonFrame->add(*ton2Box);
     tonBox->pack_start(*tonFrame);
 
-    tonBox->pack_start(*opaCurveEditorG, Gtk::PACK_SHRINK, 2);
+    tonBox->pack_start(*opaCurveEditorG, Pack::SHRINK, 2);
 
     opacityCurveEditorG->setCurveListener(this);
 
@@ -632,7 +632,7 @@ Wavelet::Wavelet() :
     opacityCurveEditorG->curveListComplete();
     opacityCurveEditorG->show();
 
-    tonBox->pack_start(*opacityCurveEditorG, Gtk::PACK_SHRINK, 2);
+    tonBox->pack_start(*opacityCurveEditorG, Pack::SHRINK, 2);
 
 // Denoise and Refine
     ToolParamBlock* const noiseBox = Gtk::manage(new ToolParamBlock());
@@ -674,7 +674,7 @@ Wavelet::Wavelet() :
     quamethodconn = quamethod->signal_changed().connect(sigc::mem_fun(*this, &Wavelet::quamethodChanged));
 //    quamethod->set_tooltip_text(M("TP_WAVELET_DENQUA_TOOLTIP"));
     Gtk::Label* const quaLabel = Gtk::manage(new Gtk::Label(M("TP_WAVELET_DENQUA") + ":"));
-    quaHBox->pack_start(*quaLabel, Gtk::PACK_SHRINK, 4);
+    quaHBox->pack_start(*quaLabel, Pack::SHRINK, 4);
     quaHBox->pack_start(*quamethod);
 
     slimethod->append(M("TP_WAVELET_DENSLI"));
@@ -682,7 +682,7 @@ Wavelet::Wavelet() :
     slimethodconn = slimethod->signal_changed().connect(sigc::mem_fun(*this, &Wavelet::slimethodChanged));
 //    slimethod->set_tooltip_text(M("TP_WAVELET_DENSLI_TOOLTIP"));
     Gtk::Label* const sliLabel = Gtk::manage(new Gtk::Label(M("TP_WAVELET_DENSLILAB") + ":"));
-    sliHBox->pack_start(*sliLabel, Gtk::PACK_SHRINK, 4);
+    sliHBox->pack_start(*sliLabel, Pack::SHRINK, 4);
     sliHBox->pack_start(*slimethod);
 
 
@@ -695,7 +695,7 @@ Wavelet::Wavelet() :
     //denmethod->set_tooltip_text(M("TP_WAVELET_DENEQUAL_TOOLTIP"));
 //    Gtk::Box* const denHBox = Gtk::manage(new Gtk::Box());
     //Gtk::Label* const denLabel = Gtk::manage(new Gtk::Label(M("TP_WAVELET_DENCONTRAST") + ":"));
-    //denHBox->pack_start(*denLabel, Gtk::PACK_SHRINK, 4);
+    //denHBox->pack_start(*denLabel, Pack::SHRINK, 4);
     //denHBox->pack_start(*denmethod);
 
     mixmethod->append(M("TP_WAVELET_MIXNOISE"));
@@ -705,7 +705,7 @@ Wavelet::Wavelet() :
     mixmethodconn = mixmethod->signal_changed().connect(sigc::mem_fun(*this, &Wavelet::mixmethodChanged));
     mixmethod->set_tooltip_text(M("TP_WAVELET_DENMIX_TOOLTIP"));
     Gtk::Label* const mixLabel = Gtk::manage(new Gtk::Label(M("TP_WAVELET_MIXCONTRAST") + ":"));
-    mixHBox->pack_start(*mixLabel, Gtk::PACK_SHRINK, 4);
+    mixHBox->pack_start(*mixLabel, Pack::SHRINK, 4);
     mixHBox->pack_start(*mixmethod);
 
     wavdenoise = static_cast<FlatCurveEditor*>(CurveEditorwavnoise->addCurve(CT_Flat, "", nullptr, false, false));
@@ -750,18 +750,18 @@ Wavelet::Wavelet() :
 
     noiseBox->pack_start(*ballum);
     noiseBox->pack_start(*CurveEditorwavhue);
-    noiseBox->pack_start(*level0noise, Gtk::PACK_SHRINK, 0);
-    noiseBox->pack_start(*level1noise, Gtk::PACK_SHRINK, 0);
-    noiseBox->pack_start(*level2noise, Gtk::PACK_SHRINK, 0);
-    noiseBox->pack_start(*level3noise, Gtk::PACK_SHRINK, 0);
+    noiseBox->pack_start(*level0noise, Pack::SHRINK, 0);
+    noiseBox->pack_start(*level1noise, Pack::SHRINK, 0);
+    noiseBox->pack_start(*level2noise, Pack::SHRINK, 0);
+    noiseBox->pack_start(*level3noise, Pack::SHRINK, 0);
    // noiseBox->pack_start(*levden);
-    noiseBox->pack_start(*leveldenoise, Gtk::PACK_SHRINK, 0);
+    noiseBox->pack_start(*leveldenoise, Pack::SHRINK, 0);
     noiseBox->pack_start(*thrden);
     noiseBox->pack_start(*quaHBox);
     noiseBox->pack_start(*sliHBox);
     //noiseBox->pack_start(*denHBox);
     noiseBox->pack_start(*mixHBox);
-    noiseBox->pack_start(*levelsigm, Gtk::PACK_SHRINK, 0);
+    noiseBox->pack_start(*levelsigm, Pack::SHRINK, 0);
     noiseBox->pack_start(*limden);
     noiseBox->pack_start(*sigm);
     noiseBox->pack_start(*CurveEditorwavnoise);
@@ -795,7 +795,7 @@ Wavelet::Wavelet() :
     ushamethod->append(M("TP_WAVELET_CLA"));
     ushamethodconn = ushamethod->signal_changed().connect(sigc::mem_fun(*this, &Wavelet::ushamethodChanged));
     ushamethod->set_tooltip_text(M("TP_WAVELET_USH_TOOLTIP"));
-    usharpHBox->pack_start(*usharpLabel, Gtk::PACK_SHRINK, 0);
+    usharpHBox->pack_start(*usharpLabel, Pack::SHRINK, 0);
     usharpHBox->pack_start(*ushamethod);
 
     clariBox->pack_start(*usharpHBox);
@@ -824,7 +824,7 @@ Wavelet::Wavelet() :
 
     Gtk::Label* const labmedgr = Gtk::manage(new Gtk::Label(M("TP_WAVELET_MEDGREINF") + ":"));
     Gtk::Box* const edbox = Gtk::manage(new Gtk::Box());
-    edbox->pack_start(*labmedgr, Gtk::PACK_SHRINK, 1);
+    edbox->pack_start(*labmedgr, Pack::SHRINK, 1);
 
     Medgreinf->append(M("TP_WAVELET_RE1"));
     Medgreinf->append(M("TP_WAVELET_RE2"));
@@ -835,11 +835,11 @@ Wavelet::Wavelet() :
     edgBox->pack_start(*edbox);
 
     Gtk::Separator* const separatorlc = Gtk::manage(new  Gtk::Separator(Gtk::Orientation::HORIZONTAL));
-    edgBox->pack_start(*separatorlc, Gtk::PACK_SHRINK, 2);
+    edgBox->pack_start(*separatorlc, Pack::SHRINK, 2);
 
     Gtk::Label* const labmED = Gtk::manage(new Gtk::Label(M("TP_WAVELET_EDTYPE") + ":"));
     Gtk::Box* const ctboxED = Gtk::manage(new Gtk::Box());
-    ctboxED->pack_start(*labmED, Gtk::PACK_SHRINK, 1);
+    ctboxED->pack_start(*labmED, Pack::SHRINK, 1);
 
     EDmethod->append(M("TP_WAVELET_EDSL"));
     EDmethod->append(M("TP_WAVELET_EDCU"));
@@ -865,14 +865,14 @@ Wavelet::Wavelet() :
     // -->
 
     edgBox->pack_start(*edgcont);
-    edgBox->pack_start(*CCWcurveEditorG, Gtk::PACK_SHRINK, 4);
+    edgBox->pack_start(*CCWcurveEditorG, Pack::SHRINK, 4);
 
     medianlev->set_active(true);
     medianlevConn = medianlev->signal_toggled().connect(sigc::mem_fun(*this, &Wavelet::medianlevToggled));
     medianlev->set_tooltip_text(M("TP_WAVELET_MEDILEV_TOOLTIP"));
 
     Gtk::Separator* const separatored1 = Gtk::manage(new  Gtk::Separator(Gtk::Orientation::HORIZONTAL));
-    edgBox->pack_start(*separatored1, Gtk::PACK_SHRINK, 2);
+    edgBox->pack_start(*separatored1, Pack::SHRINK, 2);
 
     Gtk::Box* const eddebox = Gtk::manage(new Gtk::Box());
     edgBox->pack_start(*eddebox);
@@ -889,7 +889,7 @@ Wavelet::Wavelet() :
     edgedetectthr2->setAdjusterListener(this);
     edgBox->pack_start(*edgedetectthr2);
 
-    edgBox->pack_start(*separatoredge, Gtk::PACK_SHRINK, 2);
+    edgBox->pack_start(*separatoredge, Pack::SHRINK, 2);
 
     lipst->set_active(true);
     lipstConn = lipst->signal_toggled().connect(sigc::mem_fun(*this, &Wavelet::lipstToggled));
@@ -907,7 +907,7 @@ Wavelet::Wavelet() :
     ctboxES->set_spacing(2);
 
     Gtk::Box* const ctboxNP = Gtk::manage(new Gtk::Box());
-    ctboxNP->pack_start(*labmNP, Gtk::PACK_SHRINK, 1);
+    ctboxNP->pack_start(*labmNP, Pack::SHRINK, 1);
 
     NPmethod->append(M("TP_WAVELET_NPNONE"));
     NPmethod->append(M("TP_WAVELET_NPLOW"));
@@ -936,7 +936,7 @@ Wavelet::Wavelet() :
 
     blBox->pack_start(*bluwav);
     bluwav->setAdjusterListener(this);
-    blBox->pack_start(*curveEditorbl, Gtk::PACK_SHRINK, 4);
+    blBox->pack_start(*curveEditorbl, Pack::SHRINK, 4);
 
 
     chrwav->setAdjusterListener(this);
@@ -988,7 +988,7 @@ Wavelet::Wavelet() :
     curveEditorGAM->curveListComplete();
     Chshape->setBottomBarBgGradient(milestones);
 
-    conBox->pack_start(*curveEditorGAM, Gtk::PACK_SHRINK, 4);
+    conBox->pack_start(*curveEditorGAM, Pack::SHRINK, 4);
 
     avoid->set_active(true);
     avoidConn = avoid->signal_toggled().connect(sigc::mem_fun(*this, &Wavelet::avoidToggled));
@@ -1014,11 +1014,11 @@ Wavelet::Wavelet() :
     shFrame->set_label_align(0.025, 0.5);
     ToolParamBlock* const shBox = Gtk::manage(new ToolParamBlock());
     shBox->pack_start(*oldsh);
-    shBox->pack_start(*rescon, Gtk::PACK_SHRINK);
+    shBox->pack_start(*rescon, Pack::SHRINK);
     shBox->pack_start(*thr);
-    shBox->pack_start(*resconH, Gtk::PACK_SHRINK);
-    shBox->pack_start(*thrH, Gtk::PACK_SHRINK);
-    shBox->pack_start(*radius, Gtk::PACK_SHRINK);
+    shBox->pack_start(*resconH, Pack::SHRINK);
+    shBox->pack_start(*thrH, Pack::SHRINK);
+    shBox->pack_start(*radius, Pack::SHRINK);
     shFrame->add(*shBox);
     resBox->pack_start(*shFrame);
 
@@ -1047,10 +1047,10 @@ Wavelet::Wavelet() :
 
     Gtk::Label* const labmTM = Gtk::manage(new Gtk::Label(M("TP_WAVELET_TMTYPE") + ":"));
     Gtk::Box* const ctboxTM = Gtk::manage(new Gtk::Box());
-    ctboxTM->pack_start(*labmTM, Gtk::PACK_SHRINK, 1);
+    ctboxTM->pack_start(*labmTM, Pack::SHRINK, 1);
 
 //    Gtk::Separator* const separatorR0 = Gtk::manage(new  Gtk::Separator(Gtk::Orientation::HORIZONTAL));
-//    resBox->pack_start(*separatorR0, Gtk::PACK_SHRINK, 2);
+//    resBox->pack_start(*separatorR0, Pack::SHRINK, 2);
 
     TMmethod->append(M("TP_WAVELET_COMPCONT"));
     TMmethod->append(M("TP_WAVELET_COMPTM"));
@@ -1084,7 +1084,7 @@ Wavelet::Wavelet() :
     resBox->pack_start(*contFrame);
 
 //    Gtk::Separator* const separatorR1 = Gtk::manage(new  Gtk::Separator(Gtk::Orientation::HORIZONTAL));
-//    resBox->pack_start(*separatorR1, Gtk::PACK_SHRINK, 2);
+//    resBox->pack_start(*separatorR1, Pack::SHRINK, 2);
 
     hueskin2->set_tooltip_markup(M("TP_WAVELET_HUESKY_TOOLTIP"));
     hueskin2->setBgGradient(milestones);
@@ -1107,7 +1107,7 @@ Wavelet::Wavelet() :
     curveEditorRES->curveListComplete();
     hhshape->setBottomBarBgGradient(milestones3);
 
-    resBox->pack_start(*curveEditorRES, Gtk::PACK_SHRINK, 4);
+    resBox->pack_start(*curveEditorRES, Pack::SHRINK, 4);
 
     // Toning and Color Balance
     Gtk::Separator* const separatorCB = Gtk::manage(new  Gtk::Separator(Gtk::Orientation::HORIZONTAL));
@@ -1156,22 +1156,22 @@ Wavelet::Wavelet() :
     greenhigh->setAdjusterListener(this);
     bluehigh->setAdjusterListener(this);
 
-    resBox->pack_start(*separatorCB, Gtk::PACK_SHRINK);
+    resBox->pack_start(*separatorCB, Pack::SHRINK);
 
     chanMixerHLFrame->add(*chanMixerHLBox);
     chanMixerMidFrame->add(*chanMixerMidBox);
     chanMixerShadowsFrame->add(*chanMixerShadowsBox);
     resBox->pack_start(*cbenab);
 
-    resBox->pack_start(*chanMixerHLFrame, Gtk::PACK_SHRINK);
-    resBox->pack_start(*chanMixerMidFrame, Gtk::PACK_SHRINK);
-    resBox->pack_start(*chanMixerShadowsFrame, Gtk::PACK_SHRINK);
+    resBox->pack_start(*chanMixerHLFrame, Pack::SHRINK);
+    resBox->pack_start(*chanMixerMidFrame, Pack::SHRINK);
+    resBox->pack_start(*chanMixerShadowsFrame, Pack::SHRINK);
 
     Gtk::Button* const neutral = Gtk::manage(new Gtk::Button(M("TP_COLORTONING_NEUTRAL")));
     neutral->set_tooltip_text(M("TP_COLORTONING_NEUTRAL_TOOLTIP"));
     neutralconn = neutral->signal_pressed().connect(sigc::mem_fun(*this, &Wavelet::neutral_pressed));
     neutral->show();
-    neutrHBox->pack_start(*neutral, Gtk::PACK_EXPAND_WIDGET);
+    neutrHBox->pack_start(*neutral, Pack::EXPAND_WIDGET);
 
     resBox->pack_start(*neutrHBox);
 
@@ -1181,10 +1181,10 @@ Wavelet::Wavelet() :
     ctboxBA->set_spacing(2);
 
     //Gtk::Separator *separatorfin = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
-    //ctboxBA->pack_start(*separatorfin, Gtk::PACK_SHRINK, 2);
+    //ctboxBA->pack_start(*separatorfin, Pack::SHRINK, 2);
     Gtk::Label* const labmBA = Gtk::manage(new Gtk::Label(M("TP_WAVELET_BATYPE") + ":"));
     Gtk::Box* const ctboxFI = Gtk::manage(new Gtk::Box());
-    ctboxFI->pack_start(*labmBA, Gtk::PACK_SHRINK, 1);
+    ctboxFI->pack_start(*labmBA, Pack::SHRINK, 1);
 
     BAmethod->append(M("TP_WAVELET_BANONE"));
     BAmethod->append(M("TP_WAVELET_BASLI"));
@@ -1245,7 +1245,7 @@ Wavelet::Wavelet() :
 
     fincFrame->set_label_align(0.025, 0.5);
     ToolParamBlock* const fincBox = Gtk::manage(new ToolParamBlock());
-    fincBox->pack_start(*opacityCurveEditorWL, Gtk::PACK_SHRINK, 2);
+    fincBox->pack_start(*opacityCurveEditorWL, Pack::SHRINK, 2);
     fincBox->pack_start(*sigmafin);
     fincFrame->add(*fincBox);
 
@@ -1253,7 +1253,7 @@ Wavelet::Wavelet() :
     ToolParamBlock* const dirBox = Gtk::manage(new ToolParamBlock());
     dirBox->pack_start(*ctboxBA);
     dirBox->pack_start(*balance);
-    dirBox->pack_start(*opacityCurveEditorW, Gtk::PACK_SHRINK, 2);
+    dirBox->pack_start(*opacityCurveEditorW, Pack::SHRINK, 2);
     dirBox->pack_start(*iter);
     dirBox->pack_start(*sigmadir);
     dirBox->pack_start(*tmr);
@@ -1263,7 +1263,7 @@ Wavelet::Wavelet() :
     finalBox->pack_start(*dirFrame);
 
     finalBox->pack_start(*fincFrame);
-    finalBox->pack_start(*curveEditorG, Gtk::PACK_SHRINK, 4);
+    finalBox->pack_start(*curveEditorG, Pack::SHRINK, 4);
     thrend->set_tooltip_text(M("TP_WAVELET_FINTHR_TOOLTIP"));
 
     guidFrame->set_label_align(0.025, 0.5);

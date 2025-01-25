@@ -44,9 +44,9 @@ FlatField::FlatField () : FoldableToolPanel(this, TOOL_NAME, M("TP_FLATFIELD_LAB
     ffLabel = Gtk::manage(new Gtk::Label(M("GENERAL_FILE")));
     flatFieldFileReset = Gtk::manage(new Gtk::Button());
     flatFieldFileReset->set_image (*Gtk::manage(new RTImage ("cancel-small", Gtk::ICON_SIZE_BUTTON)));
-    hbff->pack_start(*ffLabel, Gtk::PACK_SHRINK);
+    hbff->pack_start(*ffLabel, Pack::SHRINK);
     hbff->pack_start(*flatFieldFile);
-    hbff->pack_start(*flatFieldFileReset, Gtk::PACK_SHRINK);
+    hbff->pack_start(*flatFieldFileReset, Pack::SHRINK);
     flatFieldAutoSelect = Gtk::manage(new Gtk::CheckButton((M("TP_FLATFIELD_AUTOSELECT"))));
     flatFieldFromMetaData = Gtk::manage(new CheckBox((M("TP_FLATFIELD_FROMMETADATA")), multiImage));
     flatFieldFromMetaData->setCheckBoxListener (this);
@@ -60,14 +60,14 @@ FlatField::FlatField () : FoldableToolPanel(this, TOOL_NAME, M("TP_FLATFIELD_LAB
     flatFieldBlurRadius->show();
 
     Gtk::Box* hbffbt = Gtk::manage (new Gtk::Box ());
-    hbffbt->pack_start (*Gtk::manage (new Gtk::Label ( M("TP_FLATFIELD_BLURTYPE") + ":")), Gtk::PACK_SHRINK);
+    hbffbt->pack_start (*Gtk::manage (new Gtk::Label ( M("TP_FLATFIELD_BLURTYPE") + ":")), Pack::SHRINK);
     flatFieldBlurType = Gtk::manage (new MyComboBoxText ());
     flatFieldBlurType->append(M("TP_FLATFIELD_BT_AREA"));
     flatFieldBlurType->append(M("TP_FLATFIELD_BT_VERTICAL"));
     flatFieldBlurType->append(M("TP_FLATFIELD_BT_HORIZONTAL"));
     flatFieldBlurType->append(M("TP_FLATFIELD_BT_VERTHORIZ"));
     flatFieldBlurType->set_active(0);
-    hbffbt->pack_end (*flatFieldBlurType, Gtk::PACK_EXPAND_WIDGET);
+    hbffbt->pack_end (*flatFieldBlurType, Pack::EXPAND_WIDGET);
 
     flatFieldClipControl = Gtk::manage (new Adjuster(M("TP_FLATFIELD_CLIPCONTROL"), 0., 100., 1., 0.));
     flatFieldClipControl->setAdjusterListener(this);
@@ -78,14 +78,14 @@ FlatField::FlatField () : FoldableToolPanel(this, TOOL_NAME, M("TP_FLATFIELD_LAB
     flatFieldClipControl->show();
     flatFieldClipControl->set_tooltip_markup (M("TP_FLATFIELD_CLIPCONTROL_TOOLTIP"));
 
-    pack_start( *flatFieldFromMetaData, Gtk::PACK_SHRINK);
-    pack_start( *Gtk::manage( new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Gtk::PACK_SHRINK, 0 );
-    pack_start( *flatFieldAutoSelect, Gtk::PACK_SHRINK);
-    pack_start( *hbff, Gtk::PACK_SHRINK);
-    pack_start( *ffInfo, Gtk::PACK_SHRINK);
-    pack_start( *hbffbt, Gtk::PACK_SHRINK);
-    pack_start( *flatFieldBlurRadius, Gtk::PACK_SHRINK);
-    pack_start( *flatFieldClipControl, Gtk::PACK_SHRINK);
+    pack_start( *flatFieldFromMetaData, Pack::SHRINK);
+    pack_start( *Gtk::manage( new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Pack::SHRINK, 0 );
+    pack_start( *flatFieldAutoSelect, Pack::SHRINK);
+    pack_start( *hbff, Pack::SHRINK);
+    pack_start( *ffInfo, Pack::SHRINK);
+    pack_start( *hbffbt, Pack::SHRINK);
+    pack_start( *flatFieldBlurRadius, Pack::SHRINK);
+    pack_start( *flatFieldClipControl, Pack::SHRINK);
 
     flatFieldFileconn = flatFieldFile->signal_file_set().connect ( sigc::mem_fun(*this, &FlatField::flatFieldFileChanged)); //, true);
     flatFieldFileReset->signal_clicked().connect( sigc::mem_fun(*this, &FlatField::flatFieldFile_Reset), true );

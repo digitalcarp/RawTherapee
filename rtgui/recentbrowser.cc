@@ -36,7 +36,7 @@ RecentBrowser::RecentBrowser ()
         recentDirs->append (options.recentFolders[i]);
     }
 
-    pack_start (*frame, Gtk::PACK_SHRINK, 4);
+    pack_start (*frame, Pack::SHRINK, 4);
 
     conn = recentDirs->signal_changed().connect(sigc::mem_fun(*this, &RecentBrowser::selectionChanged));
 

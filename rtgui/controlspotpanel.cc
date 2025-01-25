@@ -214,7 +214,7 @@ ControlSpotPanel::ControlSpotPanel():
     pack_start(*ctboxactivmethod);
 
     Gtk::Label* const labelshape = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_SHAPETYPE") + ":"));
-    ctboxshape->pack_start(*labelshape, Gtk::PACK_SHRINK, 4);
+    ctboxshape->pack_start(*labelshape, Pack::SHRINK, 4);
     shape_->append(M("TP_LOCALLAB_ELI"));
     shape_->append(M("TP_LOCALLAB_RECT"));
     shape_->set_active(0);
@@ -228,7 +228,7 @@ ControlSpotPanel::ControlSpotPanel():
     }
 
     Gtk::Label* const labelspotmethod = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_EXCLUTYPE") + ":"));
-    ctboxspotmethod->pack_start(*labelspotmethod, Gtk::PACK_SHRINK, 4);
+    ctboxspotmethod->pack_start(*labelspotmethod, Pack::SHRINK, 4);
 
     if (showtooltip) {
         ctboxspotmethod->set_tooltip_markup(M("TP_LOCALLAB_EXCLUTYPE_TOOLTIP"));
@@ -269,7 +269,7 @@ ControlSpotPanel::ControlSpotPanel():
 
 
     Gtk::Label* const labelshapemethod = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_STYPE") + ":"));
-    ctboxshapemethod->pack_start(*labelshapemethod, Gtk::PACK_SHRINK, 4);
+    ctboxshapemethod->pack_start(*labelshapemethod, Pack::SHRINK, 4);
 
     if (showtooltip) {
         ctboxshapemethod->set_tooltip_markup(M("TP_LOCALLAB_STYPE_TOOLTIP"));
@@ -313,7 +313,7 @@ ControlSpotPanel::ControlSpotPanel():
 
     Gtk::Box* const ctboxqualitymethod = Gtk::manage(new Gtk::Box());
     Gtk::Label* const labelqualitymethod = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_QUAL_METHOD") + ":"));
-    ctboxqualitymethod->pack_start(*labelqualitymethod, Gtk::PACK_SHRINK, 4);
+    ctboxqualitymethod->pack_start(*labelqualitymethod, Pack::SHRINK, 4);
 
     if (showtooltip) {
         ctboxqualitymethod->set_tooltip_markup(M("TP_LOCALLAB_METHOD_TOOLTIP"));
@@ -407,7 +407,7 @@ ControlSpotPanel::ControlSpotPanel():
                      sigc::mem_fun(*this, &ControlSpotPanel::activChanged));
 
     Gtk::Label* const labelgamut = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_AVOID") + ":"));
-    ctboxgamut->pack_start(*labelgamut, Gtk::PACK_SHRINK, 4);
+    ctboxgamut->pack_start(*labelgamut, Pack::SHRINK, 4);
     avoidgamutMethod_->append(M("TP_LOCALLAB_GAMUTNON"));
     avoidgamutMethod_->append(M("TP_LOCALLAB_GAMUTLABRELA"));
     avoidgamutMethod_->append(M("TP_LOCALLAB_GAMUTXYZABSO"));
@@ -452,7 +452,7 @@ ControlSpotPanel::ControlSpotPanel():
 
     Gtk::Box* const ctboxwavmethod = Gtk::manage(new Gtk::Box());
     Gtk::Label* const labelwavmethod = Gtk::manage(new Gtk::Label(M("TP_WAVELET_DAUBLOCAL") + ":"));
-    ctboxwavmethod->pack_start(*labelwavmethod, Gtk::PACK_SHRINK, 4);
+    ctboxwavmethod->pack_start(*labelwavmethod, Pack::SHRINK, 4);
 
     if (showtooltip) {
         ctboxwavmethod->set_tooltip_markup(M("TP_WAVELET_DAUB_TOOLTIP"));
@@ -512,7 +512,7 @@ ControlSpotPanel::ControlSpotPanel():
     pack_start(*expMaskMerge_, false, false);
 
     Gtk::Separator *separatormet = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
-    pack_start(*separatormet, Gtk::PACK_SHRINK, 2);
+    pack_start(*separatormet, Pack::SHRINK, 2);
 
     //Gtk::Box* const ctboxcomplexmethod = Gtk::manage(new Gtk::Box());
 
@@ -521,7 +521,7 @@ ControlSpotPanel::ControlSpotPanel():
     //}
 
     //Gtk::Label* const labelcomplexmethod = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_COMPLEX_METHOD") + ":"));
-    //ctboxcomplexmethod->pack_start(*labelcomplexmethod, Gtk::PACK_SHRINK, 4);
+    //ctboxcomplexmethod->pack_start(*labelcomplexmethod, Pack::SHRINK, 4);
 
     //if (showtooltip) {
     //    complexMethod_->set_tooltip_markup(M("TP_LOCALLAB_COMPLEX_TOOLTIP"));
@@ -539,7 +539,7 @@ ControlSpotPanel::ControlSpotPanel():
 /*
     Gtk::Box* const ctboxwavmethod = Gtk::manage(new Gtk::Box());
     Gtk::Label* const labelwavmethod = Gtk::manage(new Gtk::Label(M("TP_WAVELET_DAUBLOCAL") + ":"));
-    ctboxwavmethod->pack_start(*labelwavmethod, Gtk::PACK_SHRINK, 4);
+    ctboxwavmethod->pack_start(*labelwavmethod, Pack::SHRINK, 4);
 
     if (showtooltip) {
         ctboxwavmethod->set_tooltip_markup(M("TP_WAVELET_DAUB_TOOLTIP"));
@@ -3026,7 +3026,7 @@ ControlSpotPanel::RenameDialog::RenameDialog(const Glib::ustring &actualname, Gt
     hb->pack_start(*Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_REN_DIALOG_LAB"))), false, false, 4);
     newname_->set_text(actualname);
     hb->pack_start(*newname_);
-    get_content_area()->pack_start(*hb, Gtk::PACK_SHRINK, 4);
+    get_content_area()->pack_start(*hb, Pack::SHRINK, 4);
 
     // OK/CANCEL buttons
     add_button(M("GENERAL_OK"), OkButton);

@@ -91,17 +91,17 @@ PreviewModePanel::PreviewModePanel (ImageArea* ia) :
     backColor2->set_active (options.bgcolor == 2);
     backColor3->set_active (options.bgcolor == 3);
 
-    pack_start (*backColor0, Gtk::PACK_SHRINK, 0);
-    pack_start (*backColor1, Gtk::PACK_SHRINK, 0);
-    pack_start (*backColor3, Gtk::PACK_SHRINK, 0);
-    pack_start (*backColor2, Gtk::PACK_SHRINK, 0);
+    pack_start (*backColor0, Pack::SHRINK, 0);
+    pack_start (*backColor1, Pack::SHRINK, 0);
+    pack_start (*backColor3, Pack::SHRINK, 0);
+    pack_start (*backColor2, Pack::SHRINK, 0);
 
-    pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL)), Gtk::PACK_SHRINK, 2);
+    pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 2);
 
-    pack_start (*previewR, Gtk::PACK_SHRINK, 0);
-    pack_start (*previewG, Gtk::PACK_SHRINK, 0);
-    pack_start (*previewB, Gtk::PACK_SHRINK, 0);
-    pack_start (*previewL, Gtk::PACK_SHRINK, 0);
+    pack_start (*previewR, Pack::SHRINK, 0);
+    pack_start (*previewG, Pack::SHRINK, 0);
+    pack_start (*previewB, Pack::SHRINK, 0);
+    pack_start (*previewL, Pack::SHRINK, 0);
 
     connR = previewR->signal_toggled().connect( sigc::bind(sigc::mem_fun(*this, &PreviewModePanel::buttonToggled), previewR) );
     connG = previewG->signal_toggled().connect( sigc::bind(sigc::mem_fun(*this, &PreviewModePanel::buttonToggled), previewG) );

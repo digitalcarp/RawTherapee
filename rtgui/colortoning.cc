@@ -54,7 +54,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
 
     ctbox = Gtk::manage (new Gtk::Box ());
     Gtk::Label* lab = Gtk::manage (new Gtk::Label (M("TP_COLORTONING_METHOD")));
-    ctbox->pack_start (*lab, Gtk::PACK_SHRINK, 4);
+    ctbox->pack_start (*lab, Pack::SHRINK, 4);
     ctbox->pack_start (*method);
     pack_start (*ctbox);
 
@@ -95,7 +95,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
     colorCurveEditorG->curveListComplete();
     colorCurveEditorG->show();
 
-    pack_start( *colorCurveEditorG, Gtk::PACK_SHRINK, 2);
+    pack_start( *colorCurveEditorG, Pack::SHRINK, 2);
 
     //----------------------red green  blue yellow colours
 
@@ -109,7 +109,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
 
     twocconn = twocolor->signal_changed().connect( sigc::mem_fun(*this, &ColorToning::twoColorChangedByGui) );
 
-    pack_start (*twocolor, Gtk::PACK_SHRINK, 4);
+    pack_start (*twocolor, Pack::SHRINK, 4);
 
     //----------- Opacity curve ------------------------------
 
@@ -125,7 +125,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
     opacityCurveEditorG->curveListComplete();
     opacityCurveEditorG->show();
 
-    pack_start( *opacityCurveEditorG, Gtk::PACK_SHRINK, 2);
+    pack_start( *opacityCurveEditorG, Pack::SHRINK, 2);
 
     //---------Chroma curve 1 --------------------
     iby   = Gtk::manage (new RTImage ("circle-yellow-blue-small"));
@@ -146,7 +146,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
     clshape->setBottomBarBgGradient(milestones);
     clCurveEditorG->curveListComplete();
 
-    pack_start( *clCurveEditorG, Gtk::PACK_SHRINK, 2);
+    pack_start( *clCurveEditorG, Pack::SHRINK, 2);
 
     //---------Chroma curve 2 --------------------
 
@@ -165,7 +165,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
     cl2shape->setBottomBarBgGradient(milestones);
     cl2CurveEditorG->curveListComplete();
 
-    pack_start( *cl2CurveEditorG, Gtk::PACK_SHRINK, 2);
+    pack_start( *cl2CurveEditorG, Pack::SHRINK, 2);
 
     //--------------------- Reset curves -----------------------------
     /*   Each curve can reset to a different curve, so this button only save one click now... so we remove it.
@@ -186,27 +186,27 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
     hlColSat->setBgColorProvider(this, 2);
     hlColSat->setUpdatePolicy(RTUP_DYNAMIC);
 
-    pack_start( *hlColSat, Gtk::PACK_SHRINK, 0);
+    pack_start( *hlColSat, Pack::SHRINK, 0);
 
     shadowsColSat = Gtk::manage (new ThresholdAdjuster (M("TP_COLORTONING_SHADOWS"), 0., 100., 80., M("TP_COLORTONING_STRENGTH"), 1., 0., 360., 208., M("TP_COLORTONING_HUE"), 1., nullptr, false));
     shadowsColSat->setAdjusterListener (this);
     shadowsColSat->setBgColorProvider(this, 3);
     shadowsColSat->setUpdatePolicy(RTUP_DYNAMIC);
 
-    pack_start( *shadowsColSat, Gtk::PACK_SHRINK, 0);
+    pack_start( *shadowsColSat, Pack::SHRINK, 0);
 
 
     balance = Gtk::manage( new Adjuster(M("TP_COLORTONING_BALANCE"), -100., 100., 1., 0.) );
     balance->setAdjusterListener(this);
 
-    pack_start (*balance, Gtk::PACK_SHRINK, 2);
+    pack_start (*balance, Pack::SHRINK, 2);
 
     //----------- Saturation and strength ------------------------------
 
 //  satLimiterSep = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
 
 
-//  pack_start (*satLimiterSep, Gtk::PACK_SHRINK);
+//  pack_start (*satLimiterSep, Pack::SHRINK);
 
 //  Gtk::Frame *p1Frame;
     // Vertical box container for the content of the Process 1 frame
@@ -222,21 +222,21 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
     autosatConn  = autosat->signal_toggled().connect( sigc::mem_fun(*this, &ColorToning::autosatChanged) );
     //satFrame->set_label_widget(*autosat);
 
-    p1VBox->pack_start (*autosat, Gtk::PACK_SHRINK, 2);
+    p1VBox->pack_start (*autosat, Pack::SHRINK, 2);
 
     satProtectionThreshold = Gtk::manage( new Adjuster(M("TP_COLORTONING_SATURATIONTHRESHOLD"), 0., 100., 1., 80.) );
     satProtectionThreshold->setAdjusterListener(this);
     satProtectionThreshold->set_sensitive(false);
 
-    p1VBox->pack_start( *satProtectionThreshold, Gtk::PACK_SHRINK, 2);
+    p1VBox->pack_start( *satProtectionThreshold, Pack::SHRINK, 2);
 
     saturatedOpacity = Gtk::manage( new Adjuster(M("TP_COLORTONING_SATURATEDOPACITY"), 0., 100., 1., 30.) );;
     saturatedOpacity->setAdjusterListener(this);
     saturatedOpacity->set_sensitive(false);
 
-    p1VBox->pack_start( *saturatedOpacity, Gtk::PACK_SHRINK, 2); //I have moved after Chanmixer
+    p1VBox->pack_start( *saturatedOpacity, Pack::SHRINK, 2); //I have moved after Chanmixer
     p1Frame->add(*p1VBox);
-    pack_start (*p1Frame, Gtk::PACK_EXPAND_WIDGET, 4);
+    pack_start (*p1Frame, Pack::EXPAND_WIDGET, 4);
 
     strength = Gtk::manage( new Adjuster(M("TP_COLORTONING_STR"), 0., 100., 1., 50.) );;
     strength->setAdjusterListener(this);
@@ -305,12 +305,12 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
     chanMixerMidFrame->add(*chanMixerMidBox);
     chanMixerShadowsFrame->add(*chanMixerShadowsBox);
 
-    chanMixerBox->pack_start(*chanMixerHLFrame, Gtk::PACK_SHRINK);
-    chanMixerBox->pack_start(*chanMixerMidFrame, Gtk::PACK_SHRINK);
-    chanMixerBox->pack_start(*chanMixerShadowsFrame, Gtk::PACK_SHRINK);
+    chanMixerBox->pack_start(*chanMixerHLFrame, Pack::SHRINK);
+    chanMixerBox->pack_start(*chanMixerMidFrame, Pack::SHRINK);
+    chanMixerBox->pack_start(*chanMixerShadowsFrame, Pack::SHRINK);
 
-    pack_start(*chanMixerBox, Gtk::PACK_SHRINK);
-    pack_start( *strength, Gtk::PACK_SHRINK, 2); //I have moved after Chanmixer
+    pack_start(*chanMixerBox, Pack::SHRINK);
+    pack_start( *strength, Pack::SHRINK, 2); //I have moved after Chanmixer
 
     //--------------------- Reset sliders  ---------------------------
     neutrHBox = Gtk::manage (new Gtk::Box());
@@ -350,7 +350,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
 //    EvColorToningLabGridValue = m->newEvent(RGBCURVE, "HISTORY_MSG_COLORTONING_LABGRID_VALUE");
     EvColorToningLabGridValue = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_COLORTONING_LABGRID_VALUE");
     labgrid = Gtk::manage(new LabGrid(EvColorToningLabGridValue, M("TP_COLORTONING_LABGRID_VALUES")));
-    pack_start(*labgrid, Gtk::PACK_EXPAND_WIDGET, 4);
+    pack_start(*labgrid, Pack::EXPAND_WIDGET, 4);
     //------------------------------------------------------------------------
 
     //------------------------------------------------------------------------
@@ -391,7 +391,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
     labRegionList->set_activate_on_single_click(true);
     labRegionSelectionConn = labRegionList->get_selection()->signal_changed().connect(sigc::mem_fun(this, &ColorToning::onLabRegionSelectionChanged));
     Gtk::Box *hb = Gtk::manage(new Gtk::Box());
-    hb->pack_start(*labRegionList, Gtk::PACK_EXPAND_WIDGET);
+    hb->pack_start(*labRegionList, Pack::EXPAND_WIDGET);
     Gtk::Box* vb = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     labRegionAdd = Gtk::manage(new Gtk::Button());
     labRegionAdd->add(*Gtk::manage(new RTImage("add-small", Gtk::ICON_SIZE_BUTTON)));
@@ -413,7 +413,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
     labRegionCopy->add(*Gtk::manage(new RTImage("arrow-right-small", Gtk::ICON_SIZE_BUTTON)));
     labRegionCopy->signal_clicked().connect(sigc::mem_fun(*this, &ColorToning::labRegionCopyPressed));
     add_button(labRegionCopy, vb);
-    hb->pack_start(*vb, Gtk::PACK_SHRINK);
+    hb->pack_start(*vb, Pack::SHRINK);
     labRegionBox->pack_start(*hb, true, true);
 
     labRegionAB = Gtk::manage(new LabGrid(EvLabRegionAB, M("TP_COLORTONING_LABREGION_ABVALUES"), false));
@@ -444,7 +444,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
     labRegionChannel->set_active(0);
     labRegionChannel->signal_changed().connect(sigc::mem_fun(*this, &ColorToning::labRegionChannelChanged));
 
-    hb->pack_start(*Gtk::manage(new Gtk::Label(M("TP_COLORTONING_LABREGION_CHANNEL") + ": ")), Gtk::PACK_SHRINK);
+    hb->pack_start(*Gtk::manage(new Gtk::Label(M("TP_COLORTONING_LABREGION_CHANNEL") + ": ")), Pack::SHRINK);
     hb->pack_start(*labRegionChannel);
     labRegionBox->pack_start(*hb);
 
@@ -481,7 +481,7 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
 
     labRegionEditorG->curveListComplete();
     labRegionEditorG->show();
-    labRegionBox->pack_start(*labRegionEditorG, Gtk::PACK_SHRINK, 2);
+    labRegionBox->pack_start(*labRegionEditorG, Pack::SHRINK, 2);
 
     labRegionMaskBlur = Gtk::manage(new Adjuster(M("TP_COLORTONING_LABREGION_MASKBLUR"), -10, 100, 0.1, 0));
     labRegionMaskBlur->setLogScale(10, 0);
@@ -490,9 +490,9 @@ ColorToning::ColorToning () : FoldableToolPanel(this, TOOL_NAME, M("TP_COLORTONI
 
     labRegionShowMask = Gtk::manage(new Gtk::CheckButton(M("TP_COLORTONING_LABREGION_SHOWMASK")));
     labRegionShowMask->signal_toggled().connect(sigc::mem_fun(*this, &ColorToning::labRegionShowMaskChanged));
-    labRegionBox->pack_start(*labRegionShowMask, Gtk::PACK_SHRINK, 4);
+    labRegionBox->pack_start(*labRegionShowMask, Pack::SHRINK, 4);
 
-    pack_start(*labRegionBox, Gtk::PACK_EXPAND_WIDGET, 4);
+    pack_start(*labRegionBox, Pack::EXPAND_WIDGET, 4);
 
     labRegionSaturation->setDelay(std::max(options.adjusterMinDelay, options.adjusterMaxDelay));
     labRegionSlope->setDelay(std::max(options.adjusterMinDelay, options.adjusterMaxDelay));

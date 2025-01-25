@@ -103,7 +103,7 @@ void ThresholdAdjuster::initObject (Glib::ustring label, bool editedcb)
     reset->set_relief (Gtk::RELIEF_NONE);
     reset->set_tooltip_markup (M("ADJUSTER_RESET_TO_DEFAULT"));
 
-    hbox->pack_end (*reset, Gtk::PACK_SHRINK, 0);
+    hbox->pack_end (*reset, Pack::SHRINK, 0);
 
     reset->set_size_request (-1, this->label->get_height() > MIN_RESET_BUTTON_HEIGHT ? this->label->get_height() : MIN_RESET_BUTTON_HEIGHT);
 
@@ -312,7 +312,7 @@ void ThresholdAdjuster::showEditedCB ()
 
     if (!editedCheckBox) {
         editedCheckBox =  Gtk::manage(new Gtk::CheckButton ());
-        hbox->pack_start (*editedCheckBox, Gtk::PACK_SHRINK, 2);
+        hbox->pack_start (*editedCheckBox, Pack::SHRINK, 2);
         hbox->reorder_child (*editedCheckBox, 0);
         editedChange = editedCheckBox->signal_toggled().connect( sigc::mem_fun(*this, &ThresholdAdjuster::editedToggled) );
     }

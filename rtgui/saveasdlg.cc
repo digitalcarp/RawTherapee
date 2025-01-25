@@ -131,25 +131,25 @@ SaveAsDialog::SaveAsDialog (const Glib::ustring &initialDir, Gtk::Window* parent
 
     // There is no queue in simple mode, so no need to choose
     if (!simpleEditor) {
-        vbox_bottomRight->pack_start (*saveMethod[0], Gtk::PACK_SHRINK, 2);
-        vbox_bottomRight->pack_start (*saveMethod[1], Gtk::PACK_SHRINK, 2);
-        vbox_bottomRight->pack_start (*saveMethod[2], Gtk::PACK_SHRINK, 2);
-        vbox_bottomRight->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Gtk::PACK_SHRINK, 5);
+        vbox_bottomRight->pack_start (*saveMethod[0], Pack::SHRINK, 2);
+        vbox_bottomRight->pack_start (*saveMethod[1], Pack::SHRINK, 2);
+        vbox_bottomRight->pack_start (*saveMethod[2], Pack::SHRINK, 2);
+        vbox_bottomRight->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Pack::SHRINK, 5);
     }
 
-    vbox_bottomRight->pack_start (*forceFormatOpts, Gtk::PACK_SHRINK, 4);
-    vbox_bottomRight->pack_start (*autoSuffix, Gtk::PACK_SHRINK, 4);
+    vbox_bottomRight->pack_start (*forceFormatOpts, Pack::SHRINK, 4);
+    vbox_bottomRight->pack_start (*autoSuffix, Pack::SHRINK, 4);
 
     Gtk::Box* hbox_bottom = Gtk::manage( new Gtk::Box() );
-    hbox_bottom->pack_start (*formatOpts, Gtk::PACK_EXPAND_WIDGET, 2);
-    hbox_bottom->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Gtk::PACK_SHRINK, 2);
-    hbox_bottom->pack_start (*vbox_bottomRight, Gtk::PACK_EXPAND_WIDGET, 2);
+    hbox_bottom->pack_start (*formatOpts, Pack::EXPAND_WIDGET, 2);
+    hbox_bottom->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 2);
+    hbox_bottom->pack_start (*vbox_bottomRight, Pack::EXPAND_WIDGET, 2);
 
     box->pack_start (*fchooser);
-    box->pack_start (*hbox_bottom, Gtk::PACK_SHRINK, 2);
+    box->pack_start (*hbox_bottom, Pack::SHRINK, 2);
 
-    get_action_area()->pack_end (*ok, Gtk::PACK_SHRINK, 4);
-    get_action_area()->pack_end (*cancel, Gtk::PACK_SHRINK, 4);
+    get_action_area()->pack_end (*ok, Pack::SHRINK, 4);
+    get_action_area()->pack_end (*cancel, Pack::SHRINK, 4);
 
     show_all_children ();
 

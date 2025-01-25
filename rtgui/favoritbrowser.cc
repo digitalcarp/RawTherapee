@@ -72,7 +72,7 @@ FavoritBrowser::FavoritBrowser () : listener (NULL)
     buttonBox->pack_start (*add);
     buttonBox->pack_start (*del);
 
-    pack_start (*buttonBox, Gtk::PACK_SHRINK, 2);
+    pack_start (*buttonBox, Pack::SHRINK, 2);
 
     add->signal_clicked().connect(sigc::mem_fun(*this, &FavoritBrowser::addPressed));
     del->signal_clicked().connect(sigc::mem_fun(*this, &FavoritBrowser::delPressed));

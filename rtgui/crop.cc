@@ -162,11 +162,11 @@ Crop::Crop():
     methodgrid->attach (*h, 3, 1, 1, 1);
     methodgrid->attach (*selectCrop, 0, 2, 2, 1);
     methodgrid->attach (*resetCrop, 2, 2, 2, 1);
-    pack_start (*methodgrid, Gtk::PACK_EXPAND_WIDGET, 0 );
+    pack_start (*methodgrid, Pack::EXPAND_WIDGET, 0 );
 
     Gtk::Separator* methodseparator = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     methodseparator->get_style_context()->add_class("grid-row-separator");
-    pack_start (*methodseparator, Gtk::PACK_SHRINK, 0);
+    pack_start (*methodseparator, Pack::SHRINK, 0);
 
     Gtk::Grid* settingsgrid = Gtk::manage(new Gtk::Grid());
     settingsgrid->get_style_context()->add_class("grid-spacing");
@@ -205,7 +205,7 @@ Crop::Crop():
     settingsgrid->attach (*ratiogrid, 1, 0, 1, 1);
     settingsgrid->attach (*guidelab, 0, 1, 1, 1);
     settingsgrid->attach (*guide, 1, 1, 1, 1);
-    pack_start (*settingsgrid, Gtk::PACK_SHRINK, 0 );
+    pack_start (*settingsgrid, Pack::SHRINK, 0 );
 
 
     // ppigrid START
@@ -241,7 +241,7 @@ Crop::Crop():
     ppigrid->attach (*sizecm, 1, 1, 1, 1);
     ppigrid->attach (*sizein, 1, 2, 1, 1);
     ppigrid->attach (*ppisubgrid, 0, 1, 1, 2);
-    pack_start (*ppigrid, Gtk::PACK_SHRINK, 0 );
+    pack_start (*ppigrid, Pack::SHRINK, 0 );
 
     ppi->set_value (300);
     // ppigrid END

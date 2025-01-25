@@ -405,7 +405,7 @@ IPTCPanel::IPTCPanel():
     setExpandAlignProperties(paste, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
     bbox->attach_next_to(*paste, Gtk::PositionType::RIGHT, 1, 1);
 
-    pack_end(*bbox, Gtk::PACK_SHRINK, 2);
+    pack_end(*bbox, Pack::SHRINK, 2);
 
     reset->set_tooltip_text(M("IPTCPANEL_RESETHINT"));
     file->set_tooltip_text(M("IPTCPANEL_EMBEDDEDHINT"));

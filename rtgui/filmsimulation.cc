@@ -79,7 +79,7 @@ FilmSimulation::FilmSimulation()
     m_strength = Gtk::manage( new Adjuster( M("TP_FILMSIMULATION_STRENGTH"), 0., 100, 1., 100 ) );
     m_strength->setAdjusterListener( this );
 
-    pack_start( *m_strength, Gtk::PACK_SHRINK, 0 );
+    pack_start( *m_strength, Pack::SHRINK, 0 );
 
 }
 

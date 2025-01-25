@@ -31,14 +31,14 @@ MetaDataPanel::MetaDataPanel() : EvMetaDataMode(ProcEventMapper::getInstance()->
     set_orientation(Gtk::Orientation::VERTICAL);
 
     Gtk::Box *box = Gtk::manage(new Gtk::Box());
-    box->pack_start(*Gtk::manage(new Gtk::Label(M("TP_METADATA_MODE") + ": ")), Gtk::PACK_SHRINK, 4);
+    box->pack_start(*Gtk::manage(new Gtk::Label(M("TP_METADATA_MODE") + ": ")), Pack::SHRINK, 4);
     metadataMode = Gtk::manage(new MyComboBoxText());
     metadataMode->append(M("TP_METADATA_TUNNEL"));
     metadataMode->append(M("TP_METADATA_EDIT"));
     metadataMode->append(M("TP_METADATA_STRIP"));
     metadataMode->set_active(0);
-    box->pack_end(*metadataMode, Gtk::PACK_EXPAND_WIDGET, 4);
-    pack_start(*box, Gtk::PACK_SHRINK, 4);
+    box->pack_end(*metadataMode, Pack::EXPAND_WIDGET, 4);
+    pack_start(*box, Pack::SHRINK, 4);
 
     metadataMode->signal_changed().connect(sigc::mem_fun(*this, &MetaDataPanel::metaDataModeChanged));
 

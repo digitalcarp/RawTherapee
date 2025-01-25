@@ -140,7 +140,7 @@ ExifPanel::ExifPanel() :
     reset = addbtn("EXIFPANEL_RESETHINT", "undo");
     resetAll = addbtn("EXIFPANEL_RESETALLHINT", "undo-all");
 
-    pack_end (*buttons1, Gtk::PACK_SHRINK);
+    pack_end (*buttons1, Pack::SHRINK);
 
     exifTree->get_selection()->signal_changed().connect (sigc::mem_fun (*this, &ExifPanel::exifSelectionChanged));
 

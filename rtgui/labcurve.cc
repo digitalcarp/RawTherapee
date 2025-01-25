@@ -65,7 +65,7 @@ LCurve::LCurve() : FoldableToolPanel(this, TOOL_NAME, M("TP_LABCURVE_LABEL"), fa
     //%%%%%%%%%%%%%%%%%%
     Gtk::Separator* hsep2 = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     hsep2->show();
-    pack_start(*hsep2, Gtk::PACK_EXPAND_WIDGET, 4);
+    pack_start(*hsep2, Pack::EXPAND_WIDGET, 4);
 
 
 
@@ -73,7 +73,7 @@ LCurve::LCurve() : FoldableToolPanel(this, TOOL_NAME, M("TP_LABCURVE_LABEL"), fa
     Gtk::Box* metHBox = Gtk::manage(new Gtk::Box());
     metHBox->set_spacing(2);
     Gtk::Label* metLabel = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_AVOID") + ":"));
-    metHBox->pack_start(*metLabel, Gtk::PACK_SHRINK);
+    metHBox->pack_start(*metLabel, Pack::SHRINK);
 
     gamutmunselmethod =  Gtk::manage(new MyComboBoxText());
     gamutmunselmethod->append(M("TP_LOCALLAB_GAMUTNON"));
@@ -105,7 +105,7 @@ LCurve::LCurve() : FoldableToolPanel(this, TOOL_NAME, M("TP_LABCURVE_LABEL"), fa
 
     Gtk::Separator* hsep3 = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     hsep3->show();
-    pack_start(*hsep3, Gtk::PACK_EXPAND_WIDGET, 4);
+    pack_start(*hsep3, Pack::EXPAND_WIDGET, 4);
 
     curveEditorG = new CurveEditorGroup(options.lastLabCurvesDir);
     curveEditorG->setCurveListener(this);
@@ -238,10 +238,10 @@ LCurve::LCurve() : FoldableToolPanel(this, TOOL_NAME, M("TP_LABCURVE_LABEL"), fa
     // This will add the reset button at the end of the curveType buttons
     curveEditorG->curveListComplete();
 
-    pack_start(*curveEditorG, Gtk::PACK_SHRINK, 4);
+    pack_start(*curveEditorG, Pack::SHRINK, 4);
     Gtk::Separator* hsepdh = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     hsepdh->show();
-    pack_start(*hsepdh, Gtk::PACK_EXPAND_WIDGET, 4);
+    pack_start(*hsepdh, Pack::EXPAND_WIDGET, 4);
     show_all_children();
 
 }

@@ -268,8 +268,8 @@ LocallabTone::LocallabTone():
     // pack_start(*softradiustm); //unused here, but used for normalize_mean_dt
 //    pack_start(*sensitm);
     ToolParamBlock* const tmBox3 = Gtk::manage(new ToolParamBlock());
-    tmBox3->pack_start(*maskusablet, Gtk::PACK_SHRINK, 0);
-    tmBox3->pack_start(*maskunusablet, Gtk::PACK_SHRINK, 0);
+    tmBox3->pack_start(*maskusablet, Pack::SHRINK, 0);
+    tmBox3->pack_start(*maskunusablet, Pack::SHRINK, 0);
     tmBox3->pack_start(*recothrest);
     tmBox3->pack_start(*lowthrest);
     tmBox3->pack_start(*higthrest);
@@ -279,17 +279,17 @@ LocallabTone::LocallabTone():
     pack_start(*exprecovt, false, false);
 
     ToolParamBlock* const masktmBox = Gtk::manage(new ToolParamBlock());
-    masktmBox->pack_start(*showmasktmMethod, Gtk::PACK_SHRINK, 4);
-    masktmBox->pack_start(*enatmMask, Gtk::PACK_SHRINK, 0);
-    masktmBox->pack_start(*enatmMaskaft, Gtk::PACK_SHRINK, 0);
-    masktmBox->pack_start(*masktmCurveEditorG, Gtk::PACK_SHRINK, 4);
-    masktmBox->pack_start(*blendmasktm, Gtk::PACK_SHRINK, 0);
-    masktmBox->pack_start(*lapmasktm, Gtk::PACK_SHRINK, 0);
-    masktmBox->pack_start(*radmasktm, Gtk::PACK_SHRINK, 0);
-    masktmBox->pack_start(*chromasktm, Gtk::PACK_SHRINK, 0);
-    masktmBox->pack_start(*gammasktm, Gtk::PACK_SHRINK, 0);
-    masktmBox->pack_start(*slomasktm, Gtk::PACK_SHRINK, 0);
-    masktmBox->pack_start(*mask2tmCurveEditorG, Gtk::PACK_SHRINK, 4);
+    masktmBox->pack_start(*showmasktmMethod, Pack::SHRINK, 4);
+    masktmBox->pack_start(*enatmMask, Pack::SHRINK, 0);
+    masktmBox->pack_start(*enatmMaskaft, Pack::SHRINK, 0);
+    masktmBox->pack_start(*masktmCurveEditorG, Pack::SHRINK, 4);
+    masktmBox->pack_start(*blendmasktm, Pack::SHRINK, 0);
+    masktmBox->pack_start(*lapmasktm, Pack::SHRINK, 0);
+    masktmBox->pack_start(*radmasktm, Pack::SHRINK, 0);
+    masktmBox->pack_start(*chromasktm, Pack::SHRINK, 0);
+    masktmBox->pack_start(*gammasktm, Pack::SHRINK, 0);
+    masktmBox->pack_start(*slomasktm, Pack::SHRINK, 0);
+    masktmBox->pack_start(*mask2tmCurveEditorG, Pack::SHRINK, 4);
     expmasktm->add(*masktmBox, false);
     pack_start(*expmasktm, false, false);
 }
@@ -1110,16 +1110,16 @@ LocallabRetinex::LocallabRetinex():
     toolretiBox->pack_start(*lightnessreti);
     toolretiBox->pack_start(*cliptm);
     toolretiBox->pack_start(*softradiusret);
-    toolretiBox->pack_start(*LocalcurveEditortransT, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    toolretiBox->pack_start(*LocalcurveEditortransT, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     toolretiBox->pack_start(*mMLabels);
     toolretiBox->pack_start(*transLabels);
     toolretiBox->pack_start(*transLabels2);
-    toolretiBox->pack_start(*LocalcurveEditorgainT, Gtk::PACK_SHRINK, 4);
+    toolretiBox->pack_start(*LocalcurveEditorgainT, Pack::SHRINK, 4);
     expretitools->add(*toolretiBox, false);
     retiBox->pack_start(*expretitools, false, false);
     ToolParamBlock* const reBox3 = Gtk::manage(new ToolParamBlock());
-    reBox3->pack_start(*maskusabler, Gtk::PACK_SHRINK, 0);
-    reBox3->pack_start(*maskunusabler, Gtk::PACK_SHRINK, 0);
+    reBox3->pack_start(*maskusabler, Pack::SHRINK, 0);
+    reBox3->pack_start(*maskunusabler, Pack::SHRINK, 0);
     reBox3->pack_start(*recothresr);
     reBox3->pack_start(*lowthresr);
     reBox3->pack_start(*higthresr);
@@ -1128,17 +1128,17 @@ LocallabRetinex::LocallabRetinex():
     exprecovr->add(*reBox3, false);
 
     ToolParamBlock* const maskretiBox = Gtk::manage(new ToolParamBlock());
-    maskretiBox->pack_start(*showmaskretiMethod, Gtk::PACK_SHRINK, 4);
-    maskretiBox->pack_start(*enaretiMask, Gtk::PACK_SHRINK, 0);
-    maskretiBox->pack_start(*enaretiMasktmap, Gtk::PACK_SHRINK, 0);
-    maskretiBox->pack_start(*maskretiCurveEditorG, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
-    maskretiBox->pack_start(*blendmaskreti, Gtk::PACK_SHRINK, 0);
-    maskretiBox->pack_start(*radmaskreti, Gtk::PACK_SHRINK, 0);
-    maskretiBox->pack_start(*lapmaskreti, Gtk::PACK_SHRINK, 0);
-    maskretiBox->pack_start(*chromaskreti, Gtk::PACK_SHRINK, 0);
-    maskretiBox->pack_start(*gammaskreti, Gtk::PACK_SHRINK, 0);
-    maskretiBox->pack_start(*slomaskreti, Gtk::PACK_SHRINK, 0);
-    maskretiBox->pack_start(*mask2retiCurveEditorG, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    maskretiBox->pack_start(*showmaskretiMethod, Pack::SHRINK, 4);
+    maskretiBox->pack_start(*enaretiMask, Pack::SHRINK, 0);
+    maskretiBox->pack_start(*enaretiMasktmap, Pack::SHRINK, 0);
+    maskretiBox->pack_start(*maskretiCurveEditorG, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    maskretiBox->pack_start(*blendmaskreti, Pack::SHRINK, 0);
+    maskretiBox->pack_start(*radmaskreti, Pack::SHRINK, 0);
+    maskretiBox->pack_start(*lapmaskreti, Pack::SHRINK, 0);
+    maskretiBox->pack_start(*chromaskreti, Pack::SHRINK, 0);
+    maskretiBox->pack_start(*gammaskreti, Pack::SHRINK, 0);
+    maskretiBox->pack_start(*slomaskreti, Pack::SHRINK, 0);
+    maskretiBox->pack_start(*mask2retiCurveEditorG, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     expmaskreti->add(*maskretiBox, false);
     retiBox->pack_start(*exprecovr, false, false);
     retiBox->pack_start(*expmaskreti, false, false);
@@ -2659,7 +2659,7 @@ LocallabContrast::LocallabContrast():
     Gtk::Label* const LresLabel = Gtk::manage(new Gtk::Label());
     LresLabel->set_markup(Glib::ustring("<b>") + escapeHtmlChars(M("TP_LOCALLAB_LOC_RESIDPYR")) + Glib::ustring("</b>"));
     LresLabel->set_alignment(Gtk::Align::START, Gtk::Align::CENTER);
-    LresTitleHBox->pack_start(*LresLabel, Gtk::PACK_EXPAND_WIDGET, 0);
+    LresTitleHBox->pack_start(*LresLabel, Pack::EXPAND_WIDGET, 0);
     expresidpyr->setLabel(LresTitleHBox);
     setExpandAlignProperties(expresidpyr, true, false, Gtk::Align::FILL, Gtk::Align::START);
 
@@ -2711,10 +2711,10 @@ LocallabContrast::LocallabContrast():
     LCLabel11->set_markup(escapeHtmlChars(M("TP_LOCALLAB_LOC_CONTRASTPYRLAB")));
     LCLabel->set_alignment(Gtk::Align::START, Gtk::Align::CENTER);
     LCLabel11->set_alignment(Gtk::Align::START, Gtk::Align::CENTER);
-    LCTitleHBox->pack_start(*LCLabel, Gtk::PACK_EXPAND_WIDGET, 0);
-    LCTitleHBox11->pack_start(*LCLabel11, Gtk::PACK_EXPAND_WIDGET, 0);
-    TittleVBox->pack_start(*LCTitleHBox, Gtk::PACK_SHRINK);
-    TittleVBox->pack_start(*LCTitleHBox11, Gtk::PACK_SHRINK);
+    LCTitleHBox->pack_start(*LCLabel, Pack::EXPAND_WIDGET, 0);
+    LCTitleHBox11->pack_start(*LCLabel11, Pack::EXPAND_WIDGET, 0);
+    TittleVBox->pack_start(*LCTitleHBox, Pack::SHRINK);
+    TittleVBox->pack_start(*LCTitleHBox11, Pack::SHRINK);
     expcontrastpyr->setLabel(TittleVBox);
     setExpandAlignProperties(expcontrastpyr, true, false, Gtk::Align::FILL, Gtk::Align::START);
 
@@ -2802,10 +2802,10 @@ LocallabContrast::LocallabContrast():
     LCLabel22->set_markup(escapeHtmlChars(M("TP_LOCALLAB_LOC_CONTRASTPYR2LAB")));
     LCLabel2->set_alignment(Gtk::Align::START, Gtk::Align::CENTER);
     LCLabel22->set_alignment(Gtk::Align::START, Gtk::Align::CENTER);
-    LCTitleHBox2->pack_start(*LCLabel2, Gtk::PACK_EXPAND_WIDGET, 0);
-    LCTitleHBox22->pack_start(*LCLabel22, Gtk::PACK_EXPAND_WIDGET, 0);
-    TittleVBox2->pack_start(*LCTitleHBox2, Gtk::PACK_SHRINK);
-    TittleVBox2->pack_start(*LCTitleHBox22, Gtk::PACK_SHRINK);
+    LCTitleHBox2->pack_start(*LCLabel2, Pack::EXPAND_WIDGET, 0);
+    LCTitleHBox22->pack_start(*LCLabel22, Pack::EXPAND_WIDGET, 0);
+    TittleVBox2->pack_start(*LCTitleHBox2, Pack::SHRINK);
+    TittleVBox2->pack_start(*LCTitleHBox22, Pack::SHRINK);
     expcontrastpyr2->setLabel(TittleVBox2);
 
     setExpandAlignProperties(expcontrastpyr2, true, false, Gtk::Align::FILL, Gtk::Align::START);
@@ -2927,7 +2927,7 @@ LocallabContrast::LocallabContrast():
     pack_start(*csThreshold);
     ToolParamBlock* const coBox = Gtk::manage(new ToolParamBlock());
     coBox->pack_start(*sigmalc);
-    coBox->pack_start(*LocalcurveEditorwav, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    coBox->pack_start(*LocalcurveEditorwav, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     // coBox->pack_start(*csThreshold);
     contFrame->add(*coBox);
     pack_start(*contFrame);
@@ -2977,14 +2977,14 @@ LocallabContrast::LocallabContrast():
     ToolParamBlock* const edgsBox = Gtk::manage(new ToolParamBlock());
     edgsBox->pack_start(*strengthw);
     edgsBox->pack_start(*sigmaed);
-    edgsBox->pack_start(*LocalcurveEditorwavedg, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    edgsBox->pack_start(*LocalcurveEditorwavedg, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     edgsBox->pack_start(*gradw);
     edgsBox->pack_start(*waveshow);
     edgsBoxshow->pack_start(*radiusw);
     edgsBoxshow->pack_start(*detailw);
     Gtk::Box* const edbox = Gtk::manage(new Gtk::Box());
     Gtk::Label* const labmedgr = Gtk::manage(new Gtk::Label(M("TP_WAVELET_MEDGREINF") + ":"));
-    edbox->pack_start(*labmedgr, Gtk::PACK_SHRINK, 1);
+    edbox->pack_start(*labmedgr, Pack::SHRINK, 1);
     edbox->pack_start(*localedgMethod);
     edgsBoxshow->pack_start(*edbox);
     Gtk::Separator* const separatoredg2 = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
@@ -2997,7 +2997,7 @@ LocallabContrast::LocallabContrast():
     edgsBoxshow->pack_start(*basew);
     Gtk::Box* const ctboxNP = Gtk::manage(new Gtk::Box());
     Gtk::Label* const labmNP = Gtk::manage(new Gtk::Label(M("TP_WAVELET_NPTYPE") + ":"));
-    ctboxNP->pack_start(*labmNP, Gtk::PACK_SHRINK, 1);
+    ctboxNP->pack_start(*labmNP, Pack::SHRINK, 1);
     ctboxNP->pack_start(*localneiMethod);
     edgsBoxshow->pack_start(*ctboxNP);
     edgsBox->pack_start(*edgsBoxshow);
@@ -3011,7 +3011,7 @@ LocallabContrast::LocallabContrast():
     blurlevcontBox->pack_start(*levelblur);
     blurlevcontBox->pack_start(*sigmabl);
     blurlevcontBox->pack_start(*chromablu);
-    blurlevcontBox->pack_start(*LocalcurveEditorwavlev, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    blurlevcontBox->pack_start(*LocalcurveEditorwavlev, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     Gtk::Separator* const separatorblu = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     blurlevcontBox->pack_start(*separatorblu);
     blurlevcontBox->pack_start(*residblur);
@@ -3030,7 +3030,7 @@ LocallabContrast::LocallabContrast():
     contlevBox->pack_start(*sigma);
     contlevBox->pack_start(*offset);
     contlevBox->pack_start(*chromalev);
-    contlevBox->pack_start(*LocalcurveEditorwavcon, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    contlevBox->pack_start(*LocalcurveEditorwavcon, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     contFrame2->add(*contlevBox);
     blurcontBox2->pack_start(*contFrame2);
     Gtk::Frame* const compreFrame = Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_COMPREFRA")));
@@ -3038,7 +3038,7 @@ LocallabContrast::LocallabContrast():
     compreFrame->set_label_widget(*wavcompre);
     Gtk::Box* const compreBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     compreBox->set_spacing(2);
-    compreBox->pack_start(*LocalcurveEditorwavcompre, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    compreBox->pack_start(*LocalcurveEditorwavcompre, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     compreBox->pack_start(*sigmadr);
     compreBox->pack_start(*threswav);
     compreBox->pack_start(*residcomp);
@@ -3051,7 +3051,7 @@ LocallabContrast::LocallabContrast():
     compBox->set_spacing(2);
     compBox->pack_start(*sigmadc);
     compBox->pack_start(*deltad);
-    compBox->pack_start(*LocalcurveEditorwavcomp, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    compBox->pack_start(*LocalcurveEditorwavcomp, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     // Gtk::Separator* const separatorcomp = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     // compBox->pack_start(*separatorcomp);
     // compBox->pack_start(*fatres);
@@ -3061,8 +3061,8 @@ LocallabContrast::LocallabContrast():
     pack_start(*expcontrastpyr2);
     pack_start(*fftwlc);
     ToolParamBlock* const wwBox3 = Gtk::manage(new ToolParamBlock());
-    wwBox3->pack_start(*maskusablew, Gtk::PACK_SHRINK, 0);
-    wwBox3->pack_start(*maskunusablew, Gtk::PACK_SHRINK, 0);
+    wwBox3->pack_start(*maskusablew, Pack::SHRINK, 0);
+    wwBox3->pack_start(*maskunusablew, Pack::SHRINK, 0);
     wwBox3->pack_start(*recothresw);
     wwBox3->pack_start(*lowthresw);
     wwBox3->pack_start(*higthresw);
@@ -3072,13 +3072,13 @@ LocallabContrast::LocallabContrast():
     pack_start(*exprecovw, false, false);
 
     ToolParamBlock* const masklcBox = Gtk::manage(new ToolParamBlock());
-    masklcBox->pack_start(*showmasklcMethod, Gtk::PACK_SHRINK, 4);
-    masklcBox->pack_start(*enalcMask, Gtk::PACK_SHRINK, 0);
-    masklcBox->pack_start(*masklcCurveEditorG, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
-    masklcBox->pack_start(*blendmasklc, Gtk::PACK_SHRINK, 0);
-    masklcBox->pack_start(*radmasklc, Gtk::PACK_SHRINK, 0);
-    masklcBox->pack_start(*chromasklc, Gtk::PACK_SHRINK, 0);
-    masklcBox->pack_start(*mask2lcCurveEditorG, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    masklcBox->pack_start(*showmasklcMethod, Pack::SHRINK, 4);
+    masklcBox->pack_start(*enalcMask, Pack::SHRINK, 0);
+    masklcBox->pack_start(*masklcCurveEditorG, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    masklcBox->pack_start(*blendmasklc, Pack::SHRINK, 0);
+    masklcBox->pack_start(*radmasklc, Pack::SHRINK, 0);
+    masklcBox->pack_start(*chromasklc, Pack::SHRINK, 0);
+    masklcBox->pack_start(*mask2lcCurveEditorG, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     expmasklc->add(*masklcBox, false);
     pack_start(*expmasklc, false, false);
 }
@@ -4825,7 +4825,7 @@ lumacontrastPlusButton(Gtk::manage(new Gtk::Button(M("TP_DIRPYREQUALIZER_LUMACON
     }
 
     Gtk::Separator* const separator = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
-    levBox->pack_start(*separator, Gtk::PACK_SHRINK, 2);
+    levBox->pack_start(*separator, Pack::SHRINK, 2);
     levBox->pack_start(*chromacbdl);
     levBox->pack_start(*threshold);
     levFrame->add(*levBox);
@@ -4840,8 +4840,8 @@ lumacontrastPlusButton(Gtk::manage(new Gtk::Button(M("TP_DIRPYREQUALIZER_LUMACON
     pack_start(*softradiuscb);
 //    pack_start(*sensicb);
     ToolParamBlock* const cbBox3 = Gtk::manage(new ToolParamBlock());
-    cbBox3->pack_start(*maskusablecb, Gtk::PACK_SHRINK, 0);
-    cbBox3->pack_start(*maskunusablecb, Gtk::PACK_SHRINK, 0);
+    cbBox3->pack_start(*maskusablecb, Pack::SHRINK, 0);
+    cbBox3->pack_start(*maskunusablecb, Pack::SHRINK, 0);
     cbBox3->pack_start(*recothrescb);
     cbBox3->pack_start(*lowthrescb);
     cbBox3->pack_start(*higthrescb);
@@ -4851,16 +4851,16 @@ lumacontrastPlusButton(Gtk::manage(new Gtk::Button(M("TP_DIRPYREQUALIZER_LUMACON
     pack_start(*exprecovcb, false, false);
 
     ToolParamBlock* const maskcbBox = Gtk::manage(new ToolParamBlock());
-    maskcbBox->pack_start(*showmaskcbMethod, Gtk::PACK_SHRINK, 4);
-    maskcbBox->pack_start(*enacbMask, Gtk::PACK_SHRINK, 0);
-    maskcbBox->pack_start(*maskcbCurveEditorG, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
-    maskcbBox->pack_start(*blendmaskcb, Gtk::PACK_SHRINK, 0);
-    maskcbBox->pack_start(*radmaskcb, Gtk::PACK_SHRINK, 0);
-    maskcbBox->pack_start(*lapmaskcb, Gtk::PACK_SHRINK, 0);
-    maskcbBox->pack_start(*chromaskcb, Gtk::PACK_SHRINK, 0);
-    maskcbBox->pack_start(*gammaskcb, Gtk::PACK_SHRINK, 0);
-    maskcbBox->pack_start(*slomaskcb, Gtk::PACK_SHRINK, 0);
-    maskcbBox->pack_start(*mask2cbCurveEditorG, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    maskcbBox->pack_start(*showmaskcbMethod, Pack::SHRINK, 4);
+    maskcbBox->pack_start(*enacbMask, Pack::SHRINK, 0);
+    maskcbBox->pack_start(*maskcbCurveEditorG, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    maskcbBox->pack_start(*blendmaskcb, Pack::SHRINK, 0);
+    maskcbBox->pack_start(*radmaskcb, Pack::SHRINK, 0);
+    maskcbBox->pack_start(*lapmaskcb, Pack::SHRINK, 0);
+    maskcbBox->pack_start(*chromaskcb, Pack::SHRINK, 0);
+    maskcbBox->pack_start(*gammaskcb, Pack::SHRINK, 0);
+    maskcbBox->pack_start(*slomaskcb, Pack::SHRINK, 0);
+    maskcbBox->pack_start(*mask2cbCurveEditorG, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     expmaskcb->add(*maskcbBox, false);
     pack_start(*expmaskcb, false, false);
 }
@@ -5668,7 +5668,7 @@ LocallabLog::LocallabLog():
     surHBox->set_spacing(2);
     surHBox->set_tooltip_markup(M("TP_LOCALLAB_LOGSURSOUR_TOOLTIP"));
     Gtk::Label* surLabel = Gtk::manage(new Gtk::Label(M("TP_COLORAPP_SURROUND") + ":"));
-    surHBox->pack_start(*surLabel, Gtk::PACK_SHRINK);
+    surHBox->pack_start(*surLabel, Pack::SHRINK);
     sursour->append(M("TP_COLORAPP_SURROUND_AVER"));
     sursour->append(M("TP_COLORAPP_SURROUND_DIM"));
     sursour->append(M("TP_COLORAPP_SURROUND_DARK"));
@@ -5682,7 +5682,7 @@ LocallabLog::LocallabLog():
     surrHBox->set_spacing(2);
     surrHBox->set_tooltip_markup(M("TP_COLORAPP_SURROUND_TOOLTIP"));
     Gtk::Label* surrLabel = Gtk::manage(new Gtk::Label(M("TP_COLORAPP_SURROUND") + ":"));
-    surrHBox->pack_start(*surrLabel, Gtk::PACK_SHRINK);
+    surrHBox->pack_start(*surrLabel, Pack::SHRINK);
     surround->append(M("TP_COLORAPP_SURROUND_AVER"));
     surround->append(M("TP_COLORAPP_SURROUND_DIM"));
     surround->append(M("TP_COLORAPP_SURROUND_DARK"));
@@ -5790,7 +5790,7 @@ LocallabLog::LocallabLog():
     expL->add(*logP11Box, false);
     logP1Box->pack_start(*expL, false, false);
 
-//    logP1Box->pack_start(*CurveEditorL, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+//    logP1Box->pack_start(*CurveEditorL, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     log1Frame->add(*logP1Box);
     pack_start(*log1Frame);
     log2Frame->set_label_align(0.025, 0.5);
@@ -5800,8 +5800,8 @@ LocallabLog::LocallabLog():
     logP2Box->pack_start(*catad);
     logP2Box->pack_start(*surrHBox);
     ToolParamBlock* const logBox3 = Gtk::manage(new ToolParamBlock());
-    logBox3->pack_start(*maskusablel, Gtk::PACK_SHRINK, 0);
-    logBox3->pack_start(*maskunusablel, Gtk::PACK_SHRINK, 0);
+    logBox3->pack_start(*maskusablel, Pack::SHRINK, 0);
+    logBox3->pack_start(*maskunusablel, Pack::SHRINK, 0);
     logBox3->pack_start(*recothresl);
     logBox3->pack_start(*lowthresl);
     logBox3->pack_start(*higthresl);
@@ -5810,13 +5810,13 @@ LocallabLog::LocallabLog():
     exprecovl->add(*logBox3, false);
 
     ToolParamBlock* const logP3Box = Gtk::manage(new ToolParamBlock());
-    logP3Box->pack_start(*showmaskLMethod, Gtk::PACK_SHRINK, 4);
-    logP3Box->pack_start(*enaLMask, Gtk::PACK_SHRINK, 0);
-    logP3Box->pack_start(*maskCurveEditorL, Gtk::PACK_SHRINK, 4);
+    logP3Box->pack_start(*showmaskLMethod, Pack::SHRINK, 4);
+    logP3Box->pack_start(*enaLMask, Pack::SHRINK, 0);
+    logP3Box->pack_start(*maskCurveEditorL, Pack::SHRINK, 4);
     logP3Box->pack_start(*blendmaskL);
     logP3Box->pack_start(*radmaskL);
     logP3Box->pack_start(*chromaskL);
-    logP3Box->pack_start(*mask2CurveEditorL, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    logP3Box->pack_start(*mask2CurveEditorL, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     expmaskL->add(*logP3Box, false);
 
 
@@ -7199,35 +7199,35 @@ LocallabMask::LocallabMask():
     pack_start(*softradiusmask);
     pack_start(*showmask_Method);
     pack_start(*enamask);
-    pack_start(*mask_CurveEditorG, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    pack_start(*mask_CurveEditorG, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     ToolParamBlock* const strumBox = Gtk::manage(new ToolParamBlock());
     strumBox->pack_start(*strumaskmask);
     strumBox->pack_start(*toolmask);
     struFrame->add(*strumBox);
     pack_start(*struFrame);
     ToolParamBlock* const blurmBox = Gtk::manage(new ToolParamBlock());
-    blurmBox->pack_start(*fftmask, Gtk::PACK_SHRINK, 0);
+    blurmBox->pack_start(*fftmask, Pack::SHRINK, 0);
     blurmBox->pack_start(*contmask);
     blurmBox->pack_start(*blurmask);
     blurFrame->add(*blurmBox);
     pack_start(*blurFrame);
     ToolParamBlock* const toolmaskBox = Gtk::manage(new ToolParamBlock());
-    toolmaskBox->pack_start(*radmask, Gtk::PACK_SHRINK, 0);
-    toolmaskBox->pack_start(*lapmask, Gtk::PACK_SHRINK, 0);
-    toolmaskBox->pack_start(*chromask, Gtk::PACK_SHRINK, 0);
-    toolmaskBox->pack_start(*gammask, Gtk::PACK_SHRINK, 0);
-    toolmaskBox->pack_start(*slopmask, Gtk::PACK_SHRINK, 0);
-    toolmaskBox->pack_start(*shadmask, Gtk::PACK_SHRINK, 0);
-    toolmaskBox->pack_start(*mask_HCurveEditorG, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
-    toolmaskBox->pack_start(*mask2CurveEditorG, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
-    toolmaskBox->pack_start(*mask2CurveEditorGwav, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
-    toolmaskBox->pack_start(*csThresholdmask, Gtk::PACK_SHRINK, 0);
+    toolmaskBox->pack_start(*radmask, Pack::SHRINK, 0);
+    toolmaskBox->pack_start(*lapmask, Pack::SHRINK, 0);
+    toolmaskBox->pack_start(*chromask, Pack::SHRINK, 0);
+    toolmaskBox->pack_start(*gammask, Pack::SHRINK, 0);
+    toolmaskBox->pack_start(*slopmask, Pack::SHRINK, 0);
+    toolmaskBox->pack_start(*shadmask, Pack::SHRINK, 0);
+    toolmaskBox->pack_start(*mask_HCurveEditorG, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    toolmaskBox->pack_start(*mask2CurveEditorG, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    toolmaskBox->pack_start(*mask2CurveEditorGwav, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    toolmaskBox->pack_start(*csThresholdmask, Pack::SHRINK, 0);
     ToolParamBlock* const gradmaskBox = Gtk::manage(new ToolParamBlock());
     gradmaskBox->pack_start(*str_mask);
     gradmaskBox->pack_start(*ang_mask);
     gradmaskBox->pack_start(*feather_mask);
     gradFramemask->add(*gradmaskBox);
-    toolmaskBox->pack_start(*gradFramemask, Gtk::PACK_SHRINK, 0);
+    toolmaskBox->pack_start(*gradFramemask, Pack::SHRINK, 0);
     toolmaskFrame->add(*toolmaskBox);
     pack_start(*toolmaskFrame);
 }
@@ -8283,7 +8283,7 @@ Locallabcie::Locallabcie():
     modeHBoxcam->set_spacing(2);
     //modeHBoxcam->set_tooltip_markup (M ("TP_LOCALLAB_CAMMODE_TOOLTIP"));
     Gtk::Label* modeLabelcam = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_CAMMODE") + ":"));
-    modeHBoxcam->pack_start(*modeLabelcam, Gtk::PACK_SHRINK);
+    modeHBoxcam->pack_start(*modeLabelcam, Pack::SHRINK);
     modecam->append(M("TP_LOCALLAB_CAMMODE_CAM16"));
     modecam->append(M("TP_LOCALLAB_CAMMODE_JZ"));
     modecam->set_active(0);
@@ -8294,7 +8294,7 @@ Locallabcie::Locallabcie():
     modeHBoxcie->set_spacing(2);
     modeHBoxcie->set_tooltip_markup(M("TP_LOCALLAB_CIEMODE_TOOLTIP"));
     Gtk::Label* modeLabel = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_CIEMODE") + ":"));
-    modeHBoxcie->pack_start(*modeLabel, Gtk::PACK_SHRINK);
+    modeHBoxcie->pack_start(*modeLabel, Pack::SHRINK);
     modecie->append(M("TP_LOCALLAB_CIEMODE_COM"));
     modecie->append(M("TP_LOCALLAB_CIEMODE_TM"));
     modecie->append(M("TP_LOCALLAB_CIEMODE_WAV"));
@@ -8307,7 +8307,7 @@ Locallabcie::Locallabcie():
     surHBoxcie->set_spacing(2);
     surHBoxcie->set_tooltip_markup(M("TP_LOCALLAB_LOGSURSOUR_TOOLTIP"));
     Gtk::Label* surLabel = Gtk::manage(new Gtk::Label(M("TP_COLORAPP_SURROUND") + ":"));
-    surHBoxcie->pack_start(*surLabel, Gtk::PACK_SHRINK);
+    surHBoxcie->pack_start(*surLabel, Pack::SHRINK);
     sursourcie->append(M("TP_COLORAPP_SURROUND_AVER"));
     sursourcie->append(M("TP_COLORAPP_SURROUND_DIM"));
     sursourcie->append(M("TP_COLORAPP_SURROUND_DARK"));
@@ -8325,8 +8325,8 @@ Locallabcie::Locallabcie():
     Gtk::Box* const LCTitleHBoxcamscene = Gtk::manage(new Gtk::Box());
     Gtk::Label* const LCLabelcamscene = Gtk::manage(new Gtk::Label());
     LCLabelcamscene->set_markup(Glib::ustring("<b>") + (M("TP_LOCALLAB_LOGFRA")) + Glib::ustring("</b>"));
-    LCTitleHBoxcamscene->pack_start(*LCLabelcamscene, Gtk::PACK_SHRINK);
-    TittleVBoxcamscene->pack_start(*LCTitleHBoxcamscene, Gtk::PACK_SHRINK);
+    LCTitleHBoxcamscene->pack_start(*LCLabelcamscene, Pack::SHRINK);
+    TittleVBoxcamscene->pack_start(*LCTitleHBoxcamscene, Pack::SHRINK);
     expcamscene->setLabel(TittleVBoxcamscene);
 
     setExpandAlignProperties(expcamscene, true, false, Gtk::Align::FILL, Gtk::Align::START);
@@ -8375,8 +8375,8 @@ Locallabcie::Locallabcie():
     Gtk::Box* const LCTitleHBoxprecam = Gtk::manage(new Gtk::Box());
     Gtk::Label* const LCLabelprecam = Gtk::manage(new Gtk::Label());
     LCLabelprecam->set_markup(Glib::ustring("<b>") + (M("TP_LOCALLAB_SIGTRCCIE")) + Glib::ustring("</b>"));
-    LCTitleHBoxprecam->pack_start(*LCLabelprecam, Gtk::PACK_SHRINK);
-    TittleVBoxprecam->pack_start(*LCTitleHBoxprecam, Gtk::PACK_SHRINK);
+    LCTitleHBoxprecam->pack_start(*LCLabelprecam, Pack::SHRINK);
+    TittleVBoxprecam->pack_start(*LCTitleHBoxprecam, Pack::SHRINK);
     expprecam->setLabel(TittleVBoxprecam);
 
     setExpandAlignProperties(expprecam, true, false, Gtk::Align::FILL, Gtk::Align::START);
@@ -8386,8 +8386,8 @@ Locallabcie::Locallabcie():
     logcieFrame->set_label_align(0.025, 0.5);
     logcieFrame->set_label_widget(*logcie);
     Gtk::Label* illLabel = Gtk::manage(new Gtk::Label(M("TP_ICM_WORKING_ILLU") + ":"));
-    willBox->pack_start(*illLabel, Gtk::PACK_SHRINK);
-    willBox->pack_start(*illMethod, Gtk::PACK_EXPAND_WIDGET);
+    willBox->pack_start(*illLabel, Pack::SHRINK);
+    willBox->pack_start(*illMethod, Pack::EXPAND_WIDGET);
     illMethod->append(M("TP_ICM_WORKING_ILLU_D41"));
     illMethod->append(M("TP_ICM_WORKING_ILLU_D50"));
     illMethod->append(M("TP_ICM_WORKING_ILLU_D55"));
@@ -8408,8 +8408,8 @@ Locallabcie::Locallabcie():
 
 
     Gtk::Label* primLabel = Gtk::manage(new Gtk::Label(M("TP_ICM_WORKING_PRIM") + ":"));
-    wprimBox->pack_start(*primLabel, Gtk::PACK_SHRINK);
-    wprimBox->pack_start(*primMethod, Gtk::PACK_EXPAND_WIDGET);
+    wprimBox->pack_start(*primLabel, Pack::SHRINK);
+    wprimBox->pack_start(*primMethod, Pack::EXPAND_WIDGET);
     primMethod->append(M("TP_ICM_WORKING_PRIM_PROP"));
     primMethod->append(M("TP_ICM_WORKING_PRIM_BET"));
     primMethod->append(M("TP_ICM_WORKING_PRIM_WID"));
@@ -8446,7 +8446,7 @@ Locallabcie::Locallabcie():
     primCoordGridl->attach_next_to(*bluxl, *grexl, Gtk::PositionType::POS_BOTTOM, 1, 1);
     primCoordGridl->attach_next_to(*bluyl, *bluxl, Gtk::PositionType::POS_RIGHT, 1, 1);
 
-    redBox->pack_start(*primCoordGridl, Gtk::PACK_EXPAND_WIDGET);
+    redBox->pack_start(*primCoordGridl, Pack::EXPAND_WIDGET);
 
 
     redxl->setAdjusterListener(this);
@@ -8466,8 +8466,8 @@ Locallabcie::Locallabcie():
     gridFramecie->add(*gridBox);
 
     Gtk::Label* catLabel = Gtk::manage(new Gtk::Label(M("TP_ICM_WORKING_CAT") + ":"));
-    catBox->pack_start(*catLabel, Gtk::PACK_SHRINK);
-    catBox->pack_start(*catMethod, Gtk::PACK_EXPAND_WIDGET);
+    catBox->pack_start(*catLabel, Pack::SHRINK);
+    catBox->pack_start(*catMethod, Pack::EXPAND_WIDGET);
     catMethod->append(M("TP_ICM_WORKING_CAT_BRAD"));
     catMethod->append(M("TP_ICM_WORKING_CAT_CAT16"));
     catMethod->append(M("TP_ICM_WORKING_CAT_CAT02"));
@@ -8475,21 +8475,21 @@ Locallabcie::Locallabcie():
     catMethod->append(M("TP_ICM_WORKING_CAT_XYZ"));
     catMethod->set_active(0);
     catMethodconn = catMethod->signal_changed().connect(sigc::mem_fun(*this, &Locallabcie::catMethodChanged));
-    gamutcieBox->pack_start(*gamutcie, Gtk::PACK_EXPAND_WIDGET);
+    gamutcieBox->pack_start(*gamutcie, Pack::EXPAND_WIDGET);
 
     gamutcieconn = gamutcie->signal_toggled().connect(sigc::mem_fun(*this, &Locallabcie::gamutcieChanged));
 
     ToolParamBlock* const signormBox = Gtk::manage(new ToolParamBlock());
     ToolParamBlock* const sigfraBox = Gtk::manage(new ToolParamBlock());
 
-    bwcieBox->pack_start(*bwcie, Gtk::PACK_EXPAND_WIDGET);
+    bwcieBox->pack_start(*bwcie, Pack::EXPAND_WIDGET);
 
     bwcieconn = bwcie->signal_toggled().connect(sigc::mem_fun(*this, &Locallabcie::bwcieChanged));
 
     modeHBoxbwev->set_spacing(2);
     ToolParamBlock* const gamcieBox = Gtk::manage(new ToolParamBlock());
     Gtk::Label* modeLabelbwev = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_SIGMOIDQJ") + ":"));
-    modeHBoxbwev->pack_start(*modeLabelbwev, Gtk::PACK_SHRINK);
+    modeHBoxbwev->pack_start(*modeLabelbwev, Pack::SHRINK);
 
     bwevMethod->append(M("TP_LOCALLAB_BWEVNONE"));
     bwevMethod->append(M("TP_LOCALLAB_BWEVSIG"));
@@ -8513,7 +8513,7 @@ Locallabcie::Locallabcie():
     trccieBox->pack_start(*slopjcie);
     trccieBox->pack_start(*midtcie);
 
-    smoothBox->pack_start(*smoothciemet, Gtk::PACK_EXPAND_WIDGET);
+    smoothBox->pack_start(*smoothciemet, Pack::EXPAND_WIDGET);
     smoothciemet->append(M("TP_LOCALLAB_CIE_SMOOTH_NONE"));
     smoothciemet->append(M("TP_LOCALLAB_CIE_SMOOTH_EV"));
     smoothciemet->append(M("TP_LOCALLAB_CIE_SMOOTH_GAMMA ROLLOFF"));
@@ -8599,8 +8599,8 @@ Locallabcie::Locallabcie():
     Gtk::Box* const LCTitleHBoxjz = Gtk::manage(new Gtk::Box());
     Gtk::Label* const LCLabeljz = Gtk::manage(new Gtk::Label());
     LCLabeljz->set_markup(Glib::ustring("<b>") + (M("TP_LOCALLAB_JZFRA")) + Glib::ustring("</b>"));
-    LCTitleHBoxjz->pack_start(*LCLabeljz, Gtk::PACK_SHRINK);
-    TittleVBoxjz->pack_start(*LCTitleHBoxjz, Gtk::PACK_SHRINK);
+    LCTitleHBoxjz->pack_start(*LCLabeljz, Pack::SHRINK);
+    TittleVBoxjz->pack_start(*LCTitleHBoxjz, Pack::SHRINK);
     expjz->setLabel(TittleVBoxjz);
 
     setExpandAlignProperties(expjz, true, false, Gtk::Align::FILL, Gtk::Align::START);
@@ -8692,18 +8692,18 @@ Locallabcie::Locallabcie():
     czcolorFrame->add(*ciePzcolorBox);
     jzBox->pack_start(*czcolorFrame);
 
-    jzBox->pack_start(*jz1CurveEditorG, Gtk::PACK_SHRINK, 4);
+    jzBox->pack_start(*jz1CurveEditorG, Pack::SHRINK, 4);
     HFramejz->set_label_align(0.025, 0.5);
     ToolParamBlock* const jzHHBox = Gtk::manage(new ToolParamBlock());
     JzHFramejz->set_label_align(0.025, 0.5);
     ToolParamBlock* const jzHBox = Gtk::manage(new ToolParamBlock());
 
-    jzHBox->pack_start(*jz2CurveEditorG, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    jzHBox->pack_start(*jz2CurveEditorG, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     jzHBox->pack_start(*thrhjzcie);
     JzHFramejz->add(*jzHBox);
     jzHHBox->pack_start(*JzHFramejz);
 
-    jzHHBox->pack_start(*jz3CurveEditorG, Gtk::PACK_SHRINK, 4); //   jzBox->pack_start(*adapjzcie);
+    jzHHBox->pack_start(*jz3CurveEditorG, Pack::SHRINK, 4); //   jzBox->pack_start(*adapjzcie);
     jzHHBox->pack_start(*softjzcie);
     HFramejz->add(*jzHHBox);
     jzBox->pack_start(*HFramejz);
@@ -8734,7 +8734,7 @@ Locallabcie::Locallabcie():
     coBox2jz->pack_start(*csThresholdjz);
     ToolParamBlock* const coBoxjz = Gtk::manage(new ToolParamBlock());
     coBoxjz->pack_start(*sigmalcjz);
-    coBoxjz->pack_start(*LocalcurveEditorwavjz, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    coBoxjz->pack_start(*LocalcurveEditorwavjz, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     contFramejz->add(*coBoxjz);
     coBox2jz->pack_start(*contFramejz);
 
@@ -8903,8 +8903,8 @@ Locallabcie::Locallabcie():
     Gtk::Box* const LCTitleHBoxcam16 = Gtk::manage(new Gtk::Box());
     Gtk::Label* const LCLabelcam16 = Gtk::manage(new Gtk::Label());
     LCLabelcam16->set_markup(Glib::ustring("<b>") + (M("TP_LOCALLAB_CAM16_FRA")) + Glib::ustring("</b>"));
-    LCTitleHBoxcam16->pack_start(*LCLabelcam16, Gtk::PACK_SHRINK);
-    TittleVBoxcam16->pack_start(*LCTitleHBoxcam16, Gtk::PACK_SHRINK);
+    LCTitleHBoxcam16->pack_start(*LCLabelcam16, Pack::SHRINK);
+    TittleVBoxcam16->pack_start(*LCTitleHBoxcam16, Pack::SHRINK);
     expcam16->setLabel(TittleVBoxcam16);
 
     setExpandAlignProperties(expcam16, true, false, Gtk::Align::FILL, Gtk::Align::START);
@@ -8916,8 +8916,8 @@ Locallabcie::Locallabcie():
     Gtk::Box* const LCTitleHBoxcamviewing = Gtk::manage(new Gtk::Box());
     Gtk::Label* const LCLabelcamviewing = Gtk::manage(new Gtk::Label());
     LCLabelcamviewing->set_markup(Glib::ustring("<b>") + (M("TP_LOCALLAB_LOG2FRA")) + Glib::ustring("</b>"));
-    LCTitleHBoxcamviewing->pack_start(*LCLabelcamviewing, Gtk::PACK_SHRINK);
-    TittleVBoxcamviewing->pack_start(*LCTitleHBoxcamviewing, Gtk::PACK_SHRINK);
+    LCTitleHBoxcamviewing->pack_start(*LCLabelcamviewing, Pack::SHRINK);
+    TittleVBoxcamviewing->pack_start(*LCTitleHBoxcamviewing, Pack::SHRINK);
     expcamviewing->setLabel(TittleVBoxcamviewing);
 
     setExpandAlignProperties(expcamviewing, true, false, Gtk::Align::FILL, Gtk::Align::START);
@@ -8925,7 +8925,7 @@ Locallabcie::Locallabcie():
     surrHBoxcie->set_spacing(2);
     surrHBoxcie->set_tooltip_markup(M("TP_COLORAPP_SURROUND_TOOLTIP"));
     Gtk::Label* surrLabelcie = Gtk::manage(new Gtk::Label(M("TP_COLORAPP_SURROUND") + ":"));
-    surrHBoxcie->pack_start(*surrLabelcie, Gtk::PACK_SHRINK);
+    surrHBoxcie->pack_start(*surrLabelcie, Pack::SHRINK);
     surroundcie->append(M("TP_COLORAPP_SURROUND_AVER"));
     surroundcie->append(M("TP_COLORAPP_SURROUND_DIM"));
     surroundcie->append(M("TP_COLORAPP_SURROUND_DARK"));
@@ -9094,8 +9094,8 @@ Locallabcie::Locallabcie():
     pack_start(*expgradcie, false, false);
 
     ToolParamBlock* const cieBox3 = Gtk::manage(new ToolParamBlock());
-    cieBox3->pack_start(*maskusablecie, Gtk::PACK_SHRINK, 0);
-    cieBox3->pack_start(*maskunusablecie, Gtk::PACK_SHRINK, 0);
+    cieBox3->pack_start(*maskusablecie, Pack::SHRINK, 0);
+    cieBox3->pack_start(*maskunusablecie, Pack::SHRINK, 0);
     cieBox3->pack_start(*recothrescie);
     cieBox3->pack_start(*lowthrescie);
     cieBox3->pack_start(*higthrescie);
@@ -9104,37 +9104,37 @@ Locallabcie::Locallabcie():
     pack_start(*exprecovcie, false, false);
 
     ToolParamBlock* const maskcieBox = Gtk::manage(new ToolParamBlock());
-    maskcieBox->pack_start(*showmaskcieMethod, Gtk::PACK_SHRINK, 4);
-    maskcieBox->pack_start(*enacieMask, Gtk::PACK_SHRINK, 0);
-    maskcieBox->pack_start(*enacieMaskall, Gtk::PACK_SHRINK, 0);
-    maskcieBox->pack_start(*maskcieCurveEditorG, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    maskcieBox->pack_start(*showmaskcieMethod, Pack::SHRINK, 4);
+    maskcieBox->pack_start(*enacieMask, Pack::SHRINK, 0);
+    maskcieBox->pack_start(*enacieMaskall, Pack::SHRINK, 0);
+    maskcieBox->pack_start(*maskcieCurveEditorG, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     ToolParamBlock* const strumBoxcie = Gtk::manage(new ToolParamBlock());
     strumBoxcie->pack_start(*strumaskcie);
     strumBoxcie->pack_start(*toolcie);
     struFramecie->add(*strumBoxcie);
-    maskcieBox->pack_start(*struFramecie, Gtk::PACK_SHRINK, 0);
+    maskcieBox->pack_start(*struFramecie, Pack::SHRINK, 0);
     ToolParamBlock* const blurcieBox = Gtk::manage(new ToolParamBlock());
-    blurcieBox->pack_start(*fftcieMask, Gtk::PACK_SHRINK, 0);
+    blurcieBox->pack_start(*fftcieMask, Pack::SHRINK, 0);
     blurcieBox->pack_start(*contcie);
     blurcieBox->pack_start(*blurcie);
     blurFramecie->add(*blurcieBox);
-    maskcieBox->pack_start(*blurFramecie, Gtk::PACK_SHRINK, 0);
+    maskcieBox->pack_start(*blurFramecie, Pack::SHRINK, 0);
 
-    maskcieBox->pack_start(*blendmaskcie, Gtk::PACK_SHRINK, 0);
-    maskcieBox->pack_start(*radmaskcie, Gtk::PACK_SHRINK, 0);
-    //maskcieBox->pack_start(*lapmaskcie, Gtk::PACK_SHRINK, 0);
-    maskcieBox->pack_start(*chromaskcie, Gtk::PACK_SHRINK, 0);
-    maskcieBox->pack_start(*gammaskcie, Gtk::PACK_SHRINK, 0);
-    maskcieBox->pack_start(*slomaskcie, Gtk::PACK_SHRINK, 0);
-    maskcieBox->pack_start(*highmaskcie, Gtk::PACK_SHRINK, 0);
-    maskcieBox->pack_start(*shadmaskcie, Gtk::PACK_SHRINK, 0);
-    maskcieBox->pack_start(*maskcieHCurveEditorG, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    maskcieBox->pack_start(*blendmaskcie, Pack::SHRINK, 0);
+    maskcieBox->pack_start(*radmaskcie, Pack::SHRINK, 0);
+    //maskcieBox->pack_start(*lapmaskcie, Pack::SHRINK, 0);
+    maskcieBox->pack_start(*chromaskcie, Pack::SHRINK, 0);
+    maskcieBox->pack_start(*gammaskcie, Pack::SHRINK, 0);
+    maskcieBox->pack_start(*slomaskcie, Pack::SHRINK, 0);
+    maskcieBox->pack_start(*highmaskcie, Pack::SHRINK, 0);
+    maskcieBox->pack_start(*shadmaskcie, Pack::SHRINK, 0);
+    maskcieBox->pack_start(*maskcieHCurveEditorG, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
 
-    maskcieBox->pack_start(*mask2cieCurveEditorG, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    maskcieBox->pack_start(*mask2cieCurveEditorG, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     wavFramecie->set_label_align(0.025, 0.5);
     ToolParamBlock* const toolcieBox2 = Gtk::manage(new ToolParamBlock());
-    toolcieBox2->pack_start(*mask2cieCurveEditorGwav, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
-    toolcieBox2->pack_start(*csThresholdcie, Gtk::PACK_SHRINK, 0);
+    toolcieBox2->pack_start(*mask2cieCurveEditorGwav, Pack::SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
+    toolcieBox2->pack_start(*csThresholdcie, Pack::SHRINK, 0);
     wavFramecie->add(*toolcieBox2);
     maskcieBox->pack_start(*wavFramecie);
 

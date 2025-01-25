@@ -51,7 +51,7 @@ BayerPreProcess::BayerPreProcess() : FoldableToolPanel(this, TOOL_NAME, M("TP_PR
     greenEqThreshold->show();
 
     Gtk::Box *hb = Gtk::manage(new Gtk::Box());
-    hb->pack_start(*Gtk::manage(new Gtk::Label(M("TP_PREPROCESS_LINEDENOISE_DIRECTION") + ": ")), Gtk::PACK_SHRINK, 0);
+    hb->pack_start(*Gtk::manage(new Gtk::Label(M("TP_PREPROCESS_LINEDENOISE_DIRECTION") + ": ")), Pack::SHRINK, 0);
     lineDenoiseDirection = Gtk::manage(new MyComboBoxText());
     lineDenoiseDirection->append(M("TP_PREPROCESS_LINEDENOISE_DIRECTION_HORIZONTAL"));
     lineDenoiseDirection->append(M("TP_PREPROCESS_LINEDENOISE_DIRECTION_VERTICAL"));
@@ -62,19 +62,19 @@ BayerPreProcess::BayerPreProcess() : FoldableToolPanel(this, TOOL_NAME, M("TP_PR
 
     hb->pack_start(*lineDenoiseDirection);
 
-    pack_start(*lineDenoise, Gtk::PACK_SHRINK, 4);
-    pack_start(*hb, Gtk::PACK_SHRINK, 4);
+    pack_start(*lineDenoise, Pack::SHRINK, 4);
+    pack_start(*hb, Pack::SHRINK, 4);
 
     pack_start(*Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL)));
 
-    pack_start(*greenEqThreshold, Gtk::PACK_SHRINK, 4);
+    pack_start(*greenEqThreshold, Pack::SHRINK, 4);
 
     pdafLinesFilter = Gtk::manage(new Gtk::CheckButton((M("TP_PREPROCESS_PDAFLINESFILTER"))));
     pdafLinesFilter->show();
     pdafLinesFilter->signal_toggled().connect(sigc::mem_fun(*this, &BayerPreProcess::pdafLinesFilterChanged), true);
 
     pack_start(*Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL)));
-    pack_start(*pdafLinesFilter, Gtk::PACK_SHRINK, 4);
+    pack_start(*pdafLinesFilter, Pack::SHRINK, 4);
 }
 
 void BayerPreProcess::read(const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited)

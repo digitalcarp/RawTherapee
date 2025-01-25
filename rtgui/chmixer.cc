@@ -57,7 +57,7 @@ ChMixer::ChMixer (): FoldableToolPanel(this, TOOL_NAME, M("TP_CHMIXER_LABEL"), f
         pack_start (*red[i]);
     }
 
-    pack_start (*rsep, Gtk::PACK_EXPAND_WIDGET, 4);
+    pack_start (*rsep, Pack::EXPAND_WIDGET, 4);
 
     Gtk::Label* glabel = Gtk::manage (new Gtk::Label ());
     glabel->set_markup (Glib::ustring("\t<span foreground=\"#0b8c21\"><b>") + M("TP_CHMIXER_GREEN") + Glib::ustring(":</b></span>"));
@@ -76,7 +76,7 @@ ChMixer::ChMixer (): FoldableToolPanel(this, TOOL_NAME, M("TP_CHMIXER_LABEL"), f
         pack_start (*green[i]);
     }
 
-    pack_start (*gsep, Gtk::PACK_EXPAND_WIDGET, 4);
+    pack_start (*gsep, Pack::EXPAND_WIDGET, 4);
 
     Gtk::Label* blabel = Gtk::manage (new Gtk::Label ());
     blabel->set_markup (Glib::ustring("\t<span foreground=\"#1377d7\"><b>") + M("TP_CHMIXER_BLUE") + Glib::ustring(":</b></span>"));

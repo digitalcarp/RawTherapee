@@ -241,7 +241,7 @@ void Spot::setBatchMode (bool batchMode)
             removeIfThere (labelBox, countLabel, false);
             countLabel = nullptr;
             editedCheckBox = Gtk::manage (new Gtk::CheckButton (Glib::ustring::compose (M ("TP_SPOT_COUNTLABEL"), 0)));
-            labelBox->pack_start (*editedCheckBox, Gtk::PACK_SHRINK, 2);
+            labelBox->pack_start (*editedCheckBox, Pack::SHRINK, 2);
             labelBox->reorder_child (*editedCheckBox, 0);
             editedConn = editedCheckBox->signal_toggled().connect ( sigc::mem_fun (*this, &Spot::editedToggled) );
             editedCheckBox->show();

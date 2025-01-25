@@ -238,26 +238,26 @@ FilmNegative::FilmNegative() :
     colorSpace->signal_changed().connect(sigc::mem_fun(*this, &FilmNegative::colorSpaceChanged));
     colorSpace->show();
 
-    pack_start(*greenExp, Gtk::PACK_SHRINK, 0);
-    pack_start(*redRatio, Gtk::PACK_SHRINK, 0);
-    pack_start(*blueRatio, Gtk::PACK_SHRINK, 0);
-    pack_start(picker, Gtk::PACK_SHRINK, 0);
+    pack_start(*greenExp, Pack::SHRINK, 0);
+    pack_start(*redRatio, Pack::SHRINK, 0);
+    pack_start(*blueRatio, Pack::SHRINK, 0);
+    pack_start(picker, Pack::SHRINK, 0);
 
     Gtk::Separator* const sep = Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
     sep->get_style_context()->add_class("grid-row-separator");
-    pack_start(*sep, Gtk::PACK_SHRINK, 0);
+    pack_start(*sep, Pack::SHRINK, 0);
 
 //    Gtk::Grid* const fbGrid = Gtk::manage(new Gtk::Grid());
 //    fbGrid->attach(*refInputLabel, 0, 0, 1, 1);
 //    fbGrid->attach(*filmBaseValuesLabel, 1, 0, 1, 1);
-//    pack_start(*fbGrid, Gtk::PACK_SHRINK, 0);
-    pack_start(*refInputLabel, Gtk::PACK_SHRINK, 0);
+//    pack_start(*fbGrid, Pack::SHRINK, 0);
+    pack_start(*refInputLabel, Pack::SHRINK, 0);
 
-    pack_start(*outputLevel, Gtk::PACK_SHRINK, 0);
-    pack_start(*blueBalance, Gtk::PACK_SHRINK, 0);
-    pack_start(*greenBalance, Gtk::PACK_SHRINK, 0);
+    pack_start(*outputLevel, Pack::SHRINK, 0);
+    pack_start(*blueBalance, Pack::SHRINK, 0);
+    pack_start(*greenBalance, Pack::SHRINK, 0);
 
-    pack_start(refPicker, Gtk::PACK_SHRINK, 0);
+    pack_start(refPicker, Pack::SHRINK, 0);
 
     picker.add_button_toggled_event(*this, &FilmNegative::editToggled);
     refPicker.add_button_toggled_event(*this, &FilmNegative::refSpotToggled);

@@ -85,12 +85,12 @@ Resize::Resize () : FoldableToolPanel(this, TOOL_NAME, M("TP_RESIZE_LABEL"), fal
     combos->attach(*label, 0, 2, 1, 1);
     combos->attach(*spec, 1, 2, 1, 1);
 
-    pack_start (*combos, Gtk::PACK_SHRINK, 4);
+    pack_start (*combos, Pack::SHRINK, 4);
 
     scale = new Adjuster (M("TP_RESIZE_SCALE"), 0.01, MAX_SCALE, 0.01, 1.);
     scale->setAdjusterListener (this);
 
-    pack_start (*scale, Gtk::PACK_SHRINK, 4);
+    pack_start (*scale, Pack::SHRINK, 4);
 
     sizeBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
 
@@ -114,16 +114,16 @@ Resize::Resize () : FoldableToolPanel(this, TOOL_NAME, M("TP_RESIZE_LABEL"), fal
     se->set_width_chars(5);
     setExpandAlignProperties(se, false, false, Gtk::Align::END, Gtk::Align::CENTER);
 
-    wbox->pack_start (*Gtk::manage (new Gtk::Label (M("TP_RESIZE_W"))), Gtk::PACK_SHRINK, 0);
+    wbox->pack_start (*Gtk::manage (new Gtk::Label (M("TP_RESIZE_W"))), Pack::SHRINK, 0);
     wbox->pack_start (*w);
     hbox->set_spacing(3);
-    hbox->pack_start (*Gtk::manage (new Gtk::Label (M("TP_RESIZE_H"))), Gtk::PACK_SHRINK, 0);
+    hbox->pack_start (*Gtk::manage (new Gtk::Label (M("TP_RESIZE_H"))), Pack::SHRINK, 0);
     hbox->pack_start (*h);
     lebox->set_spacing(3);
-    lebox->pack_start (*Gtk::manage (new Gtk::Label (M("TP_RESIZE_LE"))), Gtk::PACK_SHRINK, 0);
+    lebox->pack_start (*Gtk::manage (new Gtk::Label (M("TP_RESIZE_LE"))), Pack::SHRINK, 0);
     lebox->pack_start (*le);
     sebox->set_spacing(3);
-    sebox->pack_start (*Gtk::manage (new Gtk::Label (M("TP_RESIZE_SE"))), Gtk::PACK_SHRINK, 0);
+    sebox->pack_start (*Gtk::manage (new Gtk::Label (M("TP_RESIZE_SE"))), Pack::SHRINK, 0);
     sebox->pack_start (*se);
 
     sbox->set_spacing(4);
@@ -135,8 +135,8 @@ Resize::Resize () : FoldableToolPanel(this, TOOL_NAME, M("TP_RESIZE_LABEL"), fal
     ebox->pack_start (*sebox);
     ebox->set_homogeneous();
     
-    sizeBox->pack_start (*sbox, Gtk::PACK_SHRINK, 0);
-    sizeBox->pack_start (*ebox, Gtk::PACK_SHRINK, 0);
+    sizeBox->pack_start (*sbox, Pack::SHRINK, 0);
+    sizeBox->pack_start (*ebox, Pack::SHRINK, 0);
     sizeBox->show_all ();
     sizeBox->reference ();
 
@@ -768,13 +768,13 @@ void Resize::updateGUI ()
     switch (spec->get_active_row_number()) {
     case (0):
         // Scale mode
-        pack_start (*scale, Gtk::PACK_SHRINK, 4);
+        pack_start (*scale, Pack::SHRINK, 4);
         reorder_child(*allowUpscaling, 4);
         break;
 
     case (1):
         // Width mode
-        pack_start (*sizeBox, Gtk::PACK_SHRINK, 4);
+        pack_start (*sizeBox, Pack::SHRINK, 4);
         reorder_child(*allowUpscaling, 4);
         w->set_sensitive (true);
         h->set_sensitive (false);
@@ -784,7 +784,7 @@ void Resize::updateGUI ()
 
     case (2):
         // Height mode
-        pack_start (*sizeBox, Gtk::PACK_SHRINK, 4);
+        pack_start (*sizeBox, Pack::SHRINK, 4);
         reorder_child(*allowUpscaling, 4);
         w->set_sensitive (false);
         h->set_sensitive (true);
@@ -794,7 +794,7 @@ void Resize::updateGUI ()
 
     case (3):
         // Bounding box mode
-        pack_start (*sizeBox, Gtk::PACK_SHRINK, 4);
+        pack_start (*sizeBox, Pack::SHRINK, 4);
         reorder_child(*allowUpscaling, 4);
         w->set_sensitive (true);
         h->set_sensitive (true);
@@ -804,7 +804,7 @@ void Resize::updateGUI ()
 
     case (4):
         // Long edge mode
-        pack_start (*sizeBox, Gtk::PACK_SHRINK, 4);
+        pack_start (*sizeBox, Pack::SHRINK, 4);
         reorder_child(*allowUpscaling, 4);
         le->set_sensitive (true);
         se->set_sensitive (false);
@@ -814,7 +814,7 @@ void Resize::updateGUI ()
 
     case (5):
         // Short edge mode
-        pack_start (*sizeBox, Gtk::PACK_SHRINK, 4);
+        pack_start (*sizeBox, Pack::SHRINK, 4);
         reorder_child(*allowUpscaling, 4);
         le->set_sensitive (false);
         se->set_sensitive (true);

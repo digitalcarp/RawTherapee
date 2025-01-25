@@ -41,16 +41,16 @@ DarkFrame::DarkFrame () : FoldableToolPanel(this, TOOL_NAME, M("TP_DARKFRAME_LAB
     dfLabel = Gtk::manage(new Gtk::Label(M("GENERAL_FILE")));
     btnReset = Gtk::manage(new Gtk::Button());
     btnReset->set_image (*Gtk::manage(new RTImage ("cancel-small", Gtk::ICON_SIZE_BUTTON)));
-    hbdf->pack_start(*dfLabel, Gtk::PACK_SHRINK, 0);
+    hbdf->pack_start(*dfLabel, Pack::SHRINK, 0);
     hbdf->pack_start(*darkFrameFile);
-    hbdf->pack_start(*btnReset, Gtk::PACK_SHRINK, 0);
+    hbdf->pack_start(*btnReset, Pack::SHRINK, 0);
     dfAuto = Gtk::manage(new Gtk::CheckButton((M("TP_DARKFRAME_AUTOSELECT"))));
     dfInfo = Gtk::manage(new Gtk::Label(""));
     dfInfo->set_alignment(0, 0); //left align
 
-    pack_start( *hbdf, Gtk::PACK_SHRINK, 0);
-    pack_start( *dfAuto, Gtk::PACK_SHRINK, 0);
-    pack_start( *dfInfo, Gtk::PACK_SHRINK, 0);
+    pack_start( *hbdf, Pack::SHRINK, 0);
+    pack_start( *dfAuto, Pack::SHRINK, 0);
+    pack_start( *dfInfo, Pack::SHRINK, 0);
 
     dfautoconn = dfAuto->signal_toggled().connect ( sigc::mem_fun(*this, &DarkFrame::dfAutoChanged), true);
     dfFile = darkFrameFile->signal_file_set().connect ( sigc::mem_fun(*this, &DarkFrame::darkFrameChanged)); //, true);

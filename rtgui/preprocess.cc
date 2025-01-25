@@ -41,9 +41,9 @@ PreProcess::PreProcess () : FoldableToolPanel(this, TOOL_NAME, M("TP_PREPROCESS_
     hotPixel->set_tooltip_markup (M("TP_PREPROCESS_HOTPIXFILT_TOOLTIP"));
     deadPixel->set_tooltip_markup (M("TP_PREPROCESS_DEADPIXFILT_TOOLTIP"));
 
-    hotdeadPixel->pack_start( *hotPixel, Gtk::PACK_SHRINK);
-    hotdeadPixel->pack_start( *deadPixel, Gtk::PACK_SHRINK, 0);
-    pack_start(*hotdeadPixel, Gtk::PACK_SHRINK, 0);
+    hotdeadPixel->pack_start( *hotPixel, Pack::SHRINK);
+    hotdeadPixel->pack_start( *deadPixel, Pack::SHRINK, 0);
+    pack_start(*hotdeadPixel, Pack::SHRINK, 0);
     hdThreshold = Gtk::manage (new Adjuster (M("TP_RAW_HD"), 20, 200, 2, 100));
     hdThreshold->set_tooltip_markup (M("TP_RAW_HD_TOOLTIP"));
     hdThreshold->setAdjusterListener (this);
@@ -51,7 +51,7 @@ PreProcess::PreProcess () : FoldableToolPanel(this, TOOL_NAME, M("TP_PREPROCESS_
     hdThreshold->setDelay(std::max(options.adjusterMinDelay, options.adjusterMaxDelay));
 
     hdThreshold->show();
-    pack_start( *hdThreshold, Gtk::PACK_SHRINK, 4);
+    pack_start( *hdThreshold, Pack::SHRINK, 4);
 
 //  hotdeadPixel->show();
     hpixelconn = hotPixel->signal_toggled().connect ( sigc::mem_fun(*this, &PreProcess::hotPixelChanged), true);

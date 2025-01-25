@@ -41,7 +41,7 @@ RenameDialog::RenameDialog (Gtk::Window* parent)
     names->attach(*nnlab, 0, 1, 1, 1);
     names->attach(*newName, 1, 1, 1, 1);
 
-    get_content_area()->pack_start (*names, Gtk::PACK_SHRINK, 4);
+    get_content_area()->pack_start (*names, Pack::SHRINK, 4);
 
 // Issue 316
 //    Gtk::Box* tbox = Gtk::manage (new Gtk::Box());
@@ -51,10 +51,10 @@ RenameDialog::RenameDialog (Gtk::Window* parent)
 //    templates->set_model (templateModel);
 //    templates->pack_start (templateColumns.tmplName);
 
-//    tbox->pack_start (*useTmpl, Gtk::PACK_SHRINK, 4);
+//    tbox->pack_start (*useTmpl, Pack::SHRINK, 4);
 //    tbox->pack_start (*templates);
 
-//    get_content_area()->pack_start (*tbox, Gtk::PACK_SHRINK, 4);
+//    get_content_area()->pack_start (*tbox, Pack::SHRINK, 4);
 
     add_button ("_OK", Gtk::ResponseType::OK);
     add_button ("_Cancel", Gtk::ResponseType::CANCEL);

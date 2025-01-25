@@ -36,8 +36,8 @@ Gradient::Gradient () : FoldableToolPanel(this, TOOL_NAME, M("TP_GRADIENT_LABEL"
     edit->add (*Gtk::manage (new RTImage ("crosshair-adjust", Gtk::ICON_SIZE_BUTTON)));
     edit->set_tooltip_text(M("EDIT_OBJECT_TOOLTIP"));
     editConn = edit->signal_toggled().connect( sigc::mem_fun(*this, &Gradient::editToggled) );
-    editHBox->pack_start(*edit, Gtk::PACK_SHRINK, 0);
-    pack_start (*editHBox, Gtk::PACK_SHRINK, 0);
+    editHBox->pack_start(*edit, Pack::SHRINK, 0);
+    pack_start (*editHBox, Pack::SHRINK, 0);
 
     strength = Gtk::manage (new Adjuster (M("TP_GRADIENT_STRENGTH"), -5, 5, 0.01, 0));
     strength->set_tooltip_text (M("TP_GRADIENT_STRENGTH_TOOLTIP"));
@@ -59,11 +59,11 @@ Gradient::Gradient () : FoldableToolPanel(this, TOOL_NAME, M("TP_GRADIENT_LABEL"
     centerY->set_tooltip_text (M("TP_GRADIENT_CENTER_Y_TOOLTIP"));
     centerY->setAdjusterListener (this);
 
-    pack_start (*strength, Gtk::PACK_SHRINK, 0);
-    pack_start (*degree, Gtk::PACK_SHRINK, 0);
-    pack_start (*feather, Gtk::PACK_SHRINK, 0);
-    pack_start (*centerX, Gtk::PACK_SHRINK, 0);
-    pack_start (*centerY, Gtk::PACK_SHRINK, 0);
+    pack_start (*strength, Pack::SHRINK, 0);
+    pack_start (*degree, Pack::SHRINK, 0);
+    pack_start (*feather, Pack::SHRINK, 0);
+    pack_start (*centerX, Pack::SHRINK, 0);
+    pack_start (*centerY, Pack::SHRINK, 0);
 
     // Instantiating the Editing geometry; positions will be initialized later
     Line *hLine, *vLine, *featherLine[2];

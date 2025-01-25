@@ -58,8 +58,8 @@ BatchQueuePanel::BatchQueuePanel (FileCatalog* aFileCatalog) : parent(nullptr)
 
     queueShouldRun = false;
 
-    batchQueueButtonBox->pack_start (*qStartStop, Gtk::PACK_SHRINK, 4);
-    batchQueueButtonBox->pack_start (*qAutoStart, Gtk::PACK_SHRINK, 4);
+    batchQueueButtonBox->pack_start (*qStartStop, Pack::SHRINK, 4);
+    batchQueueButtonBox->pack_start (*qAutoStart, Pack::SHRINK, 4);
     Gtk::Frame *bbox = Gtk::manage(new Gtk::Frame(M("MAIN_FRAME_QUEUE")));
     bbox->set_label_align(0.025, 0.5);
     bbox->add(*batchQueueButtonBox);
@@ -70,18 +70,18 @@ BatchQueuePanel::BatchQueuePanel (FileCatalog* aFileCatalog) : parent(nullptr)
     Gtk::Box* odvb = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Box* hb2 = Gtk::manage (new Gtk::Box ());
     useTemplate = Gtk::manage (new Gtk::RadioButton (M("QUEUE_LOCATION_TEMPLATE") + ":"));
-    hb2->pack_start (*useTemplate, Gtk::PACK_SHRINK, 4);
+    hb2->pack_start (*useTemplate, Pack::SHRINK, 4);
     outdirTemplate = Gtk::manage (new Gtk::Entry ());
     hb2->pack_start (*outdirTemplate);
     templateHelpButton = Gtk::manage (new Gtk::ToggleButton("?"));
     templateHelpButton->set_tooltip_markup (M ("QUEUE_LOCATION_TEMPLATE_HELP_BUTTON_TOOLTIP"));
-    hb2->pack_start (*templateHelpButton, Gtk::PACK_SHRINK, 0);
-    odvb->pack_start (*hb2, Gtk::PACK_SHRINK, 0);
+    hb2->pack_start (*templateHelpButton, Pack::SHRINK, 0);
+    odvb->pack_start (*hb2, Pack::SHRINK, 0);
     outdirTemplate->set_tooltip_markup (M("QUEUE_LOCATION_TEMPLATE_TOOLTIP"));
     useTemplate->set_tooltip_markup (M("QUEUE_LOCATION_TEMPLATE_TOOLTIP"));
     Gtk::Box* hb3 = Gtk::manage (new Gtk::Box ());
     useFolder = Gtk::manage (new Gtk::RadioButton (M("QUEUE_LOCATION_FOLDER") + ":"));
-    hb3->pack_start (*useFolder, Gtk::PACK_SHRINK, 4);
+    hb3->pack_start (*useFolder, Pack::SHRINK, 4);
 
 #if 0 //defined(__APPLE__) || defined(__linux__)
     // At the time of writing (2013-11-11) the gtkmm FileChooserButton with ACTION_SELECT_FOLDER
@@ -110,7 +110,7 @@ BatchQueuePanel::BatchQueuePanel (FileCatalog* aFileCatalog) : parent(nullptr)
     outdirFolderButton = 0;
 #endif
 
-    odvb->pack_start (*hb3, Gtk::PACK_SHRINK, 4);
+    odvb->pack_start (*hb3, Pack::SHRINK, 4);
     destinationPreviewLabel = Gtk::manage (new Gtk::Label ());
     destinationPreviewLabel->set_tooltip_markup (M("QUEUE_DESTPREVIEW_TOOLTIP"));
     destinationPreviewLabel->set_selectable (true);  // so users can copy the path to the clipboard
@@ -118,7 +118,7 @@ BatchQueuePanel::BatchQueuePanel (FileCatalog* aFileCatalog) : parent(nullptr)
     auto destinationPreviewScrolledWindow = Gtk::manage(new Gtk::ScrolledWindow ());
     destinationPreviewScrolledWindow->set_policy (Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
     destinationPreviewScrolledWindow->add (*destinationPreviewLabel);
-    odvb->pack_start (*destinationPreviewScrolledWindow, Gtk::PACK_SHRINK);
+    odvb->pack_start (*destinationPreviewScrolledWindow, Pack::SHRINK);
     Gtk::RadioButton::Group g = useTemplate->get_group();
     useFolder->set_group (g);
     fdir->add (*odvb);
@@ -144,12 +144,12 @@ BatchQueuePanel::BatchQueuePanel (FileCatalog* aFileCatalog) : parent(nullptr)
 
     // setup button bar
     topBox = Gtk::manage (new Gtk::Box ());
-    pack_start (*topBox, Gtk::PACK_SHRINK);
+    pack_start (*topBox, Pack::SHRINK);
     topBox->set_name("BatchQueueButtonsMainContainer");
 
-    topBox->pack_start (*bbox, Gtk::PACK_SHRINK, 4);
-    topBox->pack_start (*fdir, Gtk::PACK_EXPAND_WIDGET, 4);
-    topBox->pack_start (*fformat, Gtk::PACK_EXPAND_WIDGET, 4);
+    topBox->pack_start (*bbox, Pack::SHRINK, 4);
+    topBox->pack_start (*fdir, Pack::EXPAND_WIDGET, 4);
+    topBox->pack_start (*fformat, Pack::EXPAND_WIDGET, 4);
 
     middleSplitPane = Gtk::manage (new Gtk::Paned(Gtk::Orientation::HORIZONTAL));
     templateHelpTextView = Gtk::manage (new Gtk::TextView());
@@ -167,27 +167,27 @@ BatchQueuePanel::BatchQueuePanel (FileCatalog* aFileCatalog) : parent(nullptr)
 
     // lower box with thumbnail zoom
     bottomBox = Gtk::manage (new Gtk::Box ());
-    pack_start (*bottomBox, Gtk::PACK_SHRINK);
+    pack_start (*bottomBox, Pack::SHRINK);
 
     // thumbnail zoom
     Gtk::Box* zoomBox = Gtk::manage (new Gtk::Box ());
-    zoomBox->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL)), Gtk::PACK_SHRINK, 4);
+    zoomBox->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
     Gtk::Label* zoomLabel = Gtk::manage (new Gtk::Label (Glib::ustring("<b>") + M("FILEBROWSER_THUMBSIZE") + ":</b>"));
     zoomLabel->set_use_markup (true);
-    zoomBox->pack_start (*zoomLabel, Gtk::PACK_SHRINK, 4);
+    zoomBox->pack_start (*zoomLabel, Pack::SHRINK, 4);
     zoomInButton  = Gtk::manage (new Gtk::Button ());
     zoomInButton->set_image (*Gtk::manage (new RTImage ("magnifier-plus", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
     zoomInButton->signal_pressed().connect (sigc::mem_fun(*batchQueue, &BatchQueue::zoomIn));
     zoomInButton->set_relief (Gtk::RELIEF_NONE);
     zoomInButton->set_tooltip_markup (M("FILEBROWSER_ZOOMINHINT"));
-    zoomBox->pack_end (*zoomInButton, Gtk::PACK_SHRINK);
+    zoomBox->pack_end (*zoomInButton, Pack::SHRINK);
     zoomOutButton  = Gtk::manage (new Gtk::Button ());
     zoomOutButton->set_image (*Gtk::manage (new RTImage ("magnifier-minus", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
     zoomOutButton->signal_pressed().connect (sigc::mem_fun(*batchQueue, &BatchQueue::zoomOut));
     zoomOutButton->set_relief (Gtk::RELIEF_NONE);
     zoomOutButton->set_tooltip_markup (M("FILEBROWSER_ZOOMOUTHINT"));
-    zoomBox->pack_end (*zoomOutButton, Gtk::PACK_SHRINK);
-    bottomBox->pack_end (*zoomBox, Gtk::PACK_SHRINK);
+    zoomBox->pack_end (*zoomOutButton, Pack::SHRINK);
+    bottomBox->pack_end (*zoomBox, Pack::SHRINK);
 
 
     batchQueue->setBatchQueueListener (this);

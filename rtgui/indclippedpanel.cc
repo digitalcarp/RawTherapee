@@ -69,10 +69,10 @@ IndicateClippedPanel::IndicateClippedPanel (ImageArea* ia) :
     indClippedH->set_active (options.showClippedHighlights);
     indClippedS->set_active (options.showClippedShadows);
 
-    pack_start (*previewFocusMask, Gtk::PACK_SHRINK, 0);
-    pack_start (*previewSharpMask, Gtk::PACK_SHRINK, 0);
-    pack_start (*indClippedS, Gtk::PACK_SHRINK, 0);
-    pack_start (*indClippedH, Gtk::PACK_SHRINK, 0);
+    pack_start (*previewFocusMask, Pack::SHRINK, 0);
+    pack_start (*previewSharpMask, Pack::SHRINK, 0);
+    pack_start (*indClippedS, Pack::SHRINK, 0);
+    pack_start (*indClippedH, Pack::SHRINK, 0);
 
     connSharpMask = previewSharpMask->signal_toggled().connect( sigc::bind(sigc::mem_fun(*this, &IndicateClippedPanel::buttonToggled), previewSharpMask) );
     connFocusMask = previewFocusMask->signal_toggled().connect( sigc::bind(sigc::mem_fun(*this, &IndicateClippedPanel::buttonToggled), previewFocusMask) );

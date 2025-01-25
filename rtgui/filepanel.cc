@@ -52,7 +52,7 @@ FilePanel::FilePanel () : parent(nullptr), error(0)
 
     Gtk::Box* obox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     obox->get_style_context()->add_class ("plainback");
-    obox->pack_start (*recentBrowser, Gtk::PACK_SHRINK, 4);
+    obox->pack_start (*recentBrowser, Pack::SHRINK, 4);
     obox->pack_start (*dirBrowser);
 
     placespaned->pack1 (*placesBrowser, false, true);

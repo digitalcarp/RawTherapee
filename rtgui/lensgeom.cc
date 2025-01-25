@@ -38,13 +38,13 @@ LensGeometry::LensGeometry () : FoldableToolPanel(this, TOOL_NAME, M("TP_LENSGEO
     EvTransMethod = m->newEvent(TRANSFORM, "HISTORY_MSG_TRANS_METHOD");
 
     Gtk::Box* hb1 = Gtk::manage (new Gtk::Box ());
-    hb1->pack_start (*Gtk::manage (new Gtk::Label ( M("TP_RAW_DMETHOD") + ": ")), Gtk::PACK_SHRINK, 4);
+    hb1->pack_start (*Gtk::manage (new Gtk::Label ( M("TP_RAW_DMETHOD") + ": ")), Pack::SHRINK, 4);
     method = Gtk::manage (new MyComboBoxText ());
     method->append(M("TP_LENSGEOM_LOG"));
     method->append(M("TP_LENSGEOM_LIN"));
     method->set_active(0);
-    hb1->pack_end (*method, Gtk::PACK_EXPAND_WIDGET, 4);
-    pack_start( *hb1, Gtk::PACK_SHRINK, 4);
+    hb1->pack_end (*method, Pack::EXPAND_WIDGET, 4);
+    pack_start( *hb1, Pack::SHRINK, 4);
 
     scale= Gtk::manage (new Adjuster (M("TP_LENSGEOM_SCALE"), 0.1, 10, 0.01, 1));
     scale->setAdjusterListener (this);
@@ -57,7 +57,7 @@ LensGeometry::LensGeometry () : FoldableToolPanel(this, TOOL_NAME, M("TP_LENSGEO
     autoCrop = Gtk::manage (new Gtk::Button (M("TP_LENSGEOM_AUTOCROP")));
     autoCrop->set_image (*Gtk::manage (new RTImage ("crop-auto-small", Gtk::ICON_SIZE_BUTTON)));
     autoCrop->get_style_context()->add_class("independent");
-    pack_start (*autoCrop, Gtk::PACK_SHRINK, 2);
+    pack_start (*autoCrop, Pack::SHRINK, 2);
 
     method->connect(method->signal_changed().connect(sigc::mem_fun(*this, &LensGeometry::methodChanged)));
     autoCrop->signal_pressed().connect(sigc::mem_fun(*this, &LensGeometry::autoCropPressed));
