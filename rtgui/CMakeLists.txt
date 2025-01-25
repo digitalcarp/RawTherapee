@@ -61,7 +61,7 @@ set(NONCLISOURCEFILES
     # editwindow.cc
     # epd.cc
     eventmapper.cc
-    # exiffiltersettings.cc
+    exiffiltersettings.cc
     # exifpanel.cc
     exportpanel.cc
     externaleditorpreferences.cc
@@ -74,7 +74,7 @@ set(NONCLISOURCEFILES
     # filethumbnailbuttonset.cc
     # filmnegative.cc
     # filmsimulation.cc
-    # filterpanel.cc
+    filterpanel.cc
     # flatcurveeditorsubgroup.cc
     # flatfield.cc
     # framing.cc

@@ -17,131 +17,137 @@
  *  along with RawTherapee.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "filterpanel.h"
+#include "guiutils.h"
 #include "multilangmgr.h"
+#include "svgpaintable.h"
+
 #include "rtengine/rtengine.h"
-#include "rtsurface.h"
 
 using namespace rtengine;
 
-FilterPanel::FilterPanel () : listener (nullptr), ornamentSurface(new RTSurface("ornament1.svg"))
+FilterPanel::FilterPanel () : listener (nullptr)
 {
     set_orientation(Gtk::Orientation::VERTICAL);
 
     enabled = Gtk::manage (new Gtk::CheckButton (M("EXIFFILTER_METADATAFILTER")));
-    pack_start (*enabled, Pack::SHRINK, 2);
-    pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Pack::SHRINK, 2);
+    pack_start (this, *enabled, Pack::SHRINK, 2);
+    pack_start (this, *Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL)), Pack::SHRINK, 2);
 
     enaFNumber = Gtk::manage (new Gtk::CheckButton (M("EXIFFILTER_APERTURE") + ":"));
     Gtk::Box* fnvb = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Box* fnhb = Gtk::manage(new Gtk::Box ());
-    fnvb->pack_start (*enaFNumber, Pack::SHRINK, 0);
+    pack_start(fnvb, *enaFNumber, Pack::SHRINK, 0);
     fnumberFrom = Gtk::manage(new Gtk::Entry ());
     fnumberFrom->set_width_chars(1);
     fnumberTo = Gtk::manage(new Gtk::Entry ());
     fnumberTo->set_width_chars(1);
-    fnhb->pack_start (*fnumberFrom, true, true, 2);
-    fnhb->pack_start (*Gtk::manage(new Gtk::Label(" - ")), false, false, 4);
-    fnhb->pack_start (*fnumberTo, true, true, 2);
-    fnvb->pack_start (*fnhb, Pack::SHRINK, 0);
-    pack_start (*fnvb, Pack::SHRINK, 4);
+    pack_start(fnhb, *fnumberFrom, true, true, 2);
+    pack_start(fnhb, *Gtk::manage(new Gtk::Label(" - ")), false, false, 4);
+    pack_start(fnhb, *fnumberTo, true, true, 2);
+    pack_start(fnvb, *fnhb, Pack::SHRINK, 0);
+    pack_start (this, *fnvb, Pack::SHRINK, 4);
 
     enaShutter = Gtk::manage(new Gtk::CheckButton(M("EXIFFILTER_SHUTTER") + ":"));
     Gtk::Box* svb = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Box* shb = Gtk::manage(new Gtk::Box ());
-    svb->pack_start (*enaShutter, Pack::SHRINK, 0);
+    pack_start(svb, *enaShutter, Pack::SHRINK, 0);
     shutterFrom = Gtk::manage(new Gtk::Entry ());
     shutterFrom->set_width_chars(1);
     shutterTo = Gtk::manage(new Gtk::Entry ());
     shutterTo->set_width_chars(1);
-    shb->pack_start (*shutterFrom, true, true, 2);
-    shb->pack_start (*Gtk::manage(new Gtk::Label(" - ")), false, false, 4);
-    shb->pack_start (*shutterTo, true, true, 2);
-    svb->pack_start (*shb, Pack::SHRINK, 0);
-    pack_start (*svb, Pack::SHRINK, 4);
+    pack_start(shb, *shutterFrom, true, true, 2);
+    pack_start(shb, *Gtk::manage(new Gtk::Label(" - ")), false, false, 4);
+    pack_start(shb, *shutterTo, true, true, 2);
+    pack_start(svb, *shb, Pack::SHRINK, 0);
+    pack_start (this, *svb, Pack::SHRINK, 4);
 
     enaISO = Gtk::manage(new Gtk::CheckButton(M("EXIFFILTER_ISO") + ":"));
     Gtk::Box* ivb = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Box* ihb = Gtk::manage(new Gtk::Box ());
-    ivb->pack_start (*enaISO, Pack::SHRINK, 0);
+    pack_start(ivb, *enaISO, Pack::SHRINK, 0);
     isoFrom = Gtk::manage(new Gtk::Entry ());
     isoFrom->set_width_chars(1);
     isoTo = Gtk::manage(new Gtk::Entry ());
     isoTo->set_width_chars(1);
-    ihb->pack_start (*isoFrom, true, true, 2);
-    ihb->pack_start (*Gtk::manage(new Gtk::Label(" - ")), false, false, 4);
-    ihb->pack_start (*isoTo, true, true, 2);
-    ivb->pack_start (*ihb, Pack::SHRINK, 0);
-    pack_start (*ivb, Pack::SHRINK, 4);
+    pack_start(ihb, *isoFrom, true, true, 2);
+    pack_start(ihb, *Gtk::manage(new Gtk::Label(" - ")), false, false, 4);
+    pack_start(ihb, *isoTo, true, true, 2);
+    pack_start(ivb, *ihb, Pack::SHRINK, 0);
+    pack_start (this, *ivb, Pack::SHRINK, 4);
 
     enaFocalLen = Gtk::manage(new Gtk::CheckButton(M("EXIFFILTER_FOCALLEN") + ":"));
     Gtk::Box* fvb = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Box* fhb = Gtk::manage(new Gtk::Box ());
-    fvb->pack_start (*enaFocalLen, Pack::SHRINK, 0);
+    pack_start(fvb, *enaFocalLen, Pack::SHRINK, 0);
     focalFrom = Gtk::manage(new Gtk::Entry ());
     focalFrom->set_width_chars(1);
     focalTo = Gtk::manage(new Gtk::Entry ());
     focalTo->set_width_chars(1);
-    fhb->pack_start (*focalFrom, true, true, 2);
-    fhb->pack_start (*Gtk::manage(new Gtk::Label(" - ")), false, false, 4);
-    fhb->pack_start (*focalTo, true, true, 2);
-    fvb->pack_start (*fhb, Pack::SHRINK, 0);
-    pack_start (*fvb, Pack::SHRINK, 4);
+    pack_start(fhb, *focalFrom, true, true, 2);
+    pack_start(fhb, *Gtk::manage(new Gtk::Label(" - ")), false, false, 4);
+    pack_start(fhb, *focalTo, true, true, 2);
+    pack_start(fvb, *fhb, Pack::SHRINK, 0);
+    pack_start (this, *fvb, Pack::SHRINK, 4);
 
     enaExpComp = Gtk::manage(new Gtk::CheckButton(M("EXIFFILTER_EXPOSURECOMPENSATION") + ":"));
     Gtk::Box* evb = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
-    evb->pack_start (*enaExpComp, Pack::SHRINK, 0);
-    expcomp = Gtk::manage(new Gtk::ListViewText (1, false, Gtk::SELECTION_MULTIPLE));
+    pack_start(evb, *enaExpComp, Pack::SHRINK, 0);
+    expcomp = Gtk::manage(new Gtk::ListViewText (1, false, Gtk::SelectionMode::MULTIPLE));
     expcomp->set_headers_visible (false);
     Gtk::ScrolledWindow* sexpcomp = Gtk::manage(new Gtk::ScrolledWindow());
     sexpcomp->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
     sexpcomp->set_size_request(-1, 80);
-    sexpcomp->add(*expcomp);
-    evb->pack_start (*sexpcomp, Pack::SHRINK, 0);
-    pack_start (*evb, Pack::SHRINK, 4);
+    sexpcomp->set_child(*expcomp);
+    pack_start(evb, *sexpcomp, Pack::SHRINK, 0);
+    pack_start (this, *evb, Pack::SHRINK, 4);
 
     enaCamera = Gtk::manage(new Gtk::CheckButton(M("EXIFFILTER_CAMERA") + ":"));
     Gtk::Box* cvb = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
-    cvb->pack_start (*enaCamera, Pack::SHRINK, 0);
-    camera = Gtk::manage(new Gtk::ListViewText (1, false, Gtk::SELECTION_MULTIPLE));
+    pack_start(cvb, *enaCamera, Pack::SHRINK, 0);
+    camera = Gtk::manage(new Gtk::ListViewText (1, false, Gtk::SelectionMode::MULTIPLE));
     camera->set_headers_visible (false);
     Gtk::ScrolledWindow* scamera = Gtk::manage(new Gtk::ScrolledWindow());
     scamera->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
     scamera->set_size_request(-1, 80);
-    scamera->add(*camera);
-    cvb->pack_start (*scamera, Pack::EXPAND_WIDGET, 0);
-    pack_start (*cvb, Pack::EXPAND_WIDGET, 4);
+    scamera->set_child(*camera);
+    pack_start(cvb, *scamera, Pack::EXPAND_WIDGET, 0);
+    pack_start (this, *cvb, Pack::EXPAND_WIDGET, 4);
 
     enaLens = Gtk::manage(new Gtk::CheckButton(M("EXIFFILTER_LENS") + ":"));
     Gtk::Box* lvb = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
-    lvb->pack_start (*enaLens, Pack::SHRINK, 0);
-    lens = Gtk::manage(new Gtk::ListViewText (1, false, Gtk::SELECTION_MULTIPLE));
+    pack_start(lvb, *enaLens, Pack::SHRINK, 0);
+    lens = Gtk::manage(new Gtk::ListViewText (1, false, Gtk::SelectionMode::MULTIPLE));
     lens->set_headers_visible (false);
     Gtk::ScrolledWindow* slens = Gtk::manage(new Gtk::ScrolledWindow());
     slens->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
     slens->set_size_request(-1, 80);
-    slens->add(*lens);
-    lvb->pack_start (*slens, Pack::EXPAND_WIDGET, 0);
-    pack_start (*lvb, Pack::EXPAND_WIDGET, 4);
+    slens->set_child(*lens);
+    pack_start(lvb, *slens, Pack::EXPAND_WIDGET, 0);
+    pack_start (this, *lvb, Pack::EXPAND_WIDGET, 4);
 
     enaFiletype = Gtk::manage(new Gtk::CheckButton(M("EXIFFILTER_FILETYPE") + ":"));
     Gtk::Box* ftvb = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
-    ftvb->pack_start (*enaFiletype, Pack::SHRINK, 0);
-    filetype = Gtk::manage(new Gtk::ListViewText (1, false, Gtk::SELECTION_MULTIPLE));
+    pack_start(ftvb, *enaFiletype, Pack::SHRINK, 0);
+    filetype = Gtk::manage(new Gtk::ListViewText (1, false, Gtk::SelectionMode::MULTIPLE));
     filetype->set_headers_visible (false);
     Gtk::ScrolledWindow* sfiletype = Gtk::manage(new Gtk::ScrolledWindow());
     sfiletype->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
     sfiletype->set_size_request(-1, 80);
-    sfiletype->add(*filetype);
-    ftvb->pack_start (*sfiletype, Pack::EXPAND_WIDGET, 0);
-    pack_start (*ftvb, Pack::EXPAND_WIDGET, 4);
+    sfiletype->set_child(*filetype);
+    pack_start(ftvb, *sfiletype, Pack::EXPAND_WIDGET, 0);
+    pack_start (this, *ftvb, Pack::EXPAND_WIDGET, 4);
 
     // add panel ending
     Gtk::Box* vboxpe = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Separator* hseptpe = Gtk::manage (new Gtk::Separator(Gtk::Orientation::HORIZONTAL));
-    Gtk::Image* peImg = Gtk::manage (new Gtk::Image(ornamentSurface->get()));
-    vboxpe->pack_start(*hseptpe, Pack::SHRINK, 4);
-    vboxpe->pack_start(*peImg);
-    pack_start(*vboxpe, Pack::SHRINK, 0);
+    Gtk::Picture* peImg = Gtk::manage(new Gtk::Picture());
+    {
+        auto svg = SvgPaintableWrapper::createFromImage("ornament1.svg");
+        gtk_picture_set_paintable(peImg->gobj(), svg->base_gobj());
+    }
+    pack_start(vboxpe, *hseptpe, Pack::SHRINK, 4);
+    pack_start(vboxpe, *peImg);
+    pack_start(this, *vboxpe, Pack::SHRINK, 0);
 
     conns = 0;
     sChange[conns++] = fnumberFrom->signal_changed().connect (sigc::mem_fun(*this, &FilterPanel::valueChanged));
@@ -167,8 +173,6 @@ FilterPanel::FilterPanel () : listener (nullptr), ornamentSurface(new RTSurface(
     sChange[conns++] = enaFiletype->signal_toggled().connect( sigc::mem_fun(*this, &FilterPanel::valueChanged) );
 
     set_size_request (0, -1);
-
-    show_all ();
 }
 
 void FilterPanel::setFilter (ExifFilterSettings& defefs, bool updateLists)
