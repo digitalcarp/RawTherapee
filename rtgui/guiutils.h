@@ -176,7 +176,7 @@ public:
 class MyExpander final : public Gtk::Box
 {
 public:
-    typedef sigc::signal<void()> type_signal_enabled_toggled;
+    typedef sigc::signal<void(int /*button*/)> type_signal_enabled_toggled;
 private:
     type_signal_enabled_toggled titleButtonRelease;
     type_signal_enabled_toggled message;
@@ -231,8 +231,8 @@ public:
      */
     MyExpander(bool useEnabled, Gtk::Widget* titleWidget);
 
-    type_signal_enabled_toggled signal_button_release_event();
-    type_signal_enabled_toggled signal_enabled_toggled();
+    type_signal_enabled_toggled signal_button_release_event() { return titleButtonRelease; }
+    type_signal_enabled_toggled signal_enabled_toggled() { return message; }
 
     /// Set the nesting level of the Expander to adapt its style accordingly
     void setLevel(int level);

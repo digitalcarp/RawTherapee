@@ -124,9 +124,9 @@ getSourceForSurface(const Cairo::RefPtr<Cairo::Context>& context) {
     if (!src) return result;
 
     auto type = src->get_type();
-    if (type != Cairo::PATTERN_TYPE_SURFACE) return result;
+    if (type != Cairo::Pattern::Type::SURFACE) return result;
 
-    result = Cairo::RefPtr<Cairo::SurfacePattern>::cast_static(src);
+    result = std::static_pointer_cast<Cairo::SurfacePattern>(src);
     return result;
 }
 

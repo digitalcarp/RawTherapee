@@ -41,6 +41,8 @@ class ProcParams;
 }
 class EditDataProvider;
 
+class FoldableToolPanel;
+
 class ToolPanelListener
 {
 public:
@@ -54,6 +56,7 @@ public:
     virtual void setTweakOperator (rtengine::TweakOperator *tOperator) = 0;
     /// @brief Unset the TweakOperator to the StagedImageProcessor
     virtual void unsetTweakOperator (rtengine::TweakOperator *tOperator) = 0;
+    virtual void foldAllButOne(Gtk::Box* parent, FoldableToolPanel* panel) = 0;
 };
 
 /// @brief This class control the space around the group of tools inside a tab, as well as the space separating each tool. */
@@ -172,8 +175,8 @@ protected:
     ToolParamBlock *subToolsContainer;
     bool lastEnabled;
     sigc::connection enaConn;
-    void foldThemAll (GdkEventButton* event);
-    void enabled_toggled();
+    void foldThemAll (int button);
+    void enabled_toggled(int button);
 
 public:
 

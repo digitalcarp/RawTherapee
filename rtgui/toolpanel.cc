@@ -17,7 +17,6 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "toolpanel.h"
-#include "toolpanelcoord.h"
 #include "guiutils.h"
 #include "rtimage.h"
 
@@ -64,45 +63,43 @@ FoldableToolPanel::FoldableToolPanel(Gtk::Box* content, Glib::ustring toolName, 
 
         Gtk::Label *label = Gtk::manage(new Gtk::Label());
         label->set_markup(escapeHtmlChars(UILabel));
-        label->set_alignment(Gtk::Align::START, Gtk::Align::CENTER);
-        titleHBox->pack_start(*label, Pack::EXPAND_WIDGET, 0);
+        pack_start(titleHBox, *label, Pack::EXPAND_WIDGET, 0);
 
-        RTImage *image = Gtk::manage (new RTImage("one-to-one-small"));
+        RtImage *image = Gtk::manage (new RtImage("one-to-one-small"));
         image->set_tooltip_text(M("TP_GENERAL_11SCALE_TOOLTIP"));
-        titleHBox->pack_end(*image, Pack::SHRINK, 0);
+        pack_start(titleHBox, *image, Pack::SHRINK, 0);
 
         exp = Gtk::manage (new MyExpander (useEnabled, titleHBox));
     } else {
         exp = Gtk::manage (new MyExpander (useEnabled, UILabel));
     }
 
-    exp->signal_button_release_event().connect_notify( sigc::mem_fun(this, &FoldableToolPanel::foldThemAll) );
+    exp->signal_button_release_event().connect( sigc::mem_fun(*this, &FoldableToolPanel::foldThemAll) );
     enaConn = signal_enabled_toggled().connect( sigc::mem_fun(*this, &FoldableToolPanel::enabled_toggled) );
 
     Gtk::Box *expanderContents = Gtk::manage(
-        new Gtk::Box(Gtk::Orientation::ORIENTATION_VERTICAL));
+        new Gtk::Box(Gtk::Orientation::VERTICAL));
     subToolsContainer = Gtk::manage(new ToolParamBlock());
     subToolsContainer->get_style_context()->add_class("SubToolsContainer");
     expanderContents->get_style_context()->add_class("ExpanderContents");
-    expanderContents->pack_start(*content, false, false, 0);
-    expanderContents->pack_start(*subToolsContainer, false, false, 0);
+    pack_start(expanderContents, *content, false, false, 0);
+    pack_start(expanderContents, *subToolsContainer, false, false, 0);
 
     exp->add(*expanderContents, false);
-    exp->show ();
 }
 
-void FoldableToolPanel::foldThemAll (GdkEventButton* event)
+void FoldableToolPanel::foldThemAll (int button)
 {
-    if (event->button == 3) {
+    if (button == 3) {
         if (listener) {
-            (static_cast<ToolPanelCoordinator*>(listener))->foldAllButOne( parentContainer, this);
+            listener->foldAllButOne(parentContainer, this);
         } else {
-            (static_cast<ToolPanelCoordinator*>(tmp))->foldAllButOne( parentContainer, this);
+            tmp->foldAllButOne(parentContainer, this);
         }
     }
 }
 
-void FoldableToolPanel::enabled_toggled()
+void FoldableToolPanel::enabled_toggled(int button)
 {
     if (multiImage) {
         if (exp->get_inconsistent()) {

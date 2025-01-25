@@ -665,6 +665,7 @@ void MyExpander::setupPart1()
         pack_start(headerHBox, *imageEvBox, Pack::SHRINK, 0);
 
         auto clickController = Gtk::GestureClick::create();
+        // If button changes, need to change emit() calls as well
         clickController->set_button(GDK_BUTTON_PRIMARY);
         clickController->signal_released().connect(
             sigc::mem_fun(*this, &MyExpander::onEnabledChange));
@@ -697,6 +698,7 @@ void MyExpander::setupPart2()
     updateStyle();
 
     auto clickController = Gtk::GestureClick::create();
+    // If button changes, need to change emit() calls as well
     clickController->set_button(GDK_BUTTON_PRIMARY);
     clickController->signal_released().connect(
         sigc::mem_fun(*this, &MyExpander::onToggle));
@@ -834,7 +836,7 @@ void MyExpander::setEnabled(bool isEnabled)
                 if (!inconsistent) {
                     statusImage->set_from_icon_name(disabledImage);
                     get_style_context()->remove_class("enabledTool");
-                    message.emit();
+                    message.emit(GDK_BUTTON_PRIMARY);
                 }
             } else {
                 enabled = true;
@@ -842,7 +844,7 @@ void MyExpander::setEnabled(bool isEnabled)
                 if (!inconsistent) {
                     statusImage->set_from_icon_name(enabledImage);
                     get_style_context()->add_class("enabledTool");
-                    message.emit();
+                    message.emit(GDK_BUTTON_PRIMARY);
                 }
             }
         }
@@ -925,13 +927,7 @@ void MyExpander::onToggle(int /*n_press*/, double /*x*/, double /*y*/)
         expBox->showBox();
     }
 
-    titleButtonRelease.emit();
-}
-
-// used to connect a function to the enabled_toggled signal
-MyExpander::type_signal_enabled_toggled MyExpander::signal_enabled_toggled()
-{
-    return message;
+    titleButtonRelease.emit(GDK_BUTTON_PRIMARY);
 }
 
 // internal use ; when the user clicks on the toggle button, it calls this method that will emit an enabled_change event
@@ -947,7 +943,7 @@ void MyExpander::onEnabledChange(int /*n_press*/, double /*x*/, double /*y*/)
         get_style_context()->add_class("enabledTool");
     }
 
-    message.emit();
+    message.emit(GDK_BUTTON_PRIMARY);
     flushEvent = true;
 }
 

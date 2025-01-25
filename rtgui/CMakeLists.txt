@@ -12,8 +12,7 @@ set(CLISOURCEFILES
 
 set(NONCLISOURCEFILES
     adjuster.cc
-    # alignedmalloc.cc
-    # aspectratios.cc
+    aspectratios.cc
     # batchqueue.cc
     # batchqueuebuttonset.cc
     # batchqueueentry.cc
@@ -28,9 +27,9 @@ set(NONCLISOURCEFILES
     cacheimagedata.cc
     cachemanager.cc
     # cacorrection.cc
-    # checkbox.cc
+    checkbox.cc
     # chmixer.cc
-    # clipboard.cc
+    clipboard.cc
     # coarsepanel.cc
     # colorappearance.cc
     # coloredbar.cc
@@ -61,7 +60,7 @@ set(NONCLISOURCEFILES
     # editwidgets.cc
     # editwindow.cc
     # epd.cc
-    # eventmapper.cc
+    eventmapper.cc
     # exiffiltersettings.cc
     # exifpanel.cc
     exportpanel.cc
@@ -81,7 +80,7 @@ set(NONCLISOURCEFILES
     # framing.cc
     # gradient.cc
     guiutils.cc
-    # hidpi.cc
+    hidpi.cc
     # histogrampanel.cc
     # history.cc
     # hsvequalizer.cc
@@ -159,7 +158,7 @@ set(NONCLISOURCEFILES
     splash.cc
     # spot.cc
     svgpaintable.cc
-    # threadutils.cc
+    threadutils.cc
     # thresholdadjuster.cc
     # thresholdselector.cc
     # thumbbrowserbase.cc
@@ -170,7 +169,7 @@ set(NONCLISOURCEFILES
     # toneequalizer.cc
     # toolbar.cc
     # toollocationpref.cc
-    # toolpanel.cc
+    toolpanel.cc
     # toolpanelcoord.cc
     # vibrance.cc
     # vignetting.cc
