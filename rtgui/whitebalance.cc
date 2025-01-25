@@ -157,7 +157,7 @@ WhiteBalance::WhiteBalance () : FoldableToolPanel(this, TOOL_NAME, M("TP_WBALANC
     method->pack_start(*renderer_icon, false);
     method->add_attribute(*renderer_icon, "icon-name", methodColumns.colIcon);
     Gtk::CellRendererText* const renderer_label = Gtk::manage(new Gtk::CellRendererText());
-    renderer_label->property_ellipsize() = Pango::ELLIPSIZE_MIDDLE;
+    renderer_label->property_ellipsize() = Pango::EllipsizeMode::MIDDLE;
     method->pack_start(*renderer_label, true);
     method->add_attribute(*renderer_label, "markup", methodColumns.colLabel);
 

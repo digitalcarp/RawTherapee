@@ -79,7 +79,7 @@ ExifPanel::ExifPanel() :
     Gtk::CellRendererPixbuf* render_pb = Gtk::manage (new Gtk::CellRendererPixbuf());
     render_pb->property_stock_size() = Gtk::ICON_SIZE_SMALL_TOOLBAR;
     Gtk::CellRendererText *render_txt = Gtk::manage (new Gtk::CellRendererText());
-    render_txt->property_ellipsize() = Pango::ELLIPSIZE_END;
+    render_txt->property_ellipsize() = Pango::EllipsizeMode::END;
     viewcol->pack_start(*render_pb, false);
     viewcol->pack_start(*render_txt, true);
     viewcol->add_attribute(*render_pb, "icon-name", exifColumns.icon);
@@ -100,7 +100,7 @@ ExifPanel::ExifPanel() :
 
     Gtk::TreeView::Column *viewcolv = Gtk::manage(new Gtk::TreeView::Column ("Value"));
     Gtk::CellRendererText *render_txtv = Gtk::manage(new Gtk::CellRendererText());
-    render_txtv->property_ellipsize() = Pango::ELLIPSIZE_END;
+    render_txtv->property_ellipsize() = Pango::EllipsizeMode::END;
     viewcolv->pack_start (*render_txtv, true);
     // viewcolv->add_attribute (*render_txtv, "markup", exifColumns.value);
     viewcolv->set_expand (true);

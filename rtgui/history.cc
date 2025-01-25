@@ -60,9 +60,9 @@ History::History (bool bookmarkSupport) : historyVPaned (nullptr), blistener (nu
     hTreeView->set_size_request (80, -1);
 
     Gtk::CellRendererText *changecrt = Gtk::manage (new Gtk::CellRendererText());
-    changecrt->property_ellipsize() = Pango::ELLIPSIZE_END;
+    changecrt->property_ellipsize() = Pango::EllipsizeMode::END;
     Gtk::CellRendererText *valuecrt  = Gtk::manage (new Gtk::CellRendererText());
-    valuecrt->property_ellipsize() = Pango::ELLIPSIZE_END;
+    valuecrt->property_ellipsize() = Pango::EllipsizeMode::END;
     Gtk::TreeView::Column *hviewcol = Gtk::manage (new Gtk::TreeView::Column (""));
     hviewcol->pack_start (*changecrt, true);
     hviewcol->add_attribute (changecrt->property_markup (), historyColumns.text);

@@ -103,7 +103,7 @@ LensProfilePanel::LensProfilePanel() :
     setExpandAlignProperties(lensfunCameras, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
     Gtk::CellRendererText* const camerasCellRenderer = static_cast<Gtk::CellRendererText*>(lensfunCameras->get_first_cell());
-    camerasCellRenderer->property_ellipsize() = Pango::ELLIPSIZE_MIDDLE;
+    camerasCellRenderer->property_ellipsize() = Pango::EllipsizeMode::MIDDLE;
     camerasCellRenderer->property_ellipsize_set() = true;
 
     setExpandAlignProperties(lensfunLensesLbl, false, false, Gtk::Align::END, Gtk::Align::CENTER);
@@ -114,7 +114,7 @@ LensProfilePanel::LensProfilePanel() :
     setExpandAlignProperties(lensfunLenses, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
     Gtk::CellRendererText* const lensesCellRenderer = static_cast<Gtk::CellRendererText*>(lensfunLenses->get_first_cell());
-    lensesCellRenderer->property_ellipsize() = Pango::ELLIPSIZE_MIDDLE;
+    lensesCellRenderer->property_ellipsize() = Pango::EllipsizeMode::MIDDLE;
     lensesCellRenderer->property_ellipsize_set() = true;
 
     warning->set_tooltip_text(M("TP_LENSPROFILE_LENS_WARNING"));

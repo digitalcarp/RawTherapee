@@ -389,7 +389,7 @@ void ThumbBrowserEntryBase::updateBackBuffer ()
         context->set_font_description (fontd);
         Glib::RefPtr<Pango::Layout> fn = w->create_pango_layout (dispname);
         fn->set_width (textw * Pango::SCALE);
-        fn->set_ellipsize (Pango::ELLIPSIZE_MIDDLE);
+        fn->set_ellipsize (Pango::EllipsizeMode::MIDDLE);
         cc->move_to(textposx_fn, textposy);
         fn->add_to_cairo_context (cc);
         cc->fill();
@@ -405,7 +405,7 @@ void ThumbBrowserEntryBase::updateBackBuffer ()
             if (options.fbShowDateTime && !datetimeline.empty()) {
                 fn = w->create_pango_layout (datetimeline);
                 fn->set_width (textw * Pango::SCALE);
-                fn->set_ellipsize (Pango::ELLIPSIZE_MIDDLE);
+                fn->set_ellipsize (Pango::EllipsizeMode::MIDDLE);
                 cc->move_to(textposx_dt, textposy + tpos);
                 fn->add_to_cairo_context (cc);
                 cc->fill();
@@ -416,7 +416,7 @@ void ThumbBrowserEntryBase::updateBackBuffer ()
             if (options.fbShowBasicExif && !exifline.empty()) {
                 fn = w->create_pango_layout (exifline);
                 fn->set_width (textw * Pango::SCALE);
-                fn->set_ellipsize (Pango::ELLIPSIZE_MIDDLE);
+                fn->set_ellipsize (Pango::EllipsizeMode::MIDDLE);
                 cc->move_to(textposx_ex, textposy + tpos);
                 fn->add_to_cairo_context (cc);
                 cc->fill();
