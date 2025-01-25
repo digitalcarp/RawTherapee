@@ -23,7 +23,6 @@
 
 #include "guiutils.h"
 
-class RTSurface;
 class ExportPanelListener
 {
 public:
@@ -39,8 +38,8 @@ protected:
 
     Gtk::Box* bypass_box;
     //Gtk::CheckButton* enabled;
-    Gtk::RadioButton* use_fast_pipeline;
-    Gtk::RadioButton* use_normal_pipeline;
+    Gtk::CheckButton* use_fast_pipeline;
+    Gtk::CheckButton* use_normal_pipeline;
     Gtk::CheckButton* bypass_ALL;
     Gtk::CheckButton* bypass_sharpenEdge;
     Gtk::CheckButton* bypass_sharpenMicro;
@@ -103,8 +102,6 @@ protected:
 
 
     ExportPanelListener* listener;
-
-    std::shared_ptr<RTSurface> ornamentSurface;
 
     void bypassALL_Toggled();
     void use_fast_pipeline_toggled();

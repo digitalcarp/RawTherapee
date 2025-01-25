@@ -23,6 +23,7 @@
 #endif
 #endif
 
+#include "cachemanager.h"
 #include "config.h"
 #include "extprog.h"
 #include "multilangmgr.h"
@@ -31,7 +32,6 @@
 #include "rtwindow.h"
 #include "pathutils.h"
 #include "version.h"
-// #include "cachemanager.h"
 // #include "editorpanel.h"
 // #include "filecatalog.h"
 // #include "filepanel.h"
@@ -39,8 +39,6 @@
 // #include "soundman.h"
 
 #include "rtengine/rtengine.h"
-// #include "rtengine/procparams.h"
-// #include "rtengine/dynamicprofile.h"
 
 #include <gtkmm.h>
 #include <giomm.h>
@@ -234,42 +232,6 @@ private:
     void on_activate() override;
     void on_open(const Gio::Application::type_vec_files& files,
                  const Glib::ustring& hint) override;
-    // {
-    //     // if (create_window()) {
-    //     //     struct Data {
-    //     //         std::vector<Thumbnail *> entries;
-    //     //         Glib::ustring lastfilename;
-    //     //         FileCatalog *filecatalog;
-    //     //     };
-    //     //     Data *d = new Data;
-    //     //     d->filecatalog = rtWindow->fpanel->fileCatalog;
-    //     //
-    //     //     for (const auto &f : files) {
-    //     //         Thumbnail *thm = cacheMgr->getEntry (f->get_path());
-    //     //
-    //     //         if (thm) {
-    //     //             d->entries.push_back (thm);
-    //     //             d->lastfilename = f->get_path();
-    //     //         }
-    //     //     }
-    //     //
-    //     //     if (!d->entries.empty()) {
-    //     //         const auto doit =
-    //     //         [] (gpointer data) -> gboolean {
-    //     //             Data *d = static_cast<Data *> (data);
-    //     //             d->filecatalog->openRequested (d->entries);
-    //     //             d->filecatalog->selectImage (d->lastfilename, true);
-    //     //             delete d;
-    //     //             return FALSE;
-    //     //         };
-    //     //         gdk_threads_add_idle (doit, d);
-    //     //     } else {
-    //     //         delete d;
-    //     //     }
-    //     //
-    //     //     rtWindow->present();
-    //     // }
-    // }
 
 private:
     Glib::ustring m_fatal_error;
@@ -338,6 +300,38 @@ void RtApplication::on_open(const Gio::Application::type_vec_files& files,
                             const Glib::ustring& hint)
 {
     if (!create_window()) return;
+
+    // TODO(gtk4)
+    // struct Data {
+    //     std::vector<Thumbnail *> entries;
+    //     Glib::ustring lastfilename;
+    //     FileCatalog *filecatalog;
+    // };
+    // Data *d = new Data;
+    // d->filecatalog = rtWindow->fpanel->fileCatalog;
+    //
+    // for (const auto &f : files) {
+    //     Thumbnail *thm = cacheMgr->getEntry (f->get_path());
+    //
+    //     if (thm) {
+    //         d->entries.push_back (thm);
+    //         d->lastfilename = f->get_path();
+    //     }
+    // }
+    //
+    // if (!d->entries.empty()) {
+    //     const auto doit =
+    //         [] (gpointer data) -> gboolean {
+    //             Data *d = static_cast<Data *> (data);
+    //             d->filecatalog->openRequested (d->entries);
+    //             d->filecatalog->selectImage (d->lastfilename, true);
+    //             delete d;
+    //             return FALSE;
+    //         };
+    //     gdk_threads_add_idle (doit, d);
+    // } else {
+    //     delete d;
+    // }
 
     m_window->present();
 }

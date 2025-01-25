@@ -348,21 +348,21 @@ public:
     void block(bool blocked) { myConnection.block(blocked); }
 };
 
-// /**
-//  * @brief subclass of Gtk::SpinButton in order to handle the scrollwheel
-//  */
-// class MySpinButton final : public Gtk::SpinButton
-// {
-//     Glib::RefPtr<Gtk::EventControllerScroll> m_controller;
-//
-//     bool onScroll(double dx, double dy);
-//     bool onKeyPress(guint keyval, guint keycode, Gdk::ModifierType state);
-//
-// public:
-//     MySpinButton();
-//     void updateSize();
-// };
-//
+/**
+ * @brief subclass of Gtk::SpinButton in order to handle the scrollwheel
+ */
+class MySpinButton final : public Gtk::SpinButton
+{
+    Glib::RefPtr<Gtk::EventControllerScroll> m_controller;
+
+    bool onScroll(double dx, double dy);
+    bool onKeyPress(guint keyval, guint keycode, Gdk::ModifierType state);
+
+public:
+    MySpinButton();
+    void updateSize();
+};
+
 // /**
 //  * @brief subclass of Gtk::Scale in order to handle the scrollwheel
 //  */

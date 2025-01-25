@@ -18,8 +18,10 @@
  */
 #pragma once
 
+#include "rtimage.h"
+
 #include <gtkmm.h>
-#include "rtsurface.h"
+
 class LWButton;
 
 class LWButtonListener
@@ -40,7 +42,7 @@ public:
 private:
     int xpos, ypos, w, h;
     Alignment halign, valign;
-    std::shared_ptr<RTSurface> icon;
+    std::shared_ptr<RtImage> icon;
     double bgr, bgg, bgb;
     double fgr, fgg, fgb;
     State state;
@@ -50,7 +52,7 @@ private:
     Glib::ustring* toolTip;
 
 public:
-    LWButton (std::shared_ptr<RTSurface> i, int aCode, void* aData, Alignment ha = Left, Alignment va = Center, Glib::ustring* tooltip = nullptr);
+    LWButton (const std::shared_ptr<RtImage>& i, int aCode, void* aData, Alignment ha = Left, Alignment va = Center, Glib::ustring* tooltip = nullptr);
 
     void    getSize             (int& minw, int& minh) const;
     void    getAlignment        (Alignment& ha, Alignment& va) const;
@@ -58,8 +60,8 @@ public:
     void    addPosition         (int x, int y);
     void    getPosition         (int& x, int& y) const;
     bool    inside              (int x, int y) const;
-    void    setIcon             (std::shared_ptr<RTSurface> i);
-    std::shared_ptr<RTSurface>  getIcon () const;
+    void    setIcon             (const std::shared_ptr<RtImage>& i);
+    const std::shared_ptr<RtImage>& getIcon () const;
     void    setColors           (const Gdk::RGBA& bg, const Gdk::RGBA& fg);
     void    setToolTip          (Glib::ustring* tooltip);
 

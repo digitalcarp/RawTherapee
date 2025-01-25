@@ -1190,90 +1190,95 @@ void MyComboBox::measure_vfunc(Gtk::Orientation orientation, int for_size,
     }
 }
 
-// MySpinButton::MySpinButton ()
-// {
-//     Gtk::Border border;
-//     border.set_bottom(0);
-//     border.set_top(0);
-//     border.set_left(3);
-//     border.set_right(3);
-//     set_inner_border(border);
-//     set_numeric(true);
-//     set_wrap(false);
-//     set_alignment(Gtk::Align::END);
-//     set_update_policy(Gtk::SpinButtonUpdatePolicy::UPDATE_IF_VALID); // Avoid updating text if input is not a numeric
-//
-//     auto keyPress = Gtk::EventControllerKey::create();
-//     keyPress->signal_key_pressed().connect(
-//         sigc::mem_fun(*this, &MySpinButton::onKeyPress), false);
-//     add_controller(keyPress);
-//
-//     m_controller = Gtk::EventControllerScroll::create();
-//     using Flags = Gtk::EventControllerScroll::Flags;
-//     m_controller->set_flags(Flags::VERTICAL);
-//     m_controller->signal_scroll().connect(
-//         sigc::mem_fun(*this, &MySpinButton::onScroll), false);
-//     add_controller(m_controller);
-// }
-//
-// void MySpinButton::updateSize()
-// {
-//     double vMin, vMax;
-//     int maxAbs;
-//     unsigned int digits, digits2;
-//     unsigned int maxLen;
-//
-//     get_range(vMin, vMax);
-//
-//     digits = get_digits();
-//     maxAbs = (int)(fmax(fabs(vMin), fabs(vMax)) + 0.000001);
-//
-//     if (maxAbs == 0) {
-//         digits2 = 1;
-//     } else {
-//         digits2 = (int)(log10(double(maxAbs)) + 0.000001);
-//         digits2++;
-//     }
-//
-//     maxLen = digits + digits2 + (vMin < 0 ? 1 : 0) + (digits > 0 ? 1 : 0);
-//     set_max_length(maxLen);
-//     set_width_chars(maxLen);
-//     set_max_width_chars(maxLen);
-// }
-//
-// bool MySpinButton::onKeyPress(guint keyval, guint /*keycode*/, Gdk::ModifierType /*state*/)
-// {
-//     double vMin, vMax;
-//     get_range(vMin, vMax);
-//
-//     if ((keyval >= GDK_KEY_a && keyval <= GDK_KEY_z)
-//             || (keyval >= GDK_KEY_A && keyval <= GDK_KEY_Z)
-//             || keyval == GDK_KEY_equal || keyval == GDK_KEY_underscore
-//             || keyval == GDK_KEY_plus || (keyval == GDK_KEY_minus && vMin >= 0)) {
-//         return false; // Event is propagated further
-//     } else {
-//         if (keyval == GDK_KEY_comma || keyval == GDK_KEY_KP_Decimal) {
-//             set_text(get_text() + ".");
-//             set_position(get_text().length()); // When setting text, cursor position is reset at text start. Avoiding this with this code
-//             return true; // Event is not propagated further
-//         }
-//
-//         return Gtk::SpinButton::on_key_press_event(event); // Event is propagated normally
-//     }
-// }
-//
-// bool MySpinButton::onScroll(double /*dx*/, double /*dy*/)
-// {
-//     // If Shift is pressed, the widget is modified
-//     if (m_controller->get_current_event_state() & GDK_SHIFT_MASK) {
-//         Gtk::SpinButton::on_scroll_event(event);
-//         return true;
-//     }
-//
-//     // ... otherwise the scroll event is sent back to an upper level
-//     return false;
-// }
-//
+MySpinButton::MySpinButton ()
+{
+    // TODO(gtk4)
+    // Gtk::Border border;
+    // border.set_bottom(0);
+    // border.set_top(0);
+    // border.set_left(3);
+    // border.set_right(3);
+    // set_inner_border(border);
+    set_numeric(true);
+    set_wrap(false);
+    // TODO(gtk4)
+    // set_alignment(Gtk::Align::END);
+    set_update_policy(Gtk::SpinButton::UpdatePolicy::IF_VALID); // Avoid updating text if input is not a numeric
+
+    auto keyPress = Gtk::EventControllerKey::create();
+    keyPress->signal_key_pressed().connect(
+        sigc::mem_fun(*this, &MySpinButton::onKeyPress), false);
+    add_controller(keyPress);
+
+    m_controller = Gtk::EventControllerScroll::create();
+    using Flags = Gtk::EventControllerScroll::Flags;
+    m_controller->set_flags(Flags::VERTICAL);
+    m_controller->signal_scroll().connect(
+        sigc::mem_fun(*this, &MySpinButton::onScroll), false);
+    add_controller(m_controller);
+}
+
+void MySpinButton::updateSize()
+{
+    double vMin, vMax;
+    int maxAbs;
+    unsigned int digits, digits2;
+    unsigned int maxLen;
+
+    get_range(vMin, vMax);
+
+    digits = get_digits();
+    maxAbs = (int)(fmax(fabs(vMin), fabs(vMax)) + 0.000001);
+
+    if (maxAbs == 0) {
+        digits2 = 1;
+    } else {
+        digits2 = (int)(log10(double(maxAbs)) + 0.000001);
+        digits2++;
+    }
+
+    maxLen = digits + digits2 + (vMin < 0 ? 1 : 0) + (digits > 0 ? 1 : 0);
+    set_width_chars(maxLen);
+    set_max_width_chars(maxLen);
+}
+
+bool MySpinButton::onKeyPress(guint keyval, guint /*keycode*/, Gdk::ModifierType /*state*/)
+{
+    double vMin, vMax;
+    get_range(vMin, vMax);
+
+    if ((keyval >= GDK_KEY_a && keyval <= GDK_KEY_z)
+            || (keyval >= GDK_KEY_A && keyval <= GDK_KEY_Z)
+            || keyval == GDK_KEY_equal || keyval == GDK_KEY_underscore
+            || keyval == GDK_KEY_plus || (keyval == GDK_KEY_minus && vMin >= 0)) {
+        return false; // Event is propagated further
+    } else {
+        if (keyval == GDK_KEY_comma || keyval == GDK_KEY_KP_Decimal) {
+            set_text(get_text() + ".");
+            set_position(get_text().length()); // When setting text, cursor position is reset at text start. Avoiding this with this code
+            return true; // Event is not propagated further
+        }
+
+        // TODO(gtk4)
+        // return Gtk::SpinButton::on_key_press_event(event); // Event is propagated normally
+        return false;
+    }
+}
+
+bool MySpinButton::onScroll(double /*dx*/, double /*dy*/)
+{
+    // If Shift is pressed, the widget is modified
+    auto state = m_controller->get_current_event_state() & Gdk::ModifierType::SHIFT_MASK;
+    if (state != Gdk::ModifierType::NO_MODIFIER_MASK) {
+        // TODO(gtk4): What is the equivalent in GTK4?
+        // Gtk::SpinButton::on_scroll_event(event);
+        return true;
+    }
+
+    // ... otherwise the scroll event is sent back to an upper level
+    return false;
+}
+
 // MyHScale::MyHScale()
 // {
 //     auto keyPress = Gtk::EventControllerKey::create();

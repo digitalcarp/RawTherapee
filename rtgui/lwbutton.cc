@@ -18,9 +18,8 @@
  */
 #include "lwbutton.h"
 #include "guiutils.h"
-#include "rtsurface.h"
 
-LWButton::LWButton (std::shared_ptr<RTSurface> i, int aCode, void* aData, Alignment ha, Alignment va, Glib::ustring* tooltip)
+LWButton::LWButton (const std::shared_ptr<RtImage>& i, int aCode, void* aData, Alignment ha, Alignment va, Glib::ustring* tooltip)
     : xpos(0), ypos(0), halign(ha), valign(va), icon(i), bgr(0.0), bgg(0.0), bgb(0.0), fgr(0.0), fgg(0.0), fgb(0.0), state(Normal), listener(nullptr), actionCode(aCode), actionData(aData), toolTip(tooltip)
 {
 
@@ -59,9 +58,8 @@ void LWButton::getPosition (int& x, int& y) const
     y = ypos;
 }
 
-void LWButton::setIcon (std::shared_ptr<RTSurface> i)
+void LWButton::setIcon (const std::shared_ptr<RtImage>& i)
 {
-
     icon = i;
 
     if (i)  {
@@ -72,9 +70,8 @@ void LWButton::setIcon (std::shared_ptr<RTSurface> i)
     }
 }
 
-std::shared_ptr<RTSurface> LWButton::getIcon () const
+const std::shared_ptr<RtImage>& LWButton::getIcon () const
 {
-
     return icon;
 }
 

@@ -64,7 +64,7 @@ set(NONCLISOURCEFILES
     # eventmapper.cc
     # exiffiltersettings.cc
     # exifpanel.cc
-    # exportpanel.cc
+    exportpanel.cc
     externaleditorpreferences.cc
     extprog.cc
     # fattaltonemap.cc
