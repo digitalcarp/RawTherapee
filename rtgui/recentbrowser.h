@@ -26,7 +26,7 @@ class RecentBrowser :
     public Gtk::Box
 {
 public:
-    typedef sigc::slot<void, const Glib::ustring&> DirSelectionSlot;
+    typedef sigc::slot<void(const Glib::ustring&)> DirSelectionSlot;
 
 private:
     Gtk::ComboBoxText*              recentDirs;

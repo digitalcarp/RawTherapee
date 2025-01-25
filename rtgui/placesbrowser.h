@@ -26,7 +26,7 @@ class PlacesBrowser :
     public Gtk::Box
 {
 public:
-    typedef sigc::slot<void, const Glib::ustring&> DirSelectionSlot;
+    typedef sigc::slot<void(const Glib::ustring&)> DirSelectionSlot;
 
 private:
 
@@ -47,6 +47,7 @@ private:
             add(rowSeparator);
         }
     };
+    Glib::Dispatcher dispatcher;
     PlacesColumns            placesColumns;
     Gtk::ScrolledWindow*    scrollw;
     Gtk::TreeView*          treeView;
@@ -68,7 +69,8 @@ public:
     void mountChanged (const Glib::RefPtr<Gio::Mount>& m);
     void volumeChanged (const Glib::RefPtr<Gio::Volume>& v);
     void driveChanged (const Glib::RefPtr<Gio::Drive>& d);
-    bool rowSeparatorFunc (const Glib::RefPtr<Gtk::TreeModel>& model, const Gtk::TreeModel::iterator& iter);
+    bool rowSeparatorFunc (const Glib::RefPtr<Gtk::TreeModel>& model,
+                           const Gtk::TreeModel::const_iterator& iter);
     void selectionChanged ();
     void addPressed ();
     void delPressed ();

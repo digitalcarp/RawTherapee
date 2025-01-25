@@ -29,18 +29,16 @@ RecentBrowser::RecentBrowser ()
     recentDirs = Gtk::manage (new MyComboBoxText ());
 
     Gtk::Frame* frame = Gtk::manage (new Gtk::Frame (M("MAIN_FRAME_RECENT")));
-    frame->set_label_align(0.025, 0.5);
-    frame->add (*recentDirs);
+    frame->set_label_align(0.025);
+    frame->set_child (*recentDirs);
 
     for(size_t i = 0; i < options.recentFolders.size(); i++) {
         recentDirs->append (options.recentFolders[i]);
     }
 
-    pack_start (*frame, Pack::SHRINK, 4);
+    pack_start (this, *frame, Pack::SHRINK, 4);
 
     conn = recentDirs->signal_changed().connect(sigc::mem_fun(*this, &RecentBrowser::selectionChanged));
-
-    show_all ();
 }
 
 void RecentBrowser::selectionChanged ()

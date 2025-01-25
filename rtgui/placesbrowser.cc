@@ -35,7 +35,7 @@ PlacesBrowser::PlacesBrowser ()
 
     scrollw = Gtk::manage (new Gtk::ScrolledWindow ());
     scrollw->set_policy (Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
-    pack_start (*scrollw);
+    pack_start (this, *scrollw);
 
     // Since Gtk3, we can't have image+text buttons natively. We'll comply to the Gtk guidelines and choose one of them (icons here)
     add = Gtk::manage (new Gtk::Button ());
@@ -43,23 +43,23 @@ PlacesBrowser::PlacesBrowser ()
     setExpandAlignProperties(add, true, false, Gtk::Align::FILL, Gtk::Align::START);
     //add->get_style_context()->set_junction_sides(Gtk::JUNCTION_RIGHT);
     add->get_style_context()->add_class("Left");
-    add->set_image (*Gtk::manage (new RTImage ("add-small", Gtk::ICON_SIZE_BUTTON)));
+    add->set_child (*Gtk::manage (new RtImage ("add-small")));
     del = Gtk::manage (new Gtk::Button ());
     del->set_tooltip_text(M("MAIN_FRAME_PLACES_DEL"));
     setExpandAlignProperties(del, true, false, Gtk::Align::FILL, Gtk::Align::START);
     //del->get_style_context()->set_junction_sides(Gtk::JUNCTION_LEFT);
     del->get_style_context()->add_class("Right");
-    del->set_image (*Gtk::manage (new RTImage ("remove-small", Gtk::ICON_SIZE_BUTTON)));
+    del->set_child (*Gtk::manage (new RtImage ("remove-small")));
     Gtk::Grid* buttonBox = Gtk::manage (new Gtk::Grid ());
     buttonBox->set_orientation(Gtk::Orientation::HORIZONTAL);
     buttonBox->attach_next_to(*add, Gtk::PositionType::LEFT, 1, 1);
     buttonBox->attach_next_to(*del, *add, Gtk::PositionType::RIGHT, 1, 1);
 
-    pack_start (*buttonBox, Pack::SHRINK, 2);
+    pack_start (this, *buttonBox, Pack::SHRINK, 2);
 
     treeView = Gtk::manage (new Gtk::TreeView ());
     treeView->set_can_focus(false);
-    scrollw->add (*treeView);
+    scrollw->set_child (*treeView);
 
     placesModel = Gtk::ListStore::create (placesColumns);
     treeView->set_model (placesModel);
@@ -93,7 +93,7 @@ PlacesBrowser::PlacesBrowser ()
     add->signal_clicked().connect(sigc::mem_fun(*this, &PlacesBrowser::addPressed));
     del->signal_clicked().connect(sigc::mem_fun(*this, &PlacesBrowser::delPressed));
 
-    show_all ();
+    dispatcher.connect(sigc::mem_fun(*this, &PlacesBrowser::refreshPlacesList));
 }
 
 // For drive letter comparison
@@ -248,7 +248,8 @@ void PlacesBrowser::refreshPlacesList ()
     }
 }
 
-bool PlacesBrowser::rowSeparatorFunc (const Glib::RefPtr<Gtk::TreeModel>& model, const Gtk::TreeModel::iterator& iter)
+bool PlacesBrowser::rowSeparatorFunc (const Glib::RefPtr<Gtk::TreeModel>& model,
+                                      const Gtk::TreeModel::const_iterator& iter)
 {
 
     return iter->get_value (placesColumns.rowSeparator);
@@ -256,20 +257,17 @@ bool PlacesBrowser::rowSeparatorFunc (const Glib::RefPtr<Gtk::TreeModel>& model,
 
 void PlacesBrowser::mountChanged (const Glib::RefPtr<Gio::Mount>& m)
 {
-    GThreadLock lock;
-    refreshPlacesList ();
+    dispatcher.emit();
 }
 
 void PlacesBrowser::volumeChanged (const Glib::RefPtr<Gio::Volume>& m)
 {
-    GThreadLock lock;
-    refreshPlacesList ();
+    dispatcher.emit();
 }
 
 void PlacesBrowser::driveChanged (const Glib::RefPtr<Gio::Drive>& m)
 {
-    GThreadLock lock;
-    refreshPlacesList ();
+    dispatcher.emit();
 }
 
 void PlacesBrowser::selectionChanged ()
@@ -283,7 +281,7 @@ void PlacesBrowser::selectionChanged ()
             std::vector<Glib::RefPtr<Gio::Volume> > volumes = vm->get_volumes ();
 
             for (size_t i = 0; i < volumes.size(); i++)
-                if (volumes[i]->get_name () == iter->get_value (placesColumns.label)) {
+                if (volumes[i]->get_name () == iter->get_value (placesColumns.label).c_str()) {
                     volumes[i]->mount ();
                     break;
                 }
@@ -291,7 +289,7 @@ void PlacesBrowser::selectionChanged ()
             std::vector<Glib::RefPtr<Gio::Drive> > drives = vm->get_connected_drives ();
 
             for (size_t i = 0; i < drives.size(); i++)
-                if (drives[i]->get_name () == iter->get_value (placesColumns.label)) {
+                if (drives[i]->get_name () == iter->get_value (placesColumns.label).c_str()) {
                     drives[i]->poll_for_media ();
                     break;
                 }
@@ -396,7 +394,7 @@ Glib::ustring PlacesBrowser::userPicturesDir ()
 
 #else
 
-    return Glib::get_user_special_dir (G_USER_DIRECTORY_PICTURES);
+    return Glib::get_user_special_dir (Glib::UserDirectory::PICTURES);
 
 #endif
 }

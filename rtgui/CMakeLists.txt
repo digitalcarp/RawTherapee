@@ -117,7 +117,7 @@ set(NONCLISOURCEFILES
     # pcvignette.cc
     # pdsharpening.cc
     # perspective.cc
-    # placesbrowser.cc
+    placesbrowser.cc
     # popupbutton.cc
     # popupcommon.cc
     # popuptogglebutton.cc
@@ -133,7 +133,7 @@ set(NONCLISOURCEFILES
     # prsharpening.cc
     # rawcacorrection.cc
     # rawexposure.cc
-    # recentbrowser.cc
+    recentbrowser.cc
     # renamedlg.cc
     # resize.cc
     # retinex.cc
