@@ -108,13 +108,13 @@ public:
     // }
     //
     // EditorPanel*  epanel;
-    // FilePanel* fpanel;
-    //
+    FilePanel* fpanel;
+
     // void SetEditorCurrent();
-    // void SetMainCurrent();
+    void SetMainCurrent();
     // void MoveFileBrowserToEditor();
     // void MoveFileBrowserToMain();
-    //
+
     void updateExternalEditorWidget(int selectedIndex, const std::vector<ExternalEditor> &editors);
     void updateProfiles (const Glib::ustring &printerProfile, rtengine::RenderingIntent printerIntent, bool printerBPC);
     void updateTPVScrollbar (bool hide);

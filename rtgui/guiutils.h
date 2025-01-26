@@ -18,6 +18,7 @@
  */
 #pragma once
 
+#include <list>
 #include <functional>
 #include <map>
 #include <type_traits>
@@ -26,7 +27,7 @@
 
 #include <cairomm/cairomm.h>
 
-// #include "threadutils.h"
+#include "threadutils.h"
 
 #include "rtengine/coord.h"
 #include "rtengine/noncopyable.h"
@@ -70,27 +71,26 @@ enum class Pack {
 void pack_start(Gtk::Box* box, Gtk::Widget& child, Pack pack = Pack::EXPAND_WIDGET, int padding = 0);
 void pack_start(Gtk::Box* box, Gtk::Widget& child, bool expand, bool fill, int padding = 0);
 void pack_end(Gtk::Box* box, Gtk::Widget& child, Pack pack = Pack::EXPAND_WIDGET, int padding = 0);
+void pack1(Gtk::Paned* paned, Gtk::Widget& child, bool resize, bool shrink);
+void pack2(Gtk::Paned* paned, Gtk::Widget& child, bool resize, bool shrink);
+
 void setExpandAlignProperties(Gtk::Widget *widget, bool hExpand, bool vExpand, enum Gtk::Align hAlign, enum Gtk::Align vAlign);
 Gtk::Border getPadding(const Glib::RefPtr<Gtk::StyleContext> style);
 
-// class IdleRegister final :
-//     public rtengine::NonCopyable
-// {
-// public:
-//     ~IdleRegister();
-//
-//     void add(std::function<bool ()> function, gint priority = G_PRIORITY_DEFAULT_IDLE);
-//     void destroy();
-//
-// private:
-//     struct DataWrapper {
-//         IdleRegister* const self;
-//         std::function<bool ()> function;
-//     };
-//
-//     std::map<const DataWrapper*, guint> ids;
-//     MyMutex mutex;
-// };
+class IdleRegister final : public rtengine::NonCopyable
+{
+public:
+    IdleRegister();
+
+    void add(std::function<void()>&& function);
+
+private:
+    void runPendingTasks();
+
+    Glib::Dispatcher m_dispatcher;
+    std::list<std::function<void()>> m_pending_tasks;
+    std::mutex m_mutex;
+};
 
 struct ScopedEnumHash {
     template<typename T, typename std::enable_if<std::is_enum<T>::value && !std::is_convertible<T, int>::value, int>::type = 0>
@@ -126,25 +126,25 @@ private:
     bool wasBlocked;
 };
 
-// class BlockAdjusterEvents
-// {
-// public:
-//     explicit BlockAdjusterEvents(Adjuster* adjuster);
-//     ~BlockAdjusterEvents();
-//
-// private:
-//     Adjuster* adj;
-// };
-//
-// class DisableListener
-// {
-// public:
-//     explicit DisableListener(ToolPanel* panelToDisable);
-//     ~DisableListener();
-//
-// private:
-//     ToolPanel* panel;
-// };
+class BlockAdjusterEvents
+{
+public:
+    explicit BlockAdjusterEvents(Adjuster* adjuster);
+    ~BlockAdjusterEvents();
+
+private:
+    Adjuster* adj;
+};
+
+class DisableListener
+{
+public:
+    explicit DisableListener(ToolPanel* panelToDisable);
+    ~DisableListener();
+
+private:
+    ToolPanel* panel;
+};
 
 /**
  * @brief Glue box to control visibility of the MyExpender's content ; also handle the frame around it

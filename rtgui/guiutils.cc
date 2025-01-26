@@ -23,13 +23,13 @@
 
 #include "guiutils.h"
 
-// #include "adjuster.h"
+#include "adjuster.h"
 #include "multilangmgr.h"
 #include "options.h"
 #include "rtimage.h"
 #include "rtmessagedialog.h"
 #include "rtscalable.h"
-// #include "toolpanel.h"
+#include "toolpanel.h"
 
 #include <assert.h>
 
@@ -296,79 +296,63 @@ void drawCropGuides(const Cairo::RefPtr<Cairo::Context>& cr,
 
 }  // namespace
 
-// IdleRegister::~IdleRegister()
-// {
-//     destroy();
-// }
-//
-// void IdleRegister::add(std::function<bool ()> function, gint priority)
-// {
-//     const auto dispatch =
-//         [](gpointer data) -> gboolean
-//         {
-//             DataWrapper* const data_wrapper = static_cast<DataWrapper*>(data);
-//
-//             if (!data_wrapper->function()) {
-//                 data_wrapper->self->mutex.lock();
-//                 data_wrapper->self->ids.erase(data_wrapper);
-//                 data_wrapper->self->mutex.unlock();
-//
-//                 delete data_wrapper;
-//                 return FALSE;
-//             }
-//
-//             return TRUE;
-//         };
-//
-//     DataWrapper* const data_wrapper = new DataWrapper{
-//         this,
-//         std::move(function)
-//     };
-//
-//     mutex.lock();
-//     ids[data_wrapper] = gdk_threads_add_idle_full(priority, dispatch, data_wrapper, nullptr);
-//     mutex.unlock();
-// }
-//
-// void IdleRegister::destroy()
-// {
-//     mutex.lock();
-//     for (const auto& id : ids) {
-//         g_source_remove(id.second);
-//         delete id.first;
-//     }
-//     ids.clear();
-//     mutex.unlock();
-// }
-//
-// BlockAdjusterEvents::BlockAdjusterEvents(Adjuster* adjuster) : adj(adjuster)
-// {
-//     if (adj) {
-//         adj->block(true);
-//     }
-// }
-//
-// BlockAdjusterEvents::~BlockAdjusterEvents()
-// {
-//     if (adj) {
-//         adj->block(false);
-//     }
-// }
-//
-// DisableListener::DisableListener(ToolPanel* panelToDisable) : panel(panelToDisable)
-// {
-//     if (panel) {
-//         panel->disableListener();
-//     }
-// }
-//
-// DisableListener::~DisableListener()
-// {
-//     if (panel) {
-//         panel->enableListener();
-//     }
-// }
-//
+IdleRegister::IdleRegister()
+{
+    m_dispatcher.connect(sigc::mem_fun(*this, &IdleRegister::runPendingTasks));
+}
+
+void IdleRegister::add(std::function<void()>&& function)
+{
+    const std::lock_guard<std::mutex> guard(m_mutex);
+    bool shouldEmit = m_pending_tasks.empty();
+    m_pending_tasks.push_back(std::move(function));
+    if (shouldEmit) {
+        m_dispatcher.emit();
+    }
+}
+
+void IdleRegister::runPendingTasks()
+{
+    std::list<std::function<void()>> tasks;
+    {
+        const std::lock_guard<std::mutex> guard(m_mutex);
+        std::swap(m_pending_tasks, tasks);
+    }
+
+    while (!tasks.empty()) {
+        tasks.front()();
+        tasks.pop_front();
+    }
+}
+
+BlockAdjusterEvents::BlockAdjusterEvents(Adjuster* adjuster) : adj(adjuster)
+{
+    if (adj) {
+        adj->block(true);
+    }
+}
+
+BlockAdjusterEvents::~BlockAdjusterEvents()
+{
+    if (adj) {
+        adj->block(false);
+    }
+}
+
+DisableListener::DisableListener(ToolPanel* panelToDisable) : panel(panelToDisable)
+{
+    if (panel) {
+        panel->disableListener();
+    }
+}
+
+DisableListener::~DisableListener()
+{
+    if (panel) {
+        panel->enableListener();
+    }
+}
+
 Glib::ustring escapeHtmlChars(const Glib::ustring &src)
 {
 
@@ -457,6 +441,20 @@ void pack_end(Gtk::Box* box, Gtk::Widget& child, Pack pack, int /*padding*/)
         }
     }
     box->append(child);
+}
+
+void pack1(Gtk::Paned* paned, Gtk::Widget& child, bool resize, bool shrink)
+{
+    paned->set_start_child(child);
+    paned->set_resize_start_child(resize);
+    paned->set_shrink_start_child(shrink);
+}
+
+void pack2(Gtk::Paned* paned, Gtk::Widget& child, bool resize, bool shrink)
+{
+    paned->set_end_child(child);
+    paned->set_resize_end_child(resize);
+    paned->set_shrink_end_child(shrink);
 }
 
 void setExpandAlignProperties(Gtk::Widget *widget, bool hExpand, bool vExpand, enum Gtk::Align hAlign, enum Gtk::Align vAlign)

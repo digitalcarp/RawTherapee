@@ -39,7 +39,7 @@ class DirBrowser;
 
 class FilePanel final :
     public Gtk::Paned,
-    public FileSelectionListener,
+//     public FileSelectionListener,
     public rtengine::NonCopyable
 {
 public:
@@ -57,7 +57,7 @@ public:
     // FileCatalog* fileCatalog;
     Gtk::Paned *ribbonPane;
 
-    void setParent (RTWindow* p)
+    void setParent (RtWindow* p)
     {
         parent = p;
     }
@@ -67,22 +67,22 @@ public:
     void open (const Glib::ustring& d); // open a file or a directory
     void refreshEditedState (const std::set<Glib::ustring>& efiles)
     {
-        fileCatalog->refreshEditedState (efiles);
+//         fileCatalog->refreshEditedState (efiles);
     }
-    void loadingThumbs(Glib::ustring str, double rate);
+//     void loadingThumbs(const Glib::ustring& str, double rate);
 
     // call this before closing RT: it saves file browser's related things into options
     void saveOptions ();
 
     // interface fileselectionlistener
-    bool fileSelected(Thumbnail* thm) override;
-    bool addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries) override;
+//     bool fileSelected(Thumbnail* thm) override;
+//     bool addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries) override;
 
     void optionsChanged         ();
-    bool imageLoaded( Thumbnail* thm, ProgressConnector<rtengine::InitialImage*> * );
+//     bool imageLoaded( Thumbnail* thm, ProgressConnector<rtengine::InitialImage*> * );
 
-    bool handleShortcutKey (GdkEventKey* event);
-    bool handleShortcutKeyRelease(GdkEventKey *event);
+//     bool handleShortcutKey (GdkEventKey* event);
+//     bool handleShortcutKeyRelease(GdkEventKey *event);
     void updateTPVScrollbar (bool hide);
     void updateToolPanelToolLocations(
         const std::vector<Glib::ustring> &favorites, bool cloneFavoriteTools);
@@ -93,17 +93,17 @@ private:
     PlacesBrowser* placesBrowser;
     RecentBrowser* recentBrowser;
 
-    Inspector* inspectorPanel;
+    // Inspector* inspectorPanel;
     Gtk::Paned* tpcPaned;
-    BatchToolPanelCoordinator* tpc;
+    // BatchToolPanelCoordinator* tpc;
     History* history;
-    RTWindow* parent;
+    RtWindow* parent;
     Gtk::Notebook* rightNotebook;
     sigc::connection rightNotebookSwitchConn;
 
     struct pendingLoad {
         bool complete;
-        ProgressConnector<rtengine::InitialImage*> *pc;
+//         ProgressConnector<rtengine::InitialImage*> *pc;
         Thumbnail *thm;
     };
     MyMutex pendingLoadMutex;

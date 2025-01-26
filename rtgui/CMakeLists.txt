@@ -70,7 +70,7 @@ set(NONCLISOURCEFILES
     # filebrowser.cc
     # filebrowserentry.cc
     # filecatalog.cc
-    # filepanel.cc
+    filepanel.cc
     # filethumbnailbuttonset.cc
     # filmnegative.cc
     # filmsimulation.cc

@@ -19,6 +19,8 @@
 
 #include "rtwindow.h"
 
+#include "cachemanager.h"
+#include "filepanel.h"
 #include "guiutils.h"
 #include "iccprofilecreator.h"
 #include "multilangmgr.h"
@@ -33,7 +35,6 @@
 
 #include <gtkmm.h>
 
-// #include "cachemanager.h"
 // #include "cursormanager.h"
 // #include "editwindow.h"
 // #include "thumbnail.h"
@@ -42,7 +43,6 @@
 // #include "batchqueuepanel.h"
 // #include "batchqueueentry.h"
 // #include "editorpanel.h"
-// #include "filepanel.h"
 // #include "filmsimulation.h"
 
 Glib::RefPtr<Gtk::CssProvider> cssForced;
@@ -55,9 +55,9 @@ RtWindow::RtWindow ()
     , iFullscreen (nullptr)
     , iFullscreen_exit (nullptr)
 //     , epanel (nullptr)
-//     , fpanel (nullptr)
+    , fpanel (nullptr)
 {
-//     cacheMgr->init ();
+    cacheMgr->init ();
 //     ProfilePanel::init (this);
 
     // ------- loading theme files
@@ -193,9 +193,9 @@ RtWindow::RtWindow ()
         mainNB->set_scrollable (true);
         mainNB->signal_switch_page().connect ( sigc::mem_fun (*this, &RtWindow::on_mainNB_switch_page) );
 
-//         // Editor panel
-//         fpanel =  new FilePanel () ;
-//         fpanel->setParent (this);
+        // Editor panel
+        fpanel =  new FilePanel () ;
+        fpanel->setParent (this);
 
         // decorate tab
         Gtk::Grid* fpanelLabelGrid = Gtk::manage (new Gtk::Grid ());
@@ -215,8 +215,7 @@ RtWindow::RtWindow ()
         }
 
         fpanelLabelGrid->set_tooltip_markup (M ("MAIN_FRAME_FILEBROWSER_TOOLTIP"));
-        // mainNB->append_page (*fpanel, *fpanelLabelGrid);
-        mainNB->append_page(*Gtk::manage(new Gtk::Box()), *fpanelLabelGrid);
+        mainNB->append_page (*fpanel, *fpanelLabelGrid);
 
 //         // Batch Queue panel
 //         bpanel = Gtk::manage ( new BatchQueuePanel (fpanel->fileCatalog) );
@@ -232,8 +231,8 @@ RtWindow::RtWindow ()
 //         if (isSingleTabMode()) {
 //             createSetmEditor();
 //         }
-//
-//         mainNB->set_current_page (mainNB->page_num (*fpanel));
+
+        mainNB->set_current_page (mainNB->page_num (*fpanel));
 
         // filling bottom box
         iFullscreen = new RtImage("fullscreen-enter");
@@ -319,8 +318,8 @@ RtWindow::~RtWindow()
     // }
     //
     // pldBridge = nullptr;
-    //
-    // delete fpanel;
+
+    delete fpanel;
     // delete iFullscreen;
     // delete iFullscreen_exit;
 }
@@ -329,10 +328,10 @@ void RtWindow::on_realize ()
 {
     Gtk::Window::on_realize ();
 
-//     if ( fpanel ) {
-//         fpanel->setAspect();
-//     }
-//
+    if ( fpanel ) {
+        fpanel->setAspect();
+    }
+
 //     if (simpleEditor) {
 //         epanel->setAspect();
 //     }
@@ -795,8 +794,8 @@ void RtWindow::showICCProfileCreator ()
     iccpc->set_modal(true);
     iccpc->present ();
 
-//     fpanel->optionsChanged ();
-//
+    fpanel->optionsChanged ();
+
 //     if (epanel) {
 //         epanel->defaultMonitorProfileChanged (options.rtSettings.monitorProfile, options.rtSettings.autoMonitorProfile);
 //     }
@@ -813,8 +812,8 @@ void RtWindow::showPreferences ()
     pref->set_modal(true);
     pref->present ();
 
-//     fpanel->optionsChanged ();
-//
+    fpanel->optionsChanged ();
+
 //     if (epanel) {
 //         epanel->defaultMonitorProfileChanged (options.rtSettings.monitorProfile, options.rtSettings.autoMonitorProfile);
 //     }
@@ -877,12 +876,12 @@ void RtWindow::toggle_fullscreen ()
 // {
 //     mainNB->set_current_page (mainNB->page_num (*epanel));
 // }
-//
-// void RtWindow::SetMainCurrent()
-// {
-//     mainNB->set_current_page (mainNB->page_num (*fpanel));
-// }
-//
+
+void RtWindow::SetMainCurrent()
+{
+    mainNB->set_current_page (mainNB->page_num (*fpanel));
+}
+
 // void RtWindow::MoveFileBrowserToMain()
 // {
 //     if ( fpanel->ribbonPane->get_children().empty()) {
