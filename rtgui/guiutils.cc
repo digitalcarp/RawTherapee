@@ -457,6 +457,18 @@ void pack2(Gtk::Paned* paned, Gtk::Widget& child, bool resize, bool shrink)
     paned->set_shrink_end_child(shrink);
 }
 
+bool isControlOrMetaDown(Gdk::ModifierType state) {
+    auto ctrl = state & Gdk::ModifierType::CONTROL_MASK;
+    auto meta = state & Gdk::ModifierType::META_MASK;
+    return ctrl != Gdk::ModifierType::NO_MODIFIER_MASK ||
+        meta != Gdk::ModifierType::NO_MODIFIER_MASK;
+}
+
+bool isShiftDown(Gdk::ModifierType state) {
+    auto shift = state & Gdk::ModifierType::SHIFT_MASK;
+    return shift != Gdk::ModifierType::NO_MODIFIER_MASK;
+}
+
 void setExpandAlignProperties(Gtk::Widget *widget, bool hExpand, bool vExpand, enum Gtk::Align hAlign, enum Gtk::Align vAlign)
 {
     widget->set_hexpand(hExpand);
@@ -2255,4 +2267,19 @@ void RotateLabel::snapshot_vfunc(const Glib::RefPtr<Gtk::Snapshot>& snapshot)
         snapshot->rotate(-90);
     }
     snapshot_child(m_label, snapshot);
+}
+
+ModButton::ModButton()
+{
+    m_controller = Gtk::GestureClick::create();
+    m_controller->set_button(GDK_BUTTON_PRIMARY);
+    m_controller->signal_released().connect(
+        sigc::mem_fun(*this, &ModButton::onClick));
+    add_controller(m_controller);
+}
+
+void ModButton::onClick(int /*n_press*/, double x, double y)
+{
+    auto state = m_controller->get_current_event_state();
+    m_signal.emit(state);
 }

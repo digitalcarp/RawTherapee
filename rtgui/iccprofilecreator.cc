@@ -960,12 +960,17 @@ void ICCProfileCreator::savePressed()
         dialog->set_initial_folder(Gio::File::create_for_path(options.lastICCProfCreatorDir));
     }
 
-    Glib::RefPtr<Gtk::FileFilter> filter_icc = Gtk::FileFilter::create();
+    auto filter_icc = Gtk::FileFilter::create();
     filter_icc->set_name(M("FILECHOOSER_FILTER_COLPROF"));
     filter_icc->add_pattern("*.icc");
 
+    auto filter_any = Gtk::FileFilter::create();
+    filter_any->set_name(M("FILECHOOSER_FILTER_ANY"));
+    filter_any->add_pattern("*");
+
     auto filters = Gio::ListStore<Gtk::FileFilter>::create();
     filters->append(filter_icc);
+    filters->append(filter_any);
 
     dialog->set_filters(filters);
     dialog->set_default_filter(filter_icc);
@@ -987,8 +992,7 @@ void ICCProfileCreator::onSaveFileResponse(Glib::RefPtr<Gio::AsyncResult>& resul
         return;
     }
 
-    auto folder = file->get_parent();
-    if (folder) {
+    if (auto folder = file->get_parent(); folder) {
         options.lastICCProfCreatorDir = folder->get_path();
     }
 

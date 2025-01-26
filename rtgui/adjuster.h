@@ -44,8 +44,7 @@ protected:
     Gtk::Image *imageIcon2;
     MyHScale* slider;
     MySpinButton* spin;
-    Gtk::Button* reset;
-    Glib::RefPtr<Gtk::GestureClick> resetClickController;
+    ModButton* reset;
     Gtk::CheckButton* automatic;
     AdjusterListener* adjusterListener;
     DelayedConnection<> spinChange;
@@ -128,7 +127,7 @@ public:
     void sliderReleased (int n_press, double x, double y);
     void spinReleased (int n_press, double x, double y);
     void resetValue (bool toInitial);
-    void resetPressed (int n_press, double x, double y);
+    void resetPressed (Gdk::ModifierType state);
     void editedToggled ();
     void trimValue (double &val) const;
     void trimValue (float &val) const;

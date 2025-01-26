@@ -92,7 +92,7 @@ Adjuster::Adjuster(
         setExpandAlignProperties(label, true, false, Gtk::Align::START, Gtk::Align::BASELINE);
     }
 
-    reset = Gtk::manage(new Gtk::Button());
+    reset = Gtk::manage(new ModButton());
 
     reset->set_child(*Gtk::manage(new RtImage("undo-small")));
     setExpandAlignProperties(reset, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
@@ -176,10 +176,7 @@ Adjuster::Adjuster(
         }
     );
 
-    resetClickController = Gtk::GestureClick::create();
-    resetClickController->signal_released().connect(
-        sigc::mem_fun(*this, &Adjuster::resetPressed), false);
-    reset->add_controller(resetClickController);
+    reset->signal_clicked().connect(sigc::mem_fun(*this, &Adjuster::resetPressed));
 }
 
 Adjuster::~Adjuster ()
@@ -299,10 +296,9 @@ void Adjuster::resetValue (bool toInitial)
 }
 
 // Please note that it won't change the "Auto" CheckBox's state, if there
-void Adjuster::resetPressed (int /*n_press*/, double /*x*/, double /*y*/)
+void Adjuster::resetPressed (Gdk::ModifierType state)
 {
-    auto state = resetClickController->get_current_event_state();
-    if ((state & Gdk::ModifierType::CONTROL_MASK) != Gdk::ModifierType::NO_MODIFIER_MASK) {
+    if (isControlOrMetaDown(state)) {
         resetValue(true);
     } else {
         resetValue(false);

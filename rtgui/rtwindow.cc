@@ -26,6 +26,7 @@
 #include "multilangmgr.h"
 #include "options.h"
 #include "preferences.h"
+#include "profilepanel.h"
 #include "rtimage.h"
 #include "rtmessagedialog.h"
 #include "rtscalable.h"
@@ -58,7 +59,7 @@ RtWindow::RtWindow ()
     , fpanel (nullptr)
 {
     cacheMgr->init ();
-//     ProfilePanel::init (this);
+    ProfilePanel::init (this);
 
     // ------- loading theme files
 

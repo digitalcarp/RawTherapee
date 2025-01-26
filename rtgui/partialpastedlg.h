@@ -98,8 +98,8 @@ public:
 
 private:
     // GUI aspect management functions
-    void render_keep(Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter);
-    void render_spotname(Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter);
+    void render_keep(Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter);
+    void render_spotname(Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter);
 
     // Event management function
     void keepToggled(const Glib::ustring &path);

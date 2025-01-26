@@ -112,7 +112,7 @@ set(NONCLISOURCEFILES
     # navigator.cc
     options.cc
     paramsedited.cc
-    # partialpastedlg.cc
+    partialpastedlg.cc
     pathutils.cc
     # pcvignette.cc
     # pdsharpening.cc
@@ -128,7 +128,7 @@ set(NONCLISOURCEFILES
     # previewloader.cc
     # previewmodepanel.cc
     # previewwindow.cc
-    # profilepanel.cc
+    profilepanel.cc
     profilestorecombobox.cc
     # prsharpening.cc
     # rawcacorrection.cc

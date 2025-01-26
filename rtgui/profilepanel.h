@@ -47,7 +47,7 @@ class PartialProfile;
 }
 
 }
-class RTImage;
+class RtImage;
 
 class ProfilePanel final :
     public Gtk::Grid,
@@ -63,27 +63,41 @@ private:
     Glib::ustring lastFilename;
     Glib::ustring imagePath;
     const Glib::ustring modeOn, modeOff;
-    RTImage* const profileFillImage;
+    RtImage* const profileFillImage;
     Gtk::ToggleButton* fillMode;
-    Gtk::TreeIter currRow;
+    Gtk::TreeIter<Gtk::TreeRow> currRow;
     ProfileStoreEntry *lastSavedPSE;
     ProfileStoreEntry *customPSE;
+
+    // Temporaries for async dialog handling
+    Gtk::FileDialog* fileDialog;
+    Gdk::ModifierType fileDialogState;
+    const rtengine::procparams::PartialProfile* profileToSave;
+    std::unique_ptr<rtengine::procparams::ProcParams> pasteProcParams;
+    std::unique_ptr<ParamsEdited> pasteParamsEdited;
 
     void          profileFillModeToggled ();
     bool          isCustomSelected ();
     bool          isLastSavedSelected ();
-    Gtk::TreeIter getCustomRow ();
-    Gtk::TreeIter getLastSavedRow ();
-    Gtk::TreeIter addCustomRow ();
-    Gtk::TreeIter addLastSavedRow ();
+    Gtk::TreeIter<Gtk::TreeRow> getCustomRow ();
+    Gtk::TreeIter<Gtk::TreeRow> getLastSavedRow ();
+    Gtk::TreeIter<Gtk::TreeRow> addCustomRow ();
+    Gtk::TreeIter<Gtk::TreeRow> addLastSavedRow ();
+
+    void choosePartialSaveFile(int response);
+    void createSaveFileDialog();
+    void copyPartialProfile(int response);
+    void loadPartialProfile(int response);
+    void pastePartialProfileWithClipboardEdited(int response);
+    void pastePartialProfile(int response);
 
 protected:
 
     static PartialPasteDlg* partialProfileDlg;
-    Gtk::Button* save;
-    Gtk::Button* load;
-    Gtk::Button* copy;
-    Gtk::Button* paste;
+    ModButton* save;
+    ModButton* load;
+    ModButton* copy;
+    ModButton* paste;
     ProfileStoreComboBox* profiles;
     rtengine::procparams::PartialProfile* custom;
     rtengine::procparams::PartialProfile* lastsaved;
@@ -122,10 +136,13 @@ public:
     void clearParamChanges() override;
 
     // gui callbacks
-    void save_clicked (GdkEventButton* event);
-    void load_clicked (GdkEventButton* event);
-    void copy_clicked (GdkEventButton* event);
-    void paste_clicked (GdkEventButton* event);
+    void save_clicked (Gdk::ModifierType state);
+    void load_clicked (Gdk::ModifierType state);
+    void copy_clicked (Gdk::ModifierType state);
+    void paste_clicked (Gdk::ModifierType state);
     void selection_changed ();
     void writeOptions();
+
+    void onSaveFileResponse(Glib::RefPtr<Gio::AsyncResult>& result);
+    void onLoadFileResponse(Glib::RefPtr<Gio::AsyncResult>& result);
 };

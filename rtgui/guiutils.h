@@ -77,6 +77,9 @@ void pack2(Gtk::Paned* paned, Gtk::Widget& child, bool resize, bool shrink);
 void setExpandAlignProperties(Gtk::Widget *widget, bool hExpand, bool vExpand, enum Gtk::Align hAlign, enum Gtk::Align vAlign);
 Gtk::Border getPadding(const Glib::RefPtr<Gtk::StyleContext> style);
 
+bool isControlOrMetaDown(Gdk::ModifierType state);
+bool isShiftDown(Gdk::ModifierType state);
+
 class IdleRegister final : public rtengine::NonCopyable
 {
 public:
@@ -144,6 +147,22 @@ public:
 
 private:
     ToolPanel* panel;
+};
+
+// Button with a left click callback that provides the modifier state
+class ModButton : public Gtk::Button
+{
+public:
+    using ClickedSignal = sigc::signal<void(Gdk::ModifierType)>;
+
+    ModButton();
+    ClickedSignal& signal_clicked() { return m_signal; }
+
+private:
+    void onClick(int n_press, double x, double y);
+
+    Glib::RefPtr<Gtk::GestureClick> m_controller;
+    ClickedSignal m_signal;
 };
 
 /**
@@ -744,7 +763,9 @@ public:
 //     void register_button(Gtk::ToggleButton &button);
 // };
 
-class RotateLabel : public Gtk::Widget {
+// Label that can be rotated 90 degrees
+class RotateLabel : public Gtk::Widget
+{
 public:
     RotateLabel();
     explicit RotateLabel(const Glib::ustring& text);
