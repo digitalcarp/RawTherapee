@@ -18,6 +18,8 @@
  */
 #pragma once
 
+#include "svgpaintable.h"
+
 #include <gtkmm.h>
 
 enum CursorShape {
@@ -51,38 +53,57 @@ enum CursorShape {
 
 class CursorManager
 {
-
 private:
-    Glib::RefPtr<Gdk::Cursor> cAdd;
-    Glib::RefPtr<Gdk::Cursor> cAddPicker;
-    Glib::RefPtr<Gdk::Cursor> cCropDraw;
-    Glib::RefPtr<Gdk::Cursor> cCrosshair;
-    Glib::RefPtr<Gdk::Cursor> cHandClosed;
-    Glib::RefPtr<Gdk::Cursor> cHandOpen;
-    Glib::RefPtr<Gdk::Cursor> cEmpty;
-    Glib::RefPtr<Gdk::Cursor> cMoveBL;
-    Glib::RefPtr<Gdk::Cursor> cMoveBR;
-    Glib::RefPtr<Gdk::Cursor> cMoveL;
-    Glib::RefPtr<Gdk::Cursor> cMoveR;
-    Glib::RefPtr<Gdk::Cursor> cMoveTL;
-    Glib::RefPtr<Gdk::Cursor> cMoveTR;
-    Glib::RefPtr<Gdk::Cursor> cMoveX;
-    Glib::RefPtr<Gdk::Cursor> cMoveY;
-    Glib::RefPtr<Gdk::Cursor> cMoveXY;
-    Glib::RefPtr<Gdk::Cursor> cRotate;
-    Glib::RefPtr<Gdk::Cursor> cWB;
-    Glib::RefPtr<Gdk::Cursor> cWait;
+    struct CursorInfo {
+        Glib::RefPtr<Gdk::Cursor> cursor;
+        Glib::RefPtr<SvgPaintableWrapper> svg;
+        // Cached texture for cursor
+        Glib::RefPtr<Gdk::Texture> texture;
+        // % offset from middle in range (-1, 1);
+        double hotspot_x = 0.0;
+        double hotspot_y = 0.0;
+
+        Glib::RefPtr<Gdk::Texture>
+        generateTexture(int cursor_size, double scale,
+                        int& out_width, int& out_height,
+                        int& out_hotspot_x, int& out_hotspot_y);
+    };
+    std::unordered_map<CursorShape, CursorInfo> m_cursor_info;
+
+    Glib::RefPtr<CursorInfo> cAdd;
+    Glib::RefPtr<CursorInfo> cAddPicker;
+    Glib::RefPtr<CursorInfo> cCropDraw;
+    Glib::RefPtr<CursorInfo> cCrosshair;
+    Glib::RefPtr<CursorInfo> cHandClosed;
+    Glib::RefPtr<CursorInfo> cHandOpen;
+    Glib::RefPtr<CursorInfo> cEmpty;
+    Glib::RefPtr<CursorInfo> cMoveBL;
+    Glib::RefPtr<CursorInfo> cMoveBR;
+    Glib::RefPtr<CursorInfo> cMoveL;
+    Glib::RefPtr<CursorInfo> cMoveR;
+    Glib::RefPtr<CursorInfo> cMoveTL;
+    Glib::RefPtr<CursorInfo> cMoveTR;
+    Glib::RefPtr<CursorInfo> cMoveX;
+    Glib::RefPtr<CursorInfo> cMoveY;
+    Glib::RefPtr<CursorInfo> cMoveXY;
+    Glib::RefPtr<CursorInfo> cRotate;
+    Glib::RefPtr<CursorInfo> cWB;
+    Glib::RefPtr<CursorInfo> cWait;
 
     Glib::RefPtr<Gdk::Display> display;
     Glib::RefPtr<Gtk::Window> window;
 
     void setCursor (CursorShape shape);
-    void setCursor (Glib::RefPtr<Gtk::Window> window, CursorShape shape);
+    void setCursor (const Glib::RefPtr<Gtk::Window>& window, CursorShape shape);
+
+    Glib::RefPtr<CursorInfo>
+    createCursor(const Glib::ustring& name, const Glib::ustring& fallback,
+                 double hotspot_x = 0.0, double hotspot_y = 0.0);
 
 public:
-    void init                         (Glib::RefPtr<Gtk::Window> mainWindow);
-    static void setWidgetCursor       (Glib::RefPtr<Gtk::Window> window, CursorShape shape);
-    static void setCursorOfMainWindow (Glib::RefPtr<Gtk::Window> window, CursorShape shape);
+    void init                         (const Glib::RefPtr<Gtk::Window>& mainWindow);
+    static void setWidgetCursor       (const Glib::RefPtr<Gtk::Window>& window, CursorShape shape);
+    static void setCursorOfMainWindow (const Glib::RefPtr<Gtk::Window>& window, CursorShape shape);
 };
 
 extern CursorManager mainWindowCursorManager;

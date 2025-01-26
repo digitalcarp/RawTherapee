@@ -206,7 +206,15 @@ extern Glib::ustring argv0;
 
 Glib::RefPtr<SvgPaintableWrapper>
 SvgPaintableWrapper::createFromFilename(const Glib::ustring& filepath, bool cached) {
-    // TODO(gtk4): Caching?
+    using SvgPaintableCache = std::unordered_map<std::string, Glib::RefPtr<SvgPaintableWrapper>>;
+    static SvgPaintableCache cache;
+
+    if (cached) {
+        auto it = cache.find(filepath);
+        if (it != cache.end()) {
+            return it->second;
+        }
+    }
 
     if (!Glib::file_test(filepath.c_str(), Glib::FileTest::EXISTS)) {
         std::cerr << "Failed to load SVG file \"" << filepath << "\"\n";
@@ -217,28 +225,78 @@ SvgPaintableWrapper::createFromFilename(const Glib::ustring& filepath, bool cach
     SvgPaintable* svg = SVG_PAINTABLE (svg_paintable_new(file));
     g_object_unref(file);
 
-    return std::make_shared<SvgPaintableWrapper>(svg);
+    auto wrapper = std::make_shared<SvgPaintableWrapper>(svg);
+    if (cached) {
+        cache.emplace(filepath, wrapper);
+    }
+    return wrapper;
 }
 
 Glib::RefPtr<SvgPaintableWrapper>
-SvgPaintableWrapper::createFromImage(const Glib::ustring& fname) {
-    Glib::ustring img_dir = Glib::build_filename(argv0, "images");
-    Glib::ustring filepath = Glib::build_filename(img_dir, fname);
+SvgPaintableWrapper::createFromIcon(const Glib::ustring& icon_name, bool cached) {
+    Glib::RefPtr<Gdk::Display> display = Gdk::Display::get_default();
+    auto theme = Gtk::IconTheme::get_for_display(display);
 
-    if (!Glib::file_test(filepath.c_str(), Glib::FileTest::EXISTS)) {
-        std::cerr << "Failed to load SVG file \"" << filepath << "\"\n";
+    Glib::RefPtr<Gtk::IconPaintable> icon = theme->lookup_icon(icon_name, 16);
+    if (!icon) {
+        std::cerr << "Failed to load icon \"" << icon_name << "\"\n";
         return nullptr;
     }
 
-    GFile* file = g_file_new_for_path(filepath.c_str());
-    SvgPaintable* svg = SVG_PAINTABLE (svg_paintable_new(file));
-    g_object_unref(file);
+    std::string file = icon->get_file()->get_path();
+    auto pos = file.find_last_of('.');
+    if (pos > file.length()) {
+        std::cerr << "Failed to parse extension for icon \"" << icon_name
+            << "\" at path: " << file << "\n";
+        return nullptr;
+    }
 
-    return std::make_shared<SvgPaintableWrapper>(svg);
+    auto fext = file.substr(pos + 1);
+    if (fext != "svg") {
+        std::cerr << "Icon \"" << icon_name << "\" is not an SVG: " << file << "\n";
+        return nullptr;
+    }
+
+    return SvgPaintableWrapper::createFromFilename(file, cached);
+}
+
+Glib::RefPtr<SvgPaintableWrapper>
+SvgPaintableWrapper::createFromImage(const Glib::ustring& fname, bool cached) {
+    Glib::ustring img_dir = Glib::build_filename(argv0, "images");
+    Glib::ustring filepath = Glib::build_filename(img_dir, fname);
+
+    return createFromFilename(filepath, cached);
 }
 
 SvgPaintableWrapper::~SvgPaintableWrapper() {
     if (m_gobj) {
         g_object_unref(m_gobj);
     }
+}
+
+Glib::RefPtr<Gdk::Texture> SvgPaintableWrapper::createTexture(int width, int height) {
+    // MemoryTexture::DEFAULT_FORMAT is equal to CAIRO_FORMAT_ARGB32.
+    // See gdkmemorytexture.h definition of GDK_MEMORY_DEFAULT
+    constexpr auto default_format = GDK_MEMORY_DEFAULT;
+    constexpr auto texture_format = static_cast<Gdk::MemoryTexture::Format>(default_format);
+    constexpr auto cairo_format = Cairo::Surface::Format::ARGB32;
+    static_assert(static_cast<int>(texture_format) == static_cast<int>(cairo_format));
+
+    auto surface = Cairo::ImageSurface::create(cairo_format, width, height);
+    auto cr = Cairo::Context::create(surface);
+
+    GError *error = NULL;
+    RsvgRectangle rsvg_rect = {0, 0, static_cast<double>(width), static_cast<double>(height)};
+    if (!rsvg_handle_render_document(m_gobj->handle, cr->cobj(), &rsvg_rect, &error))
+    {
+        g_error("%s", error->message);
+        return nullptr;
+    }
+
+    // Implementation inspired by private API gdk_texture_new_for_surface().
+    // See gdktexture.c
+    int stride = surface->get_stride();
+    auto bytes = Glib::Bytes::create(surface->get_data(), height * stride);
+    auto texture = Gdk::MemoryTexture::create(width, height, texture_format, bytes, stride);
+    return texture;
 }

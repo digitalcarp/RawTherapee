@@ -20,6 +20,7 @@
 #pragma once
 
 #include <gdk/gdk.h>
+#include <gdkmm/texture.h>
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 
@@ -44,7 +45,10 @@ class SvgPaintableWrapper {
 public:
     static Glib::RefPtr<SvgPaintableWrapper>
     createFromFilename(const Glib::ustring& filepath, bool cached = true);
-    static Glib::RefPtr<SvgPaintableWrapper> createFromImage(const Glib::ustring& fname);
+    static Glib::RefPtr<SvgPaintableWrapper>
+    createFromIcon(const Glib::ustring& name, bool cached = true);
+    static Glib::RefPtr<SvgPaintableWrapper>
+    createFromImage(const Glib::ustring& fname, bool cached = true);
 
     // This takes ownership of the pointer so the caller does not need to
     // call g_object_unref().
@@ -53,6 +57,10 @@ public:
 
     SvgPaintable* gobj() const { return m_gobj; }
     GdkPaintable* base_gobj() const { return GDK_PAINTABLE(m_gobj); }
+
+    // Renders a MemoryTexture at the specified size
+    // @returns nullptr if SVG rendering failed
+    Glib::RefPtr<Gdk::Texture> createTexture(int width, int height);
 
 private:
     SvgPaintable* m_gobj;

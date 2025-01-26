@@ -20,6 +20,8 @@
  */
 #pragma once
 
+#include "svgpaintable.h"
+
 #include <glibmm/ustring.h>
 #include <gtkmm/image.h>
 
@@ -31,6 +33,9 @@ public:
     RtImage();
     RtImage(const Glib::ustring& icon_name, bool cached = true);
 
+    void set_from_icon_name(const Glib::ustring& icon_name);
+
 private:
     Glib::ustring m_icon_name;
+    Glib::RefPtr<SvgPaintableWrapper> m_svg;
 };

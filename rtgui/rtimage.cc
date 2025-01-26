@@ -21,8 +21,6 @@
 
 #include "rtimage.h"
 
-#include "svgpaintable.h"
-
 #include <gdkmm/display.h>
 #include <gtkmm/icontheme.h>
 
@@ -32,29 +30,12 @@ RtImage::RtImage() : Gtk::Image() {}
 
 RtImage::RtImage(const Glib::ustring& icon_name, bool cached)
         : Gtk::Image(), m_icon_name(icon_name) {
-    Glib::RefPtr<Gdk::Display> display = Gdk::Display::get_default();
-    auto theme = Gtk::IconTheme::get_for_display(display);
+    m_svg = SvgPaintableWrapper::createFromIcon(icon_name);
+    gtk_image_set_from_paintable(gobj(), m_svg->base_gobj());
+}
 
-    Glib::RefPtr<Gtk::IconPaintable> icon = theme->lookup_icon(icon_name, 16);
-    if (!icon) {
-        std::cerr << "Failed to load icon \"" << icon_name << "\"\n";
-        return;
-    }
-
-    std::string file = icon->get_file()->get_path();
-    auto pos = file.find_last_of('.');
-    if (pos > file.length()) {
-        std::cerr << "Failed to parse extension for icon \"" << icon_name
-            << "\" at path: " << file << "\n";
-        return;
-    }
-
-    auto fext = file.substr(pos + 1);
-    if (fext != "svg") {
-        std::cerr << "Icon \"" << icon_name << "\" is not an SVG: " << file << "\n";
-        return;
-    }
-
-    Glib::RefPtr<SvgPaintableWrapper> svg = SvgPaintableWrapper::createFromFilename(file, cached);
-    gtk_image_set_from_paintable(gobj(), svg->base_gobj());
+void RtImage::set_from_icon_name(const Glib::ustring& icon_name) {
+    m_icon_name = icon_name;
+    m_svg = SvgPaintableWrapper::createFromIcon(icon_name);
+    gtk_image_set_from_paintable(gobj(), m_svg->base_gobj());
 }

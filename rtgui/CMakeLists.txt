@@ -42,7 +42,7 @@ set(NONCLISOURCEFILES
     # crop.cc
     # crophandler.cc
     # cropwindow.cc
-    # cursormanager.cc
+    cursormanager.cc
     # curveeditor.cc
     # curveeditorgroup.cc
     # darkframe.cc

@@ -17,12 +17,31 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "cursormanager.h"
-#include "rtsurface.h"
 
 CursorManager mainWindowCursorManager;
 CursorManager editWindowCursorManager;
 
-void CursorManager::init (Glib::RefPtr<Gtk::Window> mainWindow)
+Glib::RefPtr<Gdk::Texture>
+CursorManager::CursorInfo::generateTexture(int cursor_size, double scale,
+                                           int& out_width, int& out_height,
+                                           int& out_hotspot_x, int& out_hotspot_y)
+{
+    out_width = cursor_size * scale;
+    out_height = cursor_size * scale;
+
+    out_hotspot_x = out_width / 2.0 * hotspot_x;
+    out_hotspot_y = out_height / 2.0 * hotspot_y;
+
+    // If the cached texture is already correctly sized, just return it again
+    if (texture && texture->get_width() == out_width && texture->get_height() == out_height) {
+        return texture;
+    }
+
+    texture = svg->createTexture(out_width, out_height);
+    return texture;
+}
+
+void CursorManager::init (const Glib::RefPtr<Gtk::Window>& mainWindow)
 {
 
     display = Gdk::Display::get_default ();
@@ -34,138 +53,139 @@ void CursorManager::init (Glib::RefPtr<Gtk::Window> mainWindow)
 
 #endif
 
-    auto createCursor = [this] (const Glib::ustring &name, const Gdk::CursorType &fb_cursor,
-        const double offX = 0., const double offY = 0.) -> Glib::RefPtr<Gdk::Cursor>
-    {
-        // Notes:
-        // - Gdk Cursor Theme is not supported on some OS (ex : MacOS).
-        // Cursor is retrieved from theme thanks to an RTSurface
-        // - By default, cursor hotspot is located at middle of surface.
-        // Use (offX, offY) between -1 and 0.99 to move cursor hotspot
-        auto cursor_surf = RTSurface(name, Gtk::ICON_SIZE_MENU);
-        auto cursor = Gdk::Cursor::create(this->display,
-            cursor_surf.get(),
-            std::min(std::max(cursor_surf.getWidth() / 2 * (1. + offX), 0.), static_cast<double>(cursor_surf.getWidth())),
-            std::min(std::max(cursor_surf.getHeight() / 2 * (1. + offY), 0.), static_cast<double>(cursor_surf.getHeight())));
-
-        if (!cursor) {
-            cursor = Gdk::Cursor::create(this->display, fb_cursor);
-        }
-
-        return cursor;
-    };
-
-    cAdd        = createCursor("crosshair-hicontrast", Gdk::PLUS);
-    cAddPicker  = createCursor("color-picker-add-hicontrast", Gdk::PLUS, -0.666, 0.75);
-    cCropDraw   = createCursor("crop-point-hicontrast", Gdk::DIAMOND_CROSS, -0.75, 0.75);
-    cCrosshair  = createCursor("crosshair-hicontrast", Gdk::CROSSHAIR);
-    cEmpty      = createCursor("empty", Gdk::BLANK_CURSOR);
-    cHandClosed = createCursor("hand-closed-hicontrast", Gdk::HAND1);
-    cHandOpen   = createCursor("hand-open-hicontrast", Gdk::HAND2);
-    cMoveBL     = createCursor("node-move-sw-ne-hicontrast", Gdk::BOTTOM_LEFT_CORNER);
-    cMoveBR     = createCursor("node-move-nw-se-hicontrast", Gdk::BOTTOM_RIGHT_CORNER);
-    cMoveL      = createCursor("node-move-x-hicontrast", Gdk::SB_LEFT_ARROW);
-    cMoveR      = createCursor("node-move-x-hicontrast", Gdk::SB_RIGHT_ARROW);
-    cMoveTL     = createCursor("node-move-nw-se-hicontrast", Gdk::TOP_LEFT_CORNER);
-    cMoveTR     = createCursor("node-move-sw-ne-hicontrast", Gdk::TOP_RIGHT_CORNER);
-    cMoveX      = createCursor("node-move-x-hicontrast", Gdk::SB_H_DOUBLE_ARROW);
-    cMoveXY     = createCursor("node-move-xy-hicontrast", Gdk::FLEUR);
-    cMoveY      = createCursor("node-move-y-hicontrast", Gdk::SB_V_DOUBLE_ARROW);
-    cRotate     = createCursor("rotate-aroundnode-hicontrast", Gdk::EXCHANGE);
-    cWB         = createCursor("color-picker-hicontrast", Gdk::TARGET, -0.666, 0.75);
-    cWait       = createCursor("gears", Gdk::CLOCK);
+    cAdd        = createCursor("crosshair-hicontrast", "copy");
+    cAddPicker  = createCursor("color-picker-add-hicontrast", "copy", -0.666, 0.75);
+    cCropDraw   = createCursor("crop-point-hicontrast", "crosshair", -0.75, 0.75);
+    cCrosshair  = createCursor("crosshair-hicontrast", "crosshair");
+    cEmpty      = createCursor("empty", "none");
+    cHandClosed = createCursor("hand-closed-hicontrast", "grabbing");
+    cHandOpen   = createCursor("hand-open-hicontrast", "grab");
+    cMoveBL     = createCursor("node-move-sw-ne-hicontrast", "nesw-resize");
+    cMoveBR     = createCursor("node-move-nw-se-hicontrast", "nwse-resize");
+    cMoveL      = createCursor("node-move-x-hicontrast", "ew-resize");
+    cMoveR      = createCursor("node-move-x-hicontrast", "ew-resize");
+    cMoveTL     = createCursor("node-move-nw-se-hicontrast", "nwse-resize");
+    cMoveTR     = createCursor("node-move-sw-ne-hicontrast", "nesw-resize");
+    cMoveX      = createCursor("node-move-x-hicontrast", "ns-resize");
+    cMoveXY     = createCursor("node-move-xy-hicontrast", "all-scroll");
+    cMoveY      = createCursor("node-move-y-hicontrast", "ns-resize");
+    cRotate     = createCursor("rotate-aroundnode-hicontrast", "all-scroll");
+    cWB         = createCursor("color-picker-hicontrast", "copy", -0.666, 0.75);
+    cWait       = createCursor("gears", "progress");
 
     window = mainWindow;
 }
 
+Glib::RefPtr<CursorManager::CursorInfo>
+CursorManager::createCursor(const Glib::ustring& name, const Glib::ustring& fallback,
+                            double hotspot_x, double hotspot_y)
+{
+    auto info = std::make_shared<CursorInfo>();
+    info->hotspot_x = hotspot_x;
+    info->hotspot_y = hotspot_y;
+
+    auto fallback_cursor = Gdk::Cursor::create(fallback);
+
+    info->svg = SvgPaintableWrapper::createFromIcon(name);
+    if (!info->svg) {
+        info->cursor = fallback_cursor;
+    } else {
+        info->cursor = Gdk::Cursor::create_from_slot(
+            sigc::mem_fun(*info, &CursorInfo::generateTexture),
+            fallback_cursor);
+    }
+
+    return info;
+}
+
 /* Set the cursor of the given window */
-void CursorManager::setCursor (Glib::RefPtr<Gtk::Window> window, CursorShape shape)
+void CursorManager::setCursor (const Glib::RefPtr<Gtk::Window>& window, CursorShape shape)
 {
     switch (shape)
     {
         case CursorShape::CSAddColPicker:
-            window->set_cursor(cAddPicker);
+            window->set_cursor(cAddPicker->cursor);
             break;
         case CursorShape::CSArrow:
             window->set_cursor(); // set_cursor without any arguments to select system default
             break;
         case CursorShape::CSCropSelect:
-            window->set_cursor(cCropDraw);
+            window->set_cursor(cCropDraw->cursor);
             break;
         case CursorShape::CSCrosshair:
-            window->set_cursor(cCrosshair);
+            window->set_cursor(cCrosshair->cursor);
             break;
         case CursorShape::CSEmpty:
-            window->set_cursor(cEmpty);
+            window->set_cursor(cEmpty->cursor);
             break;
         case CursorShape::CSHandClosed:
-            window->set_cursor(cHandClosed);
+            window->set_cursor(cHandClosed->cursor);
             break;
         case CursorShape::CSHandOpen:
-            window->set_cursor(cHandOpen);
+            window->set_cursor(cHandOpen->cursor);
             break;
         case CursorShape::CSMove:
-            window->set_cursor(cHandClosed);
+            window->set_cursor(cHandClosed->cursor);
             break;
         case CursorShape::CSMove1DH:
-            window->set_cursor(cMoveX);
+            window->set_cursor(cMoveX->cursor);
             break;
         case CursorShape::CSMove1DV:
-            window->set_cursor(cMoveY);
+            window->set_cursor(cMoveY->cursor);
             break;
         case CursorShape::CSMove2D:
-            window->set_cursor(cMoveXY);
+            window->set_cursor(cMoveXY->cursor);
             break;
         case CursorShape::CSMoveLeft:
-            window->set_cursor(cMoveL);
+            window->set_cursor(cMoveL->cursor);
             break;
         case CursorShape::CSMoveRight:
-            window->set_cursor(cMoveR);
+            window->set_cursor(cMoveR->cursor);
             break;
         case CursorShape::CSMoveRotate:
-            window->set_cursor(cRotate);
+            window->set_cursor(cRotate->cursor);
             break;
         case CursorShape::CSPlus:
-            window->set_cursor(cAdd);
+            window->set_cursor(cAdd->cursor);
             break;
         case CursorShape::CSResizeBottomLeft:
-            window->set_cursor(cMoveBL);
+            window->set_cursor(cMoveBL->cursor);
             break;
         case CursorShape::CSResizeBottomRight:
-            window->set_cursor(cMoveBR);
+            window->set_cursor(cMoveBR->cursor);
             break;
         case CursorShape::CSResizeDiagonal:
-            window->set_cursor(cMoveXY);
+            window->set_cursor(cMoveXY->cursor);
             break;
         case CursorShape::CSResizeHeight:
-            window->set_cursor(cMoveY);
+            window->set_cursor(cMoveY->cursor);
             break;
         case CursorShape::CSResizeTopLeft:
-            window->set_cursor(cMoveTL);
+            window->set_cursor(cMoveTL->cursor);
             break;
         case CursorShape::CSResizeTopRight:
-            window->set_cursor(cMoveTR);
+            window->set_cursor(cMoveTR->cursor);
             break;
         case CursorShape::CSResizeWidth:
-            window->set_cursor(cMoveX);
+            window->set_cursor(cMoveX->cursor);
             break;
         case CursorShape::CSSpotWB:
-            window->set_cursor(cWB);
+            window->set_cursor(cWB->cursor);
             break;
         case CursorShape::CSStraighten:
-            window->set_cursor(cRotate);
+            window->set_cursor(cRotate->cursor);
             break;
         case CursorShape::CSUndefined:
             break;
         case CursorShape::CSWait:
-            window->set_cursor(cWait);
+            window->set_cursor(cWait->cursor);
             break;
         default:
-            window->set_cursor(cCrosshair);
+            window->set_cursor(cCrosshair->cursor);
     }
 }
 
-void CursorManager::setWidgetCursor (Glib::RefPtr<Gtk::Window> window, CursorShape shape)
+void CursorManager::setWidgetCursor (const Glib::RefPtr<Gtk::Window>& window, CursorShape shape)
 {
     if (window->get_display() == mainWindowCursorManager.display) {
         mainWindowCursorManager.setCursor(window, shape);
@@ -181,7 +201,7 @@ void CursorManager::setWidgetCursor (Glib::RefPtr<Gtk::Window> window, CursorSha
 #endif
 }
 
-void CursorManager::setCursorOfMainWindow (Glib::RefPtr<Gtk::Window> window, CursorShape shape)
+void CursorManager::setCursorOfMainWindow (const Glib::RefPtr<Gtk::Window>& window, CursorShape shape)
 {
     if (window->get_display() == mainWindowCursorManager.display) {
         mainWindowCursorManager.setCursor(shape);
