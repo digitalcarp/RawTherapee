@@ -21,19 +21,20 @@
 #include <gtkmm.h>
 
 #include "exportpanel.h"
-#include "filecatalog.h"
+// TODO(gtk4)
+// #include "filecatalog.h"
 #include "fileselectionlistener.h"
 #include "filterpanel.h"
 #include "history.h"
 #include "placesbrowser.h"
 #include "pparamschangelistener.h"
-#include "progressconnector.h"
+// #include "progressconnector.h"
 #include "recentbrowser.h"
 
 #include "rtengine/noncopyable.h"
 
-class BatchToolPanelCoordinator;
-class RTWindow;
+// class BatchToolPanelCoordinator;
+class RtWindow;
 class DirBrowser;
 
 class FilePanel final :
@@ -53,7 +54,7 @@ public:
     DirBrowser* dirBrowser;
     FilterPanel* filterPanel;
     ExportPanel* exportPanel;
-    FileCatalog* fileCatalog;
+    // FileCatalog* fileCatalog;
     Gtk::Paned *ribbonPane;
 
     void setParent (RTWindow* p)

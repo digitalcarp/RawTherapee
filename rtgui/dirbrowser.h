@@ -18,6 +18,8 @@
  */
 #pragma once
 
+#include <mutex>
+
 #include <gtkmm.h>
 #include <giomm.h>
 
@@ -26,7 +28,7 @@
 class DirBrowser : public Gtk::Box
 {
 public:
-    typedef sigc::signal<void, const Glib::ustring&, const Glib::ustring&> DirSelectionSignal;
+    typedef sigc::signal<void(const Glib::ustring&, const Glib::ustring&)> DirSelectionSignal;
 
 private:
 
@@ -57,6 +59,11 @@ private:
     Gtk::ScrolledWindow *scrolledwindow4;
     DirSelectionSignal dirSelectionSignal;
 
+    std::mutex mutex;
+    std::vector<Gtk::TreeIter<Gtk::TreeRow>> updatedDirs;
+    Glib::Dispatcher dispatcher;
+    Glib::Dispatcher winDispatcher;
+
     void fillRoot ();
 
     Glib::ustring openfolder;
@@ -71,29 +78,26 @@ private:
 
 #ifdef _WIN32
     unsigned int volumes;
-public:
-    void updateVolumes ();
-    void updateDirTree  (const Gtk::TreeModel::iterator& iter);
-    void updateDirTreeRoot  ();
-private:
     void addRoot (char letter);
+public:
+    void requestUpdateVolumes ();
+private:
 #endif
     void addDir (const Gtk::TreeModel::iterator& iter, const Glib::ustring& dirname);
     Gtk::TreePath expandToDir (const Glib::ustring& dirName);
-    void updateDir (const Gtk::TreeModel::iterator& iter);
-
-    IdleRegister idle_register;
+    void updateVolumes ();
+    void updateDirs();
+    void updateDir (Gtk::TreeIter<Gtk::TreeRow>& iter);
 
 public:
     DirBrowser ();
-    ~DirBrowser() override;
 
     void fillDirTree ();
     void on_sort_column_changed() const;
     void row_expanded   (const Gtk::TreeModel::iterator& iter, const Gtk::TreeModel::Path& path);
     void row_collapsed  (const Gtk::TreeModel::iterator& iter, const Gtk::TreeModel::Path& path);
     void row_activated  (const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column);
-    void file_changed   (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitorEvent event_type, const Gtk::TreeModel::iterator& iter, const Glib::ustring& dirName);
+    void file_changed   (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitor::Event event_type, const Gtk::TreeModel::iterator& iter, const Glib::ustring& dirName);
     void open           (const Glib::ustring& dirName, const Glib::ustring& fileName = ""); // goes to dir "dirName" and selects file "fileName"
     void selectDir      (Glib::ustring dir);
 

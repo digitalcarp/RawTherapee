@@ -49,7 +49,7 @@ set(NONCLISOURCEFILES
     # defringe.cc
     # dehaze.cc
     # diagonalcurveeditorsubgroup.cc
-    # dirbrowser.cc
+    dirbrowser.cc
     # dirpyrdenoise.cc
     # dirpyrequalizer.cc
     # distortion.cc
