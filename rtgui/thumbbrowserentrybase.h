@@ -25,7 +25,7 @@
 #include "cursormanager.h"
 #include "guiutils.h"
 #include "hidpi.h"
-#include "lwbuttonset.h"
+// #include "lwbuttonset.h"
 #include "threadutils.h"
 #include "options.h"
 #include "thumbnail.h"
@@ -34,7 +34,7 @@
 
 class Thumbnail;
 class ThumbBrowserBase;
-class RTSurface;
+
 class ThumbBrowserEntryBase
 {
 
@@ -74,7 +74,7 @@ protected:
 
     Glib::ustring dispname;
 
-    LWButtonSet* buttonSet;
+//     LWButtonSet* buttonSet;
 
     int width;      // minimal width
     int height;     // minimal height
@@ -94,15 +94,15 @@ protected:
     Glib::RefPtr<BackBuffer> backBuffer;
     bool bbSelected, bbFramed;
     guint8* bbPreview;
-    std::vector<std::shared_ptr<RTSurface>> bbIcons;
-    std::vector<std::shared_ptr<RTSurface>> bbSpecificityIcons;
+//     std::vector<std::shared_ptr<RTSurface>> bbIcons;
+//     std::vector<std::shared_ptr<RTSurface>> bbSpecificityIcons;
     CursorShape cursor_type;
 
-    void drawFrame (Cairo::RefPtr<Cairo::Context> cr, const Gdk::RGBA& bg, const Gdk::RGBA& fg);
+    void drawFrame (const Cairo::RefPtr<Cairo::Context>& cr, const Gdk::RGBA& bg, const Gdk::RGBA& fg);
     void getTextSizes (int& w, int& h);
 
     // called during updateBackBuffer for custom overlays
-    virtual void customBackBufferUpdate (Cairo::RefPtr<Cairo::Context> c) {}
+    virtual void customBackBufferUpdate (const Cairo::RefPtr<Cairo::Context>& c) {}
 
 private:
     const std::string collate_name;
@@ -139,9 +139,9 @@ public:
 
     void updateBackBuffer ();
     void resize (int h);
-    virtual void draw (Cairo::RefPtr<Cairo::Context> cc);
+    virtual void draw (const Cairo::RefPtr<Cairo::Context>& cc);
 
-    void addButtonSet (LWButtonSet* bs);
+//     void addButtonSet (LWButtonSet* bs);
     int getMinimalHeight () const
     {
         return height;
@@ -221,8 +221,8 @@ public:
 
     virtual void drawProgressBar (Glib::RefPtr<Gtk::Window> win, const Gdk::RGBA& foregr, const Gdk::RGBA& backgr, int x, int w, int y, int h) {}
 
-    virtual std::vector<std::shared_ptr<RTSurface>> getIconsOnImageArea ();
-    virtual std::vector<std::shared_ptr<RTSurface>> getSpecificityIconsOnImageArea ();
+//     virtual std::vector<std::shared_ptr<RTSurface>> getIconsOnImageArea ();
+//     virtual std::vector<std::shared_ptr<RTSurface>> getSpecificityIconsOnImageArea ();
     virtual void getIconSize (int& w, int& h) const = 0;
 
     virtual bool motionNotify (int x, int y);

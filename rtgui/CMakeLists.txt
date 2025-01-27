@@ -163,8 +163,8 @@ set(NONCLISOURCEFILES
     threadutils.cc
     # thresholdadjuster.cc
     # thresholdselector.cc
-    # thumbbrowserbase.cc
-    # thumbbrowserentrybase.cc
+    thumbbrowserbase.cc
+    thumbbrowserentrybase.cc
     # thumbimageupdater.cc
     thumbnail.cc
     # tonecurve.cc

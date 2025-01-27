@@ -29,7 +29,7 @@
  * Class handling the list of ThumbBrowserEntry objects and their position in it's allocated space
  */
 
-class Inspector;
+// class Inspector;
 class ThumbBrowserEntryBase;
 
 class ThumbBrowserBase :
@@ -45,37 +45,31 @@ class ThumbBrowserBase :
         bool dirty;
 
         // caching some very often used values
-        Glib::RefPtr<Gtk::StyleContext> style;
         Gdk::RGBA textn;
         Gdk::RGBA texts;
         Gdk::RGBA bgn;
         Gdk::RGBA bgs;
 
+        Glib::RefPtr<Gtk::GestureClick> clickController;
+
     public:
         Internal ();
         void setParent (ThumbBrowserBase* p);
         void on_realize() override;
-        void on_style_updated() override;
-        bool on_configure_event(GdkEventConfigure *configure_event) override;
-        bool on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr) override;
+        void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
 
         Gtk::SizeRequestMode get_request_mode_vfunc () const override;
-        void get_preferred_height_vfunc (int &minimum_height, int &natural_height) const final;
-        void get_preferred_width_vfunc (int &minimum_width, int &natural_width) const final;
-        void get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const final;
-        void get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const final;
+        void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                           int& minimum_baseline, int& natural_baseline) const override;
 
-        bool on_button_press_event (GdkEventButton* event) override;
-        bool on_button_release_event (GdkEventButton* event) override;
-        bool on_motion_notify_event (GdkEventMotion* event) override;
-        bool on_scroll_event (GdkEventScroll* event) override;
-        bool on_key_press_event (GdkEventKey* event) override;
+        void on_button_press_event (int n_press, double x, double y);
+        void on_button_release_event (int n_press, double x, double y);
+        void on_motion_notify_event (double x, double y);
+        bool on_scroll_event (double dx, double dy);
+        bool on_key_press_event (guint keyval, guint keycode, Gdk::ModifierType state);
         bool on_query_tooltip (int x, int y, bool keyboard_tooltip, const Glib::RefPtr<Gtk::Tooltip>& tooltip);
         void setPosition (int x, int y);
 
-        Glib::RefPtr<Gtk::StyleContext> getStyle() {
-            return style;
-        }
         Gdk::RGBA getNormalTextColor() {
             return textn;
         }
@@ -122,31 +116,31 @@ protected:
 
     int inW, inH;
 
-    Inspector *inspector;
-    bool isInspectorActive;
+//     Inspector *inspector;
+//     bool isInspectorActive;
 
     void resizeThumbnailArea (int w, int h);
-    void internalAreaResized (Gtk::Allocation& req);
-    void buttonPressed (int x, int y, int button, GdkEventType type, int state, int clx, int cly, int clw, int clh);
+    void internalAreaResized (int width, int height);
+    void buttonPressed (int x, int y, int button, int n_press, int state, int clx, int cly, int clw, int clh);
 
     void onInternalAreaDraw();
 
 public:
 
-    void setInspector(Inspector* inspector)
-    {
-        this->inspector = inspector;
-    }
-    Inspector* getInspector()
-    {
-        return inspector;
-    }
-    void disableInspector();
-    void enableInspector();
+//     void setInspector(Inspector* inspector)
+//     {
+//         this->inspector = inspector;
+//     }
+//     Inspector* getInspector()
+//     {
+//         return inspector;
+//     }
+//     void disableInspector();
+//     void enableInspector();
     enum Arrangement {TB_Horizontal, TB_Vertical};
     void configScrollBars ();
     void scrollChanged ();
-    void scroll (int direction, double deltaX=0.0, double deltaY=0.0);
+    void scroll (double deltaX=0.0, double deltaY=0.0);
     void scrollPage (int direction);
 
 private:
@@ -209,7 +203,6 @@ public:
     {
         return fd;
     }
-    void on_style_updated () override;
     void resort (); // re-apply sort method
     void redraw (ThumbBrowserEntryBase* entry = nullptr);   // arrange files and draw area
     void refreshThumbImages (); // refresh thumbnail sizes, re-generate thumbnail images, arrange and draw
@@ -230,10 +223,7 @@ public:
     }
     virtual void rightClicked () = 0;
     virtual void doubleClicked (ThumbBrowserEntryBase* entry) {}
-    virtual bool keyPressed (GdkEventKey* event)
-    {
-        return true;
-    }
+    virtual void keyPressed (guint keyval, guint keycode, Gdk::ModifierType state) {}
     virtual void selectionChanged () {}
 
     virtual void redrawNeeded (ThumbBrowserEntryBase* entry);
@@ -245,7 +235,7 @@ public:
     }
 
     Glib::RefPtr<Gtk::StyleContext> getStyle() {
-        return internal.getStyle();
+        return internal.get_style_context();
     }
     Gdk::RGBA getNormalTextColor() {
         return internal.getNormalTextColor();
