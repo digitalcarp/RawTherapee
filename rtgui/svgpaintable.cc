@@ -19,6 +19,7 @@
 
 #include "svgpaintable.h"
 
+#include "cairotexture.h"
 #include "rtscalable.h"
 
 #include <glibmm/fileutils.h>
@@ -275,14 +276,7 @@ SvgPaintableWrapper::~SvgPaintableWrapper() {
 }
 
 Glib::RefPtr<Gdk::Texture> SvgPaintableWrapper::createTexture(int width, int height) {
-    // MemoryTexture::DEFAULT_FORMAT is equal to CAIRO_FORMAT_ARGB32.
-    // See gdkmemorytexture.h definition of GDK_MEMORY_DEFAULT
-    constexpr auto default_format = GDK_MEMORY_DEFAULT;
-    constexpr auto texture_format = static_cast<Gdk::MemoryTexture::Format>(default_format);
-    constexpr auto cairo_format = Cairo::Surface::Format::ARGB32;
-    static_assert(static_cast<int>(texture_format) == static_cast<int>(cairo_format));
-
-    auto surface = Cairo::ImageSurface::create(cairo_format, width, height);
+    auto surface = createMemoryTextureImageSurface(width, height);
     auto cr = Cairo::Context::create(surface);
 
     GError *error = NULL;
@@ -293,10 +287,5 @@ Glib::RefPtr<Gdk::Texture> SvgPaintableWrapper::createTexture(int width, int hei
         return nullptr;
     }
 
-    // Implementation inspired by private API gdk_texture_new_for_surface().
-    // See gdktexture.c
-    int stride = surface->get_stride();
-    auto bytes = Glib::Bytes::create(surface->get_data(), height * stride);
-    auto texture = Gdk::MemoryTexture::create(width, height, texture_format, bytes, stride);
-    return texture;
+    return createMemoryTexture(surface);
 }

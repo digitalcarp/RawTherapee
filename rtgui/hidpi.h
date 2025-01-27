@@ -141,16 +141,12 @@ private:
 Cairo::RefPtr<Cairo::SurfacePattern>
 getSourceForSurface(const Cairo::RefPtr<Cairo::Context>& context);
 
-void getDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,
-                    double& x_scale, double& y_scale);
 void setDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,
                     int x_scale, int y_scale);
 inline void setDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface, int scale) {
     setDeviceScale(surface, scale, scale);
 }
 
-void getDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface,
-                    double& x_scale, double& y_scale);
 void setDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface,
                     int x_scale, int y_scale);
 inline void setDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface, int scale) {

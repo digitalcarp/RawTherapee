@@ -130,22 +130,10 @@ getSourceForSurface(const Cairo::RefPtr<Cairo::Context>& context) {
     return result;
 }
 
-void getDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,
-                    double& x_scale, double& y_scale) {
-    cairo_surface_t* cobj = surface->cobj();
-    cairo_surface_get_device_scale(cobj, &x_scale, &y_scale);
-}
-
 void setDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,
                     int x_scale, int y_scale) {
     cairo_surface_t* cobj = surface->cobj();
     cairo_surface_set_device_scale(cobj, x_scale, y_scale);
-}
-
-void getDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface,
-                    double& x_scale, double& y_scale) {
-    cairo_surface_t* cobj = surface->cobj();
-    cairo_surface_get_device_scale(cobj, &x_scale, &y_scale);
 }
 
 void setDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface,

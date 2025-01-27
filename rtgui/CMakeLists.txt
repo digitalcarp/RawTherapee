@@ -27,6 +27,7 @@ set(NONCLISOURCEFILES
     cacheimagedata.cc
     cachemanager.cc
     # cacorrection.cc
+    cairotexture.cc
     checkbox.cc
     # chmixer.cc
     clipboard.cc
@@ -158,6 +159,7 @@ set(NONCLISOURCEFILES
     splash.cc
     # spot.cc
     svgpaintable.cc
+    texturebackbuffer.cc
     threadutils.cc
     # thresholdadjuster.cc
     # thresholdselector.cc
