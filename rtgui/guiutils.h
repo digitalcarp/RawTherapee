@@ -79,6 +79,7 @@ Gtk::Border getPadding(const Glib::RefPtr<Gtk::StyleContext> style);
 
 bool isControlOrMetaDown(Gdk::ModifierType state);
 bool isShiftDown(Gdk::ModifierType state);
+bool isAltDown(Gdk::ModifierType state);
 
 class IdleRegister final : public rtengine::NonCopyable
 {
@@ -801,5 +802,5 @@ inline void setActiveTextOrIndex(Gtk::ComboBoxText &comboBox, const Glib::ustrin
 
 inline Gtk::Window* getToplevelWindow(Gtk::Widget* widget)
 {
-    return dynamic_cast<Gtk::Window*>(widget->get_root());
+    return static_cast<Gtk::Window*>(widget->get_root());
 }

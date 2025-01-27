@@ -201,7 +201,7 @@ void CursorManager::setWidgetCursor (const Glib::RefPtr<Gtk::Window>& window, Cu
 #endif
 }
 
-void CursorManager::setCursorOfMainWindow (const Glib::RefPtr<Gtk::Window>& window, CursorShape shape)
+void CursorManager::setCursorOfMainWindow (Gtk::Window* window, CursorShape shape)
 {
     if (window->get_display() == mainWindowCursorManager.display) {
         mainWindowCursorManager.setCursor(shape);

@@ -22,7 +22,7 @@
 
 #include "toolenum.h"
 
-class RTImage;
+class RtImage;
 class LockablePickerToolListener;
 
 class ToolBarListener
@@ -42,15 +42,16 @@ public:
 class ToolBar final : public Gtk::Box
 {
 private:
-    std::unique_ptr<RTImage> handimg;
-    std::unique_ptr<RTImage> editinghandimg;
-    std::unique_ptr<RTImage> showcolpickersimg;
-    std::unique_ptr<RTImage> hidecolpickersimg;
+    Glib::RefPtr<Gtk::GestureClick> clickController;
+    std::unique_ptr<RtImage> handimg;
+    std::unique_ptr<RtImage> editinghandimg;
+    std::unique_ptr<RtImage> showcolpickersimg;
+    std::unique_ptr<RtImage> hidecolpickersimg;
     bool showColPickers;
 
     void hand_pressed ();
     void wb_pressed ();
-    void colPicker_pressed (GdkEventButton* event);
+    void colPicker_pressed (int n_press, double x, double y);
     void crop_pressed ();
     void stra_pressed ();
     void persp_pressed ();
@@ -103,7 +104,7 @@ public:
     void startEditMode();
     void stopEditMode();
 
-    bool handleShortcutKey (GdkEventKey* event);
+    bool handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierType state);
     void setBatchMode();
 
     void blockEditDeactivation(bool cond = true)

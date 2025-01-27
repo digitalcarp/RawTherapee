@@ -24,8 +24,7 @@
 #include "cropguilistener.h"
 #include "cursormanager.h"
 #include "guiutils.h"
-#include "inspector.h"
-#include "rtsurface.h"
+// #include "inspector.h"
 #include "threadutils.h"
 #include "thumbbrowserbase.h"
 #include "thumbnail.h"
@@ -35,13 +34,11 @@
 
 #define CROPRESIZEBORDER 4
 
-//extern Glib::Threads::Thread* mainThread;
-
-std::shared_ptr<RTSurface> FileBrowserEntry::editedIcon(std::shared_ptr<RTSurface>(nullptr));
-std::shared_ptr<RTSurface> FileBrowserEntry::recentlySavedIcon(std::shared_ptr<RTSurface>(nullptr));
-std::shared_ptr<RTSurface> FileBrowserEntry::enqueuedIcon(std::shared_ptr<RTSurface>(nullptr));
-std::shared_ptr<RTSurface> FileBrowserEntry::hdr(std::shared_ptr<RTSurface>(nullptr));
-std::shared_ptr<RTSurface> FileBrowserEntry::ps(std::shared_ptr<RTSurface>(nullptr));
+// std::shared_ptr<RTSurface> FileBrowserEntry::editedIcon(std::shared_ptr<RTSurface>(nullptr));
+// std::shared_ptr<RTSurface> FileBrowserEntry::recentlySavedIcon(std::shared_ptr<RTSurface>(nullptr));
+// std::shared_ptr<RTSurface> FileBrowserEntry::enqueuedIcon(std::shared_ptr<RTSurface>(nullptr));
+// std::shared_ptr<RTSurface> FileBrowserEntry::hdr(std::shared_ptr<RTSurface>(nullptr));
+// std::shared_ptr<RTSurface> FileBrowserEntry::ps(std::shared_ptr<RTSurface>(nullptr));
 
 FileBrowserEntry::FileBrowserEntry (Thumbnail* thm, const Glib::ustring& fname)
     : ThumbBrowserEntryBase (fname, thm), wasInside(false), iatlistener(nullptr), press_x(0), press_y(0), action_x(0), action_y(0), rot_deg(0.0), landscape(true), cropParams(new rtengine::procparams::CropParams), cropgl(nullptr), state(SNormal), crop_custom_ratio(0.f)
@@ -62,8 +59,6 @@ FileBrowserEntry::FileBrowserEntry (Thumbnail* thm, const Glib::ustring& fname)
 
 FileBrowserEntry::~FileBrowserEntry ()
 {
-    idle_register.destroy();
-
     // so jobs arriving now do nothing
     if (feih->pending) {
         feih->destroyed = true;
@@ -82,11 +77,11 @@ FileBrowserEntry::~FileBrowserEntry ()
 
 void FileBrowserEntry::init ()
 {
-    editedIcon = std::shared_ptr<RTSurface>(new RTSurface("tick-small", Gtk::ICON_SIZE_SMALL_TOOLBAR));
-    recentlySavedIcon = std::shared_ptr<RTSurface>(new RTSurface("save-small", Gtk::ICON_SIZE_SMALL_TOOLBAR));
-    enqueuedIcon = std::shared_ptr<RTSurface>(new RTSurface("gears-small", Gtk::ICON_SIZE_SMALL_TOOLBAR));
-    hdr = std::shared_ptr<RTSurface>(new RTSurface("filetype-hdr", Gtk::ICON_SIZE_SMALL_TOOLBAR));
-    ps = std::shared_ptr<RTSurface>(new RTSurface("filetype-ps", Gtk::ICON_SIZE_SMALL_TOOLBAR));
+//     editedIcon = std::shared_ptr<RTSurface>(new RTSurface("tick-small", Gtk::ICON_SIZE_SMALL_TOOLBAR));
+//     recentlySavedIcon = std::shared_ptr<RTSurface>(new RTSurface("save-small", Gtk::ICON_SIZE_SMALL_TOOLBAR));
+//     enqueuedIcon = std::shared_ptr<RTSurface>(new RTSurface("gears-small", Gtk::ICON_SIZE_SMALL_TOOLBAR));
+//     hdr = std::shared_ptr<RTSurface>(new RTSurface("filetype-hdr", Gtk::ICON_SIZE_SMALL_TOOLBAR));
+//     ps = std::shared_ptr<RTSurface>(new RTSurface("filetype-ps", Gtk::ICON_SIZE_SMALL_TOOLBAR));
 }
 
 void FileBrowserEntry::refreshThumbnailImage(bool upgradeHint)
@@ -132,49 +127,49 @@ void FileBrowserEntry::calcThumbnailSize ()
     }
 }
 
-std::vector<std::shared_ptr<RTSurface>> FileBrowserEntry::getIconsOnImageArea ()
-{
-    if (!thumbnail) {
-        return {};
-    }
+// std::vector<std::shared_ptr<RTSurface>> FileBrowserEntry::getIconsOnImageArea ()
+// {
+//     if (!thumbnail) {
+//         return {};
+//     }
+//
+//     std::vector<std::shared_ptr<RTSurface>> ret;
+//
+//     if (thumbnail->hasProcParams() && editedIcon) {
+//         ret.push_back(editedIcon);
+//     }
+//
+//     if (thumbnail->isRecentlySaved() && recentlySavedIcon) {
+//         ret.push_back(recentlySavedIcon);
+//     }
+//
+//     if (thumbnail->isEnqueued () && enqueuedIcon) {
+//         ret.push_back(enqueuedIcon);
+//     }
+//
+//     return ret;
+// }
+//
+// std::vector<std::shared_ptr<RTSurface>> FileBrowserEntry::getSpecificityIconsOnImageArea ()
+// {
+//     if (!thumbnail) {
+//         return {};
+//     }
+//
+//     std::vector<std::shared_ptr<RTSurface>> ret;
+//
+//     if (thumbnail->isHDR() && hdr) {
+//         ret.push_back (hdr);
+//     }
+//
+//     if (thumbnail->isPixelShift() && ps) {
+//         ret.push_back (ps);
+//     }
+//
+//     return ret;
+// }
 
-    std::vector<std::shared_ptr<RTSurface>> ret;
-
-    if (thumbnail->hasProcParams() && editedIcon) {
-        ret.push_back(editedIcon);
-    }
-
-    if (thumbnail->isRecentlySaved() && recentlySavedIcon) {
-        ret.push_back(recentlySavedIcon);
-    }
-
-    if (thumbnail->isEnqueued () && enqueuedIcon) {
-        ret.push_back(enqueuedIcon);
-    }
-
-    return ret;
-}
-
-std::vector<std::shared_ptr<RTSurface>> FileBrowserEntry::getSpecificityIconsOnImageArea ()
-{
-    if (!thumbnail) {
-        return {};
-    }
-
-    std::vector<std::shared_ptr<RTSurface>> ret;
-
-    if (thumbnail->isHDR() && hdr) {
-        ret.push_back (hdr);
-    }
-
-    if (thumbnail->isPixelShift() && ps) {
-        ret.push_back (ps);
-    }
-
-    return ret;
-}
-
-void FileBrowserEntry::customBackBufferUpdate (Cairo::RefPtr<Cairo::Context> c)
+void FileBrowserEntry::customBackBufferUpdate (const Cairo::RefPtr<Cairo::Context>& c)
 {
     // somewhere in pipeline customBackBufferUpdate is called when scale == 1.0, which is nonsense for a thumb
     if (scale == 1.0 || !cropParams->enabled) return;
@@ -207,18 +202,16 @@ void FileBrowserEntry::customBackBufferUpdate (Cairo::RefPtr<Cairo::Context> c)
     }
 }
 
-void FileBrowserEntry::getIconSize (int& w, int& h) const
-{
+// void FileBrowserEntry::getIconSize (int& w, int& h) const
+// {
+//     w = editedIcon->getWidth ();
+//     h = editedIcon->getHeight ();
+// }
 
-    w = editedIcon->getWidth ();
-    h = editedIcon->getHeight ();
-}
-
-FileThumbnailButtonSet* FileBrowserEntry::getThumbButtonSet ()
-{
-
-    return (static_cast<FileThumbnailButtonSet*>(buttonSet));
-}
+// FileThumbnailButtonSet* FileBrowserEntry::getThumbButtonSet ()
+// {
+//     return (static_cast<FileThumbnailButtonSet*>(buttonSet));
+// }
 
 void FileBrowserEntry::procParamsChanged (Thumbnail* thm, int whoChangedIt, bool upgradeHint)
 {
@@ -260,8 +253,7 @@ void FileBrowserEntry::updateImage(ThumbImageUpdateListener::ImageUpdate&& updat
                 return false;
             },
             std::move(update)
-        ),
-        G_PRIORITY_LOW
+        )
     );
 }
 
@@ -291,10 +283,8 @@ void FileBrowserEntry::_updateImage(ThumbImageUpdateListener::ImageUpdate&& upda
         preview.resize(imw * imh * 3);
         std::copy(update.img->getData(), update.img->getData() + preview.size(), preview.begin());
 
-        {
-            GThreadLock lock;
-            updateBackBuffer();
-        }
+        // This function is already called from the GUI thread
+        updateBackBuffer();
     }
 
     landscape = newLandscape;
@@ -318,21 +308,21 @@ bool FileBrowserEntry::motionNotify (int x, int y)
     const int ix = x - startx - ofsX;
     const int iy = y - starty - ofsY;
 
-    Inspector* inspector = parent->getInspector();
-
-    if (inspector && inspector->isActive() && (!parent->isInTabMode() || options.inspectorWindow)) {
-        const rtengine::Coord2D coord(getPosInImgSpace(x, y));
-
-        if (coord.x != -1.) {
-            if (!wasInside) {
-                inspector->switchImage(filename);
-                wasInside = true;
-            }
-            inspector->mouseMove(coord, 0);
-        } else {
-            wasInside = false;
-        }
-    }
+//     Inspector* inspector = parent->getInspector();
+//
+//     if (inspector && inspector->isActive() && (!parent->isInTabMode() || options.inspectorWindow)) {
+//         const rtengine::Coord2D coord(getPosInImgSpace(x, y));
+//
+//         if (coord.x != -1.) {
+//             if (!wasInside) {
+//                 inspector->switchImage(filename);
+//                 wasInside = true;
+//             }
+//             inspector->mouseMove(coord, 0);
+//         } else {
+//             wasInside = false;
+//         }
+//     }
 
     if (inside(x, y)) {
         updateCursor(ix, iy);
@@ -715,7 +705,6 @@ void FileBrowserEntry::updateCursor (int x, int y)
     CursorShape newCursor = CSUndefined;
 
     ToolMode tm = iatlistener->getToolBar()->getTool ();
-    Glib::RefPtr<Gtk::Window> w = parent->getDrawingArea ()->get_window();
 
     if (!selected) {
         newCursor = CSArrow;
@@ -767,11 +756,11 @@ void FileBrowserEntry::updateCursor (int x, int y)
 
     if (newCursor != cursor_type) {
         cursor_type = newCursor;
-        CursorManager::setCursorOfMainWindow (w, cursor_type);
+        CursorManager::setCursorOfMainWindow (getToplevelWindow(parent), cursor_type);
     }
 }
 
-void FileBrowserEntry::draw (Cairo::RefPtr<Cairo::Context> cc)
+void FileBrowserEntry::draw (const Cairo::RefPtr<Cairo::Context>& cc)
 {
 
     ThumbBrowserEntryBase::draw (cc);
@@ -781,7 +770,7 @@ void FileBrowserEntry::draw (Cairo::RefPtr<Cairo::Context> cc)
     }
 }
 
-void FileBrowserEntry::drawStraightenGuide (Cairo::RefPtr<Cairo::Context> cr)
+void FileBrowserEntry::drawStraightenGuide (const Cairo::RefPtr<Cairo::Context>& cr)
 {
 
     if (action_x != press_x || action_y != press_y) {
@@ -813,8 +802,8 @@ void FileBrowserEntry::drawStraightenGuide (Cairo::RefPtr<Cairo::Context> cr)
     }
 
     Glib::RefPtr<Pango::Context> context = parent->getDrawingArea()->get_pango_context () ;
-    Pango::FontDescription fontd = parent->getDrawingArea()->get_style_context()->get_font();
-    fontd.set_weight (Pango::WEIGHT_BOLD);
+    Pango::FontDescription fontd = context->get_font_description();
+    fontd.set_weight (Pango::Weight_Wrapper::BOLD);
     const int fontSize = 8; // pt
     // Non-absolute size is defined in "Pango units" and shall be multiplied by
     // Pango::SCALE from "pt":

@@ -103,7 +103,7 @@ private:
 public:
     void init                         (const Glib::RefPtr<Gtk::Window>& mainWindow);
     static void setWidgetCursor       (const Glib::RefPtr<Gtk::Window>& window, CursorShape shape);
-    static void setCursorOfMainWindow (const Glib::RefPtr<Gtk::Window>& window, CursorShape shape);
+    static void setCursorOfMainWindow (Gtk::Window* window, CursorShape shape);
 };
 
 extern CursorManager mainWindowCursorManager;

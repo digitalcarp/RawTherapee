@@ -35,7 +35,6 @@
 
 class FileBrowserEntry;
 class Thumbnail;
-class RTSurface;
 
 struct FileBrowserEntryIdleHelper {
     FileBrowserEntry* fbentry;
@@ -67,37 +66,37 @@ class FileBrowserEntry final : public ThumbBrowserEntryBase,
 
     bool onArea (CursorArea a, int x, int y);
     void updateCursor (int x, int y);
-    void drawStraightenGuide (Cairo::RefPtr<Cairo::Context> c);
-    void customBackBufferUpdate (Cairo::RefPtr<Cairo::Context> c) override;
+    void drawStraightenGuide (const Cairo::RefPtr<Cairo::Context>& c);
+    void customBackBufferUpdate (const Cairo::RefPtr<Cairo::Context>& c) override;
     void refreshThumbnailImage(bool upgradeHint);
 
 public:
 
-    static std::shared_ptr<RTSurface> editedIcon;
-    static std::shared_ptr<RTSurface> recentlySavedIcon;
-    static std::shared_ptr<RTSurface> enqueuedIcon;
-    static std::shared_ptr<RTSurface> hdr;
-    static std::shared_ptr<RTSurface> ps;
+//     static std::shared_ptr<RTSurface> editedIcon;
+//     static std::shared_ptr<RTSurface> recentlySavedIcon;
+//     static std::shared_ptr<RTSurface> enqueuedIcon;
+//     static std::shared_ptr<RTSurface> hdr;
+//     static std::shared_ptr<RTSurface> ps;
 
     FileBrowserEntry (Thumbnail* thm, const Glib::ustring& fname);
     ~FileBrowserEntry () override;
     static void init ();
-    void draw (Cairo::RefPtr<Cairo::Context> cc) override;
+    void draw (const Cairo::RefPtr<Cairo::Context>& cc) override;
 
     void setImageAreaToolListener (ImageAreaToolListener* l)
     {
         iatlistener = l;
     }
 
-    FileThumbnailButtonSet* getThumbButtonSet ();
+//     FileThumbnailButtonSet* getThumbButtonSet ();
 
     void refreshThumbnailImage () override;
     void refreshQuickThumbnailImage () override;
     void calcThumbnailSize () override;
 
-    std::vector<std::shared_ptr<RTSurface>> getIconsOnImageArea () override;
-    std::vector<std::shared_ptr<RTSurface>> getSpecificityIconsOnImageArea () override;
-    void getIconSize (int& w, int& h) const override;
+//     std::vector<std::shared_ptr<RTSurface>> getIconsOnImageArea () override;
+//     std::vector<std::shared_ptr<RTSurface>> getSpecificityIconsOnImageArea () override;
+//     void getIconSize (int& w, int& h) const override;
 
     // thumbnaillistener interface
     void procParamsChanged (Thumbnail* thm, int whoChangedIt, bool upgradeHint) override;

@@ -469,6 +469,11 @@ bool isShiftDown(Gdk::ModifierType state) {
     return shift != Gdk::ModifierType::NO_MODIFIER_MASK;
 }
 
+bool isAltDown(Gdk::ModifierType state) {
+    auto shift = state & Gdk::ModifierType::ALT_MASK;
+    return shift != Gdk::ModifierType::NO_MODIFIER_MASK;
+}
+
 void setExpandAlignProperties(Gtk::Widget *widget, bool hExpand, bool vExpand, enum Gtk::Align hAlign, enum Gtk::Align vAlign)
 {
     widget->set_hexpand(hExpand);

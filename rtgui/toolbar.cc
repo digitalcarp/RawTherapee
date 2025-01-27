@@ -27,60 +27,50 @@ ToolBar::ToolBar () : showColPickers(true), listener (nullptr), pickerListener(n
 {
 
     editingMode = false;
-    handimg.reset(new RTImage("hand-open", Gtk::ICON_SIZE_LARGE_TOOLBAR));
-    editinghandimg.reset(new RTImage("crosshair-adjust", Gtk::ICON_SIZE_LARGE_TOOLBAR));
+    handimg.reset(new RtImage("hand-open"));
+    editinghandimg.reset(new RtImage("crosshair-adjust"));
 
     handTool = Gtk::manage (new Gtk::ToggleButton ());
-    handTool->add (*handimg);
-    handimg->show ();
-    handTool->set_relief(Gtk::RELIEF_NONE);
-    handTool->show ();
+    handTool->set_child (*handimg);
+    handTool->set_has_frame(false);
 
-    pack_start (*handTool);
+    pack_start (this, *handTool);
 
     wbTool = Gtk::manage (new Gtk::ToggleButton ());
-    Gtk::Image* wbimg = Gtk::manage (new RTImage ("color-picker", Gtk::ICON_SIZE_LARGE_TOOLBAR));
-    wbTool->add (*wbimg);
-    wbimg->show ();
-    wbTool->set_relief(Gtk::RELIEF_NONE);
-    wbTool->show ();
+    Gtk::Image* wbimg = Gtk::manage (new RtImage ("color-picker"));
+    wbTool->set_child (*wbimg);
+    wbTool->set_has_frame(false);
 
-    pack_start (*wbTool);
+    pack_start (this, *wbTool);
 
-    showcolpickersimg.reset(new RTImage("color-picker-bars", Gtk::ICON_SIZE_LARGE_TOOLBAR));
-    hidecolpickersimg.reset(new RTImage("color-picker-hide", Gtk::ICON_SIZE_LARGE_TOOLBAR));
+    showcolpickersimg.reset(new RtImage("color-picker-bars"));
+    hidecolpickersimg.reset(new RtImage("color-picker-hide"));
 
     colPickerTool = Gtk::manage (new Gtk::ToggleButton ());
-    colPickerTool->add (*showcolpickersimg);
-    showcolpickersimg->show ();
-    colPickerTool->set_relief(Gtk::RELIEF_NONE);
-    colPickerTool->show ();
+    colPickerTool->set_child (*showcolpickersimg);
+    colPickerTool->set_has_frame(false);
 
-    pack_start (*colPickerTool);
+    pack_start (this, *colPickerTool);
 
     cropTool = Gtk::manage (new Gtk::ToggleButton ());
-    Gtk::Image* cropimg = Gtk::manage (new RTImage ("crop", Gtk::ICON_SIZE_LARGE_TOOLBAR));
-    cropTool->add (*cropimg);
-    cropimg->show ();
-    cropTool->set_relief(Gtk::RELIEF_NONE);
-    cropTool->show ();
+    Gtk::Image* cropimg = Gtk::manage (new RtImage ("crop"));
+    cropTool->set_child (*cropimg);
+    cropTool->set_has_frame(false);
 
-    pack_start (*cropTool);
+    pack_start (this, *cropTool);
 
     straTool = Gtk::manage (new Gtk::ToggleButton ());
-    Gtk::Image* straimg = Gtk::manage (new RTImage ("rotate-straighten", Gtk::ICON_SIZE_LARGE_TOOLBAR));
-    straTool->add (*straimg);
-    straimg->show ();
-    straTool->set_relief(Gtk::RELIEF_NONE);
-    straTool->show ();
+    Gtk::Image* straimg = Gtk::manage (new RtImage ("rotate-straighten"));
+    straTool->set_child (*straimg);
+    straTool->set_has_frame(false);
 
-    pack_start (*straTool);
+    pack_start (this, *straTool);
 
     perspTool = Gtk::manage(new Gtk::ToggleButton());
-    Gtk::Image* perspimg = Gtk::manage(new RTImage("perspective-vertical-bottom", Gtk::ICON_SIZE_LARGE_TOOLBAR));
-    perspTool->set_image(*perspimg);
-    perspTool->set_relief(Gtk::RELIEF_NONE);
-    pack_start(*perspTool);
+    Gtk::Image* perspimg = Gtk::manage(new RtImage("perspective-vertical-bottom"));
+    perspTool->set_child(*perspimg);
+    perspTool->set_has_frame(false);
+    pack_start (this, *perspTool);
 
 
     handTool->set_active (true);
@@ -89,10 +79,14 @@ ToolBar::ToolBar () : showColPickers(true), listener (nullptr), pickerListener(n
 
     handConn = handTool->signal_toggled().connect( sigc::mem_fun(*this, &ToolBar::hand_pressed));
     wbConn   = wbTool->signal_toggled().connect( sigc::mem_fun(*this, &ToolBar::wb_pressed));
-    cpConn   = colPickerTool->signal_button_press_event().connect_notify( sigc::mem_fun(*this, &ToolBar::colPicker_pressed));
     cropConn = cropTool->signal_toggled().connect( sigc::mem_fun(*this, &ToolBar::crop_pressed));
     straConn = straTool->signal_toggled().connect( sigc::mem_fun(*this, &ToolBar::stra_pressed));
     perspConn = perspTool->signal_toggled().connect( sigc::mem_fun(*this, &ToolBar::persp_pressed));
+
+    clickController = Gtk::GestureClick::create();
+    cpConn = clickController->signal_pressed().connect(
+        sigc::mem_fun(*this, &ToolBar::colPicker_pressed));
+    add_controller(clickController);
 
     handTool->set_tooltip_markup (M("TOOLBAR_TOOLTIP_HAND"));
     wbTool->set_tooltip_markup (M("TOOLBAR_TOOLTIP_WB"));
@@ -153,7 +147,7 @@ void ToolBar::setTool (ToolMode tool)
         if (perspTool) {
             perspTool->set_active(true);
             // Perspective is a hand tool, but has its own button.
-            handTool->set_image(*handimg);
+            handTool->set_child(*handimg);
         }
     }
 
@@ -200,7 +194,7 @@ void ToolBar::startEditMode()
         }
 
         editingMode = true;
-        handTool->set_image(*editinghandimg);
+        handTool->set_child(*editinghandimg);
     }
 
 #ifndef NDEBUG
@@ -215,7 +209,7 @@ void ToolBar::stopEditMode()
 {
     if (editingMode) {
         editingMode = false;
-        handTool->set_image(*handimg);
+        handTool->set_child(*handimg);
     }
 }
 
@@ -302,10 +296,10 @@ void ToolBar::wb_pressed ()
     }
 }
 
-void ToolBar::colPicker_pressed (GdkEventButton* event)
+void ToolBar::colPicker_pressed (int n_press, double x, double y)
 {
-
-    if (event->button == 1) {
+    const auto button = clickController->get_current_button();
+    if (button == 1) {
         {
         ConnectionBlocker handBlocker(handConn);
         ConnectionBlocker straBlocker(straConn);
@@ -347,7 +341,7 @@ void ToolBar::colPicker_pressed (GdkEventButton* event)
         if (listener) {
             listener->toolSelected (current);
         }
-    } else if (event->button == 3) {
+    } else if (button == 3) {
         if (current == TMColorPicker) {
             // Disabling the Picker tool and entering into the "invisible pickers" mode
             ConnectionBlocker handBlocker(handConn);
@@ -370,7 +364,7 @@ bool ToolBar::showColorPickers(bool showCP)
 {
     if (showColPickers != showCP) {
         // Inverting the state
-        colPickerTool->set_image(showCP ? *showcolpickersimg : *hidecolpickersimg);
+        colPickerTool->set_child(showCP ? *showcolpickersimg : *hidecolpickersimg);
         showColPickers = showCP;
         return true;
     }
@@ -382,7 +376,7 @@ void ToolBar::switchColorPickersVisibility()
 {
     // Inverting the state
     showColPickers = !showColPickers;
-    colPickerTool->set_image(showColPickers ? *showcolpickersimg : *hidecolpickersimg);
+    colPickerTool->set_child(showColPickers ? *showcolpickersimg : *hidecolpickersimg);
 }
 
 void ToolBar::crop_pressed ()
@@ -501,15 +495,14 @@ void ToolBar::persp_pressed ()
     }
 }
 
-bool ToolBar::handleShortcutKey (GdkEventKey* event)
+bool ToolBar::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierType state)
 {
 
-    bool ctrl = event->state & GDK_CONTROL_MASK;
-    //bool shift = event->state & GDK_SHIFT_MASK;
-    bool alt = event->state & GDK_MOD1_MASK;
+    bool ctrl = isControlOrMetaDown(state);
+    bool alt = isAltDown(state);
 
     if (!ctrl && !alt) {
-        switch(event->keyval) {
+        switch(keyval) {
         case GDK_KEY_w:
         case GDK_KEY_W:
             if(wbTool) {
@@ -533,9 +526,6 @@ bool ToolBar::handleShortcutKey (GdkEventKey* event)
         case GDK_KEY_H:
             hand_pressed ();
             return true;
-        }
-    } else {
-        switch (event->keyval) {
         }
     }
 

@@ -69,7 +69,7 @@ set(NONCLISOURCEFILES
     extprog.cc
     # fattaltonemap.cc
     # filebrowser.cc
-    # filebrowserentry.cc
+    filebrowserentry.cc
     # filecatalog.cc
     filepanel.cc
     # filethumbnailbuttonset.cc
@@ -169,7 +169,7 @@ set(NONCLISOURCEFILES
     thumbnail.cc
     # tonecurve.cc
     # toneequalizer.cc
-    # toolbar.cc
+    toolbar.cc
     # toollocationpref.cc
     toolpanel.cc
     # toolpanelcoord.cc
