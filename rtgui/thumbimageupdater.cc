@@ -29,6 +29,7 @@
 #include "guiutils.h"
 #include "threadutils.h"
 #include "thumbnail.h"
+#include "threadpool.h"
 
 #include "rtengine/procparams.h"
 
@@ -84,10 +85,10 @@ public:
         threadCount = omp_get_num_procs();
 #endif
 
-        threadPool_.reset(new Glib::ThreadPool(threadCount, 0));
+        threadPool_ = std::make_unique<ThreadPool>(threadCount);
     }
 
-    std::unique_ptr<Glib::ThreadPool> threadPool_;
+    std::unique_ptr<ThreadPool> threadPool_;
 
     // Need to be a std::mutex because used in a std::condition_variable object...
     // This is the only exceptions along with GThreadMutex (guiutils.cc), MyMutex is used everywhere else
@@ -232,7 +233,7 @@ void ThumbImageUpdater::add(ThumbBrowserEntryBase* tbe, bool* priority, bool upg
     impl_->jobs_.push_back(Impl::Job(tbe, priority, upgrade, forceUpgrade, l));
 
     DEBUG("adding run request %s", tbe->shortname.c_str());
-    impl_->threadPool_->push(sigc::mem_fun(*impl_, &ThumbImageUpdater::Impl::processNextJob));
+    impl_->threadPool_->enqueue([&]() { impl_->processNextJob(); });
 }
 
 

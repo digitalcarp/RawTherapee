@@ -165,7 +165,7 @@ set(NONCLISOURCEFILES
     # thresholdselector.cc
     thumbbrowserbase.cc
     thumbbrowserentrybase.cc
-    # thumbimageupdater.cc
+    thumbimageupdater.cc
     thumbnail.cc
     # tonecurve.cc
     # toneequalizer.cc
