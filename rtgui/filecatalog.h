@@ -51,7 +51,7 @@ class FileCatalog final : public Gtk::Box,
     public rtengine::NonCopyable
 {
 public:
-    typedef sigc::slot<void, const Glib::ustring&> DirSelectionSlot;
+    typedef sigc::slot<void(const Glib::ustring&)> DirSelectionSlot;
 
 private:
     struct FileMonitorInfo {
@@ -92,16 +92,16 @@ private:
 
     Gtk::ToggleButton* tbLeftPanel_1;
     Gtk::ToggleButton* tbRightPanel_1;
-    Gtk::ToggleButton* bFilterClear;
-    Gtk::ToggleButton* bUnRanked;
-    Gtk::ToggleButton* bRank[5];
-    Gtk::ToggleButton* bUnCLabeled;
-    Gtk::ToggleButton* bCLabel[5];//color label
-    Gtk::ToggleButton* bEdited[2];
-    Gtk::ToggleButton* bRecentlySaved[2];
-    Gtk::ToggleButton* bTrash;
-    Gtk::ToggleButton* bNotTrash;
-    Gtk::ToggleButton* bOriginal;
+    ModToggleButton* bFilterClear;
+    ModToggleButton* bUnRanked;
+    ModToggleButton* bRank[5];
+    ModToggleButton* bUnCLabeled;
+    ModToggleButton* bCLabel[5];//color label
+    ModToggleButton* bEdited[2];
+    ModToggleButton* bRecentlySaved[2];
+    ModToggleButton* bTrash;
+    ModToggleButton* bNotTrash;
+    ModToggleButton* bOriginal;
     Gtk::ToggleButton* bRecursive;
     Gtk::ToggleButton* categoryButtons[20];
     Gtk::ToggleButton* exifInfo;
@@ -132,8 +132,8 @@ private:
     Gtk::Button* zoomInButton;
     Gtk::Button* zoomOutButton;
 
-    RTImage* progressImage;
-    Gtk::Label* progressLabel;
+    RtImage* progressImage;
+    RotateLabel* progressLabel;
 
     MyMutex dirEFSMutex;
     ExifFilterSettings dirEFS;
@@ -149,7 +149,6 @@ private:
 
     std::vector<Glib::ustring> fileNameList;
     std::set<Glib::ustring> editedFiles;
-    guint modifierKey; // any modifiers held when rank button was pressed
 
     std::vector<FileMonitorInfo> dirMonitors;
 
@@ -181,24 +180,24 @@ public:
     void previewsFinishedUI ();
     void _refreshProgressBar ();
 
-    void setInspector(Inspector* inspector)
-    {
-        if (fileBrowser) {
-            fileBrowser->setInspector(inspector);
-        }
-    }
-    void disableInspector()
-    {
-        if (fileBrowser) {
-            fileBrowser->disableInspector();
-        }
-    }
-    void enableInspector()
-    {
-        if (fileBrowser) {
-            fileBrowser->enableInspector();
-        }
-    }
+//     void setInspector(Inspector* inspector)
+//     {
+//         if (fileBrowser) {
+//             fileBrowser->setInspector(inspector);
+//         }
+//     }
+//     void disableInspector()
+//     {
+//         if (fileBrowser) {
+//             fileBrowser->disableInspector();
+//         }
+//     }
+//     void enableInspector()
+//     {
+//         if (fileBrowser) {
+//             fileBrowser->enableInspector();
+//         }
+//     }
 
     // filterpanel interface
     void exifFilterChanged () override;
@@ -248,13 +247,11 @@ public:
     void setFilterPanel (FilterPanel* fpanel);
     void setExportPanel (ExportPanel* expanel);
     void exifInfoButtonToggled();
-    void categoryButtonToggled (Gtk::ToggleButton* b, bool isMouseClick);
+    void categoryButtonToggled (Gdk::ModifierType state, Gtk::ToggleButton* b, bool isMouseClick);
     void showRecursiveToggled();
-    bool capture_event(GdkEventButton* event);
     void filterChanged ();
     void runFilterDialog ();
 
-    void on_realize() override;
     void reparseDirectory ();
     void _openImage (const std::vector<Thumbnail*>& tmb);
 
@@ -262,10 +259,10 @@ public:
     void zoomOut ();
 
     void buttonBrowsePathPressed ();
-    bool BrowsePath_key_pressed (GdkEventKey *event);
+    bool BrowsePath_key_pressed (guint keyval, guint keycode, Gdk::ModifierType state);
     void buttonQueryClearPressed ();
     void executeQuery ();
-    bool Query_key_pressed(GdkEventKey *event);
+    bool Query_key_pressed(guint keyval, guint keycode, Gdk::ModifierType state);
     void updateFBQueryTB (bool singleRow);
     void updateFBToolBarVisibility (bool showFilmStripToolBar);
 
@@ -282,11 +279,11 @@ public:
     {
         fileBrowser->openPrevImage();
     }
-    void selectImage (Glib::ustring fname, bool clearFilters);
-    void openNextPreviousEditorImage (Glib::ustring fname, bool clearFilters, eRTNav nextPrevious);
+    void selectImage (const Glib::ustring& fname, bool clearFilters);
+    void openNextPreviousEditorImage (const Glib::ustring& fname, bool clearFilters, eRTNav nextPrevious);
 
-    bool handleShortcutKey (GdkEventKey* event);
-    bool handleShortcutKeyRelease(GdkEventKey *event);
+    void handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierType state);
+    void handleShortcutKeyRelease(guint keyval, guint keycode, Gdk::ModifierType state);
 
     bool CheckSidePanelsVisibility();
     void toggleSidePanels();
@@ -296,7 +293,7 @@ public:
     void showToolBar();
     void hideToolBar();
 
-    void on_dir_changed (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitorEvent event_type, bool internal);
+    void on_dir_changed (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitor::Event event_type, bool internal);
 
 };
 

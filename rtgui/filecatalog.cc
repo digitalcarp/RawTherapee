@@ -38,13 +38,13 @@
 #include "filepanel.h"
 #include "renamedlg.h"
 #include "thumbimageupdater.h"
-#include "batchqueue.h"
-#include "batchqueueentry.h"
+// #include "batchqueue.h"
+// #include "batchqueueentry.h"
 #include "placesbrowser.h"
 #include "pathutils.h"
 #include "thumbnail.h"
 #include "toolbar.h"
-#include "inspector.h"
+// #include "inspector.h"
 
 using namespace std;
 
@@ -63,7 +63,6 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     exportPanel(nullptr),
     previewsToLoad(0),
     previewsLoaded(0),
-    modifierKey(0),
     coarsePanel(cp),
     toolBar(tb)
 {
@@ -78,44 +77,46 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     fileBrowser = Gtk::manage( new FileBrowser() );
     fileBrowser->setFileBrowserListener (this);
     fileBrowser->setArrangement (ThumbBrowserBase::TB_Vertical);
-    fileBrowser->show ();
 
     set_size_request(0, 250);
     // construct trash panel with the extra "empty trash" button
     trashButtonBox = Gtk::manage( new Gtk::Box(Gtk::Orientation::VERTICAL) );
     Gtk::Button* emptyT = Gtk::manage( new Gtk::Button ());
     emptyT->set_tooltip_markup (M("FILEBROWSER_EMPTYTRASHHINT"));
-    emptyT->set_image (*Gtk::manage(new RTImage ("trash-delete", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
-    emptyT->signal_pressed().connect (sigc::mem_fun(*this, &FileCatalog::emptyTrash));
-    trashButtonBox->pack_start (*emptyT, Pack::SHRINK, 4);
-    emptyT->show ();
-    trashButtonBox->show ();
+    emptyT->set_child (*Gtk::manage(new RtImage ("trash-delete")));
+    emptyT->signal_clicked().connect (sigc::mem_fun(*this, &FileCatalog::emptyTrash));
+    pack_start (trashButtonBox, *emptyT, Pack::SHRINK, 4);
 
     //initialize hbToolBar1
     hbToolBar1 = Gtk::manage(new Gtk::Box ());
 
     //setup BrowsePath
-    iRefreshWhite = new RTImage("refresh-small", Gtk::ICON_SIZE_BUTTON);
-    iRefreshRed = new RTImage("refresh-red-small", Gtk::ICON_SIZE_BUTTON);
+    iRefreshWhite = new RtImage("refresh-small");
+    iRefreshRed = new RtImage("refresh-red-small");
 
     BrowsePath = Gtk::manage(new Gtk::Entry ());
     BrowsePath->set_width_chars (50);
     BrowsePath->set_tooltip_markup (M("FILEBROWSER_BROWSEPATHHINT"));
     Gtk::Box* hbBrowsePath = Gtk::manage(new Gtk::Box ());
     buttonBrowsePath = Gtk::manage(new Gtk::Button ());
-    buttonBrowsePath->set_image (*iRefreshWhite);
+    buttonBrowsePath->set_child (*iRefreshWhite);
     buttonBrowsePath->set_tooltip_markup (M("FILEBROWSER_BROWSEPATHBUTTONHINT"));
-    buttonBrowsePath->set_relief (Gtk::RELIEF_NONE);
+    buttonBrowsePath->set_has_frame(false);
     buttonBrowsePath->signal_clicked().connect( sigc::mem_fun(*this, &FileCatalog::buttonBrowsePathPressed) );
-    hbBrowsePath->pack_start (*BrowsePath, Pack::EXPAND_WIDGET, 0);
-    hbBrowsePath->pack_start (*buttonBrowsePath, Pack::SHRINK, 0);
-    hbToolBar1->pack_start (*hbBrowsePath, Pack::EXPAND_WIDGET, 0);
+    pack_start (hbBrowsePath, *BrowsePath, Pack::EXPAND_WIDGET, 0);
+    pack_start (hbBrowsePath, *buttonBrowsePath, Pack::SHRINK, 0);
+    pack_start (hbToolBar1, *hbBrowsePath, Pack::EXPAND_WIDGET, 0);
 
     BrowsePath->signal_activate().connect (sigc::mem_fun(*this, &FileCatalog::buttonBrowsePathPressed)); //respond to the Enter key
-    BrowsePath->signal_key_press_event().connect(sigc::mem_fun(*this, &FileCatalog::BrowsePath_key_pressed));
+    {
+        auto keyController = Gtk::EventControllerKey::create();
+        keyController->signal_key_pressed().connect(
+            sigc::mem_fun(*this, &FileCatalog::BrowsePath_key_pressed), false);
+        BrowsePath->add_controller(keyController);
+    }
 
     //setup Query
-    iQueryClear = new RTImage("cancel-small", Gtk::ICON_SIZE_BUTTON);
+    iQueryClear = new RtImage("cancel-small");
     Gtk::Label* labelQuery = Gtk::manage(new Gtk::Label(M("FILEBROWSER_QUERYLABEL")));
     Query = Gtk::manage(new Gtk::Entry ()); // cannot use Gtk::manage here as FileCatalog::getFilter will fail on Query->get_text()
     Query->set_text("");
@@ -124,24 +125,29 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     Query->set_tooltip_markup (M("FILEBROWSER_QUERYHINT"));
     Gtk::Box* hbQuery = Gtk::manage(new Gtk::Box ());
     buttonQueryClear = Gtk::manage(new Gtk::Button ());
-    buttonQueryClear->set_image (*iQueryClear);
+    buttonQueryClear->set_child (*iQueryClear);
     buttonQueryClear->set_tooltip_markup (M("FILEBROWSER_QUERYBUTTONHINT"));
-    buttonQueryClear->set_relief (Gtk::RELIEF_NONE);
+    buttonQueryClear->set_has_frame(false);
     buttonQueryClear->signal_clicked().connect( sigc::mem_fun(*this, &FileCatalog::buttonQueryClearPressed) );
-    hbQuery->pack_start (*labelQuery, Pack::SHRINK, 0);
-    hbQuery->pack_start (*Query, Pack::SHRINK, 0);
-    hbQuery->pack_start (*buttonQueryClear, Pack::SHRINK, 0);
-    hbToolBar1->pack_start (*hbQuery, Pack::SHRINK, 0);
+    pack_start (hbQuery, *labelQuery, Pack::SHRINK, 0);
+    pack_start (hbQuery, *Query, Pack::SHRINK, 0);
+    pack_start (hbQuery, *buttonQueryClear, Pack::SHRINK, 0);
+    pack_start (hbToolBar1, *hbQuery, Pack::SHRINK, 0);
 
     Query->signal_activate().connect (sigc::mem_fun(*this, &FileCatalog::executeQuery)); //respond to the Enter key
-    Query->signal_key_press_event().connect(sigc::mem_fun(*this, &FileCatalog::Query_key_pressed));
+    {
+        auto keyController = Gtk::EventControllerKey::create();
+        keyController->signal_key_pressed().connect(
+            sigc::mem_fun(*this, &FileCatalog::Query_key_pressed), false);
+        Query->add_controller(keyController);
+    }
 
     // if NOT a single row toolbar
     if (!options.FileBrowserToolbarSingleRow) {
         hbToolBar1STB = Gtk::manage(new MyScrolledToolbar());
         hbToolBar1STB->set_name("FileBrowserQueryToolbar");
-        hbToolBar1STB->add(*hbToolBar1);
-        pack_start (*hbToolBar1STB, Pack::SHRINK, 0);
+        hbToolBar1STB->set_child(*hbToolBar1);
+        pack_start (this, *hbToolBar1STB, Pack::SHRINK, 0);
     }
 
     // setup button bar
@@ -149,34 +155,33 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     buttonBar->set_name ("ToolBarPanelFileBrowser");
     MyScrolledToolbar *stb = Gtk::manage(new MyScrolledToolbar());
     stb->set_name("FileBrowserIconToolbar");
-    stb->add(*buttonBar);
-    pack_start (*stb, Pack::SHRINK);
+    stb->set_child(*buttonBar);
+    pack_start (this, *stb, Pack::SHRINK);
 
     tbLeftPanel_1 = new Gtk::ToggleButton ();
-    iLeftPanel_1_Show = new RTImage("panel-to-right", Gtk::ICON_SIZE_LARGE_TOOLBAR);
-    iLeftPanel_1_Hide = new RTImage("panel-to-left", Gtk::ICON_SIZE_LARGE_TOOLBAR);
+    iLeftPanel_1_Show = new RtImage("panel-to-right");
+    iLeftPanel_1_Hide = new RtImage("panel-to-left");
 
-    tbLeftPanel_1->set_relief(Gtk::RELIEF_NONE);
+    tbLeftPanel_1->set_has_frame(false);
     tbLeftPanel_1->set_active (true);
     tbLeftPanel_1->set_tooltip_markup (M("MAIN_TOOLTIP_SHOWHIDELP1"));
-    tbLeftPanel_1->set_image (*iLeftPanel_1_Hide);
+    tbLeftPanel_1->set_child (*iLeftPanel_1_Hide);
     tbLeftPanel_1->signal_toggled().connect( sigc::mem_fun(*this, &FileCatalog::tbLeftPanel_1_toggled) );
-    buttonBar->pack_start (*tbLeftPanel_1, Pack::SHRINK);
+    pack_start (buttonBar, *tbLeftPanel_1, Pack::SHRINK);
 
     vSepiLeftPanel = new Gtk::Separator(Gtk::Orientation::VERTICAL);
-    buttonBar->pack_start (*vSepiLeftPanel, Pack::SHRINK);
+    pack_start (buttonBar, *vSepiLeftPanel, Pack::SHRINK);
 
-    iFilterClear = new RTImage ("filter-clear", Gtk::ICON_SIZE_LARGE_TOOLBAR);
-    igFilterClear = new RTImage ("filter", Gtk::ICON_SIZE_LARGE_TOOLBAR);
-    bFilterClear = Gtk::manage(new Gtk::ToggleButton ());
+    iFilterClear = new RtImage ("filter-clear");
+    igFilterClear = new RtImage ("filter");
+    bFilterClear = Gtk::manage(new ModToggleButton ());
     bFilterClear->set_active (true);
-    bFilterClear->set_image(*iFilterClear);
-    bFilterClear->set_relief (Gtk::RELIEF_NONE);
+    bFilterClear->set_child(*iFilterClear);
+    bFilterClear->set_has_frame(false);
     bFilterClear->set_tooltip_markup (M("FILEBROWSER_SHOWDIRHINT"));
-    bFilterClear->signal_button_press_event().connect (sigc::mem_fun(*this, &FileCatalog::capture_event), false);
     bCateg[0] = bFilterClear->signal_toggled().connect (sigc::bind(sigc::mem_fun(*this, &FileCatalog::categoryButtonToggled), bFilterClear, true));
-    buttonBar->pack_start (*bFilterClear, Pack::SHRINK);
-    buttonBar->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK);
+    pack_start (buttonBar, *bFilterClear, Pack::SHRINK);
+    pack_start (buttonBar, *Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK);
 
     fltrVbox1 = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     fltrRankbox = Gtk::manage (new Gtk::Box());
@@ -184,30 +189,26 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     fltrLabelbox = Gtk::manage (new Gtk::Box());
     fltrLabelbox->get_style_context()->add_class("smallbuttonbox");
 
-    iUnRanked = new RTImage ("star-gold-hollow-small", Gtk::ICON_SIZE_BUTTON);
-    igUnRanked = new RTImage ("star-hollow-small", Gtk::ICON_SIZE_BUTTON);
-    bUnRanked = Gtk::manage( new Gtk::ToggleButton () );
+    iUnRanked = new RtImage ("star-gold-hollow-small");
+    igUnRanked = new RtImage ("star-hollow-small");
+    bUnRanked = Gtk::manage( new ModToggleButton () );
     bUnRanked->get_style_context()->add_class("smallbutton");
     bUnRanked->set_active (false);
-    bUnRanked->set_image (*igUnRanked);
-    bUnRanked->set_relief (Gtk::RELIEF_NONE);
+    bUnRanked->set_child (*igUnRanked);
+    bUnRanked->set_has_frame(false);
     bUnRanked->set_tooltip_markup (M("FILEBROWSER_SHOWUNRANKHINT"));
     bCateg[1] = bUnRanked->signal_toggled().connect (sigc::bind(sigc::mem_fun(*this, &FileCatalog::categoryButtonToggled), bUnRanked, true));
-    fltrRankbox->pack_start (*bUnRanked, Pack::SHRINK);
-    bUnRanked->signal_button_press_event().connect (sigc::mem_fun(*this, &FileCatalog::capture_event), false);
+    pack_start (fltrRankbox, *bUnRanked, Pack::SHRINK);
 
     for (int i = 0; i < 5; i++) {
-        iranked[i] = new RTImage ("star-gold-small", Gtk::ICON_SIZE_BUTTON);
-        igranked[i] = new RTImage ("star-small", Gtk::ICON_SIZE_BUTTON);
-        iranked[i]->show ();
-        igranked[i]->show ();
-        bRank[i] = Gtk::manage( new Gtk::ToggleButton () );
+        iranked[i] = new RtImage ("star-gold-small");
+        igranked[i] = new RtImage ("star-small");
+        bRank[i] = Gtk::manage( new ModToggleButton () );
         bRank[i]->get_style_context()->add_class("smallbutton");
-        bRank[i]->set_image (*igranked[i]);
-        bRank[i]->set_relief (Gtk::RELIEF_NONE);
-        fltrRankbox->pack_start (*bRank[i], Pack::SHRINK);
+        bRank[i]->set_child (*igranked[i]);
+        bRank[i]->set_has_frame(false);
+        pack_start (fltrRankbox, *bRank[i], Pack::SHRINK);
         bCateg[i + 2] = bRank[i]->signal_toggled().connect (sigc::bind(sigc::mem_fun(*this, &FileCatalog::categoryButtonToggled), bRank[i], true));
-        bRank[i]->signal_button_press_event().connect (sigc::mem_fun(*this, &FileCatalog::capture_event), false);
     }
 
     // Toolbar
@@ -215,35 +216,31 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     std::array<std::string, 6> clabelActiveIcons = {"circle-gray-small", "circle-red-small", "circle-yellow-small", "circle-green-small", "circle-blue-small", "circle-purple-small"};
     std::array<std::string, 6> clabelInactiveIcons = {"circle-empty-gray-small", "circle-empty-red-small", "circle-empty-yellow-small", "circle-empty-green-small", "circle-empty-blue-small", "circle-empty-purple-small"};
 
-    iUnCLabeled = new RTImage(clabelActiveIcons[0], Gtk::ICON_SIZE_BUTTON);
-    igUnCLabeled = new RTImage(clabelInactiveIcons[0], Gtk::ICON_SIZE_BUTTON);
-    bUnCLabeled = Gtk::manage(new Gtk::ToggleButton());
+    iUnCLabeled = new RtImage(clabelActiveIcons[0]);
+    igUnCLabeled = new RtImage(clabelInactiveIcons[0]);
+    bUnCLabeled = Gtk::manage(new ModToggleButton());
     bUnCLabeled->get_style_context()->add_class("smallbutton");
     bUnCLabeled->set_active(false);
-    bUnCLabeled->set_image(*igUnCLabeled);
-    bUnCLabeled->set_relief(Gtk::RELIEF_NONE);
+    bUnCLabeled->set_child(*igUnCLabeled);
+    bUnCLabeled->set_has_frame(false);
     bUnCLabeled->set_tooltip_markup(M("FILEBROWSER_SHOWUNCOLORHINT"));
     bCateg[7] = bUnCLabeled->signal_toggled().connect (sigc::bind(sigc::mem_fun(*this, &FileCatalog::categoryButtonToggled), bUnCLabeled, true));
-    fltrLabelbox->pack_start(*bUnCLabeled, Pack::SHRINK);
-    bUnCLabeled->signal_button_press_event().connect (sigc::mem_fun(*this, &FileCatalog::capture_event), false);
+    pack_start (fltrLabelbox, *bUnCLabeled, Pack::SHRINK);
 
     for (int i = 0; i < 5; i++) {
-        iCLabeled[i] = new RTImage(clabelActiveIcons[i+1], Gtk::ICON_SIZE_BUTTON);
-        igCLabeled[i] = new RTImage(clabelInactiveIcons[i+1], Gtk::ICON_SIZE_BUTTON);
-        iCLabeled[i]->show();
-        igCLabeled[i]->show();
-        bCLabel[i] = Gtk::manage(new Gtk::ToggleButton());
+        iCLabeled[i] = new RtImage(clabelActiveIcons[i+1]);
+        igCLabeled[i] = new RtImage(clabelInactiveIcons[i+1]);
+        bCLabel[i] = Gtk::manage(new ModToggleButton());
         bCLabel[i]->get_style_context()->add_class("smallbutton");
-        bCLabel[i]->set_image(*igCLabeled[i]);
-        bCLabel[i]->set_relief(Gtk::RELIEF_NONE);
-        fltrLabelbox->pack_start(*bCLabel[i], Pack::SHRINK);
+        bCLabel[i]->set_child(*igCLabeled[i]);
+        bCLabel[i]->set_has_frame(false);
+        pack_start (fltrLabelbox, *bCLabel[i], Pack::SHRINK);
         bCateg[i + 8] = bCLabel[i]->signal_toggled().connect (sigc::bind(sigc::mem_fun(*this, &FileCatalog::categoryButtonToggled), bCLabel[i], true));
-        bCLabel[i]->signal_button_press_event().connect (sigc::mem_fun(*this, &FileCatalog::capture_event), false);
     }
 
-    fltrVbox1->pack_start (*fltrRankbox, Pack::SHRINK, 0);
-    fltrVbox1->pack_start (*fltrLabelbox, Pack::SHRINK, 0);
-    buttonBar->pack_start (*fltrVbox1, Pack::SHRINK);
+    pack_start (fltrVbox1, *fltrRankbox, Pack::SHRINK, 0);
+    pack_start (fltrVbox1, *fltrLabelbox, Pack::SHRINK, 0);
+    pack_start (buttonBar, *fltrVbox1, Pack::SHRINK);
 
     bRank[0]->set_tooltip_markup (M("FILEBROWSER_SHOWRANK1HINT"));
     bRank[1]->set_tooltip_markup (M("FILEBROWSER_SHOWRANK2HINT"));
@@ -257,7 +254,7 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     bCLabel[3]->set_tooltip_markup (M("FILEBROWSER_SHOWCOLORLABEL4HINT"));
     bCLabel[4]->set_tooltip_markup (M("FILEBROWSER_SHOWCOLORLABEL5HINT"));
 
-    buttonBar->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK);
+    pack_start (buttonBar, *Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK);
 
     fltrVbox2 = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     fltrEditedBox = Gtk::manage (new Gtk::Box());
@@ -269,22 +266,20 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     // TODO The "g" variant was the more transparent variant of the icon, used
     // when the button was not toggled. Simplify this, change to ordinary
     // togglebutton, use CSS for opacity change.
-    iEdited[0] = new RTImage ("tick-hollow-small", Gtk::ICON_SIZE_BUTTON);
-    igEdited[0] = new RTImage ("tick-hollow-small", Gtk::ICON_SIZE_BUTTON);
-    iEdited[1] = new RTImage ("tick-small", Gtk::ICON_SIZE_BUTTON);
-    igEdited[1] = new RTImage ("tick-small", Gtk::ICON_SIZE_BUTTON);
+    iEdited[0] = new RtImage ("tick-hollow-small");
+    igEdited[0] = new RtImage ("tick-hollow-small");
+    iEdited[1] = new RtImage ("tick-small");
+    igEdited[1] = new RtImage ("tick-small");
 
     for (int i = 0; i < 2; i++) {
-        iEdited[i]->show ();
-        bEdited[i] = Gtk::manage(new Gtk::ToggleButton ());
+        bEdited[i] = Gtk::manage(new ModToggleButton ());
         bEdited[i]->get_style_context()->add_class("smallbutton");
         bEdited[i]->set_active (false);
-        bEdited[i]->set_image (*igEdited[i]);
-        bEdited[i]->set_relief (Gtk::RELIEF_NONE);
-        fltrEditedBox->pack_start (*bEdited[i], Pack::SHRINK);
+        bEdited[i]->set_child (*igEdited[i]);
+        bEdited[i]->set_has_frame(false);
+        pack_start (fltrEditedBox, *bEdited[i], Pack::SHRINK);
         //13, 14
         bCateg[i + 13] = bEdited[i]->signal_toggled().connect (sigc::bind(sigc::mem_fun(*this, &FileCatalog::categoryButtonToggled), bEdited[i], true));
-        bEdited[i]->signal_button_press_event().connect (sigc::mem_fun(*this, &FileCatalog::capture_event), false);
     }
 
     bEdited[0]->set_tooltip_markup (M("FILEBROWSER_SHOWEDITEDNOTHINT"));
@@ -294,73 +289,68 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     // TODO The "g" variant was the more transparent variant of the icon, used
     // when the button was not toggled. Simplify this, change to ordinary
     // togglebutton, use CSS for opacity change.
-    iRecentlySaved[0] = new RTImage ("saved-no-small", Gtk::ICON_SIZE_BUTTON);
-    igRecentlySaved[0] = new RTImage ("saved-no-small", Gtk::ICON_SIZE_BUTTON);
-    iRecentlySaved[1] = new RTImage ("saved-yes-small", Gtk::ICON_SIZE_BUTTON);
-    igRecentlySaved[1] = new RTImage ("saved-yes-small", Gtk::ICON_SIZE_BUTTON);
+    iRecentlySaved[0] = new RtImage ("saved-no-small");
+    igRecentlySaved[0] = new RtImage ("saved-no-small");
+    iRecentlySaved[1] = new RtImage ("saved-yes-small");
+    igRecentlySaved[1] = new RtImage ("saved-yes-small");
 
     for (int i = 0; i < 2; i++) {
-        iRecentlySaved[i]->show ();
-        bRecentlySaved[i] = Gtk::manage(new Gtk::ToggleButton ());
+        bRecentlySaved[i] = Gtk::manage(new ModToggleButton ());
         bRecentlySaved[i]->get_style_context()->add_class("smallbutton");
         bRecentlySaved[i]->set_active (false);
-        bRecentlySaved[i]->set_image (*igRecentlySaved[i]);
-        bRecentlySaved[i]->set_relief (Gtk::RELIEF_NONE);
-        fltrRecentlySavedBox->pack_start (*bRecentlySaved[i], Pack::SHRINK);
+        bRecentlySaved[i]->set_child (*igRecentlySaved[i]);
+        bRecentlySaved[i]->set_has_frame(false);
+        pack_start (fltrRecentlySavedBox, *bRecentlySaved[i], Pack::SHRINK);
         //15, 16
         bCateg[i + 15] = bRecentlySaved[i]->signal_toggled().connect (sigc::bind(sigc::mem_fun(*this, &FileCatalog::categoryButtonToggled), bRecentlySaved[i], true));
-        bRecentlySaved[i]->signal_button_press_event().connect (sigc::mem_fun(*this, &FileCatalog::capture_event), false);
     }
 
     bRecentlySaved[0]->set_tooltip_markup (M("FILEBROWSER_SHOWRECENTLYSAVEDNOTHINT"));
     bRecentlySaved[1]->set_tooltip_markup (M("FILEBROWSER_SHOWRECENTLYSAVEDHINT"));
 
-    fltrVbox2->pack_start (*fltrEditedBox, Pack::SHRINK, 0);
-    fltrVbox2->pack_start (*fltrRecentlySavedBox, Pack::SHRINK, 0);
-    buttonBar->pack_start (*fltrVbox2, Pack::SHRINK);
+    pack_start (fltrVbox2, *fltrEditedBox, Pack::SHRINK, 0);
+    pack_start (fltrVbox2, *fltrRecentlySavedBox, Pack::SHRINK, 0);
+    pack_start (buttonBar, *fltrVbox2, Pack::SHRINK);
 
-    buttonBar->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK);
+    pack_start (buttonBar, *Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK);
 
     // Trash
-    iTrashShowEmpty = new RTImage("trash-empty-show", Gtk::ICON_SIZE_LARGE_TOOLBAR) ;
-    iTrashShowFull  = new RTImage("trash-full-show", Gtk::ICON_SIZE_LARGE_TOOLBAR) ;
+    iTrashShowEmpty = new RtImage("trash-empty-show") ;
+    iTrashShowFull  = new RtImage("trash-full-show") ;
 
-    bTrash = Gtk::manage( new Gtk::ToggleButton () );
-    bTrash->set_image (*iTrashShowEmpty);
-    bTrash->set_relief (Gtk::RELIEF_NONE);
+    bTrash = Gtk::manage( new ModToggleButton () );
+    bTrash->set_child (*iTrashShowEmpty);
+    bTrash->set_has_frame(false);
     bTrash->set_tooltip_markup (M("FILEBROWSER_SHOWTRASHHINT"));
     bCateg[17] = bTrash->signal_toggled().connect (sigc::bind(sigc::mem_fun(*this, &FileCatalog::categoryButtonToggled), bTrash, true));
-    bTrash->signal_button_press_event().connect (sigc::mem_fun(*this, &FileCatalog::capture_event), false);
 
-    iNotTrash = new RTImage("trash-hide-deleted", Gtk::ICON_SIZE_LARGE_TOOLBAR) ;
-    iOriginal = new RTImage("filter-original", Gtk::ICON_SIZE_LARGE_TOOLBAR);
+    iNotTrash = new RtImage("trash-hide-deleted") ;
+    iOriginal = new RtImage("filter-original");
 
-    bNotTrash = Gtk::manage( new Gtk::ToggleButton () );
-    bNotTrash->set_image (*iNotTrash);
-    bNotTrash->set_relief (Gtk::RELIEF_NONE);
+    bNotTrash = Gtk::manage( new ModToggleButton () );
+    bNotTrash->set_child (*iNotTrash);
+    bNotTrash->set_has_frame(false);
     bNotTrash->set_tooltip_markup (M("FILEBROWSER_SHOWNOTTRASHHINT"));
     bCateg[18] = bNotTrash->signal_toggled().connect (sigc::bind(sigc::mem_fun(*this, &FileCatalog::categoryButtonToggled), bNotTrash, true));
-    bNotTrash->signal_button_press_event().connect (sigc::mem_fun(*this, &FileCatalog::capture_event), false);
 
-    bOriginal = Gtk::manage( new Gtk::ToggleButton () );
-    bOriginal->set_image (*iOriginal);
+    bOriginal = Gtk::manage( new ModToggleButton () );
+    bOriginal->set_child (*iOriginal);
     bOriginal->set_tooltip_markup (M("FILEBROWSER_SHOWORIGINALHINT"));
-    bOriginal->set_relief (Gtk::RELIEF_NONE);
+    bOriginal->set_has_frame(false);
     bCateg[19] = bOriginal->signal_toggled().connect (sigc::bind(sigc::mem_fun(*this, &FileCatalog::categoryButtonToggled), bOriginal, true));
-    bOriginal->signal_button_press_event().connect (sigc::mem_fun(*this, &FileCatalog::capture_event), false);
 
     bRecursive = Gtk::manage(new Gtk::ToggleButton());
-    bRecursive->set_image(*Gtk::manage(new RTImage("folder-subfolder", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
+    bRecursive->set_child(*Gtk::manage(new RtImage("folder-subfolder")));
     bRecursive->set_tooltip_text(M("FILEBROWSER_SHOWRECURSIVE"));
-    bRecursive->set_relief(Gtk::RELIEF_NONE);
+    bRecursive->set_has_frame(false);
     bRecursive->set_active(options.browseRecursive);
     bRecursive->signal_toggled().connect(sigc::mem_fun(*this, &FileCatalog::showRecursiveToggled));
 
-    buttonBar->pack_start (*bTrash, Pack::SHRINK);
-    buttonBar->pack_start (*bNotTrash, Pack::SHRINK);
-    buttonBar->pack_start (*bOriginal, Pack::SHRINK);
-    buttonBar->pack_start(*bRecursive, Pack::SHRINK);
-    buttonBar->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK);
+    pack_start (buttonBar, *bTrash, Pack::SHRINK);
+    pack_start (buttonBar, *bNotTrash, Pack::SHRINK);
+    pack_start (buttonBar, *bOriginal, Pack::SHRINK);
+    pack_start (buttonBar, *bRecursive, Pack::SHRINK);
+    pack_start (buttonBar, *Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK);
     fileBrowser->trash_changed().connect( sigc::mem_fun(*this, &FileCatalog::trashChanged) );
 
     // 0  - bFilterClear
@@ -410,60 +400,59 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     categoryButtons[19] = bOriginal;
 
     exifInfo = Gtk::manage(new Gtk::ToggleButton ());
-    exifInfo->set_image (*Gtk::manage(new RTImage ("info", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
-    exifInfo->set_relief (Gtk::RELIEF_NONE);
+    exifInfo->set_child (*Gtk::manage(new RtImage ("info")));
+    exifInfo->set_has_frame(false);
     exifInfo->set_tooltip_markup (M("FILEBROWSER_SHOWEXIFINFO"));
     exifInfo->set_active( options.showFileNames );
     exifInfo->signal_toggled().connect(sigc::mem_fun(*this, &FileCatalog::exifInfoButtonToggled));
-    buttonBar->pack_start (*exifInfo, Pack::SHRINK);
+    pack_start (buttonBar, *exifInfo, Pack::SHRINK);
 
     // thumbnail zoom
     Gtk::Box* zoomBox = Gtk::manage( new Gtk::Box () );
     zoomInButton  = Gtk::manage(  new Gtk::Button () );
-    zoomInButton->set_image (*Gtk::manage(new RTImage ("magnifier-plus", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
-    zoomInButton->signal_pressed().connect (sigc::mem_fun(*this, &FileCatalog::zoomIn));
-    zoomInButton->set_relief (Gtk::RELIEF_NONE);
+    zoomInButton->set_child (*Gtk::manage(new RtImage ("magnifier-plus")));
+    zoomInButton->signal_clicked().connect (sigc::mem_fun(*this, &FileCatalog::zoomIn));
+    zoomInButton->set_has_frame(false);
     zoomInButton->set_tooltip_markup (M("FILEBROWSER_ZOOMINHINT"));
-    zoomBox->pack_end (*zoomInButton, Pack::SHRINK);
+    pack_end (zoomBox, *zoomInButton, Pack::SHRINK);
     zoomOutButton  = Gtk::manage( new Gtk::Button () );
-    zoomOutButton->set_image (*Gtk::manage(new RTImage ("magnifier-minus", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
-    zoomOutButton->signal_pressed().connect (sigc::mem_fun(*this, &FileCatalog::zoomOut));
-    zoomOutButton->set_relief (Gtk::RELIEF_NONE);
+    zoomOutButton->set_child (*Gtk::manage(new RtImage ("magnifier-minus")));
+    zoomOutButton->signal_clicked().connect (sigc::mem_fun(*this, &FileCatalog::zoomOut));
+    zoomOutButton->set_has_frame(false);
     zoomOutButton->set_tooltip_markup (M("FILEBROWSER_ZOOMOUTHINT"));
-    zoomBox->pack_end (*zoomOutButton, Pack::SHRINK);
+    pack_end (zoomBox, *zoomOutButton, Pack::SHRINK);
 
-    buttonBar->pack_start (*zoomBox, Pack::SHRINK);
-    buttonBar->pack_start (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK);
+    pack_start (buttonBar, *zoomBox, Pack::SHRINK);
+    pack_start (buttonBar, *Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK);
 
     // if it IS a single row toolbar
     if (options.FileBrowserToolbarSingleRow) {
-        buttonBar->pack_start (*hbToolBar1, Pack::EXPAND_WIDGET, 0);
+        pack_start (buttonBar, *hbToolBar1, Pack::EXPAND_WIDGET, 0);
     }
 
     tbRightPanel_1 = new Gtk::ToggleButton ();
-    iRightPanel_1_Show = new RTImage("panel-to-left", Gtk::ICON_SIZE_LARGE_TOOLBAR);
-    iRightPanel_1_Hide = new RTImage("panel-to-right", Gtk::ICON_SIZE_LARGE_TOOLBAR);
+    iRightPanel_1_Show = new RtImage("panel-to-left");
+    iRightPanel_1_Hide = new RtImage("panel-to-right");
 
-    tbRightPanel_1->set_relief(Gtk::RELIEF_NONE);
+    tbRightPanel_1->set_has_frame(false);
     tbRightPanel_1->set_active (true);
     tbRightPanel_1->set_tooltip_markup (M("MAIN_TOOLTIP_SHOWHIDERP1"));
-    tbRightPanel_1->set_image (*iRightPanel_1_Hide);
+    tbRightPanel_1->set_child (*iRightPanel_1_Hide);
     tbRightPanel_1->signal_toggled().connect( sigc::mem_fun(*this, &FileCatalog::tbRightPanel_1_toggled) );
-    buttonBar->pack_end (*tbRightPanel_1, Pack::SHRINK);
+    pack_end (buttonBar, *tbRightPanel_1, Pack::SHRINK);
 
-    buttonBar->pack_end (*coarsePanel, Pack::SHRINK);
-    buttonBar->pack_end (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
-    buttonBar->pack_end (*toolBar, Pack::SHRINK);
-    buttonBar->pack_end (*Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
+    pack_end (buttonBar, *coarsePanel, Pack::SHRINK);
+    pack_end (buttonBar, *Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
+    pack_end (buttonBar, *toolBar, Pack::SHRINK);
+    pack_end (buttonBar, *Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
 
     // add default panel
     hBox = Gtk::manage( new Gtk::Box () );
-    hBox->show ();
-    hBox->pack_end (*fileBrowser);
+    pack_end (this, *fileBrowser);
     hBox->set_name ("FilmstripPanel");
     fileBrowser->applyFilter (getFilter()); // warning: can call this only after all objects used in getFilter (e.g. Query) are instantiated
     //printf("FileCatalog::FileCatalog  fileBrowser->applyFilter (getFilter())\n");
-    pack_start (*hBox);
+    pack_start (this, *hBox);
 
     enabled = true;
 
@@ -477,8 +466,6 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
 
 FileCatalog::~FileCatalog()
 {
-    idle_register.destroy();
-
     for (int i = 0; i < 5; i++) {
         delete iranked[i];
         delete igranked[i];
@@ -512,13 +499,6 @@ FileCatalog::~FileCatalog()
     delete iRightPanel_1_Hide;
 }
 
-bool FileCatalog::capture_event(GdkEventButton* event)
-{
-    // need to record modifiers on the button press, because signal_toggled does not pass the event.
-    modifierKey = event->state;
-    return false;
-}
-
 void FileCatalog::exifInfoButtonToggled()
 {
     if (inTabMode) {
@@ -529,15 +509,6 @@ void FileCatalog::exifInfoButtonToggled()
 
     fileBrowser->refreshThumbImages ();
     refreshHeight();
-}
-
-void FileCatalog::on_realize()
-{
-
-    Gtk::Box::on_realize();
-    Pango::FontDescription fontd = get_style_context()->get_font();
-    fileBrowser->get_pango_context()->set_font_description (fontd);
-//    batchQueue->get_pango_context()->set_font_description (fontd);
 }
 
 void FileCatalog::closeDir ()
@@ -595,8 +566,8 @@ std::vector<Glib::ustring> FileCatalog::getFileList(std::vector<Glib::RefPtr<Gio
             auto enumerator = dir->enumerate_children(
                 enumerate_attrs,
                 options.browseRecursiveFollowLinks
-                    ? Gio::FileQueryInfoFlags::FILE_QUERY_INFO_NONE
-                    : Gio::FileQueryInfoFlags::FILE_QUERY_INFO_NOFOLLOW_SYMLINKS);
+                    ? Gio::FileQueryInfoFlags::NONE
+                    : Gio::FileQueryInfoFlags::NOFOLLOW_SYMLINKS);
 
             if (directories_explored) {
                 directories_explored->push_back(dir);
@@ -613,7 +584,7 @@ std::vector<Glib::ustring> FileCatalog::getFileList(std::vector<Glib::RefPtr<Gio
                         continue;
                     }
 
-                    if (file->get_file_type() == Gio::FILE_TYPE_DIRECTORY) {
+                    if (file->get_file_type() == Gio::FileType::DIRECTORY) {
                         if (max_depth > 0 && dir_quota > 0) {
                             const Glib::ustring child_dir_path = Glib::build_filename(dir_path, file->get_name());
                             getFilesRecursively(child_dir_path, max_depth - 1, --dir_quota, file_names, directories_explored);
@@ -678,7 +649,7 @@ void FileCatalog::dirSelected (const Glib::ustring& dirname, const Glib::ustring
 
         std::vector<Glib::RefPtr<Gio::File>> allDirs;
         BrowsePath->set_text(selectedDirectory);
-        buttonBrowsePath->set_image(*iRefreshWhite);
+        buttonBrowsePath->set_child(*iRefreshWhite);
         fileNameList = getFileList(&allDirs);
 
         for (unsigned int i = 0; i < fileNameList.size(); i++) {
@@ -724,7 +695,7 @@ void FileCatalog::refreshDirectoryMonitors(const std::vector<Glib::RefPtr<Gio::F
         std::back_inserter(monitored_dir_names),
         [](const FileMonitorInfo &dir_monitor) { return dir_monitor.filePath; });
     for (const auto &dir_to_monitor : dirs_to_monitor) {
-        const auto dir_path = dir_to_monitor->get_path();
+        const auto dir_path = dir_to_monitor->get_path().c_str();
         if (std::find(monitored_dir_names.cbegin(), monitored_dir_names.cend(), dir_path) != monitored_dir_names.cend()) {
             continue; // A monitor exists already.
         }
@@ -767,41 +738,44 @@ void FileCatalog::_refreshProgressBar ()
     // Also mention that this progress bar only measures the FIRST pass (quick thumbnails)
     // The second, usually longer pass is done multithreaded down in the single entries and is NOT measured by this
     if (!inTabMode && (!previewsToLoad || std::floor(100.f * previewsLoaded / previewsToLoad) != std::floor(100.f * (previewsLoaded - 1) / previewsToLoad))) {
-        GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
+        // Continue
+    } else {
+        return;
+    }
 
+    idle_register.add([this]() {
         if (!progressImage || !progressLabel) {
             // create tab label once
             Gtk::Notebook *nb = (Gtk::Notebook *)(filepanel->get_parent());
             Gtk::Grid* grid = Gtk::manage(new Gtk::Grid());
             setExpandAlignProperties (grid, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-            progressImage = Gtk::manage(new RTImage("folder-closed", Gtk::ICON_SIZE_LARGE_TOOLBAR));
-            progressLabel = Gtk::manage(new Gtk::Label(M("MAIN_FRAME_FILEBROWSER")));
+            progressImage = Gtk::manage(new RtImage("folder-closed"));
+            progressLabel = Gtk::manage(new RotateLabel(M("MAIN_FRAME_FILEBROWSER")));
             grid->attach_next_to(*progressImage, options.mainNBVertical ? Gtk::PositionType::TOP : Gtk::PositionType::RIGHT, 1, 1);
             grid->attach_next_to(*progressLabel, options.mainNBVertical ? Gtk::PositionType::TOP : Gtk::PositionType::RIGHT, 1, 1);
             grid->set_tooltip_markup(M("MAIN_FRAME_FILEBROWSER_TOOLTIP"));
-            grid->show_all();
             if (options.mainNBVertical) {
-                progressLabel->set_angle(90);
+                progressLabel->rotate90();
             }
             if (nb) {
                 nb->set_tab_label(*filepanel, *grid);
             }
         }
         if (!previewsToLoad) {
-            progressImage->set_from_icon_name("folder-closed", Gtk::ICON_SIZE_LARGE_TOOLBAR);
+            progressImage->set_from_icon_name("folder-closed");
             int filteredCount = min(fileBrowser->getNumFiltered(), previewsLoaded);
             progressLabel->set_text(M("MAIN_FRAME_FILEBROWSER") +
                                     (filteredCount != previewsLoaded ? " [" + Glib::ustring::format(filteredCount) + "/" : " (")
                                     + Glib::ustring::format(previewsLoaded) +
                                     (filteredCount != previewsLoaded ? "]" : ")"));
         } else {
-            progressImage->set_from_icon_name("magnifier", Gtk::ICON_SIZE_LARGE_TOOLBAR);
+            progressImage->set_from_icon_name("magnifier");
             progressLabel->set_text(M("MAIN_FRAME_FILEBROWSER") + " ["
                                     + Glib::ustring::format(previewsLoaded) + "/"
                                     + Glib::ustring::format(previewsToLoad) + "]" );
             filepanel->loadingThumbs("", (double)previewsLoaded / previewsToLoad);
         }
-    }
+    });
 }
 
 void FileCatalog::previewReady (int dir_id, FileBrowserEntry* fdn)
@@ -874,7 +848,6 @@ void FileCatalog::previewsFinishedUI ()
 {
 
     {
-        GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
         redrawAll();
         previewsToLoad = 0;
 
@@ -929,10 +902,9 @@ void FileCatalog::previewsFinished (int dir_id)
     }
 
     idle_register.add(
-        [this]() -> bool
+        [this]()
         {
             previewsFinishedUI();
-            return false;
         }
     );
 }
@@ -992,13 +964,7 @@ void FileCatalog::_openImage(const std::vector<Thumbnail*>& tmb)
 
 void FileCatalog::filterApplied()
 {
-    idle_register.add(
-        [this]() -> bool
-        {
-            _refreshProgressBar();
-            return false;
-        }
-    );
+    _refreshProgressBar();
 }
 
 void FileCatalog::openRequested(const std::vector<Thumbnail*>& tmb)
@@ -1018,47 +984,47 @@ void FileCatalog::openRequested(const std::vector<Thumbnail*>& tmb)
 
 void FileCatalog::deleteRequested(const std::vector<FileBrowserEntry*>& tbe, bool inclBatchProcessed, bool onlySelected)
 {
-    if (tbe.empty()) {
-        return;
-    }
-
-    Gtk::MessageDialog msd (getToplevelWindow(this), M("FILEBROWSER_DELETEDIALOG_HEADER"), true, Gtk::MessageType::QUESTION, Gtk::ButtonsType::YES_NO, true);
-    if (onlySelected) {
-        msd.set_secondary_text(Glib::ustring::compose (inclBatchProcessed ? M("FILEBROWSER_DELETEDIALOG_SELECTEDINCLPROC") : M("FILEBROWSER_DELETEDIALOG_SELECTED"), tbe.size()), true);
-    } else {
-        msd.set_secondary_text(Glib::ustring::compose (M("FILEBROWSER_DELETEDIALOG_ALL"), tbe.size()), true);
-    }
-
-    if (msd.run() == Gtk::ResponseType::YES) {
-        for (unsigned int i = 0; i < tbe.size(); i++) {
-            const auto fname = tbe[i]->filename;
-            // remove from browser
-            delete fileBrowser->delEntry (fname);
-            // remove from cache
-            cacheMgr->deleteEntry (fname);
-            // delete from file system
-            ::g_remove (fname.c_str ());
-            // delete paramfile if found
-            ::g_remove ((fname + paramFileExtension).c_str ());
-            ::g_remove ((removeExtension(fname) + paramFileExtension).c_str ());
-            // delete .thm file
-            ::g_remove ((removeExtension(fname) + ".thm").c_str ());
-            ::g_remove ((removeExtension(fname) + ".THM").c_str ());
-
-            if (inclBatchProcessed) {
-                Glib::ustring procfName = Glib::ustring::compose ("%1.%2", BatchQueue::calcAutoFileNameBase(fname), options.saveFormatBatch.format);
-                ::g_remove (procfName.c_str ());
-
-                Glib::ustring procfNameParamFile = Glib::ustring::compose ("%1.%2.out%3", BatchQueue::calcAutoFileNameBase(fname), options.saveFormatBatch.format, paramFileExtension);
-                ::g_remove (procfNameParamFile.c_str ());
-            }
-
-            previewsLoaded--;
-        }
-
-        _refreshProgressBar();
-        redrawAll ();
-    }
+//     if (tbe.empty()) {
+//         return;
+//     }
+//
+//     Gtk::MessageDialog msd (getToplevelWindow(this), M("FILEBROWSER_DELETEDIALOG_HEADER"), true, Gtk::MessageType::QUESTION, Gtk::ButtonsType::YES_NO, true);
+//     if (onlySelected) {
+//         msd.set_secondary_text(Glib::ustring::compose (inclBatchProcessed ? M("FILEBROWSER_DELETEDIALOG_SELECTEDINCLPROC") : M("FILEBROWSER_DELETEDIALOG_SELECTED"), tbe.size()), true);
+//     } else {
+//         msd.set_secondary_text(Glib::ustring::compose (M("FILEBROWSER_DELETEDIALOG_ALL"), tbe.size()), true);
+//     }
+//
+//     if (msd.run() == Gtk::ResponseType::YES) {
+//         for (unsigned int i = 0; i < tbe.size(); i++) {
+//             const auto fname = tbe[i]->filename;
+//             // remove from browser
+//             delete fileBrowser->delEntry (fname);
+//             // remove from cache
+//             cacheMgr->deleteEntry (fname);
+//             // delete from file system
+//             ::g_remove (fname.c_str ());
+//             // delete paramfile if found
+//             ::g_remove ((fname + paramFileExtension).c_str ());
+//             ::g_remove ((removeExtension(fname) + paramFileExtension).c_str ());
+//             // delete .thm file
+//             ::g_remove ((removeExtension(fname) + ".thm").c_str ());
+//             ::g_remove ((removeExtension(fname) + ".THM").c_str ());
+//
+//             if (inclBatchProcessed) {
+//                 Glib::ustring procfName = Glib::ustring::compose ("%1.%2", Thumbnail::calcAutoFileNameBase(fname), options.saveFormatBatch.format);
+//                 ::g_remove (procfName.c_str ());
+//
+//                 Glib::ustring procfNameParamFile = Glib::ustring::compose ("%1.%2.out%3", Thumbnail::calcAutoFileNameBase(fname), options.saveFormatBatch.format, paramFileExtension);
+//                 ::g_remove (procfNameParamFile.c_str ());
+//             }
+//
+//             previewsLoaded--;
+//         }
+//
+//         _refreshProgressBar();
+//         redrawAll ();
+//     }
 }
 
 void FileCatalog::copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe, bool moveRequested)
@@ -1075,24 +1041,28 @@ void FileCatalog::copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe, b
         fc_title = M("FILEBROWSER_POPUPCOPYTO");
     }
 
-    Gtk::FileChooserDialog fc (getToplevelWindow (this), fc_title, Gtk::FileChooser::Action::SELECT_FOLDER );
-    fc.add_button( M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
-    fc.add_button( M("GENERAL_OK"), Gtk::ResponseType::OK);
+    auto dialog = Gtk::FileDialog::create();
+    dialog->set_title(fc_title);
+    dialog->set_modal();
+
     if (!options.lastCopyMovePath.empty() && Glib::file_test(options.lastCopyMovePath, Glib::FileTest::IS_DIR)) {
-        fc.set_current_folder(options.lastCopyMovePath);
+        dialog->set_initial_folder(Gio::File::create_for_path(options.lastCopyMovePath));
     } else {
         // open dialog at the 1-st file's path
-        fc.set_current_folder(Glib::path_get_dirname(tbe[0]->filename));
+        dialog->set_initial_folder(Gio::File::create_for_path(
+            Glib::path_get_dirname(tbe[0]->filename.c_str())));
     }
-    //!!! TODO prevent dialog closing on "enter" key press
 
-    if( fc.run() == Gtk::ResponseType::OK ) {
-        options.lastCopyMovePath = fc.get_current_folder();
+    auto onResponse = [=](Glib::RefPtr<Gio::AsyncResult>& result) {
+        Glib::RefPtr<Gio::File> file = dialog->select_folder_finish(result);
+        if (!file) return;
+
+        options.lastCopyMovePath = file->get_path();
 
         // iterate through selected files
         for (unsigned int i = 0; i < tbe.size(); i++) {
             Glib::ustring src_fPath = tbe[i]->filename;
-            Glib::ustring src_Dir = Glib::path_get_dirname(src_fPath);
+            Glib::ustring src_Dir = Glib::path_get_dirname(src_fPath.c_str());
             Glib::RefPtr<Gio::File> src_file = Gio::File::create_for_path ( src_fPath );
 
             if( !src_file ) {
@@ -1172,199 +1142,203 @@ void FileCatalog::copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe, b
         redrawAll ();
 
         _refreshProgressBar();
-    } // Gtk::ResponseType::OK
+    };
+
+    dialog->set_accept_label(M("GENERAL_OK"));
+    dialog->select_folder(*getToplevelWindow(this), onResponse);
 }
 
 void FileCatalog::developRequested(const std::vector<FileBrowserEntry*>& tbe, bool fastmode)
 {
-    if (listener) {
-        std::vector<BatchQueueEntry*> entries;
-
-        // TODO: (HOMBRE) should we still use parallelization here, now that thumbnails are processed asynchronously...?
-        //#pragma omp parallel for ordered
-        for (size_t i = 0; i < tbe.size(); i++) {
-            FileBrowserEntry* fbe = tbe[i];
-            Thumbnail* th = fbe->thumbnail;
-            rtengine::procparams::ProcParams params = th->getProcParams();
-
-            // if fast mode is selected, override (disable) params
-            // controlling time and resource consuming tasks
-            // and also those which effect is not pronounced after reducing the image size
-            // TODO!!! could expose selections below via preferences
-            if (fastmode) {
-                if (!options.fastexport_use_fast_pipeline) {
-                    if (options.fastexport_bypass_sharpening) {
-                        params.sharpening.enabled = false;
-                    }
-
-                    if (options.fastexport_bypass_sharpenEdge) {
-                        params.sharpenEdge.enabled = false;
-                    }
-
-                    if (options.fastexport_bypass_sharpenMicro) {
-                        params.sharpenMicro.enabled = false;
-                    }
-
-                    //if (options.fastexport_bypass_lumaDenoise) params.lumaDenoise.enabled = false;
-                    //if (options.fastexport_bypass_colorDenoise) params.colorDenoise.enabled = false;
-                    if (options.fastexport_bypass_defringe) {
-                        params.defringe.enabled = false;
-                    }
-
-                    if (options.fastexport_bypass_dirpyrDenoise) {
-                        params.dirpyrDenoise.enabled = false;
-                    }
-
-                    if (options.fastexport_bypass_dirpyrequalizer) {
-                        params.dirpyrequalizer.enabled = false;
-                    }
-
-                    if (options.fastexport_bypass_wavelet) {
-                        params.wavelet.enabled = false;
-                    }
-
-                    //if (options.fastexport_bypass_raw_bayer_all_enhance) params.raw.bayersensor.all_enhance = false;
-                    if (options.fastexport_bypass_raw_bayer_dcb_iterations) {
-                        params.raw.bayersensor.dcb_iterations = 0;
-                    }
-
-                    if (options.fastexport_bypass_raw_bayer_dcb_enhance) {
-                        params.raw.bayersensor.dcb_enhance = false;
-                    }
-
-                    if (options.fastexport_bypass_raw_bayer_lmmse_iterations) {
-                        params.raw.bayersensor.lmmse_iterations = 0;
-                    }
-
-                    if (options.fastexport_bypass_raw_bayer_linenoise) {
-                        params.raw.bayersensor.linenoise = 0;
-                    }
-
-                    if (options.fastexport_bypass_raw_bayer_greenthresh) {
-                        params.raw.bayersensor.greenthresh = 0;
-                    }
-
-                    if (options.fastexport_bypass_raw_ccSteps) {
-                        params.raw.bayersensor.ccSteps = params.raw.xtranssensor.ccSteps = 0;
-                    }
-
-                    if (options.fastexport_bypass_raw_ca) {
-                        params.raw.ca_autocorrect = false;
-                        params.raw.cared = 0;
-                        params.raw.cablue = 0;
-                    }
-
-                    if (options.fastexport_bypass_raw_df) {
-                        params.raw.df_autoselect = false;
-                        params.raw.dark_frame = "";
-                    }
-
-                    if (options.fastexport_bypass_raw_ff) {
-                        params.raw.ff_AutoSelect = false;
-                        params.raw.ff_file = "";
-                    }
-
-                    params.raw.bayersensor.method = options.fastexport_raw_bayer_method;
-                    params.raw.xtranssensor.method = options.fastexport_raw_xtrans_method;
-                    params.icm.inputProfile = options.fastexport_icm_input_profile;
-                    params.icm.workingProfile = options.fastexport_icm_working_profile;
-                    params.icm.outputProfile = options.fastexport_icm_output_profile;
-                    params.icm.outputIntent = rtengine::RenderingIntent(options.fastexport_icm_outputIntent);
-                    params.icm.outputBPC = options.fastexport_icm_outputBPC;
-                }
-
-                if (params.resize.enabled) {
-                    params.resize.width = rtengine::min(params.resize.width, options.fastexport_resize_width);
-                    params.resize.height = rtengine::min(params.resize.height, options.fastexport_resize_height);
-                    params.resize.longedge = rtengine::min(params.resize.longedge, options.fastexport_resize_longedge);
-                    params.resize.shortedge = rtengine::min(params.resize.shortedge, options.fastexport_resize_shortedge);
-                } else {
-                    params.resize.width = options.fastexport_resize_width;
-                    params.resize.height = options.fastexport_resize_height;
-                    params.resize.longedge = options.fastexport_resize_longedge;
-                    params.resize.shortedge = options.fastexport_resize_shortedge;
-                }
-
-                params.resize.enabled = options.fastexport_resize_enabled;
-                params.resize.scale = options.fastexport_resize_scale;
-                params.resize.appliesTo = options.fastexport_resize_appliesTo;
-                params.resize.method = options.fastexport_resize_method;
-                params.resize.dataspec = options.fastexport_resize_dataspec;
-                params.resize.allowUpscaling = false;
-            }
-
-            rtengine::ProcessingJob* pjob = rtengine::ProcessingJob::create (fbe->filename, th->getType() == FT_Raw, params, fastmode && options.fastexport_use_fast_pipeline);
-
-            int pw;
-            int ph = BatchQueue::calcMaxThumbnailHeight();
-            th->getThumbnailSize (pw, ph);
-
-            // processThumbImage is the processing intensive part, but adding to queue must be ordered
-            //#pragma omp ordered
-            //{
-            BatchQueueEntry* bqh = new BatchQueueEntry (pjob, params, fbe->filename, pw, ph, th, options.overwriteOutputFile);
-            entries.push_back(bqh);
-            //}
-        }
-
-        listener->addBatchQueueJobs( entries );
-    }
+//     if (listener) {
+//         std::vector<BatchQueueEntry*> entries;
+//
+//         // TODO: (HOMBRE) should we still use parallelization here, now that thumbnails are processed asynchronously...?
+//         //#pragma omp parallel for ordered
+//         for (size_t i = 0; i < tbe.size(); i++) {
+//             FileBrowserEntry* fbe = tbe[i];
+//             Thumbnail* th = fbe->thumbnail;
+//             rtengine::procparams::ProcParams params = th->getProcParams();
+//
+//             // if fast mode is selected, override (disable) params
+//             // controlling time and resource consuming tasks
+//             // and also those which effect is not pronounced after reducing the image size
+//             // TODO!!! could expose selections below via preferences
+//             if (fastmode) {
+//                 if (!options.fastexport_use_fast_pipeline) {
+//                     if (options.fastexport_bypass_sharpening) {
+//                         params.sharpening.enabled = false;
+//                     }
+//
+//                     if (options.fastexport_bypass_sharpenEdge) {
+//                         params.sharpenEdge.enabled = false;
+//                     }
+//
+//                     if (options.fastexport_bypass_sharpenMicro) {
+//                         params.sharpenMicro.enabled = false;
+//                     }
+//
+//                     //if (options.fastexport_bypass_lumaDenoise) params.lumaDenoise.enabled = false;
+//                     //if (options.fastexport_bypass_colorDenoise) params.colorDenoise.enabled = false;
+//                     if (options.fastexport_bypass_defringe) {
+//                         params.defringe.enabled = false;
+//                     }
+//
+//                     if (options.fastexport_bypass_dirpyrDenoise) {
+//                         params.dirpyrDenoise.enabled = false;
+//                     }
+//
+//                     if (options.fastexport_bypass_dirpyrequalizer) {
+//                         params.dirpyrequalizer.enabled = false;
+//                     }
+//
+//                     if (options.fastexport_bypass_wavelet) {
+//                         params.wavelet.enabled = false;
+//                     }
+//
+//                     //if (options.fastexport_bypass_raw_bayer_all_enhance) params.raw.bayersensor.all_enhance = false;
+//                     if (options.fastexport_bypass_raw_bayer_dcb_iterations) {
+//                         params.raw.bayersensor.dcb_iterations = 0;
+//                     }
+//
+//                     if (options.fastexport_bypass_raw_bayer_dcb_enhance) {
+//                         params.raw.bayersensor.dcb_enhance = false;
+//                     }
+//
+//                     if (options.fastexport_bypass_raw_bayer_lmmse_iterations) {
+//                         params.raw.bayersensor.lmmse_iterations = 0;
+//                     }
+//
+//                     if (options.fastexport_bypass_raw_bayer_linenoise) {
+//                         params.raw.bayersensor.linenoise = 0;
+//                     }
+//
+//                     if (options.fastexport_bypass_raw_bayer_greenthresh) {
+//                         params.raw.bayersensor.greenthresh = 0;
+//                     }
+//
+//                     if (options.fastexport_bypass_raw_ccSteps) {
+//                         params.raw.bayersensor.ccSteps = params.raw.xtranssensor.ccSteps = 0;
+//                     }
+//
+//                     if (options.fastexport_bypass_raw_ca) {
+//                         params.raw.ca_autocorrect = false;
+//                         params.raw.cared = 0;
+//                         params.raw.cablue = 0;
+//                     }
+//
+//                     if (options.fastexport_bypass_raw_df) {
+//                         params.raw.df_autoselect = false;
+//                         params.raw.dark_frame = "";
+//                     }
+//
+//                     if (options.fastexport_bypass_raw_ff) {
+//                         params.raw.ff_AutoSelect = false;
+//                         params.raw.ff_file = "";
+//                     }
+//
+//                     params.raw.bayersensor.method = options.fastexport_raw_bayer_method;
+//                     params.raw.xtranssensor.method = options.fastexport_raw_xtrans_method;
+//                     params.icm.inputProfile = options.fastexport_icm_input_profile;
+//                     params.icm.workingProfile = options.fastexport_icm_working_profile;
+//                     params.icm.outputProfile = options.fastexport_icm_output_profile;
+//                     params.icm.outputIntent = rtengine::RenderingIntent(options.fastexport_icm_outputIntent);
+//                     params.icm.outputBPC = options.fastexport_icm_outputBPC;
+//                 }
+//
+//                 if (params.resize.enabled) {
+//                     params.resize.width = rtengine::min(params.resize.width, options.fastexport_resize_width);
+//                     params.resize.height = rtengine::min(params.resize.height, options.fastexport_resize_height);
+//                     params.resize.longedge = rtengine::min(params.resize.longedge, options.fastexport_resize_longedge);
+//                     params.resize.shortedge = rtengine::min(params.resize.shortedge, options.fastexport_resize_shortedge);
+//                 } else {
+//                     params.resize.width = options.fastexport_resize_width;
+//                     params.resize.height = options.fastexport_resize_height;
+//                     params.resize.longedge = options.fastexport_resize_longedge;
+//                     params.resize.shortedge = options.fastexport_resize_shortedge;
+//                 }
+//
+//                 params.resize.enabled = options.fastexport_resize_enabled;
+//                 params.resize.scale = options.fastexport_resize_scale;
+//                 params.resize.appliesTo = options.fastexport_resize_appliesTo;
+//                 params.resize.method = options.fastexport_resize_method;
+//                 params.resize.dataspec = options.fastexport_resize_dataspec;
+//                 params.resize.allowUpscaling = false;
+//             }
+//
+//             rtengine::ProcessingJob* pjob = rtengine::ProcessingJob::create (fbe->filename, th->getType() == FT_Raw, params, fastmode && options.fastexport_use_fast_pipeline);
+//
+//             int pw;
+//             int ph = BatchQueue::calcMaxThumbnailHeight();
+//             th->getThumbnailSize (pw, ph);
+//
+//             // processThumbImage is the processing intensive part, but adding to queue must be ordered
+//             //#pragma omp ordered
+//             //{
+//             BatchQueueEntry* bqh = new BatchQueueEntry (pjob, params, fbe->filename, pw, ph, th, options.overwriteOutputFile);
+//             entries.push_back(bqh);
+//             //}
+//         }
+//
+//         listener->addBatchQueueJobs( entries );
+//     }
 }
 
 void FileCatalog::renameRequested(const std::vector<FileBrowserEntry*>& tbe)
 {
-    RenameDialog* renameDlg = new RenameDialog ((Gtk::Window*)get_toplevel());
-
-    for (size_t i = 0; i < tbe.size(); i++) {
-        renameDlg->initName (Glib::path_get_basename (tbe[i]->filename), tbe[i]->thumbnail->getCacheImageData());
-
-        Glib::ustring ofname = tbe[i]->filename;
-        Glib::ustring dirName = Glib::path_get_dirname (tbe[i]->filename);
-        Glib::ustring baseName = Glib::path_get_basename (tbe[i]->filename);
-
-        bool success = false;
-
-        do {
-            if (renameDlg->run () == Gtk::ResponseType::OK) {
-                Glib::ustring nBaseName = renameDlg->getNewName ();
-
-                // if path has directory components, exit
-                if (Glib::path_get_dirname (nBaseName) != ".") {
-                    continue;
-                }
-
-                // if no extension is given, concatenate the extension of the original file
-                Glib::ustring ext = getExtension (nBaseName);
-
-                if (ext.empty()) {
-                    nBaseName += "." + getExtension (baseName);
-                }
-
-                Glib::ustring nfname = Glib::build_filename (dirName, nBaseName);
-
-                /* check if filename already exists*/
-                if (Glib::file_test (nfname, Glib::FileTest::EXISTS)) {
-                    Glib::ustring msg_ = Glib::ustring("<b>") + escapeHtmlChars(nfname) + ": " + M("MAIN_MSG_ALREADYEXISTS") + "</b>";
-                    Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-                    msgd.run ();
-                } else {
-                    success = true;
-
-                    if (::g_rename (ofname.c_str (), nfname.c_str ()) == 0) {
-                        cacheMgr->renameEntry (ofname, tbe[i]->thumbnail->getMD5(), nfname);
-                        ::g_remove((ofname + paramFileExtension).c_str ());
-                        reparseDirectory ();
-                    }
-                }
-            } else {
-                success = true;
-            }
-        } while (!success);
-
-        renameDlg->hide ();
-    }
-
-    delete renameDlg;
+//     auto renameDlg = Gtk::make_managed<>();
+//     RenameDialog* renameDlg = new RenameDialog ((Gtk::Window*)get_toplevel());
+//
+//     for (size_t i = 0; i < tbe.size(); i++) {
+//         renameDlg->initName (Glib::path_get_basename (tbe[i]->filename.c_str()), tbe[i]->thumbnail->getCacheImageData());
+//
+//         Glib::ustring ofname = tbe[i]->filename;
+//         Glib::ustring dirName = Glib::path_get_dirname (tbe[i]->filename.c_str());
+//         Glib::ustring baseName = Glib::path_get_basename (tbe[i]->filename.c_str());
+//
+//         bool success = false;
+//
+//         do {
+//             if (renameDlg->run () == Gtk::ResponseType::OK) {
+//                 Glib::ustring nBaseName = renameDlg->getNewName ();
+//
+//                 // if path has directory components, exit
+//                 if (Glib::path_get_dirname (nBaseName.c_str()) != ".") {
+//                     continue;
+//                 }
+//
+//                 // if no extension is given, concatenate the extension of the original file
+//                 Glib::ustring ext = getExtension (nBaseName);
+//
+//                 if (ext.empty()) {
+//                     nBaseName += "." + getExtension (baseName);
+//                 }
+//
+//                 Glib::ustring nfname = Glib::build_filename (dirName, nBaseName);
+//
+//                 /* check if filename already exists*/
+//                 if (Glib::file_test (nfname, Glib::FileTest::EXISTS)) {
+//                     Glib::ustring msg_ = Glib::ustring("<b>") + escapeHtmlChars(nfname) + ": " + M("MAIN_MSG_ALREADYEXISTS") + "</b>";
+//                     Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
+//                     msgd.run ();
+//                 } else {
+//                     success = true;
+//
+//                     if (::g_rename (ofname.c_str (), nfname.c_str ()) == 0) {
+//                         cacheMgr->renameEntry (ofname, tbe[i]->thumbnail->getMD5(), nfname);
+//                         ::g_remove((ofname + paramFileExtension).c_str ());
+//                         reparseDirectory ();
+//                     }
+//                 }
+//             } else {
+//                 success = true;
+//             }
+//         } while (!success);
+//
+//         renameDlg->hide ();
+//     }
+//
+//     delete renameDlg;
 }
 
 void FileCatalog::selectionChanged(const std::vector<Thumbnail*>& tbe)
@@ -1392,17 +1366,14 @@ bool FileCatalog::isInTabMode() const
     return inTabMode;
 }
 
-void FileCatalog::categoryButtonToggled (Gtk::ToggleButton* b, bool isMouseClick)
+void FileCatalog::categoryButtonToggled (Gdk::ModifierType state, Gtk::ToggleButton* b, bool isMouseClick)
 {
 
     //was control key pressed (ignored if was not mouse click)
-    bool control_down = modifierKey & GDK_CONTROL_MASK && isMouseClick;
+    bool control_down = isControlOrMetaDown(state) && isMouseClick;
 
     //was shift key pressed (ignored if was not mouse click)
-    bool shift_down   = modifierKey & GDK_SHIFT_MASK && isMouseClick;
-
-    // The event is process here, we can clear modifierKey now, it'll be set again on the next even
-    modifierKey = 0;
+    bool shift_down   = isShiftDown(state) && isMouseClick;
 
     const int numCateg = sizeof(bCateg) / sizeof(bCateg[0]);
     const int numButtons = sizeof(categoryButtons) / sizeof(categoryButtons[0]);
@@ -1553,8 +1524,8 @@ void FileCatalog::categoryButtonToggled (Gtk::ToggleButton* b, bool isMouseClick
         // TODO: swapping FilterClear icon needs more work in categoryButtonToggled
         /*active_now = bFilterClear->get_active();
         active_before = buttons & (1 << (0)); // 0
-        if      ( active_now && !active_before) bFilterClear->set_image (*iFilterClear);
-        else if (!active_now &&  active_before) bFilterClear->set_image (*igFilterClear);*/
+        if      ( active_now && !active_before) bFilterClear->set_child (*iFilterClear);
+        else if (!active_now &&  active_before) bFilterClear->set_child (*igFilterClear);*/
 
         // rank: set the right images
         for (int i = 0; i < 5; i++) {
@@ -1562,9 +1533,9 @@ void FileCatalog::categoryButtonToggled (Gtk::ToggleButton* b, bool isMouseClick
             active_before = buttons & (1 << (i + 2)); // 2,3,4,5,6
 
             if      ( active_now && !active_before) {
-                bRank[i]->set_image (*iranked[i]);
+                bRank[i]->set_child (*iranked[i]);
             } else if (!active_now &&  active_before) {
-                bRank[i]->set_image (*igranked[i]);
+                bRank[i]->set_child (*igranked[i]);
             }
         }
 
@@ -1572,9 +1543,9 @@ void FileCatalog::categoryButtonToggled (Gtk::ToggleButton* b, bool isMouseClick
         active_before = buttons & (1 << (1)); // 1
 
         if      ( active_now && !active_before) {
-            bUnRanked->set_image (*iUnRanked);
+            bUnRanked->set_child (*iUnRanked);
         } else if (!active_now &&  active_before) {
-            bUnRanked->set_image (*igUnRanked);
+            bUnRanked->set_child (*igUnRanked);
         }
 
         // color labels: set the right images
@@ -1583,9 +1554,9 @@ void FileCatalog::categoryButtonToggled (Gtk::ToggleButton* b, bool isMouseClick
             active_before = buttons & (1 << (i + 8)); // 8,9,10,11,12
 
             if      ( active_now && !active_before) {
-                bCLabel[i]->set_image (*iCLabeled[i]);
+                bCLabel[i]->set_child (*iCLabeled[i]);
             } else if (!active_now &&  active_before) {
-                bCLabel[i]->set_image (*igCLabeled[i]);
+                bCLabel[i]->set_child (*igCLabeled[i]);
             }
         }
 
@@ -1593,9 +1564,9 @@ void FileCatalog::categoryButtonToggled (Gtk::ToggleButton* b, bool isMouseClick
         active_before = buttons & (1 << (7)); // 7
 
         if      ( active_now && !active_before) {
-            bUnCLabeled->set_image (*iUnCLabeled);
+            bUnCLabeled->set_child (*iUnCLabeled);
         } else if (!active_now &&  active_before) {
-            bUnCLabeled->set_image (*igUnCLabeled);
+            bUnCLabeled->set_child (*igUnCLabeled);
         }
 
         // Edited: set the right images
@@ -1604,9 +1575,9 @@ void FileCatalog::categoryButtonToggled (Gtk::ToggleButton* b, bool isMouseClick
             active_before = buttons & (1 << (i + 13)); //13,14
 
             if      ( active_now && !active_before) {
-                bEdited[i]->set_image (*iEdited[i]);
+                bEdited[i]->set_child (*iEdited[i]);
             } else if (!active_now &&  active_before) {
-                bEdited[i]->set_image (*igEdited[i]);
+                bEdited[i]->set_child (*igEdited[i]);
             }
         }
 
@@ -1616,9 +1587,9 @@ void FileCatalog::categoryButtonToggled (Gtk::ToggleButton* b, bool isMouseClick
             active_before = buttons & (1 << (i + 15)); //15,16
 
             if      ( active_now && !active_before) {
-                bRecentlySaved[i]->set_image (*iRecentlySaved[i]);
+                bRecentlySaved[i]->set_child (*iRecentlySaved[i]);
             } else if (!active_now &&  active_before) {
-                bRecentlySaved[i]->set_image (*igRecentlySaved[i]);
+                bRecentlySaved[i]->set_child (*igRecentlySaved[i]);
             }
         }
 
@@ -1629,7 +1600,7 @@ void FileCatalog::categoryButtonToggled (Gtk::ToggleButton* b, bool isMouseClick
         removeIfThere (hBox, trashButtonBox);
 
         if (bTrash->get_active ()) {
-            hBox->pack_start (*trashButtonBox, Pack::SHRINK, 4);
+            pack_start (hBox, *trashButtonBox, Pack::SHRINK, 4);
         }
 
         hBox->queue_draw ();
@@ -1791,7 +1762,7 @@ void FileCatalog::reparseDirectory ()
             fileNamesToDel.push_back(entry->filename);
             fileNamesToRemove.push_back(entry->filename);
         }
-        else if (!options.browseRecursive && Glib::path_get_dirname(entry->filename) != selectedDirectory) {
+        else if (!options.browseRecursive && Glib::path_get_dirname(entry->filename.c_str()) != selectedDirectory.c_str()) {
             fileNamesToRemove.push_back(entry->filename);
         }
     }
@@ -1827,16 +1798,15 @@ void FileCatalog::reparseDirectory ()
     refreshDirectoryMonitors(allDirs);
 }
 
-void FileCatalog::on_dir_changed (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitorEvent event_type, bool internal)
+void FileCatalog::on_dir_changed (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitor::Event event_type, bool internal)
 {
 
     if ((options.has_retained_extention(file->get_parse_name())
-            && (event_type == Gio::FILE_MONITOR_EVENT_CREATED || event_type == Gio::FILE_MONITOR_EVENT_DELETED || event_type == Gio::FILE_MONITOR_EVENT_CHANGED))
-             || (event_type == Gio::FILE_MONITOR_EVENT_CREATED && Glib::file_test(file->get_path(), Glib::FileTest::IS_DIR))
-             || (event_type == Gio::FILE_MONITOR_EVENT_DELETED && std::find_if(dirMonitors.cbegin(), dirMonitors.cend(), [&file](const FileMonitorInfo &monitor) { return monitor.filePath == file->get_path(); }) != dirMonitors.cend())) {
+            && (event_type == Gio::FileMonitor::Event::CREATED || event_type == Gio::FileMonitor::Event::DELETED || event_type == Gio::FileMonitor::Event::CHANGED))
+             || (event_type == Gio::FileMonitor::Event::CREATED && Glib::file_test(file->get_path(), Glib::FileTest::IS_DIR))
+             || (event_type == Gio::FileMonitor::Event::DELETED && std::find_if(dirMonitors.cbegin(), dirMonitors.cend(), [&file](const FileMonitorInfo &monitor) { return monitor.filePath == file->get_path().c_str(); }) != dirMonitors.cend())) {
         if (!internal) {
-            GThreadLock lock;
-            reparseDirectory ();
+            idle_register.add([this]() { reparseDirectory(); });
         } else {
             reparseDirectory ();
         }
@@ -1987,9 +1957,9 @@ void FileCatalog::setExportPanel(ExportPanel* expanel)
 void FileCatalog::trashChanged ()
 {
     if (trashIsEmpty()) {
-        bTrash->set_image(*iTrashShowEmpty);
+        bTrash->set_child(*iTrashShowEmpty);
     } else {
-        bTrash->set_image(*iTrashShowFull);
+        bTrash->set_child(*iTrashShowFull);
     }
 }
 
@@ -2013,12 +1983,12 @@ void FileCatalog::executeQuery()
     }
 }
 
-bool FileCatalog::Query_key_pressed (GdkEventKey *event)
+bool FileCatalog::Query_key_pressed (guint keyval, guint keycode, Gdk::ModifierType state)
 {
 
-    bool shift = event->state & GDK_SHIFT_MASK;
+    bool shift = isShiftDown(state);
 
-    switch (event->keyval) {
+    switch (keyval) {
     case GDK_KEY_Escape:
 
         // Clear Query if the Escape character is pressed within it
@@ -2042,9 +2012,9 @@ void FileCatalog::updateFBQueryTB (bool singleRow)
 
     if (singleRow) {
         if (hbToolBar1STB) {
-            hbToolBar1STB->remove_with_viewport();
+            // hbToolBar1STB->remove_with_viewport();
             removeIfThere(this, hbToolBar1STB, false);
-            buttonBar->pack_start(*hbToolBar1, Pack::EXPAND_WIDGET, 0);
+            pack_start (buttonBar, *hbToolBar1, Pack::EXPAND_WIDGET, 0);
             hbToolBar1STB = nullptr;
         }
     } else {
@@ -2052,10 +2022,9 @@ void FileCatalog::updateFBQueryTB (bool singleRow)
             removeIfThere(buttonBar, hbToolBar1, false);
             hbToolBar1STB = Gtk::manage(new MyScrolledToolbar());
             hbToolBar1STB->set_name("FileBrowserQueryToolbar");
-            hbToolBar1STB->add(*hbToolBar1);
-            hbToolBar1STB->show();
-            pack_start (*hbToolBar1STB, Pack::SHRINK, 0);
-            reorder_child(*hbToolBar1STB, 0);
+            hbToolBar1STB->set_child(*hbToolBar1);
+            pack_start (this, *hbToolBar1STB, Pack::SHRINK, 0);
+            reorder_child_at_start(*hbToolBar1STB);
         }
     }
 
@@ -2102,16 +2071,15 @@ void FileCatalog::buttonBrowsePathPressed ()
     } else
         // error, likely path not found: show red arrow
     {
-        buttonBrowsePath->set_image (*iRefreshRed);
+        buttonBrowsePath->set_child (*iRefreshRed);
     }
 }
 
-bool FileCatalog::BrowsePath_key_pressed (GdkEventKey *event)
+bool FileCatalog::BrowsePath_key_pressed (guint keyval, guint keycode, Gdk::ModifierType state)
 {
+    bool shift = isShiftDown(state);
 
-    bool shift = event->state & GDK_SHIFT_MASK;
-
-    switch (event->keyval) {
+    switch (keyval) {
     case GDK_KEY_Escape:
 
         // On Escape character Reset BrowsePath to selectedDirectory
@@ -2154,11 +2122,11 @@ void FileCatalog::tbLeftPanel_1_toggled ()
     removeIfThere (filepanel->dirpaned, filepanel->placespaned, false);
 
     if (tbLeftPanel_1->get_active()) {
-        filepanel->dirpaned->pack1 (*filepanel->placespaned, false, true);
-        tbLeftPanel_1->set_image (*iLeftPanel_1_Hide);
+        pack1 (filepanel->dirpaned, *filepanel->placespaned, false, true);
+        tbLeftPanel_1->set_child (*iLeftPanel_1_Hide);
         options.browserDirPanelOpened = true;
     } else {
-        tbLeftPanel_1->set_image (*iLeftPanel_1_Show);
+        tbLeftPanel_1->set_child (*iLeftPanel_1_Show);
         options.browserDirPanelOpened = false;
     }
 }
@@ -2167,11 +2135,11 @@ void FileCatalog::tbRightPanel_1_toggled ()
 {
     if (tbRightPanel_1->get_active()) {
         filepanel->rightBox->show();
-        tbRightPanel_1->set_image (*iRightPanel_1_Hide);
+        tbRightPanel_1->set_child (*iRightPanel_1_Hide);
         options.browserToolPanelOpened = true;
     } else {
         filepanel->rightBox->hide();
-        tbRightPanel_1->set_image (*iRightPanel_1_Show);
+        tbRightPanel_1->set_child (*iRightPanel_1_Show);
         options.browserToolPanelOpened = false;
     }
 }
@@ -2203,10 +2171,10 @@ void FileCatalog::toggleRightPanel()
 }
 
 
-void FileCatalog::selectImage (Glib::ustring fname, bool clearFilters)
+void FileCatalog::selectImage (const Glib::ustring& fname, bool clearFilters)
 {
 
-    Glib::ustring dirname = Glib::path_get_dirname(fname);
+    Glib::ustring dirname = Glib::path_get_dirname(fname.c_str());
 
     if (!dirname.empty()) {
         BrowsePath->set_text(dirname);
@@ -2214,7 +2182,7 @@ void FileCatalog::selectImage (Glib::ustring fname, bool clearFilters)
 
         if (clearFilters) { // clear all filters
             Query->set_text("");
-            categoryButtonToggled(bFilterClear, false);
+            categoryButtonToggled(Gdk::ModifierType::NO_MODIFIER_MASK, bFilterClear, false);
 
             // disable exif filters
             if (filterPanel->isEnabled()) {
@@ -2236,10 +2204,10 @@ void FileCatalog::selectImage (Glib::ustring fname, bool clearFilters)
 }
 
 
-void FileCatalog::openNextPreviousEditorImage (Glib::ustring fname, bool clearFilters, eRTNav nextPrevious)
+void FileCatalog::openNextPreviousEditorImage (const Glib::ustring& fname, bool clearFilters, eRTNav nextPrevious)
 {
 
-    Glib::ustring dirname = Glib::path_get_dirname(fname);
+    Glib::ustring dirname = Glib::path_get_dirname(fname.c_str());
 
     if (!dirname.empty()) {
         BrowsePath->set_text(dirname);
@@ -2247,7 +2215,7 @@ void FileCatalog::openNextPreviousEditorImage (Glib::ustring fname, bool clearFi
 
         if (clearFilters) { // clear all filters
             Query->set_text("");
-            categoryButtonToggled(bFilterClear, false);
+            categoryButtonToggled(Gdk::ModifierType::NO_MODIFIER_MASK, bFilterClear, false);
 
             // disable exif filters
             if (filterPanel->isEnabled()) {
@@ -2270,21 +2238,15 @@ void FileCatalog::openNextPreviousEditorImage (Glib::ustring fname, bool clearFi
     }
 }
 
-bool FileCatalog::handleShortcutKey (GdkEventKey* event)
+void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierType state)
 {
 
-    bool ctrl = event->state & GDK_CONTROL_MASK;
-    bool shift = event->state & GDK_SHIFT_MASK;
-    bool alt = event->state & GDK_MOD1_MASK;
-#ifdef __WIN32__
-    bool altgr = event->state & GDK_MOD2_MASK;
-#else
-    bool altgr = event->state & GDK_MOD5_MASK;
-#endif
-    modifierKey = event->state;
+    bool ctrl = isControlOrMetaDown(state);
+    bool shift = isShiftDown(state);
+    bool alt = isAltDown(state);
 
     // GUI Layout
-    switch(event->keyval) {
+    switch(keyval) {
     case GDK_KEY_l:
         if (!alt) {
             tbLeftPanel_1->set_active (!tbLeftPanel_1->get_active());    // toggle left panel
@@ -2299,73 +2261,73 @@ bool FileCatalog::handleShortcutKey (GdkEventKey* event)
             tbRightPanel_1->set_active (!tbRightPanel_1->get_active()); // toggle right panel
         }
 
-        return true;
+        return;
 
     case GDK_KEY_m:
         if (!ctrl && !alt) {
             toggleSidePanels();
         }
 
-        return true;
+        return;
     }
 
     if (shift) {
-        switch(event->keyval) {
+        switch(keyval) {
         case GDK_KEY_Escape:
             BrowsePath->set_text(selectedDirectory);
             // set focus on something neutral, this is useful to remove focus from BrowsePath and Query
             // when need to execute a shortcut, which otherwise will be typed into those fields
             filepanel->grab_focus();
-            return true;
+            return;
         }
     }
 
 #ifdef __WIN32__
 
-    if (!alt && shift && !altgr) {
-        switch(event->hardware_keycode) {
+    if (!alt && shift) {
+        switch(keycode) {
         case 0x30:
-            categoryButtonToggled(bUnRanked, false);
-            return true;
+            categoryButtonToggled(state, bUnRanked, false);
+            return;
 
         case 0x31:
-            categoryButtonToggled(bRank[0], false);
-            return true;
+            categoryButtonToggled(state, bRank[0], false);
+            return;
 
         case 0x32:
-            categoryButtonToggled(bRank[1], false);
-            return true;
+            categoryButtonToggled(state, bRank[1], false);
+            return;
 
         case 0x33:
-            categoryButtonToggled(bRank[2], false);
-            return true;
+            categoryButtonToggled(state, bRank[2], false);
+            return;
 
         case 0x34:
-            categoryButtonToggled(bRank[3], false);
-            return true;
+            categoryButtonToggled(state, bRank[3], false);
+            return;
 
         case 0x35:
-            categoryButtonToggled(bRank[4], false);
-            return true;
+            categoryButtonToggled(state, bRank[4], false);
+            return;
 
         case 0x36:
-            categoryButtonToggled(bEdited[0], false);
-            return true;
+            categoryButtonToggled(state, bEdited[0], false);
+            return;
 
         case 0x37:
-            categoryButtonToggled(bEdited[1], false);
-            return true;
+            categoryButtonToggled(state, bEdited[1], false);
+            return;
         }
     }
 
     if (!alt && !shift) {
-        switch(event->keyval) {
+        switch(keyval) {
 
         case GDK_KEY_Return:
         case GDK_KEY_KP_Enter:
             if (BrowsePath->is_focus()) {
                 FileCatalog::buttonBrowsePathPressed ();
-                return true;
+                return;
             }
 
             break;
@@ -2373,87 +2335,87 @@ bool FileCatalog::handleShortcutKey (GdkEventKey* event)
     }
 
     if (alt && !shift) { // shift is reserved for color labeling
-        switch(event->hardware_keycode) {
+        switch(keycode) {
         case 0x30:
-            categoryButtonToggled(bUnCLabeled, false);
-            return true;
+            categoryButtonToggled(state, bUnCLabeled, false);
+            return;
 
         case 0x31:
-            categoryButtonToggled(bCLabel[0], false);
-            return true;
+            categoryButtonToggled(state, bCLabel[0], false);
+            return;
 
         case 0x32:
-            categoryButtonToggled(bCLabel[1], false);
-            return true;
+            categoryButtonToggled(state, bCLabel[1], false);
+            return;
 
         case 0x33:
-            categoryButtonToggled(bCLabel[2], false);
-            return true;
+            categoryButtonToggled(state, bCLabel[2], false);
+            return;
 
         case 0x34:
-            categoryButtonToggled(bCLabel[3], false);
-            return true;
+            categoryButtonToggled(state, bCLabel[3], false);
+            return;
 
         case 0x35:
-            categoryButtonToggled(bCLabel[4], false);
-            return true;
+            categoryButtonToggled(state, bCLabel[4], false);
+            return;
 
         case 0x36:
-            categoryButtonToggled(bRecentlySaved[0], false);
-            return true;
+            categoryButtonToggled(state, bRecentlySaved[0], false);
+            return;
 
         case 0x37:
-            categoryButtonToggled(bRecentlySaved[1], false);
-            return true;
+            categoryButtonToggled(state, bRecentlySaved[1], false);
+            return;
         }
     }
 
 #else
 
-    if (!alt && shift && !altgr) {
-        switch(event->hardware_keycode) {
+    if (!alt && shift) {
+        switch(keycode) {
         case 0x13:
-            categoryButtonToggled(bUnRanked, false);
-            return true;
+            categoryButtonToggled(state, bUnRanked, false);
+            return;
 
         case 0x0a:
-            categoryButtonToggled(bRank[0], false);
-            return true;
+            categoryButtonToggled(state, bRank[0], false);
+            return;
 
         case 0x0b:
-            categoryButtonToggled(bRank[1], false);
-            return true;
+            categoryButtonToggled(state, bRank[1], false);
+            return;
 
         case 0x0c:
-            categoryButtonToggled(bRank[2], false);
-            return true;
+            categoryButtonToggled(state, bRank[2], false);
+            return;
 
         case 0x0d:
-            categoryButtonToggled(bRank[3], false);
-            return true;
+            categoryButtonToggled(state, bRank[3], false);
+            return;
 
         case 0x0e:
-            categoryButtonToggled(bRank[4], false);
-            return true;
+            categoryButtonToggled(state, bRank[4], false);
+            return;
 
         case 0x0f:
-            categoryButtonToggled(bEdited[0], false);
-            return true;
+            categoryButtonToggled(state, bEdited[0], false);
+            return;
 
         case 0x10:
-            categoryButtonToggled(bEdited[1], false);
-            return true;
+            categoryButtonToggled(state, bEdited[1], false);
+            return;
         }
     }
 
     if (!alt && !shift) {
-        switch(event->keyval) {
+        switch(keyval) {
 
         case GDK_KEY_Return:
         case GDK_KEY_KP_Enter:
             if (BrowsePath->is_focus()) {
                 FileCatalog::buttonBrowsePathPressed ();
-                return true;
+                return;
             }
 
             break;
@@ -2461,104 +2423,103 @@ bool FileCatalog::handleShortcutKey (GdkEventKey* event)
     }
 
     if (alt && !shift) { // shift is reserved for color labeling
-        switch(event->hardware_keycode) {
+        switch(keycode) {
         case 0x13:
-            categoryButtonToggled(bUnCLabeled, false);
-            return true;
+            categoryButtonToggled(state, bUnCLabeled, false);
+            return;
 
         case 0x0a:
-            categoryButtonToggled(bCLabel[0], false);
-            return true;
+            categoryButtonToggled(state, bCLabel[0], false);
+            return;
 
         case 0x0b:
-            categoryButtonToggled(bCLabel[1], false);
-            return true;
+            categoryButtonToggled(state, bCLabel[1], false);
+            return;
 
         case 0x0c:
-            categoryButtonToggled(bCLabel[2], false);
-            return true;
+            categoryButtonToggled(state, bCLabel[2], false);
+            return;
 
         case 0x0d:
-            categoryButtonToggled(bCLabel[3], false);
-            return true;
+            categoryButtonToggled(state, bCLabel[3], false);
+            return;
 
         case 0x0e:
-            categoryButtonToggled(bCLabel[4], false);
-            return true;
+            categoryButtonToggled(state, bCLabel[4], false);
+            return;
 
         case 0x0f:
-            categoryButtonToggled(bRecentlySaved[0], false);
-            return true;
+            categoryButtonToggled(state, bRecentlySaved[0], false);
+            return;
 
         case 0x10:
-            categoryButtonToggled(bRecentlySaved[1], false);
-            return true;
+            categoryButtonToggled(state, bRecentlySaved[1], false);
+            return;
         }
     }
 
 #endif
 
     if (!ctrl && !alt) {
-        switch(event->keyval) {
+        switch(keyval) {
         case GDK_KEY_d:
         case GDK_KEY_D:
-            categoryButtonToggled(bFilterClear, false);
-            return true;
+            categoryButtonToggled(state, bFilterClear, false);
+            return;
         }
     }
 
     if (!ctrl || (alt && !options.tabbedUI)) {
-        switch(event->keyval) {
+        switch(keyval) {
 
         case GDK_KEY_bracketright:
             coarsePanel->rotateRight();
-            return true;
+            return;
 
         case GDK_KEY_bracketleft:
             coarsePanel->rotateLeft();
-            return true;
+            return;
 
         case GDK_KEY_i:
         case GDK_KEY_I:
             exifInfo->set_active (!exifInfo->get_active());
-            return true;
+            return;
 
         case GDK_KEY_plus:
         case GDK_KEY_equal:
             zoomIn();
-            return true;
+            return;
 
         case GDK_KEY_minus:
         case GDK_KEY_underscore:
             zoomOut();
-            return true;
+            return;
         default: // do nothing, avoids a cppcheck false positive
             break;
         }
     }
 
     if (ctrl && !alt) {
-        switch (event->keyval) {
+        switch (keyval) {
         case GDK_KEY_o:
             BrowsePath->select_region(0, BrowsePath->get_text_length());
             BrowsePath->grab_focus();
-            return true;
+            return;
 
         case GDK_KEY_f:
             Query->select_region(0, Query->get_text_length());
             Query->grab_focus();
-            return true;
+            return;
 
         case GDK_KEY_t:
         case GDK_KEY_T:
-            modifierKey = 0; // HOMBRE: yet another hack.... otherwise the shortcut won't work
-            categoryButtonToggled(bTrash, false);
-            return true;
+            categoryButtonToggled(state, bTrash, false);
+            return;
         }
     }
 
     if (!ctrl && !alt && shift) {
-        switch (event->keyval) {
+        switch (keyval) {
         case GDK_KEY_t:
         case GDK_KEY_T:
             if (inTabMode) {
@@ -2571,12 +2532,12 @@ bool FileCatalog::handleShortcutKey (GdkEventKey* event)
                 options.showFilmStripToolBar = !options.showFilmStripToolBar;
             }
 
-            return true;
+            return;
         }
     }
 
     if (!ctrl && !alt && !shift) {
-        switch (event->keyval) {
+        switch (keyval) {
         case GDK_KEY_t:
         case GDK_KEY_T:
             if (inTabMode) {
@@ -2590,39 +2551,37 @@ bool FileCatalog::handleShortcutKey (GdkEventKey* event)
             }
 
             refreshHeight();
-            return true;
+            return;
         }
     }
 
     if (!ctrl && !alt) {
-        switch (event->keyval) {
+        switch (keyval) {
         case GDK_KEY_f:
-            fileBrowser->getInspector()->showWindow(false, true);
-            return true;
+//             fileBrowser->getInspector()->showWindow(false, true);
+            return;
         case GDK_KEY_F:
-            fileBrowser->getInspector()->showWindow(false, false);
-            return true;
+//             fileBrowser->getInspector()->showWindow(false, false);
+            return;
         }
     }
 
-    return fileBrowser->keyPressed(event);
+    fileBrowser->keyPressed(keyval, keycode, state);
 }
 
-bool FileCatalog::handleShortcutKeyRelease(GdkEventKey* event)
+void FileCatalog::handleShortcutKeyRelease(guint keyval, guint keycode, Gdk::ModifierType state)
 {
-    bool ctrl = event->state & GDK_CONTROL_MASK;
-    bool alt = event->state & GDK_MOD1_MASK;
+    bool ctrl = isControlOrMetaDown(state);
+    bool alt = isAltDown(state);
 
     if (!ctrl && !alt) {
-        switch (event->keyval) {
+        switch (keyval) {
         case GDK_KEY_f:
         case GDK_KEY_F:
-            fileBrowser->getInspector()->hideWindow();
-            return true;
+//             fileBrowser->getInspector()->hideWindow();
+            return;
         }
     }
-
-    return false;
 }
 
 void FileCatalog::showToolBar()

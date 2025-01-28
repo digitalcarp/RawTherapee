@@ -69,7 +69,7 @@ public:
     {
 //         fileCatalog->refreshEditedState (efiles);
     }
-//     void loadingThumbs(const Glib::ustring& str, double rate);
+    void loadingThumbs(const Glib::ustring& str, double rate);
 
     // call this before closing RT: it saves file browser's related things into options
     void saveOptions ();

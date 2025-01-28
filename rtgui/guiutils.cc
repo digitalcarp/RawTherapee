@@ -510,6 +510,23 @@ bool removeIfThere(Gtk::Grid* grid, Gtk::Widget* w, bool increference)
 {
     return removeIfThere(grid, w, increference, [&]() { grid->remove(*w); });
 }
+bool removeIfThere(Gtk::Paned* paned, Gtk::Widget* w, bool increference)
+{
+    if (paned->get_start_child() == w) {
+        if (increference) {
+            w->reference();
+        }
+        paned->unset_start_child();
+        return true;
+    } else if (paned->get_end_child() == w) {
+        if (increference) {
+            w->reference();
+        }
+        paned->unset_end_child();
+        return true;
+    }
+    return false;
+}
 
 // TODO(gtk4): Make this and callers async safe
 bool confirmOverwrite (Gtk::Window& parent, const std::string& filename)
@@ -1023,71 +1040,71 @@ void MyExpander::onEnabledChange(int /*n_press*/, double /*x*/, double /*y*/)
 //     minimum_baseline = -1;
 //     natural_baseline = -1;
 // }
-//
-// /*
-//  *
-//  * Derived class of some widgets to properly handle the scroll wheel ;
-//  * the user has to use the Shift key to be able to change the widget's value,
-//  * otherwise the mouse wheel will scroll the toolbar.
-//  *
-//  */
-// MyScrolledToolbar::MyScrolledToolbar()
-// {
-//     set_policy (Gtk::PolicyType::EXTERNAL, Gtk::PolicyType::NEVER);
-//     get_style_context()->add_class("scrollableToolbar");
-//
-//     auto controller = Gtk::EventControllerScroll::create();
-//     controller->set_flags(Gtk::EventControllerScroll::Flags::HORIZONTAL);
-//     controller->signal_scroll().connect(
-//         sigc::mem_fun(*this, &MyScrolledToolbar::onScroll), false);
-//     add_controller(controller);
-// }
-//
-// bool MyScrolledToolbar::onScroll(double dx, double /*dy*/)
-// {
-//     Glib::RefPtr<Gtk::Adjustment> adjust = get_hadjustment();
-//     Gtk::Scrollbar* hscroll = get_hscrollbar();
-//
-//     if (adjust && hscroll) {
-//         const double upperBound = adjust->get_upper();
-//         const double lowerBound = adjust->get_lower();
-//         const double value = adjust->get_value();
-//         const double step = adjust->get_step_increment() * 2;
-//
-//         double newValue = value + step * dx;
-//         newValue = std::clamp(newValue, lowerBound, upperBound);
-//
-//         if (newValue != value) {
-//             hscroll->set_value(newValue);
-//         }
-//     }
-//
-//     return true;
-// }
-//
-// void MyScrolledToolbar::measure_vfunc(Gtk::Orientation orientation, int /*for_size*/,
-//                                       int& minimum, int& natural,
-//                                       int& minimum_baseline, int& natural_baseline) const
-// {
-//     if (orientation == Gtk::Orientation::HORIZONTAL) {
-//         int width = RTScalable::scalePixelSize(100);
-//         minimum = width;
-//         natural = width;
-//     } else {
-//         minimum = 0;
-//         natural = 0;
-//
-//         for (const auto& child : get_children()) {
-//             PreferredSize size = child->get_preferred_size();
-//             minimum = std::max(minimum, size.minimum.get_height());
-//             natural = std::max(natural, size.natural.get_height());
-//         }
-//     }
-//
-//     // Don't use baseline alignment
-//     minimum_baseline = -1;
-//     natural_baseline = -1;
-// }
+
+/*
+ *
+ * Derived class of some widgets to properly handle the scroll wheel ;
+ * the user has to use the Shift key to be able to change the widget's value,
+ * otherwise the mouse wheel will scroll the toolbar.
+ *
+ */
+MyScrolledToolbar::MyScrolledToolbar()
+{
+    set_policy (Gtk::PolicyType::EXTERNAL, Gtk::PolicyType::NEVER);
+    get_style_context()->add_class("scrollableToolbar");
+
+    auto controller = Gtk::EventControllerScroll::create();
+    controller->set_flags(Gtk::EventControllerScroll::Flags::HORIZONTAL);
+    controller->signal_scroll().connect(
+        sigc::mem_fun(*this, &MyScrolledToolbar::onScroll), false);
+    add_controller(controller);
+}
+
+bool MyScrolledToolbar::onScroll(double dx, double /*dy*/)
+{
+    Glib::RefPtr<Gtk::Adjustment> adjust = get_hadjustment();
+    Gtk::Scrollbar* hscroll = get_hscrollbar();
+
+    if (adjust && hscroll) {
+        const double upperBound = adjust->get_upper();
+        const double lowerBound = adjust->get_lower();
+        const double value = adjust->get_value();
+        const double step = adjust->get_step_increment() * 2;
+
+        double newValue = value + step * dx;
+        newValue = std::clamp(newValue, lowerBound, upperBound);
+
+        if (newValue != value) {
+            adjust->set_value(newValue);
+        }
+    }
+
+    return true;
+}
+
+void MyScrolledToolbar::measure_vfunc(Gtk::Orientation orientation, int /*for_size*/,
+                                      int& minimum, int& natural,
+                                      int& minimum_baseline, int& natural_baseline) const
+{
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        int width = RTScalable::scalePixelSize(100);
+        minimum = width;
+        natural = width;
+    } else {
+        minimum = 0;
+        natural = 0;
+
+        for (const auto& child : get_children()) {
+            PreferredSize size = child->get_preferred_size();
+            minimum = std::max(minimum, size.minimum.get_height());
+            natural = std::max(natural, size.natural.get_height());
+        }
+    }
+
+    // Don't use baseline alignment
+    minimum_baseline = -1;
+    natural_baseline = -1;
+}
 
 MyComboBoxText::MyComboBoxText (bool has_entry) : Gtk::ComboBoxText(has_entry)
 {
@@ -2215,6 +2232,12 @@ RotateLabel::RotateLabel(const Glib::ustring& text) : m_label(text), m_rotate90(
     m_label.set_parent(*this);
 }
 
+void RotateLabel::set_text(const Glib::ustring& text)
+{
+    m_label.set_text(text);
+    queue_allocate();
+}
+
 void RotateLabel::rotate90(bool val)
 {
     m_rotate90 = val;
@@ -2281,7 +2304,22 @@ ModButton::ModButton()
     add_controller(m_controller);
 }
 
-void ModButton::onClick(int /*n_press*/, double x, double y)
+void ModButton::onClick(int /*n_press*/, double /*x*/, double /*y*/)
+{
+    auto state = m_controller->get_current_event_state();
+    m_signal.emit(state);
+}
+
+ModToggleButton::ModToggleButton()
+{
+    m_controller = Gtk::GestureClick::create();
+    m_controller->set_button(GDK_BUTTON_PRIMARY);
+    m_controller->signal_released().connect(
+        sigc::mem_fun(*this, &ModToggleButton::onClick));
+    add_controller(m_controller);
+}
+
+void ModToggleButton::onClick(int /*n_press*/, double /*x*/, double /*y*/)
 {
     auto state = m_controller->get_current_event_state();
     m_signal.emit(state);

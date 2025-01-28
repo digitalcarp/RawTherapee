@@ -420,8 +420,8 @@ void FilePanel::optionsChanged ()
 //     return false;
 // }
 
-// void FilePanel::loadingThumbs(const Glib::ustring& str, double rate)
-// {
+void FilePanel::loadingThumbs(const Glib::ustring& str, double rate)
+{
 //     GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
 //
 //     if( !str.empty()) {
@@ -429,7 +429,7 @@ void FilePanel::optionsChanged ()
 //     }
 //
 //     parent->setProgress( rate );
-// }
+}
 
 void FilePanel::updateTPVScrollbar (bool hide)
 {

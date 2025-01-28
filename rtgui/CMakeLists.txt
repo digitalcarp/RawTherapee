@@ -31,7 +31,7 @@ set(NONCLISOURCEFILES
     checkbox.cc
     # chmixer.cc
     clipboard.cc
-    # coarsepanel.cc
+    coarsepanel.cc
     # colorappearance.cc
     # coloredbar.cc
     # colortoning.cc
@@ -70,7 +70,7 @@ set(NONCLISOURCEFILES
     # fattaltonemap.cc
     filebrowser.cc
     filebrowserentry.cc
-    # filecatalog.cc
+    filecatalog.cc
     filepanel.cc
     # filethumbnailbuttonset.cc
     # filmnegative.cc

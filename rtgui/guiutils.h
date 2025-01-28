@@ -54,6 +54,7 @@ Glib::ustring escapeHtmlChars(const Glib::ustring &src);
 
 bool removeIfThere(Gtk::Box* box, Gtk::Widget* w, bool increference = true);
 bool removeIfThere(Gtk::Grid* grid, Gtk::Widget* w, bool increference = true);
+bool removeIfThere(Gtk::Paned* paned, Gtk::Widget* w, bool increference = true);
 
 bool confirmOverwrite (Gtk::Window& parent, const std::string& filename);
 void drawCrop (const Cairo::RefPtr<Cairo::Context>& cr,
@@ -164,6 +165,22 @@ private:
 
     Glib::RefPtr<Gtk::GestureClick> m_controller;
     ClickedSignal m_signal;
+};
+
+// ToggleButton with a toggled callback that provides the modifier state
+class ModToggleButton : public Gtk::ToggleButton
+{
+public:
+    using ToggledSignal = sigc::signal<void(Gdk::ModifierType)>;
+
+    ModToggleButton();
+    ToggledSignal& signal_toggled() { return m_signal; }
+
+private:
+    void onClick(int n_press, double x, double y);
+
+    Glib::RefPtr<Gtk::GestureClick> m_controller;
+    ToggledSignal m_signal;
 };
 
 /**
@@ -311,20 +328,20 @@ public:
 // public:
 //     MyScrolledWindow();
 // };
-//
-// /**
-//  * @brief subclass of Gtk::ScrolledWindow in order to handle the large toolbars (wider than available space)
-//  */
-// class MyScrolledToolbar final : public Gtk::ScrolledWindow
-// {
-//     bool onScroll(double dx, double dy);
-//
-//     void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
-//                        int& minimum_baseline, int& natural_baseline) const override;
-//
-// public:
-//     MyScrolledToolbar();
-// };
+
+/**
+ * @brief subclass of Gtk::ScrolledWindow in order to handle the large toolbars (wider than available space)
+ */
+class MyScrolledToolbar final : public Gtk::ScrolledWindow
+{
+    bool onScroll(double dx, double dy);
+
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
+
+public:
+    MyScrolledToolbar();
+};
 
 /**
  * @brief subclass of Gtk::ComboBox in order to handle the scrollwheel
@@ -772,6 +789,7 @@ public:
     RotateLabel();
     explicit RotateLabel(const Glib::ustring& text);
 
+    void set_text(const Glib::ustring& text);
     void rotate90(bool val = true);
 
 protected:
