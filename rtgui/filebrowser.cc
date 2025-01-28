@@ -1164,7 +1164,7 @@ void FileBrowser::openDefaultViewer (int destination)
 }
 #endif
 
-void FileBrowser::keyPressed (guint keyval, guint keycode, Gdk::ModifierType state)
+bool FileBrowser::keyPressed (guint keyval, guint keycode, Gdk::ModifierType state)
 {
     bool ctrl = isControlOrMetaDown(state);
     bool shift = isShiftDown(state);
@@ -1172,63 +1172,64 @@ void FileBrowser::keyPressed (guint keyval, guint keycode, Gdk::ModifierType sta
 
     if ((keyval == GDK_KEY_C || keyval == GDK_KEY_c) && ctrl && shift) {
 //         menuItemActivated (copyTo);
+        return true;
     } else if ((keyval == GDK_KEY_M || keyval == GDK_KEY_m) && ctrl && shift) {
 //         menuItemActivated (moveTo);
-        return;
+        return true;
     } else if ((keyval == GDK_KEY_C || keyval == GDK_KEY_c || keyval == GDK_KEY_Insert) && ctrl) {
         copyProfile ();
-        return;
+        return true;
     } else if ((keyval == GDK_KEY_V || keyval == GDK_KEY_v) && ctrl && !shift) {
         pasteProfile ();
-        return;
+        return true;
     } else if (keyval == GDK_KEY_Insert && shift) {
         pasteProfile ();
-        return;
+        return true;
     } else if ((keyval == GDK_KEY_V || keyval == GDK_KEY_v) && ctrl && shift) {
         partPasteProfile ();
-        return;
+        return true;
     } else if (keyval == GDK_KEY_Delete && !shift) {
 //         menuItemActivated (trash);
-        return;
+        return true;
     } else if (keyval == GDK_KEY_Delete && shift) {
 //         menuItemActivated (untrash);
-        return;
+        return true;
     } else if ((keyval == GDK_KEY_B || keyval == GDK_KEY_b) && ctrl && !shift) {
 //         menuItemActivated (develop);
-        return;
+        return true;
     } else if ((keyval == GDK_KEY_B || keyval == GDK_KEY_b) && ctrl && shift) {
 //         menuItemActivated (developfast);
-        return;
+        return true;
     } else if ((keyval == GDK_KEY_A || keyval == GDK_KEY_a) && ctrl) {
 //         menuItemActivated (selall);
-        return;
+        return true;
     } else if (keyval == GDK_KEY_F2 && !ctrl) {
 //         menuItemActivated (rename);
-        return;
+        return true;
     } else if (keyval == GDK_KEY_F3 && !(ctrl || shift || alt)) { // open Previous image from FileBrowser perspective
         FileBrowser::openPrevImage ();
-        return;
+        return true;
     } else if (keyval == GDK_KEY_F4 && !(ctrl || shift || alt)) { // open Next image from FileBrowser perspective
         FileBrowser::openNextImage ();
-        return;
+        return true;
     } else if (keyval == GDK_KEY_Left) {
         selectPrev (1, shift);
-        return;
+        return true;
     } else if (keyval == GDK_KEY_Right) {
         selectNext (1, shift);
-        return;
+        return true;
     } else if (keyval == GDK_KEY_Up) {
         selectPrev (numOfCols, shift);
-        return;
+        return true;
     } else if (keyval == GDK_KEY_Down) {
         selectNext (numOfCols, shift);
-        return;
+        return true;
     } else if (keyval == GDK_KEY_Home) {
         selectFirst (shift);
-        return;
+        return true;
     } else if (keyval == GDK_KEY_End) {
         selectLast (shift);
-        return;
+        return true;
     } else if(keyval == GDK_KEY_Return || keyval == GDK_KEY_KP_Enter) {
         std::vector<FileBrowserEntry*> mselected;
 
@@ -1248,14 +1249,14 @@ void FileBrowser::keyPressed (guint keyval, guint keycode, Gdk::ModifierType sta
         }
 
         openDefaultViewer (dest);
-        return;
+        return true;
 #endif
     } else if (keyval == GDK_KEY_Page_Up) {
         scrollPage(GDK_SCROLL_UP);
-        return;
+        return true;
     } else if (keyval == GDK_KEY_Page_Down) {
         scrollPage(GDK_SCROLL_DOWN);
-        return;
+        return true;
     }
 
 #ifdef __WIN32__
@@ -1263,53 +1264,53 @@ void FileBrowser::keyPressed (guint keyval, guint keycode, Gdk::ModifierType sta
         switch(keycode) {
         case 0x30:  // 0-key
             requestRanking (0);
-            return;
+            return true;
 
         case 0x31:  // 1-key
             requestRanking (1);
-            return;
+            return true;
 
         case 0x32:  // 2-key
             requestRanking (2);
-            return;
+            return true;
 
         case 0x33:  // 3-key
             requestRanking (3);
-            return;
+            return true;
 
         case 0x34:  // 4-key
             requestRanking (4);
-            return;
+            return true;
 
         case 0x35:  // 5-key
             requestRanking (5);
-            return;
+            return true;
         }
     } else if (shift && ctrl && !alt) { // color labels
         switch(keycode) {
         case 0x30:  // 0-key
             requestColorLabel (0);
-            return;
+            return true;
 
         case 0x31:  // 1-key
             requestColorLabel (1);
-            return;
+            return true;
 
         case 0x32:  // 2-key
             requestColorLabel (2);
-            return;
+            return true;
 
         case 0x33:  // 3-key
             requestColorLabel (3);
-            return;
+            return true;
 
         case 0x34:  // 4-key
             requestColorLabel (4);
-            return;
+            return true;
 
         case 0x35:  // 5-key
             requestColorLabel (5);
-            return;
+            return true;
         }
     }
 
@@ -1318,53 +1319,53 @@ void FileBrowser::keyPressed (guint keyval, guint keycode, Gdk::ModifierType sta
         switch(keycode) {
         case 0x13:
             requestRanking (0);
-            return;
+            return true;
 
         case 0x0a:
             requestRanking (1);
-            return;
+            return true;
 
         case 0x0b:
             requestRanking (2);
-            return;
+            return true;
 
         case 0x0c:
             requestRanking (3);
-            return;
+            return true;
 
         case 0x0d:
             requestRanking (4);
-            return;
+            return true;
 
         case 0x0e:
             requestRanking (5);
-            return;
+            return true;
         }
     } else if (shift && ctrl && !alt) { // color labels
         switch(keycode) {
         case 0x13:
             requestColorLabel (0);
-            return;
+            return true;
 
         case 0x0a:
             requestColorLabel (1);
-            return;
+            return true;
 
         case 0x0b:
             requestColorLabel (2);
-            return;
+            return true;
 
         case 0x0c:
             requestColorLabel (3);
-            return;
+            return true;
 
         case 0x0d:
             requestColorLabel (4);
-            return;
+            return true;
 
         case 0x0e:
             requestColorLabel (5);
-            return;
+            return true;
         }
     }
 #endif

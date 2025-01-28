@@ -48,7 +48,8 @@
 
 using namespace std;
 
-FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
+// FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
+FileCatalog::FileCatalog (FilePanel* filepanel) :
     filepanel(filepanel),
     selectedDirectoryId(1),
     actionNextPrevious(NAV_NONE),
@@ -62,9 +63,9 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     filterPanel(nullptr),
     exportPanel(nullptr),
     previewsToLoad(0),
-    previewsLoaded(0),
-    coarsePanel(cp),
-    toolBar(tb)
+    previewsLoaded(0)
+//     coarsePanel(cp),
+//     toolBar(tb)
 {
 
     set_orientation(Gtk::Orientation::VERTICAL);
@@ -192,7 +193,8 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     iUnRanked = new RtImage ("star-gold-hollow-small");
     igUnRanked = new RtImage ("star-hollow-small");
     bUnRanked = Gtk::manage( new ModToggleButton () );
-    bUnRanked->get_style_context()->add_class("smallbutton");
+    // smallbutton seems to cause mouseover area and sizing issues
+    // bUnRanked->get_style_context()->add_class("smallbutton");
     bUnRanked->set_active (false);
     bUnRanked->set_child (*igUnRanked);
     bUnRanked->set_has_frame(false);
@@ -204,7 +206,7 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
         iranked[i] = new RtImage ("star-gold-small");
         igranked[i] = new RtImage ("star-small");
         bRank[i] = Gtk::manage( new ModToggleButton () );
-        bRank[i]->get_style_context()->add_class("smallbutton");
+        // bRank[i]->get_style_context()->add_class("smallbutton");
         bRank[i]->set_child (*igranked[i]);
         bRank[i]->set_has_frame(false);
         pack_start (fltrRankbox, *bRank[i], Pack::SHRINK);
@@ -219,7 +221,7 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     iUnCLabeled = new RtImage(clabelActiveIcons[0]);
     igUnCLabeled = new RtImage(clabelInactiveIcons[0]);
     bUnCLabeled = Gtk::manage(new ModToggleButton());
-    bUnCLabeled->get_style_context()->add_class("smallbutton");
+    // bUnCLabeled->get_style_context()->add_class("smallbutton");
     bUnCLabeled->set_active(false);
     bUnCLabeled->set_child(*igUnCLabeled);
     bUnCLabeled->set_has_frame(false);
@@ -231,7 +233,7 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
         iCLabeled[i] = new RtImage(clabelActiveIcons[i+1]);
         igCLabeled[i] = new RtImage(clabelInactiveIcons[i+1]);
         bCLabel[i] = Gtk::manage(new ModToggleButton());
-        bCLabel[i]->get_style_context()->add_class("smallbutton");
+        // bCLabel[i]->get_style_context()->add_class("smallbutton");
         bCLabel[i]->set_child(*igCLabeled[i]);
         bCLabel[i]->set_has_frame(false);
         pack_start (fltrLabelbox, *bCLabel[i], Pack::SHRINK);
@@ -273,7 +275,7 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
 
     for (int i = 0; i < 2; i++) {
         bEdited[i] = Gtk::manage(new ModToggleButton ());
-        bEdited[i]->get_style_context()->add_class("smallbutton");
+        // bEdited[i]->get_style_context()->add_class("smallbutton");
         bEdited[i]->set_active (false);
         bEdited[i]->set_child (*igEdited[i]);
         bEdited[i]->set_has_frame(false);
@@ -296,7 +298,7 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
 
     for (int i = 0; i < 2; i++) {
         bRecentlySaved[i] = Gtk::manage(new ModToggleButton ());
-        bRecentlySaved[i]->get_style_context()->add_class("smallbutton");
+        // bRecentlySaved[i]->get_style_context()->add_class("smallbutton");
         bRecentlySaved[i]->set_active (false);
         bRecentlySaved[i]->set_child (*igRecentlySaved[i]);
         bRecentlySaved[i]->set_has_frame(false);
@@ -441,15 +443,16 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     tbRightPanel_1->signal_toggled().connect( sigc::mem_fun(*this, &FileCatalog::tbRightPanel_1_toggled) );
     pack_end (buttonBar, *tbRightPanel_1, Pack::SHRINK);
 
-    pack_end (buttonBar, *coarsePanel, Pack::SHRINK);
+//     pack_end (buttonBar, *coarsePanel, Pack::SHRINK);
     pack_end (buttonBar, *Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
-    pack_end (buttonBar, *toolBar, Pack::SHRINK);
+//     pack_end (buttonBar, *toolBar, Pack::SHRINK);
     pack_end (buttonBar, *Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
 
     // add default panel
     hBox = Gtk::manage( new Gtk::Box () );
     pack_end (this, *fileBrowser);
     hBox->set_name ("FilmstripPanel");
+    hBox->hide();
     fileBrowser->applyFilter (getFilter()); // warning: can call this only after all objects used in getFilter (e.g. Query) are instantiated
     //printf("FileCatalog::FileCatalog  fileBrowser->applyFilter (getFilter())\n");
     pack_start (this, *hBox);
@@ -758,6 +761,7 @@ void FileCatalog::_refreshProgressBar ()
                 progressLabel->rotate90();
             }
             if (nb) {
+                // TODO(gtk4): Critial warning about nb not being right pointer
                 nb->set_tab_label(*filepanel, *grid);
             }
         }
@@ -2238,7 +2242,7 @@ void FileCatalog::openNextPreviousEditorImage (const Glib::ustring& fname, bool 
     }
 }
 
-void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierType state)
+bool FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierType state)
 {
 
     bool ctrl = isControlOrMetaDown(state);
@@ -2261,14 +2265,14 @@ void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierT
             tbRightPanel_1->set_active (!tbRightPanel_1->get_active()); // toggle right panel
         }
 
-        return;
+        return true;
 
     case GDK_KEY_m:
         if (!ctrl && !alt) {
             toggleSidePanels();
         }
 
-        return;
+        return true;
     }
 
     if (shift) {
@@ -2278,7 +2282,7 @@ void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierT
             // set focus on something neutral, this is useful to remove focus from BrowsePath and Query
             // when need to execute a shortcut, which otherwise will be typed into those fields
             filepanel->grab_focus();
-            return;
+            return true;
         }
     }
 
@@ -2288,35 +2292,35 @@ void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierT
         switch(keycode) {
         case 0x30:
             categoryButtonToggled(state, bUnRanked, false);
-            return;
+            return true;
 
         case 0x31:
             categoryButtonToggled(state, bRank[0], false);
-            return;
+            return true;
 
         case 0x32:
             categoryButtonToggled(state, bRank[1], false);
-            return;
+            return true;
 
         case 0x33:
             categoryButtonToggled(state, bRank[2], false);
-            return;
+            return true;
 
         case 0x34:
             categoryButtonToggled(state, bRank[3], false);
-            return;
+            return true;
 
         case 0x35:
             categoryButtonToggled(state, bRank[4], false);
-            return;
+            return true;
 
         case 0x36:
             categoryButtonToggled(state, bEdited[0], false);
-            return;
+            return true;
 
         case 0x37:
             categoryButtonToggled(state, bEdited[1], false);
-            return;
+            return true;
         }
     }
 
@@ -2327,7 +2331,7 @@ void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierT
         case GDK_KEY_KP_Enter:
             if (BrowsePath->is_focus()) {
                 FileCatalog::buttonBrowsePathPressed ();
-                return;
+                return true;
             }
 
             break;
@@ -2338,35 +2342,35 @@ void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierT
         switch(keycode) {
         case 0x30:
             categoryButtonToggled(state, bUnCLabeled, false);
-            return;
+            return true;
 
         case 0x31:
             categoryButtonToggled(state, bCLabel[0], false);
-            return;
+            return true;
 
         case 0x32:
             categoryButtonToggled(state, bCLabel[1], false);
-            return;
+            return true;
 
         case 0x33:
             categoryButtonToggled(state, bCLabel[2], false);
-            return;
+            return true;
 
         case 0x34:
             categoryButtonToggled(state, bCLabel[3], false);
-            return;
+            return true;
 
         case 0x35:
             categoryButtonToggled(state, bCLabel[4], false);
-            return;
+            return true;
 
         case 0x36:
             categoryButtonToggled(state, bRecentlySaved[0], false);
-            return;
+            return true;
 
         case 0x37:
             categoryButtonToggled(state, bRecentlySaved[1], false);
-            return;
+            return true;
         }
     }
 
@@ -2376,35 +2380,35 @@ void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierT
         switch(keycode) {
         case 0x13:
             categoryButtonToggled(state, bUnRanked, false);
-            return;
+            return true;
 
         case 0x0a:
             categoryButtonToggled(state, bRank[0], false);
-            return;
+            return true;
 
         case 0x0b:
             categoryButtonToggled(state, bRank[1], false);
-            return;
+            return true;
 
         case 0x0c:
             categoryButtonToggled(state, bRank[2], false);
-            return;
+            return true;
 
         case 0x0d:
             categoryButtonToggled(state, bRank[3], false);
-            return;
+            return true;
 
         case 0x0e:
             categoryButtonToggled(state, bRank[4], false);
-            return;
+            return true;
 
         case 0x0f:
             categoryButtonToggled(state, bEdited[0], false);
-            return;
+            return true;
 
         case 0x10:
             categoryButtonToggled(state, bEdited[1], false);
-            return;
+            return true;
         }
     }
 
@@ -2415,7 +2419,7 @@ void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierT
         case GDK_KEY_KP_Enter:
             if (BrowsePath->is_focus()) {
                 FileCatalog::buttonBrowsePathPressed ();
-                return;
+                return true;
             }
 
             break;
@@ -2426,35 +2430,35 @@ void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierT
         switch(keycode) {
         case 0x13:
             categoryButtonToggled(state, bUnCLabeled, false);
-            return;
+            return true;
 
         case 0x0a:
             categoryButtonToggled(state, bCLabel[0], false);
-            return;
+            return true;
 
         case 0x0b:
             categoryButtonToggled(state, bCLabel[1], false);
-            return;
+            return true;
 
         case 0x0c:
             categoryButtonToggled(state, bCLabel[2], false);
-            return;
+            return true;
 
         case 0x0d:
             categoryButtonToggled(state, bCLabel[3], false);
-            return;
+            return true;
 
         case 0x0e:
             categoryButtonToggled(state, bCLabel[4], false);
-            return;
+            return true;
 
         case 0x0f:
             categoryButtonToggled(state, bRecentlySaved[0], false);
-            return;
+            return true;
 
         case 0x10:
             categoryButtonToggled(state, bRecentlySaved[1], false);
-            return;
+            return true;
         }
     }
 
@@ -2465,7 +2469,7 @@ void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierT
         case GDK_KEY_d:
         case GDK_KEY_D:
             categoryButtonToggled(state, bFilterClear, false);
-            return;
+            return true;
         }
     }
 
@@ -2474,26 +2478,26 @@ void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierT
 
         case GDK_KEY_bracketright:
             coarsePanel->rotateRight();
-            return;
+            return true;
 
         case GDK_KEY_bracketleft:
             coarsePanel->rotateLeft();
-            return;
+            return true;
 
         case GDK_KEY_i:
         case GDK_KEY_I:
             exifInfo->set_active (!exifInfo->get_active());
-            return;
+            return true;
 
         case GDK_KEY_plus:
         case GDK_KEY_equal:
             zoomIn();
-            return;
+            return true;
 
         case GDK_KEY_minus:
         case GDK_KEY_underscore:
             zoomOut();
-            return;
+            return true;
         default: // do nothing, avoids a cppcheck false positive
             break;
         }
@@ -2504,17 +2508,17 @@ void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierT
         case GDK_KEY_o:
             BrowsePath->select_region(0, BrowsePath->get_text_length());
             BrowsePath->grab_focus();
-            return;
+            return true;
 
         case GDK_KEY_f:
             Query->select_region(0, Query->get_text_length());
             Query->grab_focus();
-            return;
+            return true;
 
         case GDK_KEY_t:
         case GDK_KEY_T:
             categoryButtonToggled(state, bTrash, false);
-            return;
+            return true;
         }
     }
 
@@ -2532,7 +2536,7 @@ void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierT
                 options.showFilmStripToolBar = !options.showFilmStripToolBar;
             }
 
-            return;
+            return true;
         }
     }
 
@@ -2551,7 +2555,7 @@ void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierT
             }
 
             refreshHeight();
-            return;
+            return true;
         }
     }
 
@@ -2559,17 +2563,17 @@ void FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierT
         switch (keyval) {
         case GDK_KEY_f:
 //             fileBrowser->getInspector()->showWindow(false, true);
-            return;
+            return true;
         case GDK_KEY_F:
 //             fileBrowser->getInspector()->showWindow(false, false);
-            return;
+            return true;
         }
     }
 
-    fileBrowser->keyPressed(keyval, keycode, state);
+    return fileBrowser->keyPressed(keyval, keycode, state);
 }
 
-void FileCatalog::handleShortcutKeyRelease(guint keyval, guint keycode, Gdk::ModifierType state)
+bool FileCatalog::handleShortcutKeyRelease(guint keyval, guint keycode, Gdk::ModifierType state)
 {
     bool ctrl = isControlOrMetaDown(state);
     bool alt = isAltDown(state);
@@ -2579,9 +2583,11 @@ void FileCatalog::handleShortcutKeyRelease(guint keyval, guint keycode, Gdk::Mod
         case GDK_KEY_f:
         case GDK_KEY_F:
 //             fileBrowser->getInspector()->hideWindow();
-            return;
+            return true;
         }
     }
+
+    return false;
 }
 
 void FileCatalog::showToolBar()

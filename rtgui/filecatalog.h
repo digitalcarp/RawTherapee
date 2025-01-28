@@ -168,7 +168,8 @@ public:
     CoarsePanel* coarsePanel;
     ToolBar* toolBar;
 
-    FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel);
+//     FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel);
+    FileCatalog (FilePanel* filepanel);
     ~FileCatalog() override;
     void dirSelected (const Glib::ustring& dirname, const Glib::ustring& openfile);
     void closeDir    ();
@@ -282,8 +283,8 @@ public:
     void selectImage (const Glib::ustring& fname, bool clearFilters);
     void openNextPreviousEditorImage (const Glib::ustring& fname, bool clearFilters, eRTNav nextPrevious);
 
-    void handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierType state);
-    void handleShortcutKeyRelease(guint keyval, guint keycode, Gdk::ModifierType state);
+    bool handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierType state);
+    bool handleShortcutKeyRelease(guint keyval, guint keycode, Gdk::ModifierType state);
 
     bool CheckSidePanelsVisibility();
     void toggleSidePanels();

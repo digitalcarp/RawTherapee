@@ -183,7 +183,7 @@ public:
     bool checkFilter (ThumbBrowserEntryBase* entry) const override;
     void rightClicked () override;
     void doubleClicked (ThumbBrowserEntryBase* entry) override;
-    void keyPressed (guint keyval, guint keycode, Gdk::ModifierType state) override;
+    bool keyPressed (guint keyval, guint keycode, Gdk::ModifierType state) override;
 
     void saveThumbnailHeight (int height) override;
     int  getThumbnailHeight () override;

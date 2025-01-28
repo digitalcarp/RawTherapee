@@ -21,8 +21,7 @@
 #include <gtkmm.h>
 
 #include "exportpanel.h"
-// TODO(gtk4)
-// #include "filecatalog.h"
+#include "filecatalog.h"
 #include "fileselectionlistener.h"
 #include "filterpanel.h"
 #include "history.h"
@@ -39,7 +38,7 @@ class DirBrowser;
 
 class FilePanel final :
     public Gtk::Paned,
-//     public FileSelectionListener,
+    public FileSelectionListener,
     public rtengine::NonCopyable
 {
 public:
@@ -54,7 +53,7 @@ public:
     DirBrowser* dirBrowser;
     FilterPanel* filterPanel;
     ExportPanel* exportPanel;
-    // FileCatalog* fileCatalog;
+    FileCatalog* fileCatalog;
     Gtk::Paned *ribbonPane;
 
     void setParent (RtWindow* p)
@@ -67,7 +66,7 @@ public:
     void open (const Glib::ustring& d); // open a file or a directory
     void refreshEditedState (const std::set<Glib::ustring>& efiles)
     {
-//         fileCatalog->refreshEditedState (efiles);
+        fileCatalog->refreshEditedState (efiles);
     }
     void loadingThumbs(const Glib::ustring& str, double rate);
 
@@ -75,14 +74,14 @@ public:
     void saveOptions ();
 
     // interface fileselectionlistener
-//     bool fileSelected(Thumbnail* thm) override;
-//     bool addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries) override;
+    bool fileSelected(Thumbnail* thm) override;
+    bool addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries) override;
 
     void optionsChanged         ();
 //     bool imageLoaded( Thumbnail* thm, ProgressConnector<rtengine::InitialImage*> * );
 
-//     bool handleShortcutKey (GdkEventKey* event);
-//     bool handleShortcutKeyRelease(GdkEventKey *event);
+    bool handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierType state);
+    bool handleShortcutKeyRelease(guint keyval, guint keycode, Gdk::ModifierType state);
     void updateTPVScrollbar (bool hide);
     void updateToolPanelToolLocations(
         const std::vector<Glib::ustring> &favorites, bool cloneFavoriteTools);

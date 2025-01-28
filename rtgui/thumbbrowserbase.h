@@ -223,7 +223,10 @@ public:
     }
     virtual void rightClicked () = 0;
     virtual void doubleClicked (ThumbBrowserEntryBase* entry) {}
-    virtual void keyPressed (guint keyval, guint keycode, Gdk::ModifierType state) {}
+    virtual bool keyPressed (guint keyval, guint keycode, Gdk::ModifierType state)
+    {
+        return false;
+    }
     virtual void selectionChanged () {}
 
     virtual void redrawNeeded (ThumbBrowserEntryBase* entry);

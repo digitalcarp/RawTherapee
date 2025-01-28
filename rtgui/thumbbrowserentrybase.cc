@@ -188,6 +188,12 @@ void ThumbBrowserEntryBase::updateBackBuffer ()
     Gtk::Widget* w = parent->getDrawingArea ();
     const hidpi::ScaledDeviceSize expectedDeviceSize = expected.scaleToDevice(activeDeviceScale);
 
+    // If thumbnail is hidden by a filter, drawing to it will crash
+    // if either width or height is zero then return early
+    if (expectedDeviceSize.width == 0 || expectedDeviceSize.height == 0) {
+        return;
+    }
+
     if (backBuffer && (backBuffer->getWidth() != expectedDeviceSize.width || backBuffer->getHeight() != expectedDeviceSize.height)) {
         // deleting the existing BackBuffer
         backBuffer.reset();
@@ -195,12 +201,6 @@ void ThumbBrowserEntryBase::updateBackBuffer ()
     if (!backBuffer) {
         backBuffer = Glib::RefPtr<BackBuffer>(new BackBuffer(expectedDeviceSize.width, expectedDeviceSize.height));
         hidpi::setDeviceScale(backBuffer->getSurface(), expectedDeviceSize.device_scale);
-    }
-
-    // If thumbnail is hidden by a filter, drawing to it will crash
-    // if either width or height is zero then return early
-    if (!backBuffer->getWidth() || !backBuffer->getHeight()) {
-        return;
     }
 
     Cairo::RefPtr<Cairo::ImageSurface> surface = backBuffer->getSurface();

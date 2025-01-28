@@ -65,21 +65,22 @@ FilePanel::FilePanel () : parent(nullptr), error(0)
 //     tpc = new BatchToolPanelCoordinator (this);
     // Location bar
 //     fileCatalog = Gtk::manage ( new FileCatalog (tpc->coarse, tpc->getToolBar(), this) );
+    fileCatalog = Gtk::manage ( new FileCatalog (this) );
     // Holds the location bar and thumbnails
     ribbonPane = Gtk::manage ( new Gtk::Paned() );
-//     ribbonPane->set_start_child(*fileCatalog);
+    ribbonPane->set_start_child(*fileCatalog);
     ribbonPane->set_size_request(50, 150);
     pack2 (dirpaned, *ribbonPane, true, true);
 
     DirBrowser::DirSelectionSignal dirSelected = dirBrowser->dirSelected ();
-//     dirSelected.connect (sigc::mem_fun (fileCatalog, &FileCatalog::dirSelected));
+    dirSelected.connect (sigc::mem_fun (*fileCatalog, &FileCatalog::dirSelected));
     dirSelected.connect (sigc::mem_fun (*recentBrowser, &RecentBrowser::dirSelected));
     dirSelected.connect (sigc::mem_fun (*placesBrowser, &PlacesBrowser::dirSelected));
 //     dirSelected.connect (sigc::mem_fun (tpc, &BatchToolPanelCoordinator::dirSelected));
-//     fileCatalog->setDirSelector (sigc::mem_fun (*dirBrowser, &DirBrowser::selectDir));
+    fileCatalog->setDirSelector (sigc::mem_fun (*dirBrowser, &DirBrowser::selectDir));
     placesBrowser->setDirSelector (sigc::mem_fun (*dirBrowser, &DirBrowser::selectDir));
     recentBrowser->setDirSelector (sigc::mem_fun (*dirBrowser, &DirBrowser::selectDir));
-//     fileCatalog->setFileSelectionListener (this);
+    fileCatalog->setFileSelectionListener (this);
 
     rightBox = Gtk::manage ( new Gtk::Box () );
     rightBox->set_size_request(350, 100);
@@ -105,8 +106,8 @@ FilePanel::FilePanel () : parent(nullptr), error(0)
     sExportPanel->set_child (*exportPanel);
     sExportPanel->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
 
-//     fileCatalog->setFilterPanel (filterPanel);
-//     fileCatalog->setExportPanel (exportPanel);
+    fileCatalog->setFilterPanel (filterPanel);
+    fileCatalog->setExportPanel (exportPanel);
 //     fileCatalog->setImageAreaToolListener (tpc);
 //     fileCatalog->fileBrowser->setBatchPParamsChangeListener (tpc);
 
@@ -151,7 +152,7 @@ FilePanel::FilePanel () : parent(nullptr), error(0)
 
 //     fileCatalog->setFileSelectionChangeListener (tpc);
 
-//     fileCatalog->setFileSelectionListener (this);
+    fileCatalog->setFileSelectionListener (this);
 
     idle_register.add(
         [this]() -> bool
@@ -189,13 +190,13 @@ void FilePanel::setAspect ()
     tpcPaned->set_position(options.browserToolPanelHeight);
     set_position(winW - options.browserToolPanelWidth);
 
-//     if (!options.browserDirPanelOpened) {
-//         fileCatalog->toggleLeftPanel();
-//     }
-//
-//     if (!options.browserToolPanelOpened) {
-//         fileCatalog->toggleRightPanel();
-//     }
+    if (!options.browserDirPanelOpened) {
+        fileCatalog->toggleLeftPanel();
+    }
+
+    if (!options.browserToolPanelOpened) {
+        fileCatalog->toggleRightPanel();
+    }
 }
 
 void FilePanel::init ()
@@ -237,8 +238,9 @@ void FilePanel::on_NB_switch_page(Gtk::Widget* page, guint page_num)
 //     }
 }
 
-// bool FilePanel::fileSelected (Thumbnail* thm)
-// {
+bool FilePanel::fileSelected (Thumbnail* thm)
+{
+    return false;
 //     if (!parent) {
 //         return false;
 //     }
@@ -267,16 +269,16 @@ void FilePanel::on_NB_switch_page(Gtk::Widget* page, guint page_num)
 //     ld->startFunc (sigc::bind(sigc::ptr_fun(&rtengine::InitialImage::load), thm->getFileName (), thm->getType() == FT_Raw, &error, parent->getProgressListener()),
 //                    sigc::bind(sigc::mem_fun(*this, &FilePanel::imageLoaded), thm, ld) );
 //     return true;
-// }
-//
-// bool FilePanel::addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries)
-// {
+}
+
+bool FilePanel::addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries)
+{
 //     if (parent) {
 //         parent->addBatchQueueJobs (entries);
 //     }
-//
-//     return true;
-// }
+
+    return true;
+}
 
 // bool FilePanel::imageLoaded( Thumbnail* thm, ProgressConnector<rtengine::InitialImage*> *pc )
 // {
@@ -369,11 +371,11 @@ void FilePanel::saveOptions ()
     options.browserToolPanelWidth = winW - get_position();
     options.browserToolPanelHeight = tpcPaned->get_position ();
 
-//     if (options.startupDir == STARTUPDIR_LAST && !fileCatalog->lastSelectedDir().empty()) {
-//         options.startupPath = fileCatalog->lastSelectedDir ();
-//     }
-//
-//     fileCatalog->closeDir ();
+    if (options.startupDir == STARTUPDIR_LAST && !fileCatalog->lastSelectedDir().empty()) {
+        options.startupPath = fileCatalog->lastSelectedDir ();
+    }
+
+    fileCatalog->closeDir ();
 }
 
 void FilePanel::open (const Glib::ustring& d)
@@ -390,12 +392,11 @@ void FilePanel::optionsChanged ()
 {
 
 //     tpc->optionsChanged ();
-//     fileCatalog->refreshThumbImages ();
+    fileCatalog->refreshThumbImages ();
 }
 
-// bool FilePanel::handleShortcutKey (GdkEventKey* event)
-// {
-//
+bool FilePanel::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierType state)
+{
 //     if(tpc->getToolBar() && tpc->getToolBar()->handleShortcutKey(event)) {
 //         return true;
 //     }
@@ -403,22 +404,22 @@ void FilePanel::optionsChanged ()
 //     if(tpc->handleShortcutKey(event)) {
 //         return true;
 //     }
-//
-//     if(fileCatalog->handleShortcutKey(event)) {
-//         return true;
-//     }
-//
-//     return false;
-// }
 
-// bool FilePanel::handleShortcutKeyRelease(GdkEventKey *event)
-// {
-//     if(fileCatalog->handleShortcutKeyRelease(event)) {
-//         return true;
-//     }
-//
-//     return false;
-// }
+    if(fileCatalog->handleShortcutKey(keyval, keycode, state)) {
+        return true;
+    }
+
+    return false;
+}
+
+bool FilePanel::handleShortcutKeyRelease(guint keyval, guint keycode, Gdk::ModifierType state)
+{
+    if(fileCatalog->handleShortcutKeyRelease(keyval, keycode, state)) {
+        return true;
+    }
+
+    return false;
+}
 
 void FilePanel::loadingThumbs(const Glib::ustring& str, double rate)
 {
