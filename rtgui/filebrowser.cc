@@ -25,15 +25,16 @@
 
 #include "filebrowser.h"
 
-#include "batchqueue.h"
+// #include "batchqueue.h"
 #include "clipboard.h"
-#include "inspector.h"
+// #include "inspector.h"
 #include "multilangmgr.h"
 #include "options.h"
 #include "paramsedited.h"
 #include "profilestorecombobox.h"
 #include "procparamchangers.h"
 #include "rtimage.h"
+#include "rtmessagedialog.h"
 #include "threadutils.h"
 #include "thumbnail.h"
 
@@ -54,7 +55,7 @@ const Glib::ustring* getOriginalExtension (const ThumbBrowserEntryBase* entry)
     const ExtensionVector& originalExtensions = options.parsedExtensions;
 
     // Extract extension from basename
-    const Glib::ustring basename = Glib::path_get_basename (entry->filename.lowercase());
+    const Glib::ustring basename = Glib::path_get_basename (entry->filename.lowercase().c_str());
 
     const Glib::ustring::size_type pos = basename.find_last_of ('.');
     if (pos >= basename.length () - 1) {
@@ -96,7 +97,7 @@ void findOriginalEntries (const std::vector<ThumbBrowserEntryBase*>& entries)
     std::map<Glib::ustring, std::vector<ThumbBrowserEntryBase*>> byBasename;
 
     for (const auto entry : entries) {
-        const auto basename = Glib::path_get_basename(entry->filename.lowercase());
+        const auto basename = Glib::path_get_basename(entry->filename.lowercase().c_str());
 
         const auto pos = basename.find_last_of('.');
         if (pos >= basename.length() - 1) {
@@ -129,17 +130,17 @@ void findOriginalEntries (const std::vector<ThumbBrowserEntryBase*>& entries)
 }
 
 FileBrowser::FileBrowser () :
-    menuLabel(nullptr),
-    miOpenDefaultViewer(nullptr),
-    selectDF(nullptr),
-    thisIsDF(nullptr),
-    autoDF(nullptr),
-    selectFF(nullptr),
-    thisIsFF(nullptr),
-    autoFF(nullptr),
-    clearFromCache(nullptr),
-    clearFromCacheFull(nullptr),
-    colorLabel_actionData(nullptr),
+//     menuLabel(nullptr),
+//     miOpenDefaultViewer(nullptr),
+//     selectDF(nullptr),
+//     thisIsDF(nullptr),
+//     autoDF(nullptr),
+//     selectFF(nullptr),
+//     thisIsFF(nullptr),
+//     autoFF(nullptr),
+//     clearFromCache(nullptr),
+//     clearFromCacheFull(nullptr),
+//     colorLabel_actionData(nullptr),
     bppcl(nullptr),
     tbl(nullptr),
     numFiltered(0),
@@ -149,464 +150,448 @@ FileBrowser::FileBrowser () :
 
     ProfileStore::getInstance()->addListener(this);
 
-    int p = 0;
-    pmenu = new Gtk::Menu ();
-    pmenu->attach (*Gtk::manage(open = new Gtk::MenuItem (M("FILEBROWSER_POPUPOPEN"))), 0, 1, p, p + 1);
-    p++;
-    if (options.inspectorWindow) {
-        pmenu->attach (*Gtk::manage(inspect = new Gtk::MenuItem (M("FILEBROWSER_POPUPINSPECT"))), 0, 1, p, p + 1);
-        p++;
-    }
-    pmenu->attach (*Gtk::manage(develop = new MyImageMenuItem (M("FILEBROWSER_POPUPPROCESS"), "gears")), 0, 1, p, p + 1);
-    p++;
-    pmenu->attach (*Gtk::manage(developfast = new Gtk::MenuItem (M("FILEBROWSER_POPUPPROCESSFAST"))), 0, 1, p, p + 1);
-    p++;
-
-    pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
-    p++;
-    pmenu->attach (*Gtk::manage(selall = new Gtk::MenuItem (M("FILEBROWSER_POPUPSELECTALL"))), 0, 1, p, p + 1);
-    p++;
-
-    /***********************
-     * sort
-     ***********************/
-    const std::array<std::string, 2> cnameSortOrders = {
-        M("SORT_ASCENDING"),
-        M("SORT_DESCENDING"),
-    };
-
-    const std::array<std::string, Options::SORT_METHOD_COUNT> cnameSortMethods = {
-        M("SORT_BY_NAME"),
-        M("SORT_BY_DATE"),
-        M("SORT_BY_EXIF"),
-        M("SORT_BY_RANK"),
-        M("SORT_BY_LABEL"),
-    };
-
-    pmenu->attach (*Gtk::manage(menuSort = new Gtk::MenuItem (M("FILEBROWSER_POPUPSORTBY"))), 0, 1, p, p + 1);
-    p++;
-    Gtk::Menu* submenuSort = Gtk::manage (new Gtk::Menu ());
-    Gtk::RadioButtonGroup sortOrderGroup, sortMethodGroup;
-    for (size_t i = 0; i < cnameSortOrders.size(); i++) {
-        submenuSort->attach (*Gtk::manage(sortOrder[i] = new Gtk::RadioMenuItem (sortOrderGroup, cnameSortOrders[i])), 0, 1, p, p + 1);
-        p++;
-        sortOrder[i]->set_active (i == options.sortDescending);
-    }
-    submenuSort->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
-    p++;
-    for (size_t i = 0; i < cnameSortMethods.size(); i++) {
-        submenuSort->attach (*Gtk::manage(sortMethod[i] = new Gtk::RadioMenuItem (sortMethodGroup, cnameSortMethods[i])), 0, 1, p, p + 1);
-        p++;
-        sortMethod[i]->set_active (i == options.sortMethod);
-    }
-    submenuSort->show_all ();
-    menuSort->set_submenu (*submenuSort);
-
-    /***********************
-     * rank
-     ***********************/
-    if (options.menuGroupRank) {
-        pmenu->attach (*Gtk::manage(menuRank = new Gtk::MenuItem (M("FILEBROWSER_POPUPRANK"))), 0, 1, p, p + 1);
-        p++;
-        Gtk::Menu* submenuRank = Gtk::manage (new Gtk::Menu ());
-        submenuRank->attach (*Gtk::manage(rank[0] = new Gtk::MenuItem (M("FILEBROWSER_POPUPUNRANK"))), 0, 1, p, p + 1);
-        p++;
-
-        for (int i = 1; i <= 5; i++) {
-            submenuRank->attach (*Gtk::manage(rank[i] = new Gtk::MenuItem (M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPRANK", i)))), 0, 1, p, p + 1);
-            p++;
-        }
-
-        submenuRank->show_all ();
-        menuRank->set_submenu (*submenuRank);
-    } else {
-        pmenu->attach (*Gtk::manage(rank[0] = new Gtk::MenuItem (M("FILEBROWSER_POPUPUNRANK"))), 0, 1, p, p + 1);
-        p++;
-
-        for (int i = 1; i <= 5; i++) {
-            pmenu->attach (*Gtk::manage(rank[i] = new Gtk::MenuItem (M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPRANK", i)))), 0, 1, p, p + 1);
-            p++;
-        }
-
-        pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
-        p++;
-    }
-
-    if (!options.menuGroupRank || !options.menuGroupLabel) { // separate Rank and Color Labels if either is not grouped
-        pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
-    }
-
-    p++;
-
-    /***********************
-     * color labels
-     ***********************/
-
-    // Thumbnail context menu
-    // Similar image arrays in filecatalog.cc
-    std::array<std::string, 6> clabelActiveIcons = {"circle-empty-gray-small", "circle-red-small", "circle-yellow-small", "circle-green-small", "circle-blue-small", "circle-purple-small"};
-    std::array<std::string, 6> clabelInactiveIcons = {"circle-empty-darkgray-small", "circle-empty-red-small", "circle-empty-yellow-small", "circle-empty-green-small", "circle-empty-blue-small", "circle-empty-purple-small"};
-
-    if (options.menuGroupLabel) {
-        pmenu->attach (*Gtk::manage(menuLabel = new Gtk::MenuItem (M("FILEBROWSER_POPUPCOLORLABEL"))), 0, 1, p, p + 1);
-        p++;
-        Gtk::Menu* submenuLabel = Gtk::manage (new Gtk::Menu ());
-
-        for (int i = 0; i <= 5; i++) {
-            submenuLabel->attach(*Gtk::manage(colorlabel[i] = new MyImageMenuItem(M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPCOLORLABEL", i)), clabelActiveIcons[i])), 0, 1, p, p + 1);
-            p++;
-        }
-
-        submenuLabel->show_all ();
-        menuLabel->set_submenu (*submenuLabel);
-    } else {
-        for (int i = 0; i <= 5; i++) {
-            pmenu->attach(*Gtk::manage(colorlabel[i] = new MyImageMenuItem(M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPCOLORLABEL", i)), clabelInactiveIcons[i])), 0, 1, p, p + 1);
-            p++;
-        }
-    }
-
-    pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
-    p++;
-
-    /***********************
-     * external programs
-     * *********************/
-#if defined(_WIN32)
-    Gtk::manage(miOpenDefaultViewer = new Gtk::MenuItem (M("FILEBROWSER_OPENDEFAULTVIEWER")));
-#endif
-
-    // Build a list of menu items
-    mMenuExtProgs.clear();
-    amiExtProg = nullptr;
-
-    for (const auto& action : extProgStore->getActions ()) {
-        if (action.target == 1 || action.target == 2) {
-            mMenuExtProgs[action.getFullName ()] = &action;
-        }
-    }
-
-    // Attach them to menu
-    if (!mMenuExtProgs.empty() || miOpenDefaultViewer) {
-        amiExtProg = new Gtk::MenuItem*[mMenuExtProgs.size()];
-        int itemNo = 0;
-
-        if (options.menuGroupExtProg) {
-            pmenu->attach (*Gtk::manage(menuExtProg = new Gtk::MenuItem (M("FILEBROWSER_EXTPROGMENU"))), 0, 1, p, p + 1);
-            p++;
-            Gtk::Menu* submenuExtProg = Gtk::manage (new Gtk::Menu());
-
-#ifdef _WIN32
-            if (miOpenDefaultViewer) {
-                submenuExtProg->attach (*miOpenDefaultViewer, 0, 1, p, p + 1);
-                p++;
-            }
-#endif
-            for (auto it = mMenuExtProgs.begin(); it != mMenuExtProgs.end(); it++, itemNo++) {
-                submenuExtProg->attach (*Gtk::manage(amiExtProg[itemNo] = new Gtk::MenuItem ((*it).first)), 0, 1, p, p + 1);
-                p++;
-            }
-
-            submenuExtProg->show_all ();
-            menuExtProg->set_submenu (*submenuExtProg);
-        } else {
-#ifdef _WIN32
-            if (miOpenDefaultViewer) {
-                pmenu->attach (*miOpenDefaultViewer, 0, 1, p, p + 1);
-                p++;
-            }
-#endif
-            for (auto it = mMenuExtProgs.begin(); it != mMenuExtProgs.end(); it++, itemNo++) {
-                pmenu->attach (*Gtk::manage(amiExtProg[itemNo] = new Gtk::MenuItem ((*it).first)), 0, 1, p, p + 1);
-                p++;
-            }
-        }
-
-        pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
-        p++;
-    }
-
-    /***********************
-     * File Operations
-     * *********************/
-    if (options.menuGroupFileOperations) {
-        pmenu->attach (*Gtk::manage(menuFileOperations = new Gtk::MenuItem (M("FILEBROWSER_POPUPFILEOPERATIONS"))), 0, 1, p, p + 1);
-        p++;
-        Gtk::Menu* submenuFileOperations = Gtk::manage (new Gtk::Menu ());
-
-        submenuFileOperations->attach (*Gtk::manage(trash = new Gtk::MenuItem (M("FILEBROWSER_POPUPTRASH"))), 0, 1, p, p + 1);
-        p++;
-        submenuFileOperations->attach (*Gtk::manage(untrash = new Gtk::MenuItem (M("FILEBROWSER_POPUPUNTRASH"))), 0, 1, p, p + 1);
-        p++;
-        submenuFileOperations->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
-        p++;
-        submenuFileOperations->attach (*Gtk::manage(rename = new Gtk::MenuItem (M("FILEBROWSER_POPUPRENAME"))), 0, 1, p, p + 1);
-        p++;
-        submenuFileOperations->attach (*Gtk::manage(remove = new Gtk::MenuItem (M("FILEBROWSER_POPUPREMOVE"))), 0, 1, p, p + 1);
-        p++;
-        submenuFileOperations->attach (*Gtk::manage(removeInclProc = new Gtk::MenuItem (M("FILEBROWSER_POPUPREMOVEINCLPROC"))), 0, 1, p, p + 1);
-        p++;
-        submenuFileOperations->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
-        p++;
-        submenuFileOperations->attach (*Gtk::manage(copyTo = new Gtk::MenuItem (M("FILEBROWSER_POPUPCOPYTO"))), 0, 1, p, p + 1);
-        p++;
-        submenuFileOperations->attach (*Gtk::manage(moveTo = new Gtk::MenuItem (M("FILEBROWSER_POPUPMOVETO"))), 0, 1, p, p + 1);
-        p++;
-
-        submenuFileOperations->show_all ();
-        menuFileOperations->set_submenu (*submenuFileOperations);
-    } else {
-        pmenu->attach (*Gtk::manage(trash = new Gtk::MenuItem (M("FILEBROWSER_POPUPTRASH"))), 0, 1, p, p + 1);
-        p++;
-        pmenu->attach (*Gtk::manage(untrash = new Gtk::MenuItem (M("FILEBROWSER_POPUPUNTRASH"))), 0, 1, p, p + 1);
-        p++;
-        pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
-        p++;
-        pmenu->attach (*Gtk::manage(rename = new Gtk::MenuItem (M("FILEBROWSER_POPUPRENAME"))), 0, 1, p, p + 1);
-        p++;
-        pmenu->attach (*Gtk::manage(remove = new Gtk::MenuItem (M("FILEBROWSER_POPUPREMOVE"))), 0, 1, p, p + 1);
-        p++;
-        pmenu->attach (*Gtk::manage(removeInclProc = new Gtk::MenuItem (M("FILEBROWSER_POPUPREMOVEINCLPROC"))), 0, 1, p, p + 1);
-        p++;
-        pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
-        p++;
-        pmenu->attach (*Gtk::manage(copyTo = new Gtk::MenuItem (M("FILEBROWSER_POPUPCOPYTO"))), 0, 1, p, p + 1);
-        p++;
-        pmenu->attach (*Gtk::manage(moveTo = new Gtk::MenuItem (M("FILEBROWSER_POPUPMOVETO"))), 0, 1, p, p + 1);
-        p++;
-    }
-
-    pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
-    p++;
-
-    /***********************
-     * Profile Operations
-     * *********************/
-    if (options.menuGroupProfileOperations) {
-        pmenu->attach (*Gtk::manage(menuProfileOperations = new Gtk::MenuItem (M("FILEBROWSER_POPUPPROFILEOPERATIONS"))), 0, 1, p, p + 1);
-        p++;
-
-        Gtk::Menu* submenuProfileOperations = Gtk::manage (new Gtk::Menu ());
-
-        submenuProfileOperations->attach (*Gtk::manage(copyprof = new Gtk::MenuItem (M("FILEBROWSER_COPYPROFILE"))), 0, 1, p, p + 1);
-        p++;
-        submenuProfileOperations->attach (*Gtk::manage(pasteprof = new Gtk::MenuItem (M("FILEBROWSER_PASTEPROFILE"))), 0, 1, p, p + 1);
-        p++;
-        submenuProfileOperations->attach (*Gtk::manage(partpasteprof = new Gtk::MenuItem (M("FILEBROWSER_PARTIALPASTEPROFILE"))), 0, 1, p, p + 1);
-        p++;
-        submenuProfileOperations->attach (*Gtk::manage(applyprof = new Gtk::MenuItem (M("FILEBROWSER_APPLYPROFILE"))), 0, 1, p, p + 1);
-        p++;
-        submenuProfileOperations->attach (*Gtk::manage(applypartprof = new Gtk::MenuItem (M("FILEBROWSER_APPLYPROFILE_PARTIAL"))), 0, 1, p, p + 1);
-        p++;
-        submenuProfileOperations->attach (*Gtk::manage(resetdefaultprof = new Gtk::MenuItem (M("FILEBROWSER_RESETDEFAULTPROFILE"))), 0, 1, p, p + 1);
-        p++;
-        submenuProfileOperations->attach (*Gtk::manage(clearprof = new Gtk::MenuItem (M("FILEBROWSER_CLEARPROFILE"))), 0, 1, p, p + 1);
-        p++;
-
-        submenuProfileOperations->show_all ();
-        menuProfileOperations->set_submenu (*submenuProfileOperations);
-    } else {
-        pmenu->attach (*Gtk::manage(copyprof = new Gtk::MenuItem (M("FILEBROWSER_COPYPROFILE"))), 0, 1, p, p + 1);
-        p++;
-        pmenu->attach (*Gtk::manage(pasteprof = new Gtk::MenuItem (M("FILEBROWSER_PASTEPROFILE"))), 0, 1, p, p + 1);
-        p++;
-        pmenu->attach (*Gtk::manage(partpasteprof = new Gtk::MenuItem (M("FILEBROWSER_PARTIALPASTEPROFILE"))), 0, 1, p, p + 1);
-        p++;
-        pmenu->attach (*Gtk::manage(applyprof = new Gtk::MenuItem (M("FILEBROWSER_APPLYPROFILE"))), 0, 1, p, p + 1);
-        p++;
-        pmenu->attach (*Gtk::manage(applypartprof = new Gtk::MenuItem (M("FILEBROWSER_APPLYPROFILE_PARTIAL"))), 0, 1, p, p + 1);
-        p++;
-        pmenu->attach (*Gtk::manage(resetdefaultprof = new Gtk::MenuItem (M("FILEBROWSER_RESETDEFAULTPROFILE"))), 0, 1, p, p + 1);
-        p++;
-        pmenu->attach (*Gtk::manage(clearprof = new Gtk::MenuItem (M("FILEBROWSER_CLEARPROFILE"))), 0, 1, p, p + 1);
-        p++;
-    }
-
-
-    pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
-    p++;
-    pmenu->attach (*Gtk::manage(menuDF = new Gtk::MenuItem (M("FILEBROWSER_DARKFRAME"))), 0, 1, p, p + 1);
-    p++;
-    pmenu->attach (*Gtk::manage(menuFF = new Gtk::MenuItem (M("FILEBROWSER_FLATFIELD"))), 0, 1, p, p + 1);
-    p++;
-
-    pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
-    p++;
-    pmenu->attach (*Gtk::manage(cachemenu = new Gtk::MenuItem (M("FILEBROWSER_CACHE"))), 0, 1, p, p + 1);
-
-    pmenu->show_all ();
-
-    /***********************
-     * Accelerators
-     * *********************/
-    pmaccelgroup = Gtk::AccelGroup::create ();
-    pmenu->set_accel_group (pmaccelgroup);
-    selall->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_a, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-    trash->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_Delete, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
-    untrash->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_Delete, Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
-    open->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_Return, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
-    if (options.inspectorWindow)
-        inspect->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_f, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
-    develop->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_B, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-    developfast->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_B, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
-    copyprof->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_C, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-    pasteprof->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_V, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-    partpasteprof->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_V, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
-    copyTo->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_C, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
-    moveTo->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_M, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
-
-    // Bind to event handlers
-    open->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), open));
-
-    if (options.inspectorWindow) {
-        inspect->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), inspect));
-    }
-
-    for (int i = 0; i < 2; i++) {
-        sortOrder[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), sortOrder[i]));
-    }
-
-    for (int i = 0; i < Options::SORT_METHOD_COUNT; i++) {
-        sortMethod[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), sortMethod[i]));
-    }
-
-    for (int i = 0; i < 6; i++) {
-        rank[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), rank[i]));
-    }
-
-    for (int i = 0; i < 6; i++) {
-        colorlabel[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), colorlabel[i]));
-    }
-
-    for (size_t i = 0; i < mMenuExtProgs.size(); i++) {
-        amiExtProg[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), amiExtProg[i]));
-    }
-
-#ifdef _WIN32
-    if (miOpenDefaultViewer) {
-        miOpenDefaultViewer->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), miOpenDefaultViewer));
-    }
-#endif
-
-    trash->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), trash));
-    untrash->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), untrash));
-    develop->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), develop));
-    developfast->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), developfast));
-    rename->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), rename));
-    remove->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), remove));
-    removeInclProc->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), removeInclProc));
-    selall->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), selall));
-    copyTo->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), copyTo));
-    moveTo->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), moveTo));
-    copyprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), copyprof));
-    pasteprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), pasteprof));
-    partpasteprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), partpasteprof));
-    applyprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), applyprof));
-    applypartprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), applypartprof));
-    resetdefaultprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), resetdefaultprof));
-    clearprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), clearprof));
-    cachemenu->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), cachemenu));
-
-    // A separate pop-up menu for Color Labels
-    int c = 0;
-    pmenuColorLabels = new Gtk::Menu();
-
-    for (int i = 0; i <= 5; i++) {
-        pmenuColorLabels->attach(*Gtk::manage(colorlabel_pop[i] = new MyImageMenuItem(M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPCOLORLABEL", i)), clabelActiveIcons[i])), 0, 1, c, c + 1);
-        c++;
-    }
-
-    pmenuColorLabels->show_all();
+//     int p = 0;
+//     pmenu = new Gtk::Menu ();
+//     pmenu->attach (*Gtk::manage(open = new Gtk::MenuItem (M("FILEBROWSER_POPUPOPEN"))), 0, 1, p, p + 1);
+//     p++;
+//     if (options.inspectorWindow) {
+//         pmenu->attach (*Gtk::manage(inspect = new Gtk::MenuItem (M("FILEBROWSER_POPUPINSPECT"))), 0, 1, p, p + 1);
+//         p++;
+//     }
+//     pmenu->attach (*Gtk::manage(develop = new MyImageMenuItem (M("FILEBROWSER_POPUPPROCESS"), "gears")), 0, 1, p, p + 1);
+//     p++;
+//     pmenu->attach (*Gtk::manage(developfast = new Gtk::MenuItem (M("FILEBROWSER_POPUPPROCESSFAST"))), 0, 1, p, p + 1);
+//     p++;
+//
+//     pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
+//     p++;
+//     pmenu->attach (*Gtk::manage(selall = new Gtk::MenuItem (M("FILEBROWSER_POPUPSELECTALL"))), 0, 1, p, p + 1);
+//     p++;
+//
+//     /***********************
+//      * sort
+//      ***********************/
+//     const std::array<std::string, 2> cnameSortOrders = {
+//         M("SORT_ASCENDING"),
+//         M("SORT_DESCENDING"),
+//     };
+//
+//     const std::array<std::string, Options::SORT_METHOD_COUNT> cnameSortMethods = {
+//         M("SORT_BY_NAME"),
+//         M("SORT_BY_DATE"),
+//         M("SORT_BY_EXIF"),
+//         M("SORT_BY_RANK"),
+//         M("SORT_BY_LABEL"),
+//     };
+//
+//     pmenu->attach (*Gtk::manage(menuSort = new Gtk::MenuItem (M("FILEBROWSER_POPUPSORTBY"))), 0, 1, p, p + 1);
+//     p++;
+//     Gtk::Menu* submenuSort = Gtk::manage (new Gtk::Menu ());
+//     Gtk::RadioButtonGroup sortOrderGroup, sortMethodGroup;
+//     for (size_t i = 0; i < cnameSortOrders.size(); i++) {
+//         submenuSort->attach (*Gtk::manage(sortOrder[i] = new Gtk::RadioMenuItem (sortOrderGroup, cnameSortOrders[i])), 0, 1, p, p + 1);
+//         p++;
+//         sortOrder[i]->set_active (i == options.sortDescending);
+//     }
+//     submenuSort->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
+//     p++;
+//     for (size_t i = 0; i < cnameSortMethods.size(); i++) {
+//         submenuSort->attach (*Gtk::manage(sortMethod[i] = new Gtk::RadioMenuItem (sortMethodGroup, cnameSortMethods[i])), 0, 1, p, p + 1);
+//         p++;
+//         sortMethod[i]->set_active (i == options.sortMethod);
+//     }
+//     menuSort->set_submenu (*submenuSort);
+//
+//     /***********************
+//      * rank
+//      ***********************/
+//     if (options.menuGroupRank) {
+//         pmenu->attach (*Gtk::manage(menuRank = new Gtk::MenuItem (M("FILEBROWSER_POPUPRANK"))), 0, 1, p, p + 1);
+//         p++;
+//         Gtk::Menu* submenuRank = Gtk::manage (new Gtk::Menu ());
+//         submenuRank->attach (*Gtk::manage(rank[0] = new Gtk::MenuItem (M("FILEBROWSER_POPUPUNRANK"))), 0, 1, p, p + 1);
+//         p++;
+//
+//         for (int i = 1; i <= 5; i++) {
+//             submenuRank->attach (*Gtk::manage(rank[i] = new Gtk::MenuItem (M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPRANK", i)))), 0, 1, p, p + 1);
+//             p++;
+//         }
+//
+//         menuRank->set_submenu (*submenuRank);
+//     } else {
+//         pmenu->attach (*Gtk::manage(rank[0] = new Gtk::MenuItem (M("FILEBROWSER_POPUPUNRANK"))), 0, 1, p, p + 1);
+//         p++;
+//
+//         for (int i = 1; i <= 5; i++) {
+//             pmenu->attach (*Gtk::manage(rank[i] = new Gtk::MenuItem (M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPRANK", i)))), 0, 1, p, p + 1);
+//             p++;
+//         }
+//
+//         pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
+//         p++;
+//     }
+//
+//     if (!options.menuGroupRank || !options.menuGroupLabel) { // separate Rank and Color Labels if either is not grouped
+//         pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
+//     }
+//
+//     p++;
+//
+//     /***********************
+//      * color labels
+//      ***********************/
+//
+//     // Thumbnail context menu
+//     // Similar image arrays in filecatalog.cc
+//     std::array<std::string, 6> clabelActiveIcons = {"circle-empty-gray-small", "circle-red-small", "circle-yellow-small", "circle-green-small", "circle-blue-small", "circle-purple-small"};
+//     std::array<std::string, 6> clabelInactiveIcons = {"circle-empty-darkgray-small", "circle-empty-red-small", "circle-empty-yellow-small", "circle-empty-green-small", "circle-empty-blue-small", "circle-empty-purple-small"};
+//
+//     if (options.menuGroupLabel) {
+//         pmenu->attach (*Gtk::manage(menuLabel = new Gtk::MenuItem (M("FILEBROWSER_POPUPCOLORLABEL"))), 0, 1, p, p + 1);
+//         p++;
+//         Gtk::Menu* submenuLabel = Gtk::manage (new Gtk::Menu ());
+//
+//         for (int i = 0; i <= 5; i++) {
+//             submenuLabel->attach(*Gtk::manage(colorlabel[i] = new MyImageMenuItem(M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPCOLORLABEL", i)), clabelActiveIcons[i])), 0, 1, p, p + 1);
+//             p++;
+//         }
+//
+//         menuLabel->set_submenu (*submenuLabel);
+//     } else {
+//         for (int i = 0; i <= 5; i++) {
+//             pmenu->attach(*Gtk::manage(colorlabel[i] = new MyImageMenuItem(M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPCOLORLABEL", i)), clabelInactiveIcons[i])), 0, 1, p, p + 1);
+//             p++;
+//         }
+//     }
+//
+//     pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
+//     p++;
+//
+//     /***********************
+//      * external programs
+//      * *********************/
+// #if defined(_WIN32)
+//     Gtk::manage(miOpenDefaultViewer = new Gtk::MenuItem (M("FILEBROWSER_OPENDEFAULTVIEWER")));
+// #endif
+//
+//     // Build a list of menu items
+//     mMenuExtProgs.clear();
+//     amiExtProg = nullptr;
+//
+//     for (const auto& action : extProgStore->getActions ()) {
+//         if (action.target == 1 || action.target == 2) {
+//             mMenuExtProgs[action.getFullName ()] = &action;
+//         }
+//     }
+//
+//     // Attach them to menu
+//     if (!mMenuExtProgs.empty() || miOpenDefaultViewer) {
+//         amiExtProg = new Gtk::MenuItem*[mMenuExtProgs.size()];
+//         int itemNo = 0;
+//
+//         if (options.menuGroupExtProg) {
+//             pmenu->attach (*Gtk::manage(menuExtProg = new Gtk::MenuItem (M("FILEBROWSER_EXTPROGMENU"))), 0, 1, p, p + 1);
+//             p++;
+//             Gtk::Menu* submenuExtProg = Gtk::manage (new Gtk::Menu());
+//
+// #ifdef _WIN32
+//             if (miOpenDefaultViewer) {
+//                 submenuExtProg->attach (*miOpenDefaultViewer, 0, 1, p, p + 1);
+//                 p++;
+//             }
+// #endif
+//             for (auto it = mMenuExtProgs.begin(); it != mMenuExtProgs.end(); it++, itemNo++) {
+//                 submenuExtProg->attach (*Gtk::manage(amiExtProg[itemNo] = new Gtk::MenuItem ((*it).first)), 0, 1, p, p + 1);
+//                 p++;
+//             }
+//
+//             menuExtProg->set_submenu (*submenuExtProg);
+//         } else {
+// #ifdef _WIN32
+//             if (miOpenDefaultViewer) {
+//                 pmenu->attach (*miOpenDefaultViewer, 0, 1, p, p + 1);
+//                 p++;
+//             }
+// #endif
+//             for (auto it = mMenuExtProgs.begin(); it != mMenuExtProgs.end(); it++, itemNo++) {
+//                 pmenu->attach (*Gtk::manage(amiExtProg[itemNo] = new Gtk::MenuItem ((*it).first)), 0, 1, p, p + 1);
+//                 p++;
+//             }
+//         }
+//
+//         pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
+//         p++;
+//     }
+//
+//     /***********************
+//      * File Operations
+//      * *********************/
+//     if (options.menuGroupFileOperations) {
+//         pmenu->attach (*Gtk::manage(menuFileOperations = new Gtk::MenuItem (M("FILEBROWSER_POPUPFILEOPERATIONS"))), 0, 1, p, p + 1);
+//         p++;
+//         Gtk::Menu* submenuFileOperations = Gtk::manage (new Gtk::Menu ());
+//
+//         submenuFileOperations->attach (*Gtk::manage(trash = new Gtk::MenuItem (M("FILEBROWSER_POPUPTRASH"))), 0, 1, p, p + 1);
+//         p++;
+//         submenuFileOperations->attach (*Gtk::manage(untrash = new Gtk::MenuItem (M("FILEBROWSER_POPUPUNTRASH"))), 0, 1, p, p + 1);
+//         p++;
+//         submenuFileOperations->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
+//         p++;
+//         submenuFileOperations->attach (*Gtk::manage(rename = new Gtk::MenuItem (M("FILEBROWSER_POPUPRENAME"))), 0, 1, p, p + 1);
+//         p++;
+//         submenuFileOperations->attach (*Gtk::manage(remove = new Gtk::MenuItem (M("FILEBROWSER_POPUPREMOVE"))), 0, 1, p, p + 1);
+//         p++;
+//         submenuFileOperations->attach (*Gtk::manage(removeInclProc = new Gtk::MenuItem (M("FILEBROWSER_POPUPREMOVEINCLPROC"))), 0, 1, p, p + 1);
+//         p++;
+//         submenuFileOperations->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
+//         p++;
+//         submenuFileOperations->attach (*Gtk::manage(copyTo = new Gtk::MenuItem (M("FILEBROWSER_POPUPCOPYTO"))), 0, 1, p, p + 1);
+//         p++;
+//         submenuFileOperations->attach (*Gtk::manage(moveTo = new Gtk::MenuItem (M("FILEBROWSER_POPUPMOVETO"))), 0, 1, p, p + 1);
+//         p++;
+//
+//         menuFileOperations->set_submenu (*submenuFileOperations);
+//     } else {
+//         pmenu->attach (*Gtk::manage(trash = new Gtk::MenuItem (M("FILEBROWSER_POPUPTRASH"))), 0, 1, p, p + 1);
+//         p++;
+//         pmenu->attach (*Gtk::manage(untrash = new Gtk::MenuItem (M("FILEBROWSER_POPUPUNTRASH"))), 0, 1, p, p + 1);
+//         p++;
+//         pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
+//         p++;
+//         pmenu->attach (*Gtk::manage(rename = new Gtk::MenuItem (M("FILEBROWSER_POPUPRENAME"))), 0, 1, p, p + 1);
+//         p++;
+//         pmenu->attach (*Gtk::manage(remove = new Gtk::MenuItem (M("FILEBROWSER_POPUPREMOVE"))), 0, 1, p, p + 1);
+//         p++;
+//         pmenu->attach (*Gtk::manage(removeInclProc = new Gtk::MenuItem (M("FILEBROWSER_POPUPREMOVEINCLPROC"))), 0, 1, p, p + 1);
+//         p++;
+//         pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
+//         p++;
+//         pmenu->attach (*Gtk::manage(copyTo = new Gtk::MenuItem (M("FILEBROWSER_POPUPCOPYTO"))), 0, 1, p, p + 1);
+//         p++;
+//         pmenu->attach (*Gtk::manage(moveTo = new Gtk::MenuItem (M("FILEBROWSER_POPUPMOVETO"))), 0, 1, p, p + 1);
+//         p++;
+//     }
+//
+//     pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
+//     p++;
+//
+//     /***********************
+//      * Profile Operations
+//      * *********************/
+//     if (options.menuGroupProfileOperations) {
+//         pmenu->attach (*Gtk::manage(menuProfileOperations = new Gtk::MenuItem (M("FILEBROWSER_POPUPPROFILEOPERATIONS"))), 0, 1, p, p + 1);
+//         p++;
+//
+//         Gtk::Menu* submenuProfileOperations = Gtk::manage (new Gtk::Menu ());
+//
+//         submenuProfileOperations->attach (*Gtk::manage(copyprof = new Gtk::MenuItem (M("FILEBROWSER_COPYPROFILE"))), 0, 1, p, p + 1);
+//         p++;
+//         submenuProfileOperations->attach (*Gtk::manage(pasteprof = new Gtk::MenuItem (M("FILEBROWSER_PASTEPROFILE"))), 0, 1, p, p + 1);
+//         p++;
+//         submenuProfileOperations->attach (*Gtk::manage(partpasteprof = new Gtk::MenuItem (M("FILEBROWSER_PARTIALPASTEPROFILE"))), 0, 1, p, p + 1);
+//         p++;
+//         submenuProfileOperations->attach (*Gtk::manage(applyprof = new Gtk::MenuItem (M("FILEBROWSER_APPLYPROFILE"))), 0, 1, p, p + 1);
+//         p++;
+//         submenuProfileOperations->attach (*Gtk::manage(applypartprof = new Gtk::MenuItem (M("FILEBROWSER_APPLYPROFILE_PARTIAL"))), 0, 1, p, p + 1);
+//         p++;
+//         submenuProfileOperations->attach (*Gtk::manage(resetdefaultprof = new Gtk::MenuItem (M("FILEBROWSER_RESETDEFAULTPROFILE"))), 0, 1, p, p + 1);
+//         p++;
+//         submenuProfileOperations->attach (*Gtk::manage(clearprof = new Gtk::MenuItem (M("FILEBROWSER_CLEARPROFILE"))), 0, 1, p, p + 1);
+//         p++;
+//
+//         menuProfileOperations->set_submenu (*submenuProfileOperations);
+//     } else {
+//         pmenu->attach (*Gtk::manage(copyprof = new Gtk::MenuItem (M("FILEBROWSER_COPYPROFILE"))), 0, 1, p, p + 1);
+//         p++;
+//         pmenu->attach (*Gtk::manage(pasteprof = new Gtk::MenuItem (M("FILEBROWSER_PASTEPROFILE"))), 0, 1, p, p + 1);
+//         p++;
+//         pmenu->attach (*Gtk::manage(partpasteprof = new Gtk::MenuItem (M("FILEBROWSER_PARTIALPASTEPROFILE"))), 0, 1, p, p + 1);
+//         p++;
+//         pmenu->attach (*Gtk::manage(applyprof = new Gtk::MenuItem (M("FILEBROWSER_APPLYPROFILE"))), 0, 1, p, p + 1);
+//         p++;
+//         pmenu->attach (*Gtk::manage(applypartprof = new Gtk::MenuItem (M("FILEBROWSER_APPLYPROFILE_PARTIAL"))), 0, 1, p, p + 1);
+//         p++;
+//         pmenu->attach (*Gtk::manage(resetdefaultprof = new Gtk::MenuItem (M("FILEBROWSER_RESETDEFAULTPROFILE"))), 0, 1, p, p + 1);
+//         p++;
+//         pmenu->attach (*Gtk::manage(clearprof = new Gtk::MenuItem (M("FILEBROWSER_CLEARPROFILE"))), 0, 1, p, p + 1);
+//         p++;
+//     }
+//
+//
+//     pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
+//     p++;
+//     pmenu->attach (*Gtk::manage(menuDF = new Gtk::MenuItem (M("FILEBROWSER_DARKFRAME"))), 0, 1, p, p + 1);
+//     p++;
+//     pmenu->attach (*Gtk::manage(menuFF = new Gtk::MenuItem (M("FILEBROWSER_FLATFIELD"))), 0, 1, p, p + 1);
+//     p++;
+//
+//     pmenu->attach (*Gtk::manage(new Gtk::SeparatorMenuItem ()), 0, 1, p, p + 1);
+//     p++;
+//     pmenu->attach (*Gtk::manage(cachemenu = new Gtk::MenuItem (M("FILEBROWSER_CACHE"))), 0, 1, p, p + 1);
+//
+//     /***********************
+//      * Accelerators
+//      * *********************/
+//     pmaccelgroup = Gtk::AccelGroup::create ();
+//     pmenu->set_accel_group (pmaccelgroup);
+//     selall->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_a, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+//     trash->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_Delete, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
+//     untrash->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_Delete, Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
+//     open->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_Return, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
+// //     if (options.inspectorWindow)
+// //         inspect->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_f, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
+//     develop->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_B, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+//     developfast->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_B, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
+//     copyprof->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_C, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+//     pasteprof->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_V, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+//     partpasteprof->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_V, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
+//     copyTo->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_C, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
+//     moveTo->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_M, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
+//
+//     // Bind to event handlers
+//     open->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), open));
+//
+//     if (options.inspectorWindow) {
+//         inspect->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), inspect));
+//     }
+//
+//     for (int i = 0; i < 2; i++) {
+//         sortOrder[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), sortOrder[i]));
+//     }
+//
+//     for (int i = 0; i < Options::SORT_METHOD_COUNT; i++) {
+//         sortMethod[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), sortMethod[i]));
+//     }
+//
+//     for (int i = 0; i < 6; i++) {
+//         rank[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), rank[i]));
+//     }
+//
+//     for (int i = 0; i < 6; i++) {
+//         colorlabel[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), colorlabel[i]));
+//     }
+//
+//     for (size_t i = 0; i < mMenuExtProgs.size(); i++) {
+//         amiExtProg[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), amiExtProg[i]));
+//     }
+//
+// #ifdef _WIN32
+//     if (miOpenDefaultViewer) {
+//         miOpenDefaultViewer->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), miOpenDefaultViewer));
+//     }
+// #endif
+//
+//     trash->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), trash));
+//     untrash->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), untrash));
+//     develop->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), develop));
+//     developfast->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), developfast));
+//     rename->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), rename));
+//     remove->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), remove));
+//     removeInclProc->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), removeInclProc));
+//     selall->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), selall));
+//     copyTo->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), copyTo));
+//     moveTo->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), moveTo));
+//     copyprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), copyprof));
+//     pasteprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), pasteprof));
+//     partpasteprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), partpasteprof));
+//     applyprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), applyprof));
+//     applypartprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), applypartprof));
+//     resetdefaultprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), resetdefaultprof));
+//     clearprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), clearprof));
+//     cachemenu->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), cachemenu));
+//
+//     // A separate pop-up menu for Color Labels
+//     int c = 0;
+//     pmenuColorLabels = new Gtk::Menu();
+//
+//     for (int i = 0; i <= 5; i++) {
+//         pmenuColorLabels->attach(*Gtk::manage(colorlabel_pop[i] = new MyImageMenuItem(M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPCOLORLABEL", i)), clabelActiveIcons[i])), 0, 1, c, c + 1);
+//         c++;
+//     }
 
     // Has to be located after creation of applyprof and applypartprof
     updateProfileList ();
 
-    // Bind to event handlers
-    for (int i = 0; i <= 5; i++) {
-        colorlabel_pop[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuColorlabelActivated), colorlabel_pop[i]));
-    }
+//     // Bind to event handlers
+//     for (int i = 0; i <= 5; i++) {
+//         colorlabel_pop[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuColorlabelActivated), colorlabel_pop[i]));
+//     }
 }
 
 FileBrowser::~FileBrowser ()
 {
-    idle_register.destroy();
-
     ProfileStore::getInstance()->removeListener(this);
-    delete pmenu;
-    delete pmenuColorLabels;
-    delete[] amiExtProg;
+//     delete pmenu;
+//     delete pmenuColorLabels;
+//     delete[] amiExtProg;
 }
 
 void FileBrowser::rightClicked ()
 {
-
-    {
-        MYREADERLOCK(l, entryRW);
-
-        trash->set_sensitive (false);
-        untrash->set_sensitive (false);
-
-        for (size_t i = 0; i < selected.size(); i++)
-            if ((static_cast<FileBrowserEntry*>(selected[i]))->thumbnail->getTrashed()) {
-                untrash->set_sensitive (true);
-                break;
-            }
-
-        for (size_t i = 0; i < selected.size(); i++)
-            if (!(static_cast<FileBrowserEntry*>(selected[i]))->thumbnail->getTrashed()) {
-                trash->set_sensitive (true);
-                break;
-            }
-
-        pasteprof->set_sensitive (clipboard.hasProcParams());
-        partpasteprof->set_sensitive (clipboard.hasProcParams());
-        copyprof->set_sensitive (selected.size() == 1);
-        clearprof->set_sensitive (!selected.empty());
-        copyTo->set_sensitive (!selected.empty());
-        moveTo->set_sensitive (!selected.empty());
-    }
-
-    // submenuDF
-    int p = 0;
-    Gtk::Menu* submenuDF = Gtk::manage (new Gtk::Menu ());
-    submenuDF->attach (*Gtk::manage(selectDF = new Gtk::MenuItem (M("FILEBROWSER_SELECTDARKFRAME"))), 0, 1, p, p + 1);
-    p++;
-    submenuDF->attach (*Gtk::manage(autoDF = new Gtk::MenuItem (M("FILEBROWSER_AUTODARKFRAME"))), 0, 1, p, p + 1);
-    p++;
-    submenuDF->attach (*Gtk::manage(thisIsDF = new Gtk::MenuItem (M("FILEBROWSER_MOVETODARKFDIR"))), 0, 1, p, p + 1);
-    selectDF->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), selectDF));
-    autoDF->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), autoDF));
-    thisIsDF->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), thisIsDF ));
-    submenuDF->show_all ();
-    menuDF->set_submenu (*submenuDF);
-
-    // submenuFF
-    p = 0;
-    Gtk::Menu* submenuFF = Gtk::manage (new Gtk::Menu ());
-    submenuFF->attach (*Gtk::manage(selectFF = new Gtk::MenuItem (M("FILEBROWSER_SELECTFLATFIELD"))), 0, 1, p, p + 1);
-    p++;
-    submenuFF->attach (*Gtk::manage(autoFF = new Gtk::MenuItem (M("FILEBROWSER_AUTOFLATFIELD"))), 0, 1, p, p + 1);
-    p++;
-    submenuFF->attach (*Gtk::manage(thisIsFF = new Gtk::MenuItem (M("FILEBROWSER_MOVETOFLATFIELDDIR"))), 0, 1, p, p + 1);
-    selectFF->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), selectFF));
-    autoFF->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), autoFF));
-    thisIsFF->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), thisIsFF ));
-    submenuFF->show_all ();
-    menuFF->set_submenu (*submenuFF);
-
-    // build cache sub menu
-    p = 0;
-    Gtk::Menu* cachesubmenu = Gtk::manage (new Gtk::Menu ());
-    cachesubmenu->attach (*Gtk::manage(clearFromCache = new Gtk::MenuItem (M("FILEBROWSER_CACHECLEARFROMPARTIAL"))), 0, 1, p, p + 1);
-    p++;
-    cachesubmenu->attach (*Gtk::manage(clearFromCacheFull = new Gtk::MenuItem (M("FILEBROWSER_CACHECLEARFROMFULL"))), 0, 1, p, p + 1);
-    p++;
-    clearFromCache->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), clearFromCache));
-    clearFromCacheFull->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), clearFromCacheFull));
-    cachesubmenu->show_all ();
-    cachemenu->set_submenu (*cachesubmenu);
-
-    pmenu->popup (3, this->eventTime);
+//     {
+//         MYREADERLOCK(l, entryRW);
+//
+//         trash->set_sensitive (false);
+//         untrash->set_sensitive (false);
+//
+//         for (size_t i = 0; i < selected.size(); i++)
+//             if ((static_cast<FileBrowserEntry*>(selected[i]))->thumbnail->getTrashed()) {
+//                 untrash->set_sensitive (true);
+//                 break;
+//             }
+//
+//         for (size_t i = 0; i < selected.size(); i++)
+//             if (!(static_cast<FileBrowserEntry*>(selected[i]))->thumbnail->getTrashed()) {
+//                 trash->set_sensitive (true);
+//                 break;
+//             }
+//
+//         pasteprof->set_sensitive (clipboard.hasProcParams());
+//         partpasteprof->set_sensitive (clipboard.hasProcParams());
+//         copyprof->set_sensitive (selected.size() == 1);
+//         clearprof->set_sensitive (!selected.empty());
+//         copyTo->set_sensitive (!selected.empty());
+//         moveTo->set_sensitive (!selected.empty());
+//     }
+//
+//     // submenuDF
+//     int p = 0;
+//     Gtk::Menu* submenuDF = Gtk::manage (new Gtk::Menu ());
+//     submenuDF->attach (*Gtk::manage(selectDF = new Gtk::MenuItem (M("FILEBROWSER_SELECTDARKFRAME"))), 0, 1, p, p + 1);
+//     p++;
+//     submenuDF->attach (*Gtk::manage(autoDF = new Gtk::MenuItem (M("FILEBROWSER_AUTODARKFRAME"))), 0, 1, p, p + 1);
+//     p++;
+//     submenuDF->attach (*Gtk::manage(thisIsDF = new Gtk::MenuItem (M("FILEBROWSER_MOVETODARKFDIR"))), 0, 1, p, p + 1);
+//     selectDF->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), selectDF));
+//     autoDF->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), autoDF));
+//     thisIsDF->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), thisIsDF ));
+//     menuDF->set_submenu (*submenuDF);
+//
+//     // submenuFF
+//     p = 0;
+//     Gtk::Menu* submenuFF = Gtk::manage (new Gtk::Menu ());
+//     submenuFF->attach (*Gtk::manage(selectFF = new Gtk::MenuItem (M("FILEBROWSER_SELECTFLATFIELD"))), 0, 1, p, p + 1);
+//     p++;
+//     submenuFF->attach (*Gtk::manage(autoFF = new Gtk::MenuItem (M("FILEBROWSER_AUTOFLATFIELD"))), 0, 1, p, p + 1);
+//     p++;
+//     submenuFF->attach (*Gtk::manage(thisIsFF = new Gtk::MenuItem (M("FILEBROWSER_MOVETOFLATFIELDDIR"))), 0, 1, p, p + 1);
+//     selectFF->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), selectFF));
+//     autoFF->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), autoFF));
+//     thisIsFF->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), thisIsFF ));
+//     menuFF->set_submenu (*submenuFF);
+//
+//     // build cache sub menu
+//     p = 0;
+//     Gtk::Menu* cachesubmenu = Gtk::manage (new Gtk::Menu ());
+//     cachesubmenu->attach (*Gtk::manage(clearFromCache = new Gtk::MenuItem (M("FILEBROWSER_CACHECLEARFROMPARTIAL"))), 0, 1, p, p + 1);
+//     p++;
+//     cachesubmenu->attach (*Gtk::manage(clearFromCacheFull = new Gtk::MenuItem (M("FILEBROWSER_CACHECLEARFROMFULL"))), 0, 1, p, p + 1);
+//     p++;
+//     clearFromCache->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), clearFromCache));
+//     clearFromCacheFull->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), clearFromCacheFull));
+//     cachemenu->set_submenu (*cachesubmenu);
+//
+//     pmenu->popup (3, this->eventTime);
 }
 
 void FileBrowser::doubleClicked (ThumbBrowserEntryBase* entry)
@@ -645,12 +630,12 @@ void FileBrowser::addEntry_ (FileBrowserEntry* entry)
     entry->drawable = false;
     entry->framed = editedFiles.find(entry->filename) != editedFiles.end();
 
-    // add button set to the thumbbrowserentry
-    entry->addButtonSet(new FileThumbnailButtonSet(entry));
-    entry->getThumbButtonSet()->setRank(entry->thumbnail->getRank());
-    entry->getThumbButtonSet()->setColorLabel(entry->thumbnail->getColorLabel());
-    entry->getThumbButtonSet()->setInTrash(entry->thumbnail->getTrashed());
-    entry->getThumbButtonSet()->setButtonListener(this);
+//     // add button set to the thumbbrowserentry
+//     entry->addButtonSet(new FileThumbnailButtonSet(entry));
+//     entry->getThumbButtonSet()->setRank(entry->thumbnail->getRank());
+//     entry->getThumbButtonSet()->setColorLabel(entry->thumbnail->getColorLabel());
+//     entry->getThumbButtonSet()->setInTrash(entry->thumbnail->getTrashed());
+//     entry->getThumbButtonSet()->setButtonListener(this);
     entry->resize(getThumbnailHeight());
     entry->filtered = !checkFilter(entry);
     insertEntry(entry);
@@ -717,341 +702,341 @@ void FileBrowser::close ()
     lastClicked = nullptr;
 }
 
-void FileBrowser::menuColorlabelActivated (Gtk::MenuItem* m)
-{
-
-    std::vector<FileBrowserEntry*> tbe;
-    tbe.push_back (static_cast<FileBrowserEntry*>(colorLabel_actionData));
-
-    for (int i = 0; i < 6; i++)
-        if (m == colorlabel_pop[i]) {
-            colorlabelRequested (tbe, i);
-            return;
-        }
-}
-
-void FileBrowser::menuItemActivated (Gtk::MenuItem* m)
-{
-    std::vector<FileBrowserEntry*> mselected;
-
-    {
-        MYREADERLOCK(l, entryRW);
-
-        for (size_t i = 0; i < selected.size(); i++) {
-            mselected.push_back (static_cast<FileBrowserEntry*>(selected[i]));
-        }
-    }
-
-
-    if (!tbl || (m != selall && mselected.empty()) ) {
-        return;
-    }
-
-    for (int i = 0; i < 2; i++)
-        if (m == sortOrder[i]) {
-            sortOrderRequested (i);
-            return;
-        }
-
-    for (int i = 0; i < Options::SORT_METHOD_COUNT; i++)
-        if (m == sortMethod[i]) {
-            sortMethodRequested (i);
-            return;
-        }
-
-    for (int i = 0; i < 6; i++)
-        if (m == rank[i]) {
-            rankingRequested (mselected, i);
-            return;
-        }
-
-    for (int i = 0; i < 6; i++)
-        if (m == colorlabel[i]) {
-            colorlabelRequested (mselected, i);
-            return;
-        }
-
-    for (size_t j = 0; j < mMenuExtProgs.size(); j++) {
-        if (m == amiExtProg[j]) {
-            const auto pAct = mMenuExtProgs[m->get_label()];
-
-            // Build vector of all file names
-            std::vector<Glib::ustring> selFileNames;
-
-            for (size_t i = 0; i < mselected.size(); i++) {
-                Glib::ustring fn = mselected[i]->thumbnail->getFileName();
-
-                // Maybe batch processed version
-                if (pAct->target == 2) {
-                    fn = Glib::ustring::compose ("%1.%2", BatchQueue::calcAutoFileNameBase(fn), options.saveFormatBatch.format);
-                }
-
-                selFileNames.push_back(fn);
-            }
-
-            pAct->execute (selFileNames);
-            return;
-        }
-    }
-
-    if (m == open) {
-        openRequested(mselected);
-    } else if (options.inspectorWindow && m == inspect) {
-        inspectRequested(mselected);
-    } else if (m == remove) {
-        tbl->deleteRequested (mselected, false, true);
-    } else if (m == removeInclProc) {
-        tbl->deleteRequested (mselected, true, true);
-    } else if (m == trash) {
-        toTrashRequested (mselected);
-    } else if (m == untrash) {
-        fromTrashRequested (mselected);
-    }
-
-    else if (m == develop) {
-        tbl->developRequested (mselected, false);
-    } else if (m == developfast) {
-        if (exportPanel) {
-            // force saving export panel settings
-            exportPanel->setExportPanelListener(nullptr);
-            exportPanel->FastExportPressed();
-            exportPanel->setExportPanelListener(this);
-        }
-        tbl->developRequested (mselected, true);
-    }
-
-    else if (m == rename) {
-        tbl->renameRequested (mselected);
-    } else if (m == selall) {
-        lastClicked = nullptr;
-        {
-            MYWRITERLOCK(l, entryRW);
-
-            selected.clear();
-
-            for (size_t i = 0; i < fd.size(); ++i) {
-                if (checkFilter(fd[i])) {
-                    fd[i]->selected = true;
-                    selected.push_back(fd[i]);
-                }
-            }
-            if (!anchor && !selected.empty()) {
-                anchor = selected[0];
-            }
-        }
-        queue_draw ();
-        notifySelectionListener();
-    } else if( m == copyTo) {
-        tbl->copyMoveRequested (mselected, false);
-    }
-
-    else if( m == moveTo) {
-        tbl->copyMoveRequested (mselected, true);
-    }
-
-    else if (m == autoDF) {
-        if (!mselected.empty() && bppcl) {
-            bppcl->beginBatchPParamsChange(mselected.size());
-        }
-
-        for (size_t i = 0; i < mselected.size(); i++) {
-            rtengine::procparams::ProcParams pp = mselected[i]->thumbnail->getProcParams();
-            pp.raw.df_autoselect = true;
-            pp.raw.dark_frame.clear();
-            mselected[i]->thumbnail->setProcParams(pp, nullptr, FILEBROWSER, false);
-        }
-
-        if (!mselected.empty() && bppcl) {
-            bppcl->endBatchPParamsChange();
-        }
-
-    } else if (m == selectDF) {
-        if( !mselected.empty() ) {
-            rtengine::procparams::ProcParams pp = mselected[0]->thumbnail->getProcParams();
-            Gtk::FileChooserDialog fc (getToplevelWindow (this), "Dark Frame", Gtk::FileChooser::Action::OPEN );
-            bindCurrentFolder (fc, options.lastDarkframeDir);
-            fc.add_button( M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
-            fc.add_button( M("GENERAL_APPLY"), Gtk::ResponseType::APPLY);
-
-            if(!pp.raw.dark_frame.empty()) {
-                fc.set_filename( pp.raw.dark_frame );
-            }
-
-            if( fc.run() == Gtk::ResponseType::APPLY ) {
-                if (bppcl) {
-                    bppcl->beginBatchPParamsChange(mselected.size());
-                }
-
-                for (size_t i = 0; i < mselected.size(); i++) {
-                    rtengine::procparams::ProcParams lpp = mselected[i]->thumbnail->getProcParams();
-                    lpp.raw.dark_frame = fc.get_filename();
-                    lpp.raw.df_autoselect = false;
-                    mselected[i]->thumbnail->setProcParams(lpp, nullptr, FILEBROWSER, false);
-                }
-
-                if (bppcl) {
-                    bppcl->endBatchPParamsChange();
-                }
-            }
-        }
-    } else if( m == thisIsDF) {
-        if( !options.rtSettings.darkFramesPath.empty()) {
-            if (Gio::File::create_for_path(options.rtSettings.darkFramesPath)->query_exists() ) {
-                for (size_t i = 0; i < mselected.size(); i++) {
-                    Glib::RefPtr<Gio::File> file = Gio::File::create_for_path ( mselected[i]->filename );
-
-                    if( !file ) {
-                        continue;
-                    }
-
-                    Glib::ustring destName = options.rtSettings.darkFramesPath + "/" + file->get_basename();
-                    Glib::RefPtr<Gio::File> dest = Gio::File::create_for_path ( destName );
-                    file->move(  dest );
-                }
-
-                // Reinit cache
-                rtengine::DFManager::getInstance().init( options.rtSettings.darkFramesPath );
-            } else {
-                // Target directory creation failed, we clear the darkFramesPath setting
-                options.rtSettings.darkFramesPath.clear();
-                Glib::ustring msg_ = Glib::ustring::compose (M("MAIN_MSG_PATHDOESNTEXIST"), escapeHtmlChars(options.rtSettings.darkFramesPath))
-                                     + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
-                Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-                msgd.set_title(M("TP_DARKFRAME_LABEL"));
-                msgd.run ();
-            }
-        } else {
-            Glib::ustring msg_ = M("MAIN_MSG_SETPATHFIRST") + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
-            Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-            msgd.set_title(M("TP_DARKFRAME_LABEL"));
-            msgd.run ();
-        }
-    } else if (m == autoFF) {
-        if (!mselected.empty() && bppcl) {
-            bppcl->beginBatchPParamsChange(mselected.size());
-        }
-
-        for (size_t i = 0; i < mselected.size(); i++) {
-            rtengine::procparams::ProcParams pp = mselected[i]->thumbnail->getProcParams();
-            pp.raw.ff_AutoSelect = true;
-            pp.raw.ff_file.clear();
-            mselected[i]->thumbnail->setProcParams(pp, nullptr, FILEBROWSER, false);
-        }
-
-        if (!mselected.empty() && bppcl) {
-            bppcl->endBatchPParamsChange();
-        }
-    } else if (m == selectFF) {
-        if( !mselected.empty() ) {
-            rtengine::procparams::ProcParams pp = mselected[0]->thumbnail->getProcParams();
-            Gtk::FileChooserDialog fc (getToplevelWindow (this), "Flat Field", Gtk::FileChooser::Action::OPEN );
-            bindCurrentFolder (fc, options.lastFlatfieldDir);
-            fc.add_button( M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
-            fc.add_button( M("GENERAL_APPLY"), Gtk::ResponseType::APPLY);
-
-            if(!pp.raw.ff_file.empty()) {
-                fc.set_filename( pp.raw.ff_file );
-            }
-
-            if( fc.run() == Gtk::ResponseType::APPLY ) {
-                if (bppcl) {
-                    bppcl->beginBatchPParamsChange(mselected.size());
-                }
-
-                for (size_t i = 0; i < mselected.size(); i++) {
-                    rtengine::procparams::ProcParams lpp = mselected[i]->thumbnail->getProcParams();
-                    lpp.raw.ff_file = fc.get_filename();
-                    lpp.raw.ff_AutoSelect = false;
-                    mselected[i]->thumbnail->setProcParams(lpp, nullptr, FILEBROWSER, false);
-                }
-
-                if (bppcl) {
-                    bppcl->endBatchPParamsChange();
-                }
-            }
-        }
-    } else if( m == thisIsFF) {
-        if( !options.rtSettings.flatFieldsPath.empty()) {
-            if (Gio::File::create_for_path(options.rtSettings.flatFieldsPath)->query_exists() ) {
-                for (size_t i = 0; i < mselected.size(); i++) {
-                    Glib::RefPtr<Gio::File> file = Gio::File::create_for_path ( mselected[i]->filename );
-
-                    if( !file ) {
-                        continue;
-                    }
-
-                    Glib::ustring destName = options.rtSettings.flatFieldsPath + "/" + file->get_basename();
-                    Glib::RefPtr<Gio::File> dest = Gio::File::create_for_path ( destName );
-                    file->move(  dest );
-                }
-
-                // Reinit cache
-                rtengine::ffm.init( options.rtSettings.flatFieldsPath );
-            } else {
-                // Target directory creation failed, we clear the flatFieldsPath setting
-                options.rtSettings.flatFieldsPath.clear();
-                Glib::ustring msg_ = Glib::ustring::compose (M("MAIN_MSG_PATHDOESNTEXIST"), escapeHtmlChars(options.rtSettings.flatFieldsPath))
-                                     + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
-                Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-                msgd.set_title(M("TP_FLATFIELD_LABEL"));
-                msgd.run ();
-            }
-        } else {
-            Glib::ustring msg_ = M("MAIN_MSG_SETPATHFIRST") + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
-            Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-            msgd.set_title(M("TP_FLATFIELD_LABEL"));
-            msgd.run ();
-        }
-    } else if (m == copyprof) {
-        copyProfile ();
-    } else if (m == pasteprof) {
-        pasteProfile ();
-    } else if (m == partpasteprof) {
-        partPasteProfile ();
-    } else if (m == clearprof) {
-        for (size_t i = 0; i < mselected.size(); i++) {
-            mselected[i]->thumbnail->clearProcParams (FILEBROWSER);
-        }
-
-        queue_draw ();
-    } else if (m == resetdefaultprof) {
-        if (!mselected.empty() && bppcl) {
-            bppcl->beginBatchPParamsChange(mselected.size());
-        }
-
-        for (size_t i = 0; i < mselected.size(); i++)  {
-            const auto thumbnail = mselected[i]->thumbnail;
-            const auto rank = thumbnail->getRank();
-            const auto colorLabel = thumbnail->getColorLabel();
-            const auto stage = thumbnail->getTrashed();
-
-            thumbnail->createProcParamsForUpdate (false, true);
-            thumbnail->setRank(rank);
-            thumbnail->setColorLabel(colorLabel);
-            thumbnail->setTrashed(stage);
-
-            // Empty run to update the thumb
-            rtengine::procparams::ProcParams params = thumbnail->getProcParams ();
-            thumbnail->setProcParams (params, nullptr, FILEBROWSER, true, true);
-        }
-
-        if (!mselected.empty() && bppcl) {
-            bppcl->endBatchPParamsChange();
-        }
-    } else if (m == clearFromCache) {
-        tbl->clearFromCacheRequested (mselected, false);
-
-        //queue_draw ();
-    } else if (m == clearFromCacheFull) {
-        tbl->clearFromCacheRequested (mselected, true);
-
-        //queue_draw ();
-#ifdef _WIN32
-    } else if (miOpenDefaultViewer && m == miOpenDefaultViewer) {
-        openDefaultViewer(1);
-#endif
-    }
-}
+// void FileBrowser::menuColorlabelActivated (Gtk::MenuItem* m)
+// {
+//
+//     std::vector<FileBrowserEntry*> tbe;
+//     tbe.push_back (static_cast<FileBrowserEntry*>(colorLabel_actionData));
+//
+//     for (int i = 0; i < 6; i++)
+//         if (m == colorlabel_pop[i]) {
+//             colorlabelRequested (tbe, i);
+//             return;
+//         }
+// }
+//
+// void FileBrowser::menuItemActivated (Gtk::MenuItem* m)
+// {
+//     std::vector<FileBrowserEntry*> mselected;
+//
+//     {
+//         MYREADERLOCK(l, entryRW);
+//
+//         for (size_t i = 0; i < selected.size(); i++) {
+//             mselected.push_back (static_cast<FileBrowserEntry*>(selected[i]));
+//         }
+//     }
+//
+//
+//     if (!tbl || (m != selall && mselected.empty()) ) {
+//         return;
+//     }
+//
+//     for (int i = 0; i < 2; i++)
+//         if (m == sortOrder[i]) {
+//             sortOrderRequested (i);
+//             return;
+//         }
+//
+//     for (int i = 0; i < Options::SORT_METHOD_COUNT; i++)
+//         if (m == sortMethod[i]) {
+//             sortMethodRequested (i);
+//             return;
+//         }
+//
+//     for (int i = 0; i < 6; i++)
+//         if (m == rank[i]) {
+//             rankingRequested (mselected, i);
+//             return;
+//         }
+//
+//     for (int i = 0; i < 6; i++)
+//         if (m == colorlabel[i]) {
+//             colorlabelRequested (mselected, i);
+//             return;
+//         }
+//
+//     for (size_t j = 0; j < mMenuExtProgs.size(); j++) {
+//         if (m == amiExtProg[j]) {
+//             const auto pAct = mMenuExtProgs[m->get_label()];
+//
+//             // Build vector of all file names
+//             std::vector<Glib::ustring> selFileNames;
+//
+//             for (size_t i = 0; i < mselected.size(); i++) {
+//                 Glib::ustring fn = mselected[i]->thumbnail->getFileName();
+//
+//                 // Maybe batch processed version
+//                 if (pAct->target == 2) {
+//                     fn = Glib::ustring::compose ("%1.%2", BatchQueue::calcAutoFileNameBase(fn), options.saveFormatBatch.format);
+//                 }
+//
+//                 selFileNames.push_back(fn);
+//             }
+//
+//             pAct->execute (selFileNames);
+//             return;
+//         }
+//     }
+//
+//     if (m == open) {
+//         openRequested(mselected);
+// //     } else if (options.inspectorWindow && m == inspect) {
+// //         inspectRequested(mselected);
+//     } else if (m == remove) {
+//         tbl->deleteRequested (mselected, false, true);
+//     } else if (m == removeInclProc) {
+//         tbl->deleteRequested (mselected, true, true);
+//     } else if (m == trash) {
+//         toTrashRequested (mselected);
+//     } else if (m == untrash) {
+//         fromTrashRequested (mselected);
+//     }
+//
+//     else if (m == develop) {
+//         tbl->developRequested (mselected, false);
+//     } else if (m == developfast) {
+//         if (exportPanel) {
+//             // force saving export panel settings
+//             exportPanel->setExportPanelListener(nullptr);
+//             exportPanel->FastExportPressed();
+//             exportPanel->setExportPanelListener(this);
+//         }
+//         tbl->developRequested (mselected, true);
+//     }
+//
+//     else if (m == rename) {
+//         tbl->renameRequested (mselected);
+//     } else if (m == selall) {
+//         lastClicked = nullptr;
+//         {
+//             MYWRITERLOCK(l, entryRW);
+//
+//             selected.clear();
+//
+//             for (size_t i = 0; i < fd.size(); ++i) {
+//                 if (checkFilter(fd[i])) {
+//                     fd[i]->selected = true;
+//                     selected.push_back(fd[i]);
+//                 }
+//             }
+//             if (!anchor && !selected.empty()) {
+//                 anchor = selected[0];
+//             }
+//         }
+//         queue_draw ();
+//         notifySelectionListener();
+//     } else if( m == copyTo) {
+//         tbl->copyMoveRequested (mselected, false);
+//     }
+//
+//     else if( m == moveTo) {
+//         tbl->copyMoveRequested (mselected, true);
+//     }
+//
+//     else if (m == autoDF) {
+//         if (!mselected.empty() && bppcl) {
+//             bppcl->beginBatchPParamsChange(mselected.size());
+//         }
+//
+//         for (size_t i = 0; i < mselected.size(); i++) {
+//             rtengine::procparams::ProcParams pp = mselected[i]->thumbnail->getProcParams();
+//             pp.raw.df_autoselect = true;
+//             pp.raw.dark_frame.clear();
+//             mselected[i]->thumbnail->setProcParams(pp, nullptr, FILEBROWSER, false);
+//         }
+//
+//         if (!mselected.empty() && bppcl) {
+//             bppcl->endBatchPParamsChange();
+//         }
+//
+//     } else if (m == selectDF) {
+//         if( !mselected.empty() ) {
+//             rtengine::procparams::ProcParams pp = mselected[0]->thumbnail->getProcParams();
+//             Gtk::FileChooserDialog fc (getToplevelWindow (this), "Dark Frame", Gtk::FileChooser::Action::OPEN );
+//             bindCurrentFolder (fc, options.lastDarkframeDir);
+//             fc.add_button( M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
+//             fc.add_button( M("GENERAL_APPLY"), Gtk::ResponseType::APPLY);
+//
+//             if(!pp.raw.dark_frame.empty()) {
+//                 fc.set_filename( pp.raw.dark_frame );
+//             }
+//
+//             if( fc.run() == Gtk::ResponseType::APPLY ) {
+//                 if (bppcl) {
+//                     bppcl->beginBatchPParamsChange(mselected.size());
+//                 }
+//
+//                 for (size_t i = 0; i < mselected.size(); i++) {
+//                     rtengine::procparams::ProcParams lpp = mselected[i]->thumbnail->getProcParams();
+//                     lpp.raw.dark_frame = fc.get_filename();
+//                     lpp.raw.df_autoselect = false;
+//                     mselected[i]->thumbnail->setProcParams(lpp, nullptr, FILEBROWSER, false);
+//                 }
+//
+//                 if (bppcl) {
+//                     bppcl->endBatchPParamsChange();
+//                 }
+//             }
+//         }
+//     } else if( m == thisIsDF) {
+//         if( !options.rtSettings.darkFramesPath.empty()) {
+//             if (Gio::File::create_for_path(options.rtSettings.darkFramesPath)->query_exists() ) {
+//                 for (size_t i = 0; i < mselected.size(); i++) {
+//                     Glib::RefPtr<Gio::File> file = Gio::File::create_for_path ( mselected[i]->filename );
+//
+//                     if( !file ) {
+//                         continue;
+//                     }
+//
+//                     Glib::ustring destName = options.rtSettings.darkFramesPath + "/" + file->get_basename();
+//                     Glib::RefPtr<Gio::File> dest = Gio::File::create_for_path ( destName );
+//                     file->move(  dest );
+//                 }
+//
+//                 // Reinit cache
+//                 rtengine::DFManager::getInstance().init( options.rtSettings.darkFramesPath );
+//             } else {
+//                 // Target directory creation failed, we clear the darkFramesPath setting
+//                 options.rtSettings.darkFramesPath.clear();
+//                 Glib::ustring msg_ = Glib::ustring::compose (M("MAIN_MSG_PATHDOESNTEXIST"), escapeHtmlChars(options.rtSettings.darkFramesPath))
+//                                      + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
+//                 Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
+//                 msgd.set_title(M("TP_DARKFRAME_LABEL"));
+//                 msgd.run ();
+//             }
+//         } else {
+//             Glib::ustring msg_ = M("MAIN_MSG_SETPATHFIRST") + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
+//             Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
+//             msgd.set_title(M("TP_DARKFRAME_LABEL"));
+//             msgd.run ();
+//         }
+//     } else if (m == autoFF) {
+//         if (!mselected.empty() && bppcl) {
+//             bppcl->beginBatchPParamsChange(mselected.size());
+//         }
+//
+//         for (size_t i = 0; i < mselected.size(); i++) {
+//             rtengine::procparams::ProcParams pp = mselected[i]->thumbnail->getProcParams();
+//             pp.raw.ff_AutoSelect = true;
+//             pp.raw.ff_file.clear();
+//             mselected[i]->thumbnail->setProcParams(pp, nullptr, FILEBROWSER, false);
+//         }
+//
+//         if (!mselected.empty() && bppcl) {
+//             bppcl->endBatchPParamsChange();
+//         }
+//     } else if (m == selectFF) {
+//         if( !mselected.empty() ) {
+//             rtengine::procparams::ProcParams pp = mselected[0]->thumbnail->getProcParams();
+//             Gtk::FileChooserDialog fc (getToplevelWindow (this), "Flat Field", Gtk::FileChooser::Action::OPEN );
+//             bindCurrentFolder (fc, options.lastFlatfieldDir);
+//             fc.add_button( M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
+//             fc.add_button( M("GENERAL_APPLY"), Gtk::ResponseType::APPLY);
+//
+//             if(!pp.raw.ff_file.empty()) {
+//                 fc.set_filename( pp.raw.ff_file );
+//             }
+//
+//             if( fc.run() == Gtk::ResponseType::APPLY ) {
+//                 if (bppcl) {
+//                     bppcl->beginBatchPParamsChange(mselected.size());
+//                 }
+//
+//                 for (size_t i = 0; i < mselected.size(); i++) {
+//                     rtengine::procparams::ProcParams lpp = mselected[i]->thumbnail->getProcParams();
+//                     lpp.raw.ff_file = fc.get_filename();
+//                     lpp.raw.ff_AutoSelect = false;
+//                     mselected[i]->thumbnail->setProcParams(lpp, nullptr, FILEBROWSER, false);
+//                 }
+//
+//                 if (bppcl) {
+//                     bppcl->endBatchPParamsChange();
+//                 }
+//             }
+//         }
+//     } else if( m == thisIsFF) {
+//         if( !options.rtSettings.flatFieldsPath.empty()) {
+//             if (Gio::File::create_for_path(options.rtSettings.flatFieldsPath)->query_exists() ) {
+//                 for (size_t i = 0; i < mselected.size(); i++) {
+//                     Glib::RefPtr<Gio::File> file = Gio::File::create_for_path ( mselected[i]->filename );
+//
+//                     if( !file ) {
+//                         continue;
+//                     }
+//
+//                     Glib::ustring destName = options.rtSettings.flatFieldsPath + "/" + file->get_basename();
+//                     Glib::RefPtr<Gio::File> dest = Gio::File::create_for_path ( destName );
+//                     file->move(  dest );
+//                 }
+//
+//                 // Reinit cache
+//                 rtengine::ffm.init( options.rtSettings.flatFieldsPath );
+//             } else {
+//                 // Target directory creation failed, we clear the flatFieldsPath setting
+//                 options.rtSettings.flatFieldsPath.clear();
+//                 Glib::ustring msg_ = Glib::ustring::compose (M("MAIN_MSG_PATHDOESNTEXIST"), escapeHtmlChars(options.rtSettings.flatFieldsPath))
+//                                      + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
+//                 Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
+//                 msgd.set_title(M("TP_FLATFIELD_LABEL"));
+//                 msgd.run ();
+//             }
+//         } else {
+//             Glib::ustring msg_ = M("MAIN_MSG_SETPATHFIRST") + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
+//             Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
+//             msgd.set_title(M("TP_FLATFIELD_LABEL"));
+//             msgd.run ();
+//         }
+//     } else if (m == copyprof) {
+//         copyProfile ();
+//     } else if (m == pasteprof) {
+//         pasteProfile ();
+//     } else if (m == partpasteprof) {
+//         partPasteProfile ();
+//     } else if (m == clearprof) {
+//         for (size_t i = 0; i < mselected.size(); i++) {
+//             mselected[i]->thumbnail->clearProcParams (FILEBROWSER);
+//         }
+//
+//         queue_draw ();
+//     } else if (m == resetdefaultprof) {
+//         if (!mselected.empty() && bppcl) {
+//             bppcl->beginBatchPParamsChange(mselected.size());
+//         }
+//
+//         for (size_t i = 0; i < mselected.size(); i++)  {
+//             const auto thumbnail = mselected[i]->thumbnail;
+//             const auto rank = thumbnail->getRank();
+//             const auto colorLabel = thumbnail->getColorLabel();
+//             const auto stage = thumbnail->getTrashed();
+//
+//             thumbnail->createProcParamsForUpdate (false, true);
+//             thumbnail->setRank(rank);
+//             thumbnail->setColorLabel(colorLabel);
+//             thumbnail->setTrashed(stage);
+//
+//             // Empty run to update the thumb
+//             rtengine::procparams::ProcParams params = thumbnail->getProcParams ();
+//             thumbnail->setProcParams (params, nullptr, FILEBROWSER, true, true);
+//         }
+//
+//         if (!mselected.empty() && bppcl) {
+//             bppcl->endBatchPParamsChange();
+//         }
+//     } else if (m == clearFromCache) {
+//         tbl->clearFromCacheRequested (mselected, false);
+//
+//         //queue_draw ();
+//     } else if (m == clearFromCacheFull) {
+//         tbl->clearFromCacheRequested (mselected, true);
+//
+//         //queue_draw ();
+// #ifdef _WIN32
+//     } else if (miOpenDefaultViewer && m == miOpenDefaultViewer) {
+//         openDefaultViewer(1);
+// #endif
+//     }
+// }
 
 void FileBrowser::copyProfile ()
 {
@@ -1119,14 +1104,14 @@ void FileBrowser::partPasteProfile ()
             return;
         }
 
-        auto toplevel = static_cast<Gtk::Window*> (get_toplevel ());
-        PartialPasteDlg partialPasteDlg (M("PARTIALPASTE_DIALOGLABEL"), toplevel);
+        auto toplevel = getToplevelWindow(this);
+        auto partialPasteDlg = Gtk::make_managed<PartialPasteDlg>(
+            M("PARTIALPASTE_DIALOGLABEL"), toplevel);
 
-        partialPasteDlg.updateSpotWidget(clipboard.getPartialProfile().pparams);
-
-        int i = partialPasteDlg.run ();
-
-        if (i == Gtk::ResponseType::OK) {
+        partialPasteDlg->updateSpotWidget(clipboard.getPartialProfile().pparams);
+        partialPasteDlg->signal_response().connect([&, partialPasteDlg, mselected](int response) {
+            partialPasteDlg->hide();
+            if (response != Gtk::ResponseType::OK) return;
 
             if (!mselected.empty() && bppcl) {
                 bppcl->beginBatchPParamsChange(mselected.size());
@@ -1139,7 +1124,7 @@ void FileBrowser::partPasteProfile ()
                 rtengine::procparams::PartialProfile pastedPartProf(&entry->thumbnail->getProcParams (), nullptr);
 
                 // pushing the selected values of the clipboard PartialProfile to the temporary PartialProfile
-                partialPasteDlg.applyPaste (pastedPartProf.pparams, pastedPartProf.pedited, cbPartProf.pparams, cbPartProf.pedited);
+                partialPasteDlg->applyPaste (pastedPartProf.pparams, pastedPartProf.pedited, cbPartProf.pparams, cbPartProf.pedited);
 
                 // applying the temporary PartialProfile to the thumb's ProcParams
                 entry->thumbnail->setProcParams (*pastedPartProf.pparams, pastedPartProf.pedited, FILEBROWSER);
@@ -1151,9 +1136,8 @@ void FileBrowser::partPasteProfile ()
             }
 
             queue_draw ();
-        }
-
-        partialPasteDlg.hide ();
+        });
+        partialPasteDlg->show();
     }
 }
 
@@ -1171,82 +1155,81 @@ void FileBrowser::openDefaultViewer (int destination)
     }
 
     if (!success) {
-        Gtk::MessageDialog msgd(getToplevelWindow(this), M("MAIN_MSG_IMAGEUNPROCESSED"), true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-        msgd.run ();
+        auto msgd = Gtk::make_managed<RtMessageDialog>(
+            M("MAIN_MSG_IMAGEUNPROCESSED"),
+            RtMessageDialog::Type::ERROR,
+            RtMessageDialog::ButtonSet::OK);
+        msgd->show(getToplevelWindow(this));
     }
 }
 #endif
 
-bool FileBrowser::keyPressed (GdkEventKey* event)
+void FileBrowser::keyPressed (guint keyval, guint keycode, Gdk::ModifierType state)
 {
-    bool ctrl  = event->state & GDK_CONTROL_MASK;
-    bool shift = event->state & GDK_SHIFT_MASK;
-    bool alt   = event->state & GDK_MOD1_MASK;
-#ifdef __WIN32__
-    bool altgr = event->state & GDK_MOD2_MASK;
-#endif
+    bool ctrl = isControlOrMetaDown(state);
+    bool shift = isShiftDown(state);
+    bool alt = isAltDown(state);
 
-    if ((event->keyval == GDK_KEY_C || event->keyval == GDK_KEY_c) && ctrl && shift) {
-        menuItemActivated (copyTo);
-        return true;
-    } else if ((event->keyval == GDK_KEY_M || event->keyval == GDK_KEY_m) && ctrl && shift) {
-        menuItemActivated (moveTo);
-        return true;
-    } else if ((event->keyval == GDK_KEY_C || event->keyval == GDK_KEY_c || event->keyval == GDK_KEY_Insert) && ctrl) {
+    if ((keyval == GDK_KEY_C || keyval == GDK_KEY_c) && ctrl && shift) {
+//         menuItemActivated (copyTo);
+    } else if ((keyval == GDK_KEY_M || keyval == GDK_KEY_m) && ctrl && shift) {
+//         menuItemActivated (moveTo);
+        return;
+    } else if ((keyval == GDK_KEY_C || keyval == GDK_KEY_c || keyval == GDK_KEY_Insert) && ctrl) {
         copyProfile ();
-        return true;
-    } else if ((event->keyval == GDK_KEY_V || event->keyval == GDK_KEY_v) && ctrl && !shift) {
+        return;
+    } else if ((keyval == GDK_KEY_V || keyval == GDK_KEY_v) && ctrl && !shift) {
         pasteProfile ();
-        return true;
-    } else if (event->keyval == GDK_KEY_Insert && shift) {
+        return;
+    } else if (keyval == GDK_KEY_Insert && shift) {
         pasteProfile ();
-        return true;
-    } else if ((event->keyval == GDK_KEY_V || event->keyval == GDK_KEY_v) && ctrl && shift) {
+        return;
+    } else if ((keyval == GDK_KEY_V || keyval == GDK_KEY_v) && ctrl && shift) {
         partPasteProfile ();
-        return true;
-    } else if (event->keyval == GDK_KEY_Delete && !shift) {
-        menuItemActivated (trash);
-        return true;
-    } else if (event->keyval == GDK_KEY_Delete && shift) {
-        menuItemActivated (untrash);
-        return true;
-    } else if ((event->keyval == GDK_KEY_B || event->keyval == GDK_KEY_b) && ctrl && !shift) {
-        menuItemActivated (develop);
-        return true;
-    } else if ((event->keyval == GDK_KEY_B || event->keyval == GDK_KEY_b) && ctrl && shift) {
-        menuItemActivated (developfast);
-        return true;
-    } else if ((event->keyval == GDK_KEY_A || event->keyval == GDK_KEY_a) && ctrl) {
-        menuItemActivated (selall);
-        return true;
-    } else if (event->keyval == GDK_KEY_F2 && !ctrl) {
-        menuItemActivated (rename);
-        return true;
-    } else if (event->keyval == GDK_KEY_F3 && !(ctrl || shift || alt)) { // open Previous image from FileBrowser perspective
+        return;
+    } else if (keyval == GDK_KEY_Delete && !shift) {
+//         menuItemActivated (trash);
+        return;
+    } else if (keyval == GDK_KEY_Delete && shift) {
+//         menuItemActivated (untrash);
+        return;
+    } else if ((keyval == GDK_KEY_B || keyval == GDK_KEY_b) && ctrl && !shift) {
+//         menuItemActivated (develop);
+        return;
+    } else if ((keyval == GDK_KEY_B || keyval == GDK_KEY_b) && ctrl && shift) {
+//         menuItemActivated (developfast);
+        return;
+    } else if ((keyval == GDK_KEY_A || keyval == GDK_KEY_a) && ctrl) {
+//         menuItemActivated (selall);
+        return;
+    } else if (keyval == GDK_KEY_F2 && !ctrl) {
+//         menuItemActivated (rename);
+        return;
+    } else if (keyval == GDK_KEY_F3 && !(ctrl || shift || alt)) { // open Previous image from FileBrowser perspective
         FileBrowser::openPrevImage ();
-        return true;
-    } else if (event->keyval == GDK_KEY_F4 && !(ctrl || shift || alt)) { // open Next image from FileBrowser perspective
+        return;
+    } else if (keyval == GDK_KEY_F4 && !(ctrl || shift || alt)) { // open Next image from FileBrowser perspective
         FileBrowser::openNextImage ();
-        return true;
-    } else if (event->keyval == GDK_KEY_Left) {
+        return;
+    } else if (keyval == GDK_KEY_Left) {
         selectPrev (1, shift);
-        return true;
-    } else if (event->keyval == GDK_KEY_Right) {
+        return;
+    } else if (keyval == GDK_KEY_Right) {
         selectNext (1, shift);
-        return true;
-    } else if (event->keyval == GDK_KEY_Up) {
+        return;
+    } else if (keyval == GDK_KEY_Up) {
         selectPrev (numOfCols, shift);
-        return true;
-    } else if (event->keyval == GDK_KEY_Down) {
+        return;
+    } else if (keyval == GDK_KEY_Down) {
         selectNext (numOfCols, shift);
-        return true;
-    } else if (event->keyval == GDK_KEY_Home) {
+        return;
+    } else if (keyval == GDK_KEY_Home) {
         selectFirst (shift);
-        return true;
-    } else if (event->keyval == GDK_KEY_End) {
+        return;
+    } else if (keyval == GDK_KEY_End) {
         selectLast (shift);
-        return true;
-    } else if(event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_KP_Enter) {
+        return;
+    } else if(keyval == GDK_KEY_Return || keyval == GDK_KEY_KP_Enter) {
         std::vector<FileBrowserEntry*> mselected;
 
         for (size_t i = 0; i < selected.size(); i++) {
@@ -1255,139 +1238,136 @@ bool FileBrowser::keyPressed (GdkEventKey* event)
 
         openRequested(mselected);
 #ifdef _WIN32
-    } else if (event->keyval == GDK_KEY_F5) {
+    } else if (keyval == GDK_KEY_F5) {
         int dest = 1;
 
-        if (event->state & GDK_SHIFT_MASK) {
+        if (shift) {
             dest = 2;
-        } else if (event->state & GDK_CONTROL_MASK) {
+        } else if (ctrl) {
             dest = 3;
         }
 
         openDefaultViewer (dest);
-        return true;
+        return;
 #endif
-    } else if (event->keyval == GDK_KEY_Page_Up) {
+    } else if (keyval == GDK_KEY_Page_Up) {
         scrollPage(GDK_SCROLL_UP);
-        return true;
-    } else if (event->keyval == GDK_KEY_Page_Down) {
+        return;
+    } else if (keyval == GDK_KEY_Page_Down) {
         scrollPage(GDK_SCROLL_DOWN);
-        return true;
+        return;
     }
 
 #ifdef __WIN32__
-    else if (!shift && !ctrl && !alt && !altgr) { // rank
-        switch(event->hardware_keycode) {
+    else if (!shift && !ctrl && !alt) { // rank
+        switch(keycode) {
         case 0x30:  // 0-key
             requestRanking (0);
-            return true;
+            return;
 
         case 0x31:  // 1-key
             requestRanking (1);
-            return true;
+            return;
 
         case 0x32:  // 2-key
             requestRanking (2);
-            return true;
+            return;
 
         case 0x33:  // 3-key
             requestRanking (3);
-            return true;
+            return;
 
         case 0x34:  // 4-key
             requestRanking (4);
-            return true;
+            return;
 
         case 0x35:  // 5-key
             requestRanking (5);
-            return true;
+            return;
         }
-    } else if (shift && ctrl && !alt && !altgr) { // color labels
-        switch(event->hardware_keycode) {
+    } else if (shift && ctrl && !alt) { // color labels
+        switch(keycode) {
         case 0x30:  // 0-key
             requestColorLabel (0);
-            return true;
+            return;
 
         case 0x31:  // 1-key
             requestColorLabel (1);
-            return true;
+            return;
 
         case 0x32:  // 2-key
             requestColorLabel (2);
-            return true;
+            return;
 
         case 0x33:  // 3-key
             requestColorLabel (3);
-            return true;
+            return;
 
         case 0x34:  // 4-key
             requestColorLabel (4);
-            return true;
+            return;
 
         case 0x35:  // 5-key
             requestColorLabel (5);
-            return true;
+            return;
         }
     }
 
 #else
     else if (!shift && !ctrl && !alt) { // rank
-        switch(event->hardware_keycode) {
+        switch(keycode) {
         case 0x13:
             requestRanking (0);
-            return true;
+            return;
 
         case 0x0a:
             requestRanking (1);
-            return true;
+            return;
 
         case 0x0b:
             requestRanking (2);
-            return true;
+            return;
 
         case 0x0c:
             requestRanking (3);
-            return true;
+            return;
 
         case 0x0d:
             requestRanking (4);
-            return true;
+            return;
 
         case 0x0e:
             requestRanking (5);
-            return true;
+            return;
         }
     } else if (shift && ctrl && !alt) { // color labels
-        switch(event->hardware_keycode) {
+        switch(keycode) {
         case 0x13:
             requestColorLabel (0);
-            return true;
+            return;
 
         case 0x0a:
             requestColorLabel (1);
-            return true;
+            return;
 
         case 0x0b:
             requestColorLabel (2);
-            return true;
+            return;
 
         case 0x0c:
             requestColorLabel (3);
-            return true;
+            return;
 
         case 0x0d:
             requestColorLabel (4);
-            return true;
+            return;
 
         case 0x0e:
             requestColorLabel (5);
-            return true;
+            return;
         }
     }
-
 #endif
-
-    return false;
 }
 
 void FileBrowser::saveThumbnailHeight (int height)
@@ -1412,14 +1392,14 @@ int FileBrowser::getThumbnailHeight ()
 void FileBrowser::enableTabMode(bool enable)
 {
     ThumbBrowserBase::enableTabMode(enable);
-    if (options.inspectorWindow) {
-        if (enable) {
-            inspect->remove_accelerator(pmenu->get_accel_group(), GDK_KEY_f, (Gdk::ModifierType)0);
-        }
-        else {
-            inspect->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_f, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
-        }
-    }
+//     if (options.inspectorWindow) {
+//         if (enable) {
+//             inspect->remove_accelerator(pmenu->get_accel_group(), GDK_KEY_f, (Gdk::ModifierType)0);
+//         }
+//         else {
+//             inspect->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_f, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
+//         }
+//     }
 }
 
 void FileBrowser::applyMenuItemActivated (ProfileStoreLabel *label)
@@ -1459,13 +1439,14 @@ void FileBrowser::applyPartialMenuItemActivated (ProfileStoreLabel *label)
     const rtengine::procparams::PartialProfile* srcProfiles = ProfileStore::getInstance()->getProfile (label->entry);
 
     if (srcProfiles->pparams) {
+        auto toplevel = getToplevelWindow(this);
+        auto partialPasteDlg = Gtk::make_managed<PartialPasteDlg>(
+            M("PARTIALPASTE_DIALOGLABEL"), toplevel);
 
-        auto toplevel = static_cast<Gtk::Window*> (get_toplevel ());
-        PartialPasteDlg partialPasteDlg (M("PARTIALPASTE_DIALOGLABEL"), toplevel);
-
-        partialPasteDlg.updateSpotWidget(srcProfiles->pparams);
-
-        if (partialPasteDlg.run() == Gtk::ResponseType::OK) {
+        partialPasteDlg->updateSpotWidget(srcProfiles->pparams);
+        partialPasteDlg->signal_response().connect([&](int response) {
+            partialPasteDlg->hide();
+            if (response != Gtk::ResponseType::OK) return;
 
             MYREADERLOCK(l, entryRW);
 
@@ -1480,7 +1461,7 @@ void FileBrowser::applyPartialMenuItemActivated (ProfileStoreLabel *label)
                 *dstProfile.pparams = (static_cast<FileBrowserEntry*>(selected[i]))->thumbnail->getProcParams ();
                 dstProfile.set(true);
                 dstProfile.pedited->locallab.spots.resize(dstProfile.pparams->locallab.spots.size(), LocallabParamsEdited::LocallabSpotEdited(true));
-                partialPasteDlg.applyPaste (dstProfile.pparams, dstProfile.pedited, srcProfiles->pparams, srcProfiles->pedited);
+                partialPasteDlg->applyPaste (dstProfile.pparams, dstProfile.pedited, srcProfiles->pparams, srcProfiles->pedited);
                 (static_cast<FileBrowserEntry*>(selected[i]))->thumbnail->setProcParams (*dstProfile.pparams, dstProfile.pedited, FILEBROWSER);
                 dstProfile.deleteInstance();
             }
@@ -1490,9 +1471,8 @@ void FileBrowser::applyPartialMenuItemActivated (ProfileStoreLabel *label)
             }
 
             queue_draw ();
-        }
-
-        partialPasteDlg.hide ();
+        });
+        partialPasteDlg->show();
     }
 }
 
@@ -1567,7 +1547,7 @@ bool FileBrowser::checkFilter (ThumbBrowserEntryBase* entryb) const   // true ->
     if (!filter.vFilterStrings.empty()) {
         // check if image's FileName contains queryFileName (case insensitive)
         // TODO should we provide case-sensitive search option via preferences?
-        std::string FileName = Glib::path_get_basename(entry->thumbnail->getFileName());
+        std::string FileName = Glib::path_get_basename(entry->thumbnail->getFileName().c_str());
         std::transform(FileName.begin(), FileName.end(), FileName.begin(), ::toupper);
         int iFilenameMatch = 0;
 
@@ -1631,12 +1611,12 @@ void FileBrowser::toTrashRequested (std::vector<FileBrowserEntry*> tbe)
 
         tbe[i]->thumbnail->setTrashed (true);
 
-        if (tbe[i]->getThumbButtonSet()) {
-            tbe[i]->getThumbButtonSet()->setRank (tbe[i]->thumbnail->getRank());
-            tbe[i]->getThumbButtonSet()->setColorLabel (tbe[i]->thumbnail->getColorLabel());
-            tbe[i]->getThumbButtonSet()->setInTrash (true);
-            tbe[i]->thumbnail->updateCache (); // needed to save the colorlabel to disk in the procparam file(s) and the cache image data file
-        }
+//         if (tbe[i]->getThumbButtonSet()) {
+//             tbe[i]->getThumbButtonSet()->setRank (tbe[i]->thumbnail->getRank());
+//             tbe[i]->getThumbButtonSet()->setColorLabel (tbe[i]->thumbnail->getColorLabel());
+//             tbe[i]->getThumbButtonSet()->setInTrash (true);
+//             tbe[i]->thumbnail->updateCache (); // needed to save the colorlabel to disk in the procparam file(s) and the cache image data file
+//         }
     }
 
     trash_changed().emit();
@@ -1655,12 +1635,12 @@ void FileBrowser::fromTrashRequested (std::vector<FileBrowserEntry*> tbe)
 
         tbe[i]->thumbnail->setTrashed (false);
 
-        if (tbe[i]->getThumbButtonSet()) {
-            tbe[i]->getThumbButtonSet()->setRank (tbe[i]->thumbnail->getRank());
-            tbe[i]->getThumbButtonSet()->setColorLabel (tbe[i]->thumbnail->getColorLabel());
-            tbe[i]->getThumbButtonSet()->setInTrash (false);
-            tbe[i]->thumbnail->updateCache (); // needed to save the colorlabel to disk in the procparam file(s) and the cache image data file
-        }
+//         if (tbe[i]->getThumbButtonSet()) {
+//             tbe[i]->getThumbButtonSet()->setRank (tbe[i]->thumbnail->getRank());
+//             tbe[i]->getThumbButtonSet()->setColorLabel (tbe[i]->thumbnail->getColorLabel());
+//             tbe[i]->getThumbButtonSet()->setInTrash (false);
+//             tbe[i]->thumbnail->updateCache (); // needed to save the colorlabel to disk in the procparam file(s) and the cache image data file
+//         }
     }
 
     trash_changed().emit();
@@ -1698,9 +1678,9 @@ void FileBrowser::rankingRequested (std::vector<FileBrowserEntry*> tbe, int rank
         tbe[i]->thumbnail->updateCache (); // needed to save the colorlabel to disk in the procparam file(s) and the cache image data file
         //TODO? - should update pparams instead?
 
-        if (tbe[i]->getThumbButtonSet()) {
-            tbe[i]->getThumbButtonSet()->setRank (tbe[i]->thumbnail->getRank());
-        }
+//         if (tbe[i]->getThumbButtonSet()) {
+//             tbe[i]->getThumbButtonSet()->setRank (tbe[i]->thumbnail->getRank());
+//         }
     }
 
     applyFilter (filter);
@@ -1728,9 +1708,9 @@ void FileBrowser::colorlabelRequested (std::vector<FileBrowserEntry*> tbe, int c
         tbe[i]->thumbnail->updateCache(); // needed to save the colorlabel to disk in the procparam file(s) and the cache image data file
 
         //TODO? - should update pparams instead?
-        if (tbe[i]->getThumbButtonSet()) {
-            tbe[i]->getThumbButtonSet()->setColorLabel (tbe[i]->thumbnail->getColorLabel());
-        }
+//         if (tbe[i]->getThumbButtonSet()) {
+//             tbe[i]->getThumbButtonSet()->setColorLabel (tbe[i]->thumbnail->getColorLabel());
+//         }
     }
 
     applyFilter (filter);
@@ -1768,33 +1748,33 @@ void FileBrowser::requestColorLabel(int colorlabel)
     colorlabelRequested (mselected, colorlabel);
 }
 
-void FileBrowser::buttonPressed (LWButton* button, int actionCode, void* actionData)
-{
-
-    if (actionCode >= 0 && actionCode <= 5) { // rank
-        std::vector<FileBrowserEntry*> tbe;
-        tbe.push_back (static_cast<FileBrowserEntry*>(actionData));
-        rankingRequested (tbe, actionCode);
-    } else if (actionCode == 6 && tbl) { // to processing queue
-        std::vector<FileBrowserEntry*> tbe;
-        tbe.push_back (static_cast<FileBrowserEntry*>(actionData));
-        tbl->developRequested (tbe, false); // not a fast, but a FULL mode
-    } else if (actionCode == 7) { // to trash / undelete
-        std::vector<FileBrowserEntry*> tbe;
-        FileBrowserEntry* entry = static_cast<FileBrowserEntry*>(actionData);
-        tbe.push_back (entry);
-
-        if (!entry->thumbnail->getTrashed()) {
-            toTrashRequested (tbe);
-        } else {
-            fromTrashRequested (tbe);
-        }
-    } else if (actionCode == 8 && tbl) { // color label
-        // show popup menu
-        colorLabel_actionData = actionData;// this will be reused when pmenuColorLabels is clicked
-        pmenuColorLabels->popup (3, this->eventTime);
-    }
-}
+// void FileBrowser::buttonPressed (LWButton* button, int actionCode, void* actionData)
+// {
+//
+//     if (actionCode >= 0 && actionCode <= 5) { // rank
+//         std::vector<FileBrowserEntry*> tbe;
+//         tbe.push_back (static_cast<FileBrowserEntry*>(actionData));
+//         rankingRequested (tbe, actionCode);
+//     } else if (actionCode == 6 && tbl) { // to processing queue
+//         std::vector<FileBrowserEntry*> tbe;
+//         tbe.push_back (static_cast<FileBrowserEntry*>(actionData));
+//         tbl->developRequested (tbe, false); // not a fast, but a FULL mode
+//     } else if (actionCode == 7) { // to trash / undelete
+//         std::vector<FileBrowserEntry*> tbe;
+//         FileBrowserEntry* entry = static_cast<FileBrowserEntry*>(actionData);
+//         tbe.push_back (entry);
+//
+//         if (!entry->thumbnail->getTrashed()) {
+//             toTrashRequested (tbe);
+//         } else {
+//             fromTrashRequested (tbe);
+//         }
+//     } else if (actionCode == 8 && tbl) { // color label
+//         // show popup menu
+//         colorLabel_actionData = actionData;// this will be reused when pmenuColorLabels is clicked
+//         pmenuColorLabels->popup (3, this->eventTime);
+//     }
+// }
 
 void FileBrowser::openNextImage()
 {
@@ -2018,11 +1998,11 @@ void FileBrowser::notifySelectionListener ()
     }
 }
 
-void FileBrowser::redrawNeeded (LWButton* button)
-{
-    GThreadLock lock;
-    queue_draw ();
-}
+// void FileBrowser::redrawNeeded (LWButton* button)
+// {
+//     queue_draw ();
+// }
+
 FileBrowser::type_trash_changed FileBrowser::trash_changed ()
 {
     return m_trash_changed;
@@ -2032,7 +2012,7 @@ FileBrowser::type_trash_changed FileBrowser::trash_changed ()
 // ExportPanel interface
 void FileBrowser::exportRequested ()
 {
-    FileBrowser::menuItemActivated(developfast);
+//     FileBrowser::menuItemActivated(developfast);
 }
 
 void FileBrowser::setExportPanel (ExportPanel* expanel)
@@ -2049,96 +2029,96 @@ void FileBrowser::storeCurrentValue()
 
 void FileBrowser::updateProfileList()
 {
-    // submenu applmenu
-    int p = 0;
-
-    const std::vector<const ProfileStoreEntry*> *profEntries = ProfileStore::getInstance()->getFileList();  // lock and get a pointer to the profiles' list
-
-    std::map<unsigned short /* folderId */, Gtk::Menu*> subMenuList;  // store the Gtk::Menu that Gtk::MenuItem will have to be attached to
-
-    subMenuList[0] = Gtk::manage (new Gtk::Menu ()); // adding the root submenu
-
-    // iterate the profile store's profile list
-    for (size_t i = 0; i < profEntries->size(); i++) {
-        // create a new label for the current entry (be it a folder or file)
-        ProfileStoreLabel *currLabel = Gtk::manage(new ProfileStoreLabel( profEntries->at(i) ));
-
-        // create the MenuItem object
-        Gtk::MenuItem* mi = Gtk::manage (new Gtk::MenuItem (*currLabel));
-
-        // create a new Menu object if the entry is a folder and not the root one
-        if (currLabel->entry->type == PSET_FOLDER) {
-            // creating the new sub-menu
-            Gtk::Menu* subMenu = Gtk::manage (new Gtk::Menu ());
-
-            // add it to the menu list
-            subMenuList[currLabel->entry->folderId] = subMenu;
-
-            // add it to the parent MenuItem
-            mi->set_submenu(*subMenu);
-        }
-
-        // Hombre: ... does parentMenuId sounds like a hack?         ... Yes.
-        int parentMenuId = !options.useBundledProfiles && currLabel->entry->parentFolderId == 1 ? 0 : currLabel->entry->parentFolderId;
-        subMenuList[parentMenuId]->attach (*mi, 0, 1, p, p + 1);
-        p++;
-
-        if (currLabel->entry->type == PSET_FILE) {
-            mi->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::applyMenuItemActivated), currLabel));
-        }
-
-        mi->show ();
-    }
-
-    if (subMenuList.size() && applyprof)
-        // TODO: Check that the previous one has been deleted, including all childrens
-    {
-        applyprof->set_submenu (*(subMenuList.at(0)));
-    }
-
-    subMenuList.clear();
-    subMenuList[0] = Gtk::manage (new Gtk::Menu ()); // adding the root submenu
-    // keep profEntries list
-
-    // submenu applpartmenu
-    p = 0;
-
-    for (size_t i = 0; i < profEntries->size(); i++) {
-        ProfileStoreLabel *currLabel = Gtk::manage(new ProfileStoreLabel( profEntries->at(i) ));
-
-        Gtk::MenuItem* mi = Gtk::manage (new Gtk::MenuItem (*currLabel));
-
-        if (currLabel->entry->type == PSET_FOLDER) {
-            // creating the new sub-menu
-            Gtk::Menu* subMenu = Gtk::manage (new Gtk::Menu ());
-
-            // add it to the menu list
-            subMenuList[currLabel->entry->folderId] = subMenu;
-
-            // add it to the parent MenuItem
-            mi->set_submenu(*subMenu);
-        }
-
-        // Hombre: ... does parentMenuId sounds like a hack?         ... yes.
-        int parentMenuId = !options.useBundledProfiles && currLabel->entry->parentFolderId == 1 ? 0 : currLabel->entry->parentFolderId;
-        subMenuList[parentMenuId]->attach (*mi, 0, 1, p, p + 1);
-        p++;
-
-        if (currLabel->entry->type == PSET_FILE) {
-            mi->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::applyPartialMenuItemActivated), currLabel));
-        }
-
-        mi->show ();
-    }
-
-    if (subMenuList.size() && applypartprof)
-        // TODO: Check that the previous one has been deleted, including all childrens
-    {
-        applypartprof->set_submenu (*(subMenuList.at(0)));
-    }
-
-    ProfileStore::getInstance()->releaseFileList();
-    subMenuList.clear();
+//     // submenu applmenu
+//     int p = 0;
+//
+//     const std::vector<const ProfileStoreEntry*> *profEntries = ProfileStore::getInstance()->getFileList();  // lock and get a pointer to the profiles' list
+//
+//     std::map<unsigned short /* folderId */, Gtk::Menu*> subMenuList;  // store the Gtk::Menu that Gtk::MenuItem will have to be attached to
+//
+//     subMenuList[0] = Gtk::manage (new Gtk::Menu ()); // adding the root submenu
+//
+//     // iterate the profile store's profile list
+//     for (size_t i = 0; i < profEntries->size(); i++) {
+//         // create a new label for the current entry (be it a folder or file)
+//         ProfileStoreLabel *currLabel = Gtk::manage(new ProfileStoreLabel( profEntries->at(i) ));
+//
+//         // create the MenuItem object
+//         Gtk::MenuItem* mi = Gtk::manage (new Gtk::MenuItem (*currLabel));
+//
+//         // create a new Menu object if the entry is a folder and not the root one
+//         if (currLabel->entry->type == PSET_FOLDER) {
+//             // creating the new sub-menu
+//             Gtk::Menu* subMenu = Gtk::manage (new Gtk::Menu ());
+//
+//             // add it to the menu list
+//             subMenuList[currLabel->entry->folderId] = subMenu;
+//
+//             // add it to the parent MenuItem
+//             mi->set_submenu(*subMenu);
+//         }
+//
+//         // Hombre: ... does parentMenuId sounds like a hack?         ... Yes.
+//         int parentMenuId = !options.useBundledProfiles && currLabel->entry->parentFolderId == 1 ? 0 : currLabel->entry->parentFolderId;
+//         subMenuList[parentMenuId]->attach (*mi, 0, 1, p, p + 1);
+//         p++;
+//
+//         if (currLabel->entry->type == PSET_FILE) {
+//             mi->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::applyMenuItemActivated), currLabel));
+//         }
+//
+//         mi->show ();
+//     }
+//
+//     if (subMenuList.size() && applyprof)
+//         // TODO: Check that the previous one has been deleted, including all childrens
+//     {
+//         applyprof->set_submenu (*(subMenuList.at(0)));
+//     }
+//
+//     subMenuList.clear();
+//     subMenuList[0] = Gtk::manage (new Gtk::Menu ()); // adding the root submenu
+//     // keep profEntries list
+//
+//     // submenu applpartmenu
+//     p = 0;
+//
+//     for (size_t i = 0; i < profEntries->size(); i++) {
+//         ProfileStoreLabel *currLabel = Gtk::manage(new ProfileStoreLabel( profEntries->at(i) ));
+//
+//         Gtk::MenuItem* mi = Gtk::manage (new Gtk::MenuItem (*currLabel));
+//
+//         if (currLabel->entry->type == PSET_FOLDER) {
+//             // creating the new sub-menu
+//             Gtk::Menu* subMenu = Gtk::manage (new Gtk::Menu ());
+//
+//             // add it to the menu list
+//             subMenuList[currLabel->entry->folderId] = subMenu;
+//
+//             // add it to the parent MenuItem
+//             mi->set_submenu(*subMenu);
+//         }
+//
+//         // Hombre: ... does parentMenuId sounds like a hack?         ... yes.
+//         int parentMenuId = !options.useBundledProfiles && currLabel->entry->parentFolderId == 1 ? 0 : currLabel->entry->parentFolderId;
+//         subMenuList[parentMenuId]->attach (*mi, 0, 1, p, p + 1);
+//         p++;
+//
+//         if (currLabel->entry->type == PSET_FILE) {
+//             mi->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::applyPartialMenuItemActivated), currLabel));
+//         }
+//
+//         mi->show ();
+//     }
+//
+//     if (subMenuList.size() && applypartprof)
+//         // TODO: Check that the previous one has been deleted, including all childrens
+//     {
+//         applypartprof->set_submenu (*(subMenuList.at(0)));
+//     }
+//
+//     ProfileStore::getInstance()->releaseFileList();
+//     subMenuList.clear();
 }
 
 void FileBrowser::restoreValue()
@@ -2158,7 +2138,7 @@ void FileBrowser::openRequested( std::vector<FileBrowserEntry*> mselected)
     tbl->openRequested (entries);
 }
 
-void FileBrowser::inspectRequested(std::vector<FileBrowserEntry*> mselected)
-{
-    getInspector()->showWindow(true);
-}
+// void FileBrowser::inspectRequested(std::vector<FileBrowserEntry*> mselected)
+// {
+//     getInspector()->showWindow(true);
+// }

@@ -23,7 +23,7 @@ set(NONCLISOURCEFILES
     # bayerrawexposure.cc
     # blackwhite.cc
     # bqentryupdater.cc
-    # browserfilter.cc
+    browserfilter.cc
     cacheimagedata.cc
     cachemanager.cc
     # cacorrection.cc
@@ -68,7 +68,7 @@ set(NONCLISOURCEFILES
     externaleditorpreferences.cc
     extprog.cc
     # fattaltonemap.cc
-    # filebrowser.cc
+    filebrowser.cc
     filebrowserentry.cc
     # filecatalog.cc
     filepanel.cc
