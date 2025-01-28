@@ -126,7 +126,7 @@ set(NONCLISOURCEFILES
     # preprocess.cc
     # preprocesswb.cc
     # previewhandler.cc
-    # previewloader.cc
+    previewloader.cc
     # previewmodepanel.cc
     # previewwindow.cc
     profilepanel.cc

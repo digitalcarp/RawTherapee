@@ -23,6 +23,7 @@
 #include "filebrowserentry.h"
 #include "previewloader.h"
 #include "guiutils.h"
+#include "threadpool.h"
 #include "threadutils.h"
 
 #ifdef _OPENMP
@@ -82,10 +83,10 @@ public:
         int threadCount = 2;
 #endif
 
-        threadPool_.reset(new Glib::ThreadPool(threadCount, 0));
+        threadPool_ = std::make_unique<ThreadPool>(threadCount);
     }
 
-    std::unique_ptr<Glib::ThreadPool> threadPool_;
+    std::unique_ptr<ThreadPool> threadPool_;
     MyMutex mutex_;
     JobSet jobs_;
     gint nConcurrentThreads;
@@ -195,7 +196,7 @@ void PreviewLoader::add(int dir_id, const Glib::ustring& dir_entry, PreviewLoade
 
         // queue a run request
         DEBUG("adding run request %s", dir_entry.c_str());
-        impl_->threadPool_->push(sigc::mem_fun(*impl_, &PreviewLoader::Impl::processNextJob));
+        impl_->threadPool_->enqueue([&]() { impl_->processNextJob(); });
     }
 }
 

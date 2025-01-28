@@ -202,11 +202,11 @@ void FileBrowserEntry::customBackBufferUpdate (const Cairo::RefPtr<Cairo::Contex
     }
 }
 
-// void FileBrowserEntry::getIconSize (int& w, int& h) const
-// {
+void FileBrowserEntry::getIconSize (int& w, int& h) const
+{
 //     w = editedIcon->getWidth ();
 //     h = editedIcon->getHeight ();
-// }
+}
 
 // FileThumbnailButtonSet* FileBrowserEntry::getThumbButtonSet ()
 // {

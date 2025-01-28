@@ -96,7 +96,7 @@ public:
 
 //     std::vector<std::shared_ptr<RTSurface>> getIconsOnImageArea () override;
 //     std::vector<std::shared_ptr<RTSurface>> getSpecificityIconsOnImageArea () override;
-//     void getIconSize (int& w, int& h) const override;
+    void getIconSize (int& w, int& h) const override;
 
     // thumbnaillistener interface
     void procParamsChanged (Thumbnail* thm, int whoChangedIt, bool upgradeHint) override;
