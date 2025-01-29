@@ -95,23 +95,48 @@ Inspector::Inspector () : currImage(nullptr), scaled(false), scale(1.0), zoomSca
         window->set_name("InspectorWindow");
         window->set_title("RawTherapee " + M("INSPECTOR_WINDOW_TITLE"));
         window->set_visible(false);
-        window->add_events(Gdk::KEY_PRESS_MASK);
-        window->signal_key_release_event().connect(sigc::mem_fun(*this, &Inspector::on_key_release));
-        window->signal_key_press_event().connect(sigc::mem_fun(*this, &Inspector::on_key_press));
+
+        auto keyController = Gtk::EventControllerKey::create();
+        keyController->signal_key_pressed().connect(
+            sigc::mem_fun(*this, &Inspector::on_key_press), false);
+        keyController->signal_key_released().connect(
+            sigc::mem_fun(*this, &Inspector::on_key_release));
+        window->add_controller(keyController);
+
         window->signal_hide().connect(sigc::mem_fun(*this, &Inspector::on_window_hide));
-        window->signal_window_state_event().connect(sigc::mem_fun(*this, &Inspector::on_inspector_window_state_event));
+        window->property_fullscreened().signal_changed().connect(
+            sigc::mem_fun(*this, &Inspector::onFullscreenChange));
 
-        add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_MOTION_MASK | Gdk::SCROLL_MASK | Gdk::SMOOTH_SCROLL_MASK);
-        gestureZoom = Gtk::GestureZoom::create(*this);
+        auto clickController = Gtk::GestureClick::create();
+        clickController->signal_pressed().connect(
+            sigc::mem_fun(*this, &Inspector::on_button_press_event));
+        window->add_controller(clickController);
+
+        auto motionController = Gtk::EventControllerMotion::create();
+        motionController->signal_motion().connect(
+            sigc::mem_fun(*this, &Inspector::on_motion_notify_event));
+        window->add_controller(motionController);
+
+        scrollController = Gtk::EventControllerScroll::create();
+        scrollController->set_flags(Gtk::EventControllerScroll::Flags::BOTH_AXES);
+        scrollController->signal_scroll().connect(
+            sigc::mem_fun(*this, &Inspector::on_scroll_event), false);
+        window->add_controller(scrollController);
+
+        gestureZoom = Gtk::GestureZoom::create();
         gestureZoom->signal_begin().connect(sigc::mem_fun(*this, &Inspector::on_zoom_begin));
-        gestureZoom->signal_scale_changed().connect(sigc::mem_fun(*this, &Inspector::on_zoom_scale_changed));
+        gestureZoom->signal_scale_changed().connect(
+            sigc::mem_fun(*this, &Inspector::on_zoom_scale_changed));
+        window->add_controller(gestureZoom);
 
-        window->add(*this);
+        window->set_child(*this);
         window->set_size_request(500, 500);
         window->fullscreen();
         initialized = false; // delay init to avoid flickering on some systems
         active = true; // always track inspected thumbnails
     }
+
+    set_draw_func(sigc::mem_fun(*this, &Inspector::on_draw));
 }
 
 Inspector::~Inspector()
@@ -128,7 +153,6 @@ void Inspector::showWindow(bool pinned, bool scaled)
 
     // initialize when shown first
     if (!initialized) {
-        window->show_all();
         initialized = true;
     }
 
@@ -151,26 +175,24 @@ void Inspector::hideWindow()
     window->set_visible(false);
 }
 
-bool Inspector::on_key_release(GdkEventKey *event)
+void Inspector::on_key_release(guint keyval, guint keycode, Gdk::ModifierType state)
 {
     keyDown = false;
 
-    if (!window)
-        return false;
+    if (!window) return;
 
     if (!pinned) {
-        switch (event->keyval) {
+        switch (keyval) {
         case GDK_KEY_f:
         case GDK_KEY_F:
             zoomScale = 1.0;
             window->set_visible(false);
-            return true;
+            return;
         }
     }
-    return false;
 }
 
-bool Inspector::on_key_press(GdkEventKey *event)
+bool Inspector::on_key_press(guint keyval, guint keycode, Gdk::ModifierType state)
 {
     if (!window)
         return false;
@@ -181,7 +203,7 @@ bool Inspector::on_key_press(GdkEventKey *event)
 
     keyDown = true;
 
-    switch (event->keyval) {
+    switch (keyval) {
     case GDK_KEY_z:
     case GDK_KEY_F:
         // show image unscaled in 100% view
@@ -222,40 +244,31 @@ void Inspector::on_window_hide()
     windowShowing = false;
 }
 
-bool Inspector::on_inspector_window_state_event(GdkEventWindowState *event)
+void Inspector::onFullscreenChange()
 {
-    if (!window->get_window() || window->get_window()->gobj() != event->window) {
-        return false;
-    }
-
-    fullscreen = event->new_window_state & GDK_WINDOW_STATE_FULLSCREEN;
-
-    return true;
+    fullscreen = window->property_fullscreened().get_value();
 }
 
-bool Inspector::on_button_press_event(GdkEventButton *event)
+void Inspector::on_button_press_event(int n_press, double x, double y)
 {
-    if (!window)
-        return false;
+    if (!window) return;
 
-    if (event->type == GDK_BUTTON_PRESS) {
-        button_pos.set(event->x, event->y);
-        if (!pinned)
+    if (n_press == 1) {
+        button_pos.set(x, y);
+        if (!pinned) {
             // pin window with mouse click
             pinned = true;
-        return true;
+        }
     }
-    return false;
 }
 
-bool Inspector::on_motion_notify_event(GdkEventMotion *event)
+void Inspector::on_motion_notify_event(double x, double y)
 {
-    if (!currImage || !window)
-        return false;
+    if (!currImage || !window) return;
 
     int deviceScale = get_scale_factor();
-    int event_x = round(event->x);
-    int event_y = round(event->y);
+    int event_x = round(x);
+    int event_y = round(y);
     int delta_x = (button_pos.x - event_x) * deviceScale;
     int delta_y = (button_pos.y - event_y) * deviceScale;
     int imW = currImage->imgBuffer.getWidth();
@@ -268,62 +281,37 @@ bool Inspector::on_motion_notify_event(GdkEventMotion *event)
         dirty = true;
         queue_draw();
     }
-
-    return true;
 }
 
-bool Inspector::on_scroll_event(GdkEventScroll *event)
+bool Inspector::on_scroll_event(double dx, double dy)
 {
     if (!currImage || !window)
         return false;
 
     pinned = true;
 
-    bool alt = event->state & GDK_MOD1_MASK;
+    bool alt = isAltDown(scrollController->get_current_event_state());
     int deviceScale = get_scale_factor();
     int imW = currImage->imgBuffer.getWidth();
     int imH = currImage->imgBuffer.getHeight();
 
-#ifdef GDK_WINDOWING_QUARTZ
-    // event reports speed of scroll wheel
-    double step_x = -event->delta_x;
-    double step_y = event->delta_y;
-#else
-    // assume fixed step of 5%
-    double step_x = 5;
-    double step_y = 5;
-#endif
-    int delta_x = 0;
-    int delta_y = 0;
-    switch (event->direction) {
-    case GDK_SCROLL_SMOOTH:
-#ifdef GDK_WINDOWING_QUARTZ
-        // no additional step for smooth scrolling
-        delta_x = event->delta_x * deviceScale;
-        delta_y = event->delta_y * deviceScale;
-#else
-        // apply step to smooth scrolling as well
-        delta_x = event->delta_x * deviceScale * step_x * imW / 100;
-        delta_y = event->delta_y * deviceScale * step_y * imH / 100;
-#endif
-        break;
-    case GDK_SCROLL_DOWN:
-        delta_y = step_y * deviceScale * imH / 100;
-        break;
-    case GDK_SCROLL_UP:
-        delta_y = -step_y * deviceScale * imH / 100;
-        break;
-    case GDK_SCROLL_LEFT:
-        delta_x = step_x * deviceScale * imW / 100;
-        break;
-    case GDK_SCROLL_RIGHT:
-        delta_x = -step_x * deviceScale * imW / 100;
-        break;
+    double delta_x = 0.0;
+    double delta_y = 0.0;
+    if (scrollController->get_unit() == Gdk::ScrollUnit::SURFACE) {
+        delta_x = dx;
+        delta_y = dy;
+    } else {
+        delta_x = 5.0 * dx * deviceScale * imH / 100;
+        delta_y = 5.0 * dy * deviceScale * imH / 100;
     }
 
     if ((options.zoomOnScroll && !alt) || (!options.zoomOnScroll && alt)) {
         // zoom
-        beginZoom(event->x, event->y);
+        auto event = scrollController->get_current_event();
+        double x = 0.0;
+        double y = 0.0;
+        event->get_position(x, y);
+        beginZoom(x, y);
         if (std::fabs(delta_y) > std::fabs(delta_x))
             on_zoom_scale_changed(1.0 - (double)delta_y / imH / deviceScale);
         else
@@ -366,21 +354,20 @@ void Inspector::beginZoom(double x, double y)
     // store center and current position for zooming
     double cur_scale = zoomScale;
     if (scaled) {
-        Glib::RefPtr<Gtk::Window> win = get_window();
-        double winW = win->get_width() * deviceScale;
-        double winH = win->get_height() * deviceScale;
+        double winW = get_width() * deviceScale;
+        double winH = get_height() * deviceScale;
         int imW = rtengine::max<int>(currImage->imgBuffer.getWidth(), 1);
         int imH = rtengine::max<int>(currImage->imgBuffer.getHeight(), 1);
         cur_scale *= rtengine::min<double>(winW / imW, winH / imH);
     }
-    dcenterBegin.x = (x - window->get_width() / 2.) / cur_scale * deviceScale;
-    dcenterBegin.y = (y - window->get_height() / 2.) / cur_scale * deviceScale;
+    dcenterBegin.x = (x - get_width() / 2.) / cur_scale * deviceScale;
+    dcenterBegin.y = (y - get_height() / 2.) / cur_scale * deviceScale;
     centerBegin = center;
     zoomScaleBegin = zoomScale;
 
 }
 
-void Inspector::on_zoom_begin(GdkEventSequence *s)
+void Inspector::on_zoom_begin(Gdk::EventSequence *s)
 {
     double x, y;
     pinned = true;
@@ -404,24 +391,15 @@ void Inspector::on_zoom_scale_changed(double zscale)
     }
 }
 
-bool Inspector::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
+void Inspector::on_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height)
 {
     dirty = false;
-
-    Glib::RefPtr<Gtk::Window> win = get_window();
-
-    if (!win) {
-        return false;
-    }
 
     if (!active) {
         active = true;
     }
 
-
     // cleanup the region
-
-
     if (currImage && currImage->imgBuffer.surfaceCreated()) {
         // this will eventually create/update the off-screen pixmap
 
@@ -431,8 +409,8 @@ bool Inspector::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
         rtengine::Coord topLeftInt;
         rtengine::Coord2D dest(0, 0);
         int deviceScale = window? get_scale_factor(): 1;
-        availableSize.x = win->get_width() * deviceScale;
-        availableSize.y = win->get_height() * deviceScale;
+        availableSize.x = width * deviceScale;
+        availableSize.y = height * deviceScale;
         int imW = rtengine::max<int>(currImage->imgBuffer.getWidth(), 1);
         int imH = rtengine::max<int>(currImage->imgBuffer.getHeight(), 1);
         scale = rtengine::min(1., rtengine::min<double>(availableSize.x / imW, availableSize.y / imH));
@@ -480,27 +458,31 @@ bool Inspector::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
         topLeftInt.y = floor(topLeft.y);
 
         // define the destination area
-        currImage->imgBuffer.setDrawRectangle(win, dest.x, dest.y, rtengine::min<int>(ceil(availableSize.x + (topLeft.x - topLeftInt.x) - 2 * dest.x), imW), rtengine::min<int>(ceil(availableSize.y + (topLeft.y - topLeftInt.y) - 2 * dest.y), imH), false);
+        currImage->imgBuffer.setDrawRectangle(
+            getToplevelWindow(this),
+            dest.x, dest.y,
+            rtengine::min<int>(ceil(availableSize.x + (topLeft.x - topLeftInt.x) - 2 * dest.x), imW),
+            rtengine::min<int>(ceil(availableSize.y + (topLeft.y - topLeftInt.y) - 2 * dest.y), imH),
+            false);
         currImage->imgBuffer.setSrcOffset(topLeftInt.x, topLeftInt.y);
 
         if (!currImage->imgBuffer.surfaceCreated()) {
-            return false;
+            return;
         }
 
         // Draw!
 
-        Gdk::RGBA c;
         Glib::RefPtr<Gtk::StyleContext> style = get_style_context();
 
         if (!window) {
             // draw the background
-            style->render_background(cr, 0, 0, get_width(), get_height());
+            style->render_background(cr, 0, 0, width, height);
         }
 
         bool scaledImage = scale != 1.0;
         if (!window || (deviceScale == 1 && !scaledImage)) {
             // standard drawing
-            currImage->imgBuffer.copySurface(win);
+            currImage->imgBuffer.copySurface(cr);
         }
         else {
             // consider device scale and image scale
@@ -523,7 +505,7 @@ bool Inspector::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
                 double dx = scale * (dest.x + topLeftInt.x - topLeft.x);
                 double dy = scale * (dest.y + topLeftInt.y - topLeft.y);
                 // scale crop as the device does not seem to support it (Linux)
-                crop = crop->scale_simple(round(viewW*scale), round(viewH*scale), Gdk::INTERP_BILINEAR);
+                crop = crop->scale_simple(round(viewW*scale), round(viewH*scale), Gdk::InterpType::BILINEAR);
                 Gdk::Cairo::set_source_pixbuf(cr, crop, dx, dy);
             }
             cr->paint();
@@ -531,15 +513,9 @@ bool Inspector::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
 
         if (!window) {
             // draw the frame
-            c = style->get_border_color (Gtk::STATE_FLAG_NORMAL);
-            cr->set_source_rgb (c.get_red(), c.get_green(), c.get_blue());
-            cr->set_line_width (1);
-            cr->rectangle (0.5, 0.5, availableSize.x - 1, availableSize.y - 1);
-            cr->stroke ();
+            style->render_frame (cr, 0, 0, width, height);
         }
     }
-
-    return true;
 }
 
 void Inspector::mouseMove (rtengine::Coord2D pos, int transform)
@@ -686,25 +662,18 @@ Gtk::SizeRequestMode Inspector::get_request_mode_vfunc () const
     return Gtk::SizeRequestMode::CONSTANT_SIZE;
 }
 
-void Inspector::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const
+void Inspector::measure_vfunc(Gtk::Orientation orientation, int for_size,
+                              int& minimum, int& natural,
+                              int& minimum_baseline, int& natural_baseline) const
 {
-    minimum_height = RTScalable::scalePixelSize(50);
-    natural_height = RTScalable::scalePixelSize(300);
-}
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        minimum = RTScalable::scalePixelSize(50);
+        natural = RTScalable::scalePixelSize(200);
+    } else {
+        minimum = RTScalable::scalePixelSize(50);
+        natural = RTScalable::scalePixelSize(300);
+    }
 
-void Inspector::get_preferred_width_vfunc (int &minimum_width, int &natural_width) const
-{
-    minimum_width = RTScalable::scalePixelSize(50);
-    natural_width = RTScalable::scalePixelSize(200);
+    minimum_baseline = -1;
+    natural_baseline = -1;
 }
-
-void Inspector::get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const
-{
-    get_preferred_height_vfunc(minimum_height, natural_height);
-}
-
-void Inspector::get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const
-{
-    get_preferred_width_vfunc (minimum_width, natural_width);
-}
-

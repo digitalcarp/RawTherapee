@@ -91,7 +91,7 @@ set(NONCLISOURCEFILES
     # imageareapanel.cc
     # impulsedenoise.cc
     # indclippedpanel.cc
-    # inspector.cc
+    inspector.cc
     # iptcpanel.cc
     # labcurve.cc
     # labgrid.cc

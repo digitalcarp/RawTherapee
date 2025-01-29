@@ -168,6 +168,7 @@ public:
     CoarsePanel* coarsePanel;
     ToolBar* toolBar;
 
+// TODO(gtk4)
 //     FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel);
     FileCatalog (FilePanel* filepanel);
     ~FileCatalog() override;

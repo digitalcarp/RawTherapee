@@ -63,25 +63,26 @@ private:
     rtengine::Coord2D next_image_pos;
 
     Gtk::Window *window;
-    bool on_key_release(GdkEventKey *event);
-    bool on_key_press(GdkEventKey *event);
+    void on_key_release(guint keyval, guint keycode, Gdk::ModifierType state);
+    bool on_key_press(guint keyval, guint keycode, Gdk::ModifierType state);
 
     void on_window_hide();
-    bool on_inspector_window_state_event(GdkEventWindowState *event);
+    void onFullscreenChange();
 
     rtengine::Coord button_pos;
-    bool on_button_press_event(GdkEventButton *event) override;
-    bool on_motion_notify_event(GdkEventMotion *event) override;
+    void on_button_press_event(int n_press, double x, double y);
+    void on_motion_notify_event(double x, double y);
 
-    bool on_scroll_event(GdkEventScroll *event) override;
+    bool on_scroll_event(double dx, double dy);
     void moveCenter(int delta_x, int delta_y, int imW, int imH, int deviceScale);
 
+    Glib::RefPtr<Gtk::EventControllerScroll> scrollController;
     Glib::RefPtr<Gtk::GestureZoom> gestureZoom;
     void beginZoom(double x, double y);
-    void on_zoom_begin(GdkEventSequence *);
+    void on_zoom_begin(Gdk::EventSequence *);
     void on_zoom_scale_changed(double zscale);
 
-    bool on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr) override;
+    void on_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height);
     void deleteBuffers();
 
     bool doSwitchImage();
@@ -134,9 +135,6 @@ public:
     };
 
     Gtk::SizeRequestMode get_request_mode_vfunc () const override;
-    void get_preferred_height_vfunc (int& minimum_height, int& natural_height) const override;
-    void get_preferred_width_vfunc (int &minimum_width, int &natural_width) const override;
-    void get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const override;
-    void get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const override;
-
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
 };

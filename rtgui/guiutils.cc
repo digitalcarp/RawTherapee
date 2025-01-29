@@ -1859,13 +1859,13 @@ void BackBuffer::getSrcOffset(rtengine::Coord &offset)
 }
 
 // Note: newW & newH must be > 0
-bool BackBuffer::setDrawRectangle(Glib::RefPtr<Gtk::Window> window, Gdk::Rectangle &rectangle, bool updateBackBufferSize)
+bool BackBuffer::setDrawRectangle(Gtk::Window* window, Gdk::Rectangle &rectangle, bool updateBackBufferSize)
 {
     return setDrawRectangle(window, rectangle.get_x(), rectangle.get_y(), rectangle.get_width(), rectangle.get_height(), updateBackBufferSize);
 }
 
 // Note: newW & newH must be > 0
-bool BackBuffer::setDrawRectangle(Glib::RefPtr<Gtk::Window> window, int newX, int newY, int newW, int newH, bool updateBackBufferSize)
+bool BackBuffer::setDrawRectangle(Gtk::Window* window, int newX, int newY, int newW, int newH, bool updateBackBufferSize)
 {
     assert(newW && newH);
 
@@ -1967,42 +1967,6 @@ void BackBuffer::copyRGBCharData(const unsigned char *srcData, int srcX, int src
     surface->mark_dirty();
 
 }
-
-// /*
-//  * Copy the backbuffer to a Gtk::Window
-//  */
-// void backbuffer::copysurface(glib::refptr<gtk::window> window, gdk::rectangle *destrectangle)
-// {
-//     if (surface && window) {
-//         // todo: look out if window can be different on each call, and if not, store a reference to the window
-//         cairo::refptr<cairo::context> crsrc = window->create_cairo_context();
-//         cairo::refptr<cairo::surface> destsurface = crsrc->get_target();
-//
-//         // compute the source offset
-//         int offsetx = rtengine::lim<int>(offset.x, 0, surface->get_width());
-//         int offsety = rtengine::lim<int>(offset.y, 0, surface->get_height());
-//
-//         // now copy the off-screen Surface to the destination Surface
-//         Cairo::RefPtr<Cairo::Context> crDest = Cairo::Context::create(destSurface);
-//         crDest->set_line_width(0.);
-//
-//         if (destRectangle) {
-//             crDest->set_source(surface, -offsetX + destRectangle->get_x(), -offsetY + destRectangle->get_y());
-//             int w_ = destRectangle->get_width() > 0 ? destRectangle->get_width() : w;
-//             int h_ = destRectangle->get_height() > 0 ? destRectangle->get_height() : h;
-//             //printf("BackBuffer::copySurface / rectangle1(%d, %d, %d, %d)\n", destRectangle->get_x(), destRectangle->get_y(), w_, h_);
-//             crDest->rectangle(destRectangle->get_x(), destRectangle->get_y(), w_, h_);
-//             //printf("BackBuffer::copySurface / rectangle1\n");
-//         } else {
-//             crDest->set_source(surface, -offsetX + x, -offsetY + y);
-//             //printf("BackBuffer::copySurface / rectangle2(%d, %d, %d, %d)\n", x, y, w, h);
-//             crDest->rectangle(x, y, w, h);
-//             //printf("BackBuffer::copySurface / rectangle2\n");
-//         }
-//
-//         crDest->fill();
-//     }
-// }
 
 /*
  * Copy the BackBuffer to another BackBuffer

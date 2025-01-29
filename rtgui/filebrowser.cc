@@ -1369,6 +1369,8 @@ bool FileBrowser::keyPressed (guint keyval, guint keycode, Gdk::ModifierType sta
         }
     }
 #endif
+
+    return false;
 }
 
 void FileBrowser::saveThumbnailHeight (int height)
