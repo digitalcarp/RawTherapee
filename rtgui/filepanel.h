@@ -42,6 +42,8 @@ class FilePanel final :
     public rtengine::NonCopyable
 {
 public:
+    using NotebookLabelChange = sigc::signal<void(Gtk::Widget&)>;
+
     FilePanel ();
     ~FilePanel () override;
 
@@ -60,6 +62,8 @@ public:
     {
         parent = p;
     }
+    RtWindow* getParent() const { return parent; }
+
     void init (); // don't call it directly, the constructor calls it as idle source
     void on_realize () override;
     void setAspect();
@@ -86,6 +90,8 @@ public:
     void updateToolPanelToolLocations(
         const std::vector<Glib::ustring> &favorites, bool cloneFavoriteTools);
 
+    NotebookLabelChange& signalNotebookLabelChange() { return notebookLabelChange; }
+
 private:
     void on_NB_switch_page(Gtk::Widget* page, guint page_num);
 
@@ -96,7 +102,10 @@ private:
     Gtk::Paned* tpcPaned;
     // BatchToolPanelCoordinator* tpc;
     History* history;
+
     RtWindow* parent;
+    NotebookLabelChange notebookLabelChange;  // For parent notebook
+
     Gtk::Notebook* rightNotebook;
     sigc::connection rightNotebookSwitchConn;
 

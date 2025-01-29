@@ -198,6 +198,10 @@ RtWindow::RtWindow ()
         fpanel =  new FilePanel () ;
         fpanel->setParent (this);
 
+        fpanel->signalNotebookLabelChange().connect([&](Gtk::Widget& widget) {
+            mainNB->set_tab_label(*fpanel, widget);
+        });
+
         // decorate tab
         Gtk::Grid* fpanelLabelGrid = Gtk::manage (new Gtk::Grid ());
         setExpandAlignProperties (fpanelLabelGrid, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
@@ -909,7 +913,7 @@ void RtWindow::SetMainCurrent()
 //         fCatalog->tbRightPanel_1_visible (false);
 //     }
 // }
-//
+
 void RtWindow::updateExternalEditorWidget(int selectedIndex, const std::vector<ExternalEditor> & editors)
 {
 //     if (epanel) {

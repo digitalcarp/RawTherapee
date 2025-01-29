@@ -749,7 +749,6 @@ void FileCatalog::_refreshProgressBar ()
     idle_register.add([this]() {
         if (!progressImage || !progressLabel) {
             // create tab label once
-            Gtk::Notebook *nb = (Gtk::Notebook *)(filepanel->get_parent());
             Gtk::Grid* grid = Gtk::manage(new Gtk::Grid());
             setExpandAlignProperties (grid, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
             progressImage = Gtk::manage(new RtImage("folder-closed"));
@@ -760,10 +759,7 @@ void FileCatalog::_refreshProgressBar ()
             if (options.mainNBVertical) {
                 progressLabel->rotate90();
             }
-            if (nb) {
-                // TODO(gtk4): Critial warning about nb not being right pointer
-                nb->set_tab_label(*filepanel, *grid);
-            }
+            filepanel->signalNotebookLabelChange().emit(*grid);
         }
         if (!previewsToLoad) {
             progressImage->set_from_icon_name("folder-closed");
