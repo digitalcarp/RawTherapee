@@ -146,14 +146,21 @@ Preferences::Preferences(RtWindow *rtwindow)
     ProfileStore::getInstance()->addListener(this);
 
     fillPreferences();
+
+    signal_close_request().connect([&]() -> bool {
+        // Otherwise extensionsChanged() gets called on close and we segfault
+        extensionsConnection.disconnect();
+
+        get_default_size(options.preferencesWidth, options.preferencesHeight);
+
+        return false;
+    }, false);
 }
 
 
 Preferences::~Preferences()
 {
-
     ProfileStore::getInstance()->removeListener(this);
-    get_default_size(options.preferencesWidth, options.preferencesHeight);
 }
 
 int Preferences::getThemeRowNumber (const Glib::ustring& name)
@@ -1699,7 +1706,8 @@ Gtk::Widget* Preferences::getFileBrowserPanel()
 
     pack_start(vbFileBrowser, *hb6, Pack::SHRINK, 4);
 
-    extensions->signal_cursor_changed().connect(sigc::mem_fun(*this, &Preferences::extensionsChanged));
+    extensionsConnection = extensions->signal_cursor_changed().connect(
+        sigc::mem_fun(*this, &Preferences::extensionsChanged));
     extension->signal_changed().connect(sigc::mem_fun(*this, &Preferences::extensionChanged));
 
     addExt->signal_clicked().connect(sigc::mem_fun(*this, &Preferences::addExtPressed));

@@ -231,30 +231,21 @@ void FileBrowserEntry::updateImage(ThumbImageUpdateListener::ImageUpdate&& updat
     redrawRequests++;
     feih->pending++;
 
-    idle_register.add(
-        // Using std::bind as move capture only enabled in C++14
-        std::bind(
-            [this](ThumbImageUpdateListener::ImageUpdate& up) -> bool
-            {
-                if (feih->destroyed) {
-                    if (feih->pending == 1) {
-                        delete feih;
-                    } else {
-                        --feih->pending;
-                    }
-
-                    delete up.img;
-                    return false;
-                }
-
-                feih->fbentry->_updateImage(std::move(up));
+    idle_register.add([&, up=std::move(update)]() mutable {
+        if (feih->destroyed) {
+            if (feih->pending == 1) {
+                delete feih;
+            } else {
                 --feih->pending;
+            }
 
-                return false;
-            },
-            std::move(update)
-        )
-    );
+            delete up.img;
+            return;
+        }
+
+        feih->fbentry->_updateImage(std::move(up));
+        --feih->pending;
+    });
 }
 
 void FileBrowserEntry::_updateImage(ThumbImageUpdateListener::ImageUpdate&& update)

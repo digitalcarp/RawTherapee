@@ -799,8 +799,9 @@ void RtWindow::showICCProfileCreator ()
     iccpc->set_modal(true);
     iccpc->present ();
 
-    fpanel->optionsChanged ();
-
+// TODO(gtk4): Do on close request
+//     fpanel->optionsChanged ();
+//
 //     if (epanel) {
 //         epanel->defaultMonitorProfileChanged (options.rtSettings.monitorProfile, options.rtSettings.autoMonitorProfile);
 //     }
@@ -817,8 +818,9 @@ void RtWindow::showPreferences ()
     pref->set_modal(true);
     pref->present ();
 
-    fpanel->optionsChanged ();
-
+// TODO(gtk4): Do on close request
+//     fpanel->optionsChanged ();
+//
 //     if (epanel) {
 //         epanel->defaultMonitorProfileChanged (options.rtSettings.monitorProfile, options.rtSettings.autoMonitorProfile);
 //     }

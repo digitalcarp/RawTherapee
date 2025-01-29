@@ -181,6 +181,7 @@ class Preferences final :
     Gtk::SpinButton*   maxCacheEntriesSB;
     Gtk::Entry*     extension;
     Gtk::TreeView*  extensions;
+    sigc::connection extensionsConnection;
     Gtk::Button*    addExt;
     Gtk::Button*    delExt;
     Gtk::Button*    moveExtUp;

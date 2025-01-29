@@ -212,7 +212,7 @@ void ThumbBrowserEntryBase::updateBackBuffer ()
     const Cairo::RefPtr<Cairo::Context>& cc = Cairo::Context::create(surface);
 
     Glib::RefPtr<Gtk::StyleContext> style = parent->getStyle();
-    Gdk::RGBA textn = style->get_color();
+    Gdk::RGBA textn = parent->getNormalTextColor();
     Gdk::RGBA texts = parent->getSelectedTextColor();
     Gdk::RGBA bgn = parent->getNormalBgColor();
     Gdk::RGBA bgs = parent->getSelectedBgColor();

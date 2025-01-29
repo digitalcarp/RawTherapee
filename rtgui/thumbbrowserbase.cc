@@ -830,36 +830,11 @@ void ThumbBrowserBase::Internal::on_realize()
     Gtk::DrawingArea::on_realize();
 
     // TODO(gtk4): Workaround for Gtk::StateFlags not being accepted for StyleContext
-    {
-        set_state_flags(Gtk::StateFlags::NORMAL, /*clear*/ true);
-        auto style = get_style_context();
-
-        auto surface = std::static_pointer_cast<Cairo::Surface>(
-            Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1, 1));
-        auto cr = Cairo::Context::create(surface);
-
-        auto getBgColor = [&](Gdk::RGBA& color) {
-            style->render_background(cr, 0, 0, 1, 1);
-            auto pattern = cr->get_source();
-            auto solid = std::dynamic_pointer_cast<Cairo::SolidPattern>(pattern);
-            if (solid) {
-                double r, g, b, a = 0.0;
-                solid->get_rgba(r, g, b, a);
-                color.set_rgba(r, g, b, a);
-            } else {
-                color.set_rgba(0.0, 0.0, 0.0, 1.0);
-            }
-        };
-
-        textn = style->get_color();
-        getBgColor(bgn);
-
-        set_state_flags(Gtk::StateFlags::SELECTED, /*clear*/ true);
-        texts = style->get_color();
-        getBgColor(bgs);
-
-        set_state_flags(Gtk::StateFlags::NORMAL, /*clear*/ true);
-    }
+    // Values taken from RawTherapee.css
+    textn.set_rgba(0.733, 0.733, 0.733);  // #BBBBBB
+    bgn.set_rgba(0.224, 0.224, 0.224);    // #393939
+    texts.set_rgba(0.733, 0.733, 0.733);
+    bgs.set_rgba(0.337, 0.337, 0.337);    // #565656
 
     set_can_focus(true);
     set_has_tooltip (true);
