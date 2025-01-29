@@ -181,7 +181,7 @@ Glib::RefPtr<Gdk::Pixbuf> PreviewHandler::getRoughImage (
         h = rtengine::LIM<int>(h, 0, int(previewImg->get_height() * totalZoom) - pos.y);
 
         resPixbuf = Gdk::Pixbuf::create (Gdk::COLORSPACE_RGB, false, 8, w, h);
-        previewImg->scale (resPixbuf, 0, 0, w, h, -pos.x, -pos.y, totalZoom, totalZoom, Gdk::INTERP_NEAREST);
+        previewImg->scale (resPixbuf, 0, 0, w, h, -pos.x, -pos.y, totalZoom, totalZoom, Gdk::InterpType::NEAREST);
     }
 
     return resPixbuf;
@@ -203,7 +203,7 @@ hidpi::DevicePixbuf PreviewHandler::getRoughImage (hidpi::LogicalSize desiredSiz
         zoom = zoom * deviceScale;
 
         auto pixbuf = Gdk::Pixbuf::create (Gdk::COLORSPACE_RGB, false, 8, image->getWidth() * zoom, image->getHeight() * zoom);
-        previewImg->scale (pixbuf, 0, 0, previewImg->get_width()*zoom, previewImg->get_height()*zoom, 0, 0, zoom, zoom, Gdk::INTERP_BILINEAR);
+        previewImg->scale (pixbuf, 0, 0, previewImg->get_width()*zoom, previewImg->get_height()*zoom, 0, 0, zoom, zoom, Gdk::InterpType::BILINEAR);
 
         result = hidpi::DevicePixbuf(pixbuf, deviceScale);
     }
