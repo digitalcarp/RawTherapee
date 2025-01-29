@@ -449,7 +449,7 @@ bool FileBrowserEntry::pressNotify   (int button, int type, int bstate, int x, i
     bool b = ThumbBrowserEntryBase::pressNotify (button, type, bstate, x, y);
 
     if (!iatlistener || !iatlistener->getToolBar()) {
-        return true;
+        return b;
     }
 
     ToolMode tm = iatlistener->getToolBar()->getTool ();
