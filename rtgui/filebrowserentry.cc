@@ -24,7 +24,7 @@
 #include "cropguilistener.h"
 #include "cursormanager.h"
 #include "guiutils.h"
-// #include "inspector.h"
+#include "inspector.h"
 #include "threadutils.h"
 #include "thumbbrowserbase.h"
 #include "thumbnail.h"
@@ -308,21 +308,21 @@ bool FileBrowserEntry::motionNotify (int x, int y)
     const int ix = x - startx - ofsX;
     const int iy = y - starty - ofsY;
 
-//     Inspector* inspector = parent->getInspector();
-//
-//     if (inspector && inspector->isActive() && (!parent->isInTabMode() || options.inspectorWindow)) {
-//         const rtengine::Coord2D coord(getPosInImgSpace(x, y));
-//
-//         if (coord.x != -1.) {
-//             if (!wasInside) {
-//                 inspector->switchImage(filename);
-//                 wasInside = true;
-//             }
-//             inspector->mouseMove(coord, 0);
-//         } else {
-//             wasInside = false;
-//         }
-//     }
+    Inspector* inspector = parent->getInspector();
+
+    if (inspector && inspector->isActive() && (!parent->isInTabMode() || options.inspectorWindow)) {
+        const rtengine::Coord2D coord(getPosInImgSpace(x, y));
+
+        if (coord.x != -1.) {
+            if (!wasInside) {
+                inspector->switchImage(filename);
+                wasInside = true;
+            }
+            inspector->mouseMove(coord, 0);
+        } else {
+            wasInside = false;
+        }
+    }
 
     if (inside(x, y)) {
         updateCursor(ix, iy);

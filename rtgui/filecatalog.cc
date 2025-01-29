@@ -44,7 +44,7 @@
 #include "pathutils.h"
 #include "thumbnail.h"
 #include "toolbar.h"
-// #include "inspector.h"
+#include "inspector.h"
 
 using namespace std;
 
@@ -2558,10 +2558,10 @@ bool FileCatalog::handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierT
     if (!ctrl && !alt) {
         switch (keyval) {
         case GDK_KEY_f:
-//             fileBrowser->getInspector()->showWindow(false, true);
+            fileBrowser->getInspector()->showWindow(false, true);
             return true;
         case GDK_KEY_F:
-//             fileBrowser->getInspector()->showWindow(false, false);
+            fileBrowser->getInspector()->showWindow(false, false);
             return true;
         }
     }
@@ -2578,7 +2578,7 @@ bool FileCatalog::handleShortcutKeyRelease(guint keyval, guint keycode, Gdk::Mod
         switch (keyval) {
         case GDK_KEY_f:
         case GDK_KEY_F:
-//             fileBrowser->getInspector()->hideWindow();
+            fileBrowser->getInspector()->hideWindow();
             return true;
         }
     }

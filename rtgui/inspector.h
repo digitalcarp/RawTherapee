@@ -74,7 +74,7 @@ private:
     void on_motion_notify_event(double x, double y);
 
     bool on_scroll_event(double dx, double dy);
-    void moveCenter(int delta_x, int delta_y, int imW, int imH, int deviceScale);
+    void moveCenter(double delta_x, double delta_y, int imW, int imH, int deviceScale);
 
     Glib::RefPtr<Gtk::EventControllerScroll> scrollController;
     Glib::RefPtr<Gtk::GestureZoom> gestureZoom;

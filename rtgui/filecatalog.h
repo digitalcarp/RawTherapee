@@ -182,24 +182,24 @@ public:
     void previewsFinishedUI ();
     void _refreshProgressBar ();
 
-//     void setInspector(Inspector* inspector)
-//     {
-//         if (fileBrowser) {
-//             fileBrowser->setInspector(inspector);
-//         }
-//     }
-//     void disableInspector()
-//     {
-//         if (fileBrowser) {
-//             fileBrowser->disableInspector();
-//         }
-//     }
-//     void enableInspector()
-//     {
-//         if (fileBrowser) {
-//             fileBrowser->enableInspector();
-//         }
-//     }
+    void setInspector(Inspector* inspector)
+    {
+        if (fileBrowser) {
+            fileBrowser->setInspector(inspector);
+        }
+    }
+    void disableInspector()
+    {
+        if (fileBrowser) {
+            fileBrowser->disableInspector();
+        }
+    }
+    void enableInspector()
+    {
+        if (fileBrowser) {
+            fileBrowser->enableInspector();
+        }
+    }
 
     // filterpanel interface
     void exifFilterChanged () override;

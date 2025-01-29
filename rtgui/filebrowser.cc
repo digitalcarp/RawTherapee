@@ -27,7 +27,7 @@
 
 // #include "batchqueue.h"
 #include "clipboard.h"
-// #include "inspector.h"
+#include "inspector.h"
 #include "multilangmgr.h"
 #include "options.h"
 #include "paramsedited.h"
@@ -2141,7 +2141,7 @@ void FileBrowser::openRequested( std::vector<FileBrowserEntry*> mselected)
     tbl->openRequested (entries);
 }
 
-// void FileBrowser::inspectRequested(std::vector<FileBrowserEntry*> mselected)
-// {
-//     getInspector()->showWindow(true);
-// }
+void FileBrowser::inspectRequested(std::vector<FileBrowserEntry*> mselected)
+{
+    getInspector()->showWindow(true);
+}

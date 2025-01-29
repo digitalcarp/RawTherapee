@@ -19,7 +19,7 @@
 #include <glibmm/ustring.h>
 
 #include "hidpi.h"
-// #include "inspector.h"
+#include "inspector.h"
 #include "multilangmgr.h"
 #include "options.h"
 #include "rtscalable.h"
@@ -31,7 +31,7 @@
 using namespace std;
 
 ThumbBrowserBase::ThumbBrowserBase ()
-    : location(THLOC_FILEBROWSER), /*inspector(nullptr), isInspectorActive(false),*/ eventTime(0), lastClicked(nullptr), anchor(nullptr), previewHeight(options.thumbSize), numOfCols(1), lastRowHeight(0), arrangement(TB_Horizontal)
+    : location(THLOC_FILEBROWSER), inspector(nullptr), isInspectorActive(false), eventTime(0), lastClicked(nullptr), anchor(nullptr), previewHeight(options.thumbSize), numOfCols(1), lastRowHeight(0), arrangement(TB_Horizontal)
 {
     lastDeviceScale = 0;
     inW = -1;
@@ -806,19 +806,19 @@ void ThumbBrowserBase::arrangeFiles(ThumbBrowserEntryBase* entry)
     }
 }
 
-// void ThumbBrowserBase::disableInspector()
-// {
-//     if (inspector) {
-//         inspector->setActive(false);
-//     }
-// }
-//
-// void ThumbBrowserBase::enableInspector()
-// {
-//     if (inspector) {
-//         inspector->setActive(true);
-//     }
-// }
+void ThumbBrowserBase::disableInspector()
+{
+    if (inspector) {
+        inspector->setActive(false);
+    }
+}
+
+void ThumbBrowserBase::enableInspector()
+{
+    if (inspector) {
+        inspector->setActive(true);
+    }
+}
 
 void ThumbBrowserBase::Internal::on_realize()
 {

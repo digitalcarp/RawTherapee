@@ -98,7 +98,7 @@ private:
     PlacesBrowser* placesBrowser;
     RecentBrowser* recentBrowser;
 
-    // Inspector* inspectorPanel;
+    Inspector* inspectorPanel;
     Gtk::Paned* tpcPaned;
     // BatchToolPanelCoordinator* tpc;
     History* history;

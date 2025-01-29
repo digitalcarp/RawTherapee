@@ -29,7 +29,7 @@
  * Class handling the list of ThumbBrowserEntry objects and their position in it's allocated space
  */
 
-// class Inspector;
+class Inspector;
 class ThumbBrowserEntryBase;
 
 class ThumbBrowserBase :
@@ -116,8 +116,8 @@ protected:
 
     int inW, inH;
 
-//     Inspector *inspector;
-//     bool isInspectorActive;
+    Inspector *inspector;
+    bool isInspectorActive;
 
     void resizeThumbnailArea (int w, int h);
     void internalAreaResized (int width, int height);
@@ -127,16 +127,16 @@ protected:
 
 public:
 
-//     void setInspector(Inspector* inspector)
-//     {
-//         this->inspector = inspector;
-//     }
-//     Inspector* getInspector()
-//     {
-//         return inspector;
-//     }
-//     void disableInspector();
-//     void enableInspector();
+    void setInspector(Inspector* inspector)
+    {
+        this->inspector = inspector;
+    }
+    Inspector* getInspector()
+    {
+        return inspector;
+    }
+    void disableInspector();
+    void enableInspector();
     enum Arrangement {TB_Horizontal, TB_Vertical};
     void configScrollBars ();
     void scrollChanged ();

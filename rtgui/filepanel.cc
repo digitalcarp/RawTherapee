@@ -23,7 +23,7 @@
 // #include "editorpanel.h"
 #include "multilangmgr.h"
 #include "rtwindow.h"
-// #include "inspector.h"
+#include "inspector.h"
 #include "placesbrowser.h"
 #include "thumbnail.h"
 
@@ -98,8 +98,8 @@ FilePanel::FilePanel () : parent(nullptr), error(0)
     filterPanel = Gtk::manage ( new FilterPanel () );
     sFilterPanel->set_child (*filterPanel);
 
-//     inspectorPanel = new Inspector();
-//     fileCatalog->setInspector(inspectorPanel);
+    inspectorPanel = new Inspector();
+    fileCatalog->setInspector(inspectorPanel);
 
     Gtk::ScrolledWindow* sExportPanel = Gtk::manage ( new Gtk::ScrolledWindow() );
     exportPanel = Gtk::manage ( new ExportPanel () );
@@ -138,8 +138,8 @@ FilePanel::FilePanel () : parent(nullptr), error(0)
     pack2 (tpcPaned, *history, true, false);
 
     rightNotebook->append_page (*sFilterPanel, *filtLab);
-//     if (!options.inspectorWindow)
-//         rightNotebook->append_page (*inspectorPanel, *inspectLab);
+    if (!options.inspectorWindow)
+        rightNotebook->append_page (*inspectorPanel, *inspectLab);
     rightNotebook->append_page (*tpcPaned, *devLab);
     //rightNotebook->append_page (*taggingBox, *tagLab); commented out: currently the tab is empty ...
     rightNotebook->append_page (*sExportPanel, *exportLab);
@@ -167,10 +167,10 @@ FilePanel::~FilePanel ()
 {
     rightNotebookSwitchConn.disconnect();
 
-//     if (inspectorPanel) {
-//         delete inspectorPanel;
-//     }
-//
+    if (inspectorPanel) {
+        delete inspectorPanel;
+    }
+
 //     delete tpc;
 }
 
@@ -229,13 +229,13 @@ void FilePanel::init ()
 
 void FilePanel::on_NB_switch_page(Gtk::Widget* page, guint page_num)
 {
-//     if (page_num == 1) {
-//         // switching the inspector "on"
-//         fileCatalog->enableInspector();
-//     } else {
-//         // switching the inspector "off"
-//         fileCatalog->disableInspector();
-//     }
+    if (page_num == 1) {
+        // switching the inspector "on"
+        fileCatalog->enableInspector();
+    } else {
+        // switching the inspector "off"
+        fileCatalog->disableInspector();
+    }
 }
 
 bool FilePanel::fileSelected (Thumbnail* thm)

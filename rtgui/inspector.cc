@@ -267,15 +267,13 @@ void Inspector::on_motion_notify_event(double x, double y)
     if (!currImage || !window) return;
 
     int deviceScale = get_scale_factor();
-    int event_x = round(x);
-    int event_y = round(y);
-    int delta_x = (button_pos.x - event_x) * deviceScale;
-    int delta_y = (button_pos.y - event_y) * deviceScale;
+    double delta_x = (button_pos.x - x) * deviceScale;
+    double delta_y = (button_pos.y - y) * deviceScale;
     int imW = currImage->imgBuffer.getWidth();
     int imH = currImage->imgBuffer.getHeight();
 
     moveCenter(delta_x, delta_y, imW, imH, deviceScale);
-    button_pos.set(event_x, event_y);
+    button_pos.set(x, y);
 
     if (!dirty) {
         dirty = true;
@@ -330,7 +328,7 @@ bool Inspector::on_scroll_event(double dx, double dy)
     return true;
 }
 
-void Inspector::moveCenter(int delta_x, int delta_y, int imW, int imH, int deviceScale)
+void Inspector::moveCenter(double delta_x, double delta_y, int imW, int imH, int deviceScale)
 {
     rtengine::Coord margin; // limit to image size
     margin.x = rtengine::min<int>(window->get_width() * deviceScale / scale, imW) / 2;
