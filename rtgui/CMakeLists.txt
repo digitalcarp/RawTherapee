@@ -119,6 +119,7 @@ set(NONCLISOURCEFILES
     # pdsharpening.cc
     # perspective.cc
     placesbrowser.cc
+    popoverutils.cc
     # popupbutton.cc
     # popupcommon.cc
     # popuptogglebutton.cc

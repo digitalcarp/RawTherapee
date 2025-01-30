@@ -40,21 +40,24 @@ ThumbBrowserBase::ThumbBrowserBase ()
     hscroll.set_orientation(Gtk::Orientation::HORIZONTAL);
     vscroll.set_orientation(Gtk::Orientation::VERTICAL);
 
-    setExpandAlignProperties(&internal, true, true, Gtk::Align::FILL, Gtk::Align::FILL);
+    internal = std::make_shared<Internal>();
+    setExpandAlignProperties(internal.get(), true, true, Gtk::Align::FILL, Gtk::Align::FILL);
+    setExpandAlignProperties(&popoverBin, true, true, Gtk::Align::FILL, Gtk::Align::FILL);
     setExpandAlignProperties(&hscroll, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     setExpandAlignProperties(&vscroll, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
-    attach (internal, 0, 0, 1, 1);
+    attach (popoverBin, 0, 0, 1, 1);
     attach (vscroll, 1, 0, 1, 1);
     attach (hscroll, 0, 1, 1, 1);
 
-    internal.setParent (this);
+    popoverBin.set_child(internal);
+    internal->setParent(this);
 
     vscroll.get_adjustment()->set_lower(0);
     hscroll.get_adjustment()->set_lower(0);
     vscroll.get_adjustment()->signal_value_changed().connect( sigc::mem_fun(*this, &ThumbBrowserBase::scrollChanged) );
     hscroll.get_adjustment()->signal_value_changed().connect( sigc::mem_fun(*this, &ThumbBrowserBase::scrollChanged) );
 
-    internal.signal_resize().connect( sigc::mem_fun(*this, &ThumbBrowserBase::internalAreaResized) );
+    internal->signal_resize().connect( sigc::mem_fun(*this, &ThumbBrowserBase::internalAreaResized) );
 }
 
 void ThumbBrowserBase::scrollChanged ()
@@ -68,12 +71,12 @@ void ThumbBrowserBase::scrollChanged ()
         }
     }
 
-    internal.setPosition ((int)(hscroll.get_adjustment()->get_value()),
+    internal->setPosition ((int)(hscroll.get_adjustment()->get_value()),
                           (int)(vscroll.get_adjustment()->get_value()));
 
-    if (!internal.isDirty()) {
-        internal.setDirty ();
-        internal.queue_draw ();
+    if (!internal->isDirty()) {
+        internal->setDirty ();
+        internal->queue_draw ();
     }
 }
 
@@ -292,7 +295,7 @@ void ThumbBrowserBase::selectPrev (int distance, bool enlarge)
                         selected.clear ();
 
                         // make sure the newly selected thumbnail is visible and make it current
-                        scrollToEntry (h, v, internal.get_width (), internal.get_height (), *curr);
+                        scrollToEntry (h, v, internal->get_width (), internal->get_height (), *curr);
                         lastClicked = *curr;
 
                         // either enlarge current selection or set new selection
@@ -360,7 +363,7 @@ void ThumbBrowserBase::selectNext (int distance, bool enlarge)
                         selected.clear ();
 
                         // make sure the newly selected thumbnail is visible and make it current
-                        scrollToEntry (h, v, internal.get_width (), internal.get_height (), *curr);
+                        scrollToEntry (h, v, internal->get_width (), internal->get_height (), *curr);
                         lastClicked = *curr;
 
                         // either enlarge current selection or set new selection
@@ -414,7 +417,7 @@ void ThumbBrowserBase::selectFirst (bool enlarge)
                 }
             }
 
-            scrollToEntry (h, v, internal.get_width (), internal.get_height (), *first);
+            scrollToEntry (h, v, internal->get_width (), internal->get_height (), *first);
 
             ThumbBrowserEntryBase* lastEntry = lastClicked;
             lastClicked = *first;
@@ -478,7 +481,7 @@ void ThumbBrowserBase::selectLast (bool enlarge)
                 }
             }
 
-            scrollToEntry (h, v, internal.get_width (), internal.get_height (), *last);
+            scrollToEntry (h, v, internal->get_width (), internal->get_height (), *last);
 
             ThumbBrowserEntryBase* lastEntry = lastClicked;
             lastClicked = *last;
@@ -532,12 +535,12 @@ void ThumbBrowserBase::resizeThumbnailArea (int w, int h)
     inW = w;
     inH = h;
 
-    if (hscroll.get_adjustment()->get_value() + internal.get_width() > inW) {
-        hscroll.get_adjustment()->set_value (inW - internal.get_width());
+    if (hscroll.get_adjustment()->get_value() + internal->get_width() > inW) {
+        hscroll.get_adjustment()->set_value (inW - internal->get_width());
     }
 
-    if (vscroll.get_adjustment()->get_value() + internal.get_height() > inH) {
-        vscroll.get_adjustment()->set_value (inH - internal.get_height());
+    if (vscroll.get_adjustment()->get_value() + internal->get_height() > inH) {
+        vscroll.get_adjustment()->set_value (inH - internal->get_height());
     }
 
     configScrollBars ();
@@ -568,10 +571,10 @@ void ThumbBrowserBase::onInternalAreaDraw()
 void ThumbBrowserBase::configScrollBars ()
 {
     if (inW > 0 && inH > 0) {
-        int ih = internal.get_height();
+        int ih = internal->get_height();
         if (arrangement == TB_Horizontal) {
             auto ha = hscroll.get_adjustment();
-            int iw = internal.get_width();
+            int iw = internal->get_width();
             ha->set_upper(inW);
             ha->set_step_increment(!fd.empty() ? fd[0]->getEffectiveWidth() : 0);
             ha->set_page_increment(iw);
@@ -660,7 +663,7 @@ void ThumbBrowserBase::arrangeFiles(ThumbBrowserEntryBase* entry)
         // This will require a Writer access
         resizeThumbnailArea(currx, !fd.empty() ? fd[0]->getEffectiveHeight() : rowHeight);
     } else {
-        const int availWidth = internal.get_width();
+        const int availWidth = internal->get_width();
 
         // initial number of columns
         int oldNumOfCols = numOfCols;
@@ -874,6 +877,7 @@ ThumbBrowserBase::Internal::Internal () : ofsX(0), ofsY(0), parent(nullptr), dir
     set_draw_func(sigc::mem_fun(*this, &ThumbBrowserBase::Internal::on_draw));
 
     clickController = Gtk::GestureClick::create();
+    clickController->set_button();  // Listen to all button events
     clickController->signal_pressed().connect(
         sigc::mem_fun(*this, &ThumbBrowserBase::Internal::on_button_press_event));
     clickController->signal_released().connect(
@@ -956,9 +960,9 @@ void ThumbBrowserBase::buttonPressed (int x, int y, int button, int n_press, int
     {
         MYWRITERLOCK(l, entryRW);
 
-        if (selected.size() == 1 && n_press == 2 && button == 1) {
+        if (selected.size() == 1 && n_press == 2 && button == MouseButton::LEFT) {
             doubleClicked (selected[0]);
-        } else if (button == 1 && n_press == 1) {
+        } else if (button == MouseButton::LEFT && n_press == 1) {
             if (fileDescr && (state & GDK_SHIFT_MASK))
                 selectRange (fileDescr, state & GDK_CONTROL_MASK);
             else if (fileDescr && (state & GDK_CONTROL_MASK))
@@ -969,7 +973,7 @@ void ThumbBrowserBase::buttonPressed (int x, int y, int button, int n_press, int
             lastClicked = fileDescr;
             MYWRITERLOCK_RELEASE(l);
             selectionChanged ();
-        } else if (fileDescr && button == 3 && n_press == 1) {
+        } else if (fileDescr && button == MouseButton::RIGHT && n_press == 1) {
             if (!fileDescr->selected) {
                 selectSingle (fileDescr);
 
@@ -979,7 +983,7 @@ void ThumbBrowserBase::buttonPressed (int x, int y, int button, int n_press, int
             }
 
             MYWRITERLOCK_RELEASE(l);
-            rightClicked ();
+            rightClicked (x, y);
         }
     } // end of MYWRITERLOCK(l, entryRW);
 
@@ -1287,10 +1291,10 @@ int ThumbBrowserBase::getEffectiveHeight()
 
 void ThumbBrowserBase::redrawNeeded (ThumbBrowserEntryBase* entry)
 {
-    if (entry->insideWindow (0, 0, internal.get_width(), internal.get_height())) {
-        if (!internal.isDirty ()) {
-            internal.setDirty ();
-            internal.queue_draw ();
+    if (entry->insideWindow (0, 0, internal->get_width(), internal->get_height())) {
+        if (!internal->isDirty ()) {
+            internal->setDirty ();
+            internal->queue_draw ();
         }
     }
 }

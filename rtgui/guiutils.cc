@@ -2198,6 +2198,11 @@ RotateLabel::RotateLabel(const Glib::ustring& text) : m_label(text), m_rotate90(
     signal_destroy().connect([this]() { m_label.unparent(); });
 }
 
+RotateLabel::~RotateLabel()
+{
+    m_label.unparent();
+}
+
 void RotateLabel::set_text(const Glib::ustring& text)
 {
     m_label.set_text(text);

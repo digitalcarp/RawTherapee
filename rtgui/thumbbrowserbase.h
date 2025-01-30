@@ -24,6 +24,7 @@
 
 #include "guiutils.h"
 #include "options.h"
+#include "popoverutils.h"
 
 /*
  * Class handling the list of ThumbBrowserEntry objects and their position in it's allocated space
@@ -109,7 +110,8 @@ protected:
     virtual void saveThumbnailHeight (int height) = 0;
     virtual int  getThumbnailHeight () = 0;
 
-    Internal internal;
+    PopoverBin popoverBin;
+    Glib::RefPtr<Internal> internal;
     Gtk::Scrollbar hscroll;
     Gtk::Scrollbar vscroll;
     int lastDeviceScale;
@@ -221,7 +223,7 @@ public:
     {
         return true;
     }
-    virtual void rightClicked () = 0;
+    virtual void rightClicked (double x, double y) = 0;
     virtual void doubleClicked (ThumbBrowserEntryBase* entry) {}
     virtual bool keyPressed (guint keyval, guint keycode, Gdk::ModifierType state)
     {
@@ -234,23 +236,23 @@ public:
 
     Gtk::Widget* getDrawingArea ()
     {
-        return &internal;
+        return internal.get();
     }
 
     Glib::RefPtr<Gtk::StyleContext> getStyle() {
-        return internal.get_style_context();
+        return internal->get_style_context();
     }
     Gdk::RGBA getNormalTextColor() {
-        return internal.getNormalTextColor();
+        return internal->getNormalTextColor();
     }
     Gdk::RGBA getSelectedTextColor() {
-        return internal.getSelectedTextColor();
+        return internal->getSelectedTextColor();
     }
     Gdk::RGBA getNormalBgColor() {
-        return internal.getNormalBgColor();
+        return internal->getNormalBgColor();
     }
     Gdk::RGBA getSelectedBgColor() {
-        return internal.getSelectedBgColor();
+        return internal->getSelectedBgColor();
     }
 
 };

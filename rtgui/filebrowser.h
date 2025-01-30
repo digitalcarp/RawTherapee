@@ -71,58 +71,21 @@ private:
     IdleRegister idle_register;
     unsigned int session_id_;
 
+    void appendSortMenu(Glib::RefPtr<Gio::Menu>& section);
+    void appendRankMenu(Glib::RefPtr<Gio::Menu>& section);
+    void appendColorLabelMenu(Glib::RefPtr<Gio::Menu>& section);
+    void appendFileOperationsMenu(Glib::RefPtr<Gio::Menu>& section);
+    void appendProfileOperationsMenu(Glib::RefPtr<Gio::Menu>& section);
+    void appendExternalProgramMenu(Glib::RefPtr<Gio::Menu>& section);
+    void appendDarkFrameMenu(Glib::RefPtr<Gio::Menu>& section);
+    void appendFlatFieldMenu(Glib::RefPtr<Gio::Menu>& section);
+    void appendCacheMenu(Glib::RefPtr<Gio::Menu>& section);
+
 protected:
-    // Gtk::MenuItem* rank[6];
-    // MyImageMenuItem* colorlabel[6];
-    // Gtk::MenuItem* trash;
-    // Gtk::MenuItem* untrash;
-    // Gtk::MenuItem* develop;
-    // Gtk::MenuItem* developfast;
-    // Gtk::MenuItem* rename;
-    // Gtk::MenuItem* remove;
-    // Gtk::MenuItem* removeInclProc;
-    // Gtk::MenuItem* open;
-    // Gtk::MenuItem* inspect;
-    // Gtk::MenuItem* selall;
-    // Gtk::RadioMenuItem* sortMethod[Options::SORT_METHOD_COUNT];
-    // Gtk::RadioMenuItem* sortOrder[2];
-    // Gtk::MenuItem* copyTo;
-    // Gtk::MenuItem* moveTo;
-    //
-    // Gtk::MenuItem* menuSort;
-    // Gtk::MenuItem* menuRank;
-    // Gtk::MenuItem* menuLabel;
-    // Gtk::MenuItem* menuFileOperations;
-    // Gtk::MenuItem* menuProfileOperations;
-    // Gtk::MenuItem* menuExtProg;
-    // Gtk::MenuItem** amiExtProg;
-    // Gtk::MenuItem* miOpenDefaultViewer;
-    // std::map<Glib::ustring, const ExtProgAction*> mMenuExtProgs;  // key is menuitem label
-    //
-    // Gtk::MenuItem* menuDF;
-    // Gtk::MenuItem* selectDF;
-    // Gtk::MenuItem* thisIsDF;
-    // Gtk::MenuItem* autoDF;
-    //
-    // Gtk::MenuItem* menuFF;
-    // Gtk::MenuItem* selectFF;
-    // Gtk::MenuItem* thisIsFF;
-    // Gtk::MenuItem* autoFF;
-    //
-    // Gtk::MenuItem* copyprof;
-    // Gtk::MenuItem* pasteprof;
-    // Gtk::MenuItem* partpasteprof;
-    // Gtk::MenuItem* applyprof;
-    // Gtk::MenuItem* applypartprof;
-    // Gtk::MenuItem* resetdefaultprof;
-    // Gtk::MenuItem* clearprof;
-    // Gtk::MenuItem* cachemenu;
-    // Gtk::MenuItem* clearFromCache;
-    // Gtk::MenuItem* clearFromCacheFull;
-    // Gtk::Menu* pmenu;
-    //
-    // MyImageMenuItem* colorlabel_pop[6];
-    // Gtk::Menu* pmenuColorLabels;
+    Glib::RefPtr<Gtk::PopoverMenu> pmenu;
+
+    std::map<Glib::ustring, const ExtProgAction*> mMenuExtProgs;  // key is menuitem label
+
     // void* colorLabel_actionData;
     // void menuColorlabelActivated (Gtk::MenuItem* m); // use only when menu is invoked via FileBrowser::buttonPressed to pass actionData
     //
@@ -181,7 +144,7 @@ public:
     // void buttonPressed (LWButton* button, int actionCode, void* actionData) override;
     // void redrawNeeded  (LWButton* button) override;
     bool checkFilter (ThumbBrowserEntryBase* entry) const override;
-    void rightClicked () override;
+    void rightClicked (double x, double y) override;
     void doubleClicked (ThumbBrowserEntryBase* entry) override;
     bool keyPressed (guint keyval, guint keycode, Gdk::ModifierType state) override;
 

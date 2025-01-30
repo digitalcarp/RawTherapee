@@ -50,6 +50,11 @@ class Adjuster;
 class RtImage;
 class ToolPanel;
 
+namespace MouseButton {
+constexpr unsigned int LEFT = 1;
+constexpr unsigned int RIGHT = 3;
+};
+
 Glib::ustring escapeHtmlChars(const Glib::ustring &src);
 
 bool removeIfThere(Gtk::Box* box, Gtk::Widget* w, bool increference = true);
@@ -787,6 +792,7 @@ class RotateLabel : public Gtk::Widget
 public:
     RotateLabel();
     explicit RotateLabel(const Glib::ustring& text);
+    ~RotateLabel();
 
     void set_text(const Glib::ustring& text);
     void rotate90(bool val = true);
