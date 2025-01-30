@@ -87,6 +87,11 @@ bool isControlOrMetaDown(Gdk::ModifierType state);
 bool isShiftDown(Gdk::ModifierType state);
 bool isAltDown(Gdk::ModifierType state);
 
+namespace GuiThreadSafety {
+void init();
+void assertInGuiThread();
+}
+
 class IdleRegister final : public rtengine::NonCopyable
 {
 public:

@@ -1907,6 +1907,7 @@ void FileBrowser::notifySelectionListener ()
 
 // void FileBrowser::redrawNeeded (LWButton* button)
 // {
+//     GuiThreadSafety::assertInGuiThread();
 //     queue_draw ();
 // }
 

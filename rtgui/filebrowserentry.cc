@@ -250,6 +250,7 @@ void FileBrowserEntry::updateImage(ThumbImageUpdateListener::ImageUpdate&& updat
 
 void FileBrowserEntry::_updateImage(ThumbImageUpdateListener::ImageUpdate&& update)
 {
+    GuiThreadSafety::assertInGuiThread();
     MYWRITERLOCK(l, lockRW);
 
     redrawRequests--;

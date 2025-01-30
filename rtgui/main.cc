@@ -26,6 +26,7 @@
 #include "cachemanager.h"
 #include "config.h"
 #include "extprog.h"
+#include "guiutils.h"
 #include "multilangmgr.h"
 #include "options.h"
 #include "rtmessagedialog.h"
@@ -168,6 +169,7 @@ int processLineParams ( int argc, char **argv )
 
 bool init_rt()
 {
+    GuiThreadSafety::init();
     extProgStore->init();
     // SoundManager::init();
 

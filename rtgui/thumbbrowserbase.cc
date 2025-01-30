@@ -570,6 +570,8 @@ void ThumbBrowserBase::onInternalAreaDraw()
 
 void ThumbBrowserBase::configScrollBars ()
 {
+    GuiThreadSafety::assertInGuiThread();
+
     if (inW > 0 && inH > 0) {
         int ih = internal->get_height();
         if (arrangement == TB_Horizontal) {
@@ -1108,6 +1110,7 @@ void ThumbBrowserBase::resort ()
 
 void ThumbBrowserBase::redraw (ThumbBrowserEntryBase* entry)
 {
+    GuiThreadSafety::assertInGuiThread();
     arrangeFiles(entry);
     queue_draw();
 }
@@ -1291,6 +1294,7 @@ int ThumbBrowserBase::getEffectiveHeight()
 
 void ThumbBrowserBase::redrawNeeded (ThumbBrowserEntryBase* entry)
 {
+    GuiThreadSafety::assertInGuiThread();
     if (entry->insideWindow (0, 0, internal->get_width(), internal->get_height())) {
         if (!internal->isDirty ()) {
             internal->setDirty ();

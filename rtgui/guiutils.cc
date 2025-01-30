@@ -32,6 +32,7 @@
 #include "toolpanel.h"
 
 #include <assert.h>
+#include <iostream>
 
 using namespace std;
 
@@ -294,7 +295,29 @@ void drawCropGuides(const Cairo::RefPtr<Cairo::Context>& cr,
     }
 }
 
+// This should only be used for checking if current thread is the GUI main
+// thread. See GuiThreadSafety::assertInGuiThread().
+GThread*& getGuiThread() {
+    static GThread* s_gui_thread = nullptr;
+    return s_gui_thread;
+}
+
 }  // namespace
+
+namespace GuiThreadSafety {
+
+void init() {
+    getGuiThread() = g_thread_self();
+}
+
+void assertInGuiThread() {
+    if (g_thread_self() != getGuiThread()) {
+        std::cerr << "GUI code execution from a non-GUI thread context!\n";
+        std::terminate();
+    }
+}
+
+}  // namespace GuiThreadSafety
 
 IdleRegister::IdleRegister()
 {

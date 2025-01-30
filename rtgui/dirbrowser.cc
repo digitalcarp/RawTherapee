@@ -158,7 +158,7 @@ void DirBrowser::updateVolumes ()
     unsigned int nvolumes = GetLogicalDrives ();
 
     if (nvolumes != volumes) {
-        GThreadLock lock;
+        GuiThreadSafety::assertInGuiThread();
 
         for (int i = 0; i < 32; i++)
             if (((volumes >> i) & 1) && !((nvolumes >> i) & 1)) { // volume i has been deleted
@@ -322,6 +322,7 @@ void DirBrowser::updateDirs ()
 // Only call this from the GUI thread
 void DirBrowser::updateDir(Gtk::TreeIter<Gtk::TreeRow>& iter)
 {
+    GuiThreadSafety::assertInGuiThread();
     // first test if some files are deleted
     bool change = true;
 

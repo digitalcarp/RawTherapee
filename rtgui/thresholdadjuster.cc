@@ -263,7 +263,7 @@ bool ThresholdAdjuster::notifyListener ()
 {
 
     if (adjusterListener != nullptr && !blocked) {
-        GThreadLock lock;
+        GuiThreadSafety::assertInGuiThread();
         sendToListener();
     }
 

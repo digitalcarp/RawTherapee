@@ -848,6 +848,7 @@ void FileCatalog::previewsFinishedUI ()
 {
 
     {
+        GuiThreadSafety::assertInGuiThread();
         redrawAll();
         previewsToLoad = 0;
 
