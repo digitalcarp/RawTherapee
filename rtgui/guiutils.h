@@ -520,24 +520,6 @@ private:
     std::unique_ptr<Impl> pimpl;
 };
 
-/**
- * @brief A helper method to connect the current folder property of a file chooser to an arbitrary variable.
- */
-template <class FileChooser>
-void bindCurrentFolder (FileChooser& chooser, Glib::ustring& variable)
-{
-    chooser->signal_selection_changed ().connect ([&]()
-    {
-        const auto current_folder = chooser.get_current_folder ();
-
-        if (current_folder)
-            variable = current_folder;
-    });
-
-    if (!variable.empty ())
-        chooser->set_current_folder (Gio::File::create_for_path(variable));
-}
-
 typedef enum RTUpdatePolicy {
     RTUP_STATIC,
     RTUP_DYNAMIC

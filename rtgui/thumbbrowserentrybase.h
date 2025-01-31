@@ -203,7 +203,9 @@ public:
         case Options::SORT_BY_LABEL:
             cmp = thumbnail->getColorLabel() - other.thumbnail->getColorLabel();
             break;
-        case Options::SORT_METHOD_COUNT: abort();
+        case Options::SORT_METHOD_COUNT:
+        default:
+            abort();
         }
 
         // Always fall back to sorting by name

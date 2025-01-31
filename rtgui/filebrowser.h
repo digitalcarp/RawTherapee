@@ -68,6 +68,17 @@ private:
 
     using ThumbBrowserBase::redrawNeeded;
 
+    Glib::RefPtr<Gtk::PopoverMenu> pmenu;
+    Glib::RefPtr<Gio::SimpleActionGroup> pmenuActions;
+    Glib::RefPtr<Gio::SimpleAction> trashAction;
+    Glib::RefPtr<Gio::SimpleAction> untrashAction;
+    Glib::RefPtr<Gio::SimpleAction> copyToAction;
+    Glib::RefPtr<Gio::SimpleAction> moveToAction;
+    Glib::RefPtr<Gio::SimpleAction> copyProfileAction;
+    Glib::RefPtr<Gio::SimpleAction> pasteProfileAction;
+    Glib::RefPtr<Gio::SimpleAction> partialPasteProfileAction;
+    Glib::RefPtr<Gio::SimpleAction> clearProfileAction;
+
     IdleRegister idle_register;
     unsigned int session_id_;
 
@@ -81,9 +92,21 @@ private:
     void appendFlatFieldMenu(Glib::RefPtr<Gio::Menu>& section);
     void appendCacheMenu(Glib::RefPtr<Gio::Menu>& section);
 
-protected:
-    Glib::RefPtr<Gtk::PopoverMenu> pmenu;
+    std::vector<FileBrowserEntry*> getSelected();
+    void activateProcessFast();
+    void activateSelectAll();
+    void activateRank(int rank);
+    void activateColorLabel(int rank);
+    void activateResetDefaultProfile();
+    void activateExternalProgram(const Glib::ustring& name);
+    void activateSelectDarkFrame();
+    void activateAutoDarkFrame();
+    void activateMoveToDarkFrameDir();
+    void activateSelectFlatField();
+    void activateAutoFlatField();
+    void activateMoveToFlatFieldDir();
 
+protected:
     std::map<Glib::ustring, const ExtProgAction*> mMenuExtProgs;  // key is menuitem label
 
     // void* colorLabel_actionData;
@@ -131,7 +154,6 @@ public:
         tbl = l;
     }
 
-//     void menuItemActivated (Gtk::MenuItem* m);
     void applyMenuItemActivated (ProfileStoreLabel *label);
     void applyPartialMenuItemActivated (ProfileStoreLabel *label);
 

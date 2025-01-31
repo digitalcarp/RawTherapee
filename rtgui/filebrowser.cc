@@ -42,8 +42,26 @@
 #include "rtengine/ffmanager.h"
 #include "rtengine/procparams.h"
 
+#define GET_SELECTED_ITEMS()        \
+    if (!tbl) return;               \
+    auto mselected = getSelected(); \
+    if (mselected.empty()) return;
+
 namespace
 {
+
+const char* FILEBROWSER_ACTION_GROUP = "filebrowser";
+const char* SELECT_ALL_ACTION_NAME = "select-all";
+const char* RENAME_ACTION_NAME = "rename";
+const char* PROCESS_ACTION_NAME = "process";
+
+Glib::ustring getActionName(const char* name) {
+    return Glib::ustring::compose("%1.%2", FILEBROWSER_ACTION_GROUP, name);
+}
+
+Glib::ustring getActionName(const char* name, int target) {
+    return Glib::ustring::compose("%1.%2(%3)", FILEBROWSER_ACTION_GROUP, name, target);
+}
 
 const Glib::ustring* getOriginalExtension (const ThumbBrowserEntryBase* entry)
 {
@@ -150,6 +168,7 @@ FileBrowser::FileBrowser () :
 
     ProfileStore::getInstance()->addListener(this);
 
+    pmenuActions = Gio::SimpleActionGroup::create();
     auto menuModel = Gio::Menu::create();
     auto section = Gio::Menu::create();
 
@@ -158,16 +177,37 @@ FileBrowser::FileBrowser () :
         section = Gio::Menu::create();
     };
 
-    section->append(M("FILEBROWSER_POPUPOPEN"));
-    if (options.inspectorWindow) {
-        section->append(M("FILEBROWSER_POPUPINSPECT"));
-    }
-    // TODO(gtk4): Needs icon "gears"
-    section->append(M("FILEBROWSER_POPUPPROCESS"));
-    section->append(M("FILEBROWSER_POPUPPROCESSFAST"));
+    {
+        const char* POPUP_OPEN = "open";
+        pmenuActions->add_action(POPUP_OPEN, [&]() {
+            GET_SELECTED_ITEMS();
+            openRequested(mselected);
+        });
+        section->append(M("FILEBROWSER_POPUPOPEN"), getActionName(POPUP_OPEN));
+        if (options.inspectorWindow) {
+            const char* POPUP_INSPECT = "inspect";
+            pmenuActions->add_action(POPUP_INSPECT, [&]() {
+                GET_SELECTED_ITEMS();
+                inspectRequested(mselected);
+            });
+            section->append(M("FILEBROWSER_POPUPINSPECT"), getActionName(POPUP_INSPECT));
+        }
 
-    startNewSection();
-    section->append(M("FILEBROWSER_POPUPSELECTALL"));
+        pmenuActions->add_action(PROCESS_ACTION_NAME, [&]() {
+            GET_SELECTED_ITEMS();
+            tbl->developRequested(mselected, false);
+        });
+        // TODO(gtk4): Needs icon "gears"
+        section->append(M("FILEBROWSER_POPUPPROCESS"), getActionName(PROCESS_ACTION_NAME));
+
+        const char* POPUP_PROCESS_FAST = "process-fast";
+        pmenuActions->add_action(POPUP_PROCESS_FAST, [&]() { activateProcessFast(); });
+        section->append(M("FILEBROWSER_POPUPPROCESSFAST"), getActionName(POPUP_PROCESS_FAST));
+
+        startNewSection();
+        pmenuActions->add_action(SELECT_ALL_ACTION_NAME, [&]() { activateSelectAll(); });
+        section->append(M("FILEBROWSER_POPUPSELECTALL"), getActionName(SELECT_ALL_ACTION_NAME));
+    }
     appendSortMenu(section);
     appendRankMenu(section);
 
@@ -190,6 +230,7 @@ FileBrowser::FileBrowser () :
     menuModel->append_section(section);
 
     pmenu = std::make_shared<Gtk::PopoverMenu>();
+    pmenu->insert_action_group("filebrowser", pmenuActions);
     pmenu->set_menu_model(menuModel);
     pmenu->set_flags(Gtk::PopoverMenu::Flags::NESTED);
     pmenu->set_has_arrow(false);
@@ -214,57 +255,8 @@ FileBrowser::FileBrowser () :
 //     copyTo->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_C, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
 //     moveTo->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_M, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
 //
-//     // Bind to event handlers
-//     open->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), open));
-//
-//     if (options.inspectorWindow) {
-//         inspect->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), inspect));
-//     }
-//
-//     for (int i = 0; i < 2; i++) {
-//         sortOrder[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), sortOrder[i]));
-//     }
-//
-//     for (int i = 0; i < Options::SORT_METHOD_COUNT; i++) {
-//         sortMethod[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), sortMethod[i]));
-//     }
-//
-//     for (int i = 0; i < 6; i++) {
-//         rank[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), rank[i]));
-//     }
-//
-//     for (int i = 0; i < 6; i++) {
-//         colorlabel[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), colorlabel[i]));
-//     }
-//
-//     for (size_t i = 0; i < mMenuExtProgs.size(); i++) {
-//         amiExtProg[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), amiExtProg[i]));
-//     }
-//
-// #ifdef _WIN32
-//     if (miOpenDefaultViewer) {
-//         miOpenDefaultViewer->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), miOpenDefaultViewer));
-//     }
-// #endif
-//
-//     trash->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), trash));
-//     untrash->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), untrash));
-//     develop->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), develop));
-//     developfast->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), developfast));
-//     rename->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), rename));
-//     remove->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), remove));
-//     removeInclProc->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), removeInclProc));
-//     selall->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), selall));
-//     copyTo->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), copyTo));
-//     moveTo->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), moveTo));
-//     copyprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), copyprof));
-//     pasteprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), pasteprof));
-//     partpasteprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), partpasteprof));
 //     applyprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), applyprof));
 //     applypartprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), applypartprof));
-//     resetdefaultprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), resetdefaultprof));
-//     clearprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), clearprof));
-//     cachemenu->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), cachemenu));
 //
 //     // A separate pop-up menu for Color Labels
 //     int c = 0;
@@ -294,18 +286,38 @@ void FileBrowser::appendSortMenu(Glib::RefPtr<Gio::Menu>& section)
 {
     auto sortSubmenu = Gio::Menu::create();
 
-    // TODO: radio group default options.sortDescending
+    const char* SORT_ORDER = "sort-order";
+    auto orderRadioAction = Gio::SimpleAction::create_radio_integer(
+        SORT_ORDER, options.sortDescending ? 1 : 0);
+    orderRadioAction->signal_activate().connect(
+        [&, orderRadioAction](const Glib::VariantBase& state) {
+            orderRadioAction->set_state(state);
+            auto order = Glib::VariantBase::cast_dynamic<Glib::Variant<gint32>>(state);
+            sortOrderRequested(order.get());
+        });
+    pmenuActions->add_action(orderRadioAction);
+
     auto sortOrderSection = Gio::Menu::create();
     constexpr std::array<const char*, 2> sortOrders = {
         "SORT_ASCENDING",
         "SORT_DESCENDING"
     };
-    for (const auto& label : sortOrders) {
-        sortOrderSection->append(M(label));
+    for (int i = 0; i < 2; i++) {
+        sortOrderSection->append(M(sortOrders[i]), getActionName(SORT_ORDER, i));
     }
     sortSubmenu->append_section(sortOrderSection);
 
-    // TODO: radio group default options.sortMethod
+    const char* SORT_METHOD = "sort-method";
+    auto methodRadioAction = Gio::SimpleAction::create_radio_integer(
+        SORT_METHOD, static_cast<gint32>(options.sortMethod));
+    methodRadioAction->signal_activate().connect(
+        [&, methodRadioAction](const Glib::VariantBase& state) {
+            methodRadioAction->set_state(state);
+            auto method = Glib::VariantBase::cast_dynamic<Glib::Variant<gint32>>(state);
+            sortMethodRequested(method.get());
+        });
+    pmenuActions->add_action(methodRadioAction);
+
     auto sortMethodSection = Gio::Menu::create();
     constexpr std::array<const char*, Options::SORT_METHOD_COUNT> sortMethods = {
         "SORT_BY_NAME",
@@ -314,8 +326,8 @@ void FileBrowser::appendSortMenu(Glib::RefPtr<Gio::Menu>& section)
         "SORT_BY_RANK",
         "SORT_BY_LABEL"
     };
-    for (const auto& label : sortMethods) {
-        sortMethodSection->append(M(label));
+    for (int i = 0; i < Options::SORT_METHOD_COUNT; i++) {
+        sortMethodSection->append(M(sortMethods[i]), getActionName(SORT_METHOD, i));
     }
     sortSubmenu->append_section(sortMethodSection);
 
@@ -325,9 +337,15 @@ void FileBrowser::appendSortMenu(Glib::RefPtr<Gio::Menu>& section)
 void FileBrowser::appendRankMenu(Glib::RefPtr<Gio::Menu>& section)
 {
     auto rankMenu = Gio::Menu::create();
-    rankMenu->append(M("FILEBROWSER_POPUPUNRANK"));
+    {
+        pmenuActions->add_action("rank0", [&]() { activateRank(0); });
+        rankMenu->append(M("FILEBROWSER_POPUPUNRANK"), getActionName("rank0"));
+    }
     for (int i = 1; i <= 5; i++) {
-        rankMenu->append(M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPRANK", i)));
+        auto actionName = Glib::ustring::compose("rank%1", i);
+        pmenuActions->add_action(actionName, [&, i]() { activateRank(i); });
+        rankMenu->append(M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPRANK", i)),
+                         getActionName(actionName.c_str()));
     }
     if (options.menuGroupRank) {
         section->append_submenu(M("FILEBROWSER_POPUPRANK"), rankMenu);
@@ -341,7 +359,7 @@ void FileBrowser::appendColorLabelMenu(Glib::RefPtr<Gio::Menu>& section)
     // Thumbnail context menu
     // Similar image arrays in filecatalog.cc
     constexpr int COLOR_LABEL_SIZE = 6;
-    // TODO: image rows
+    // TODO(gtk4): image rows
     // constexpr std::array<const char*, COLOR_LABEL_SIZE> activeLabelIcons = {
     //     "circle-empty-gray-small",
     //     "circle-red-small",
@@ -361,8 +379,11 @@ void FileBrowser::appendColorLabelMenu(Glib::RefPtr<Gio::Menu>& section)
 
     auto colorLabelMenu = Gio::Menu::create();
     for (int i = 0; i < COLOR_LABEL_SIZE; i++) {
-        // with active icon [i]
-        colorLabelMenu->append(M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPCOLORLABEL", i)));
+        auto actionName = Glib::ustring::compose("color%1", i);
+        pmenuActions->add_action(actionName, [&, i]() { activateColorLabel(i); });
+        // TODO(gtk4): with active icon [i]
+        colorLabelMenu->append(M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPCOLORLABEL", i)),
+                               getActionName(actionName.c_str()));
     }
     if (options.menuGroupLabel) {
         section->append_submenu(M("FILEBROWSER_POPUPCOLORLABEL"), colorLabelMenu);
@@ -374,15 +395,66 @@ void FileBrowser::appendColorLabelMenu(Glib::RefPtr<Gio::Menu>& section)
 void FileBrowser::appendFileOperationsMenu(Glib::RefPtr<Gio::Menu>& section)
 {
     auto section1 = Gio::Menu::create();
-    section1->append(M("FILEBROWSER_POPUPTRASH"));
-    section1->append(M("FILEBROWSER_POPUPUNTRASH"));
+
+    const char* TRASH = "trash";
+    trashAction = Gio::SimpleAction::create(TRASH);
+    trashAction->signal_activate().connect([&](auto) {
+        GET_SELECTED_ITEMS();
+        toTrashRequested(mselected);
+    });
+    pmenuActions->add_action(trashAction);
+    section1->append(M("FILEBROWSER_POPUPTRASH"), getActionName(TRASH));
+
+    const char* UNTRASH = "untrash";
+    untrashAction = Gio::SimpleAction::create(UNTRASH);
+    untrashAction->signal_activate().connect([&](auto) {
+        GET_SELECTED_ITEMS();
+        fromTrashRequested(mselected);
+    });
+    pmenuActions->add_action(untrashAction);
+    section1->append(M("FILEBROWSER_POPUPUNTRASH"), getActionName(UNTRASH));
+
     auto section2 = Gio::Menu::create();
-    section2->append(M("FILEBROWSER_POPUPRENAME"));
-    section2->append(M("FILEBROWSER_POPUPREMOVE"));
-    section2->append(M("FILEBROWSER_POPUPREMOVEINCLPROC"));
+
+    pmenuActions->add_action(RENAME_ACTION_NAME, [&]() {
+        GET_SELECTED_ITEMS();
+        tbl->renameRequested(mselected);
+    });
+    section2->append(M("FILEBROWSER_POPUPRENAME"), getActionName(RENAME_ACTION_NAME));
+
+    const char* REMOVE = "remove";
+    pmenuActions->add_action(REMOVE, [&]() {
+        GET_SELECTED_ITEMS();
+        tbl->deleteRequested(mselected, false, true);
+    });
+    section2->append(M("FILEBROWSER_POPUPREMOVE"), getActionName(REMOVE));
+
+    const char* REMOVE_INCL_PROC = "remove-incl-proc";
+    pmenuActions->add_action(REMOVE_INCL_PROC, [&]() {
+        GET_SELECTED_ITEMS();
+        tbl->deleteRequested(mselected, true, true);
+    });
+    section2->append(M("FILEBROWSER_POPUPREMOVEINCLPROC"), getActionName(REMOVE_INCL_PROC));
+
     auto section3 = Gio::Menu::create();
-    section3->append(M("FILEBROWSER_POPUPCOPYTO"));
-    section3->append(M("FILEBROWSER_POPUPMOVETO"));
+
+    const char* COPY_TO = "copy-to";
+    copyToAction = Gio::SimpleAction::create(COPY_TO);
+    copyToAction->signal_activate().connect([&](auto) {
+        GET_SELECTED_ITEMS();
+        tbl->copyMoveRequested(mselected, false);
+    });
+    pmenuActions->add_action(copyToAction);
+    section3->append(M("FILEBROWSER_POPUPCOPYTO"), getActionName(COPY_TO));
+
+    const char* MOVE_TO = "move-to";
+    moveToAction = Gio::SimpleAction::create(MOVE_TO);
+    moveToAction->signal_activate().connect([&](auto) {
+        GET_SELECTED_ITEMS();
+        tbl->copyMoveRequested(mselected, true);
+    });
+    pmenuActions->add_action(moveToAction);
+    section3->append(M("FILEBROWSER_POPUPMOVETO"), getActionName(MOVE_TO));
 
     auto menu = Gio::Menu::create();
     menu->append_section(section1);
@@ -399,12 +471,44 @@ void FileBrowser::appendFileOperationsMenu(Glib::RefPtr<Gio::Menu>& section)
 void FileBrowser::appendProfileOperationsMenu(Glib::RefPtr<Gio::Menu>& section)
 {
     auto menu = Gio::Menu::create();
-    menu->append(M("FILEBROWSER_COPYPROFILE"));
-    menu->append(M("FILEBROWSER_PASTEPROFILE"));
-    menu->append(M("FILEBROWSER_PARTIALPASTEPROFILE"));
+
+    const char* COPY = "copy-profile";
+    copyProfileAction = Gio::SimpleAction::create(COPY);
+    copyProfileAction->signal_activate().connect([&](auto) { copyProfile(); });
+    pmenuActions->add_action(copyProfileAction);
+    menu->append(M("FILEBROWSER_COPYPROFILE"), getActionName(COPY));
+
+    const char* PASTE = "paste-profile";
+    pasteProfileAction = Gio::SimpleAction::create(PASTE);
+    pasteProfileAction->signal_activate().connect([&](auto) { pasteProfile(); });
+    pmenuActions->add_action(pasteProfileAction);
+    menu->append(M("FILEBROWSER_PASTEPROFILE"), getActionName(PASTE));
+
+    const char* PASTE_PARTIAL = "partial-paste-profile";
+    partialPasteProfileAction = Gio::SimpleAction::create(PASTE_PARTIAL);
+    partialPasteProfileAction->signal_activate().connect([&](auto) { partPasteProfile(); });
+    pmenuActions->add_action(partialPasteProfileAction);
+    menu->append(M("FILEBROWSER_PARTIALPASTEPROFILE"), getActionName(PASTE_PARTIAL));
+
+    // TODO(gtk4): action?
     menu->append(M("FILEBROWSER_APPLYPROFILE"));
-    menu->append(M("FILEBROWSER_RESETDEFAULTPROFILE"));
-    menu->append(M("FILEBROWSER_CLEARPROFILE"));
+
+    const char* RESET = "reset-default-profile";
+    pmenuActions->add_action(RESET, [&]() { activateResetDefaultProfile(); });
+    menu->append(M("FILEBROWSER_RESETDEFAULTPROFILE"), getActionName(RESET));
+
+    const char* CLEAR = "clear-profile";
+    clearProfileAction = Gio::SimpleAction::create(CLEAR);
+    clearProfileAction->signal_activate().connect([&](auto) {
+        GET_SELECTED_ITEMS();
+        for (size_t i = 0; i < mselected.size(); i++) {
+            mselected[i]->thumbnail->clearProcParams(FILEBROWSER);
+        }
+        redraw();
+    });
+    pmenuActions->add_action(clearProfileAction);
+    menu->append(M("FILEBROWSER_CLEARPROFILE"), getActionName(CLEAR));
+
     if (options.menuGroupProfileOperations) {
         section->append_submenu(M("FILEBROWSER_POPUPPROFILEOPERATIONS"), menu);
     } else {
@@ -415,7 +519,9 @@ void FileBrowser::appendProfileOperationsMenu(Glib::RefPtr<Gio::Menu>& section)
 void FileBrowser::appendExternalProgramMenu(Glib::RefPtr<Gio::Menu>& section)
 {
 #if defined(_WIN32)
-    section->append(M("FILEBROWSER_OPENDEFAULTVIEWER"));
+    const char* OPEN_DEFAULT = "open-default-viewer";
+    pmenu->add_action(OPEN_DEFAULT, [&]() { openDefaultViewer(1); });
+    section->append(M("FILEBROWSER_OPENDEFAULTVIEWER"), getActionName(OPEN_DEFAULT));
 #endif
     // Build a list of menu items
     mMenuExtProgs.clear();
@@ -429,7 +535,13 @@ void FileBrowser::appendExternalProgramMenu(Glib::RefPtr<Gio::Menu>& section)
     auto menu = Gio::Menu::create();
     int itemNo = 0;
     for (auto it = mMenuExtProgs.begin(); it != mMenuExtProgs.end(); it++, itemNo++) {
-        menu->append(it->first);
+        auto name = Glib::ustring::compose("external-program%1", itemNo);
+        auto action = Gio::SimpleAction::create(name);
+        action->signal_activate().connect([&, externalName=it->first](auto) {
+            activateExternalProgram(externalName);
+        });
+        pmenuActions->add_action(action);
+        menu->append(it->first, getActionName(name.c_str()));
     }
 
     if (options.menuGroupExtProg) {
@@ -442,60 +554,94 @@ void FileBrowser::appendExternalProgramMenu(Glib::RefPtr<Gio::Menu>& section)
 void FileBrowser::appendDarkFrameMenu(Glib::RefPtr<Gio::Menu>& section)
 {
     auto menu = Gio::Menu::create();
-    menu->append(M("FILEBROWSER_SELECTDARKFRAME"));
-    menu->append(M("FILEBROWSER_AUTODARKFRAME"));
-    menu->append(M("FILEBROWSER_MOVETODARKFDIR"));
+
+    const char* SELECT = "select-dark-frame";
+    pmenuActions->add_action(SELECT, [&]() { activateSelectDarkFrame(); });
+    menu->append(M("FILEBROWSER_SELECTDARKFRAME"), getActionName(SELECT));
+
+    const char* AUTO = "auto-dark-frame";
+    pmenuActions->add_action(AUTO, [&]() { activateAutoDarkFrame(); });
+    menu->append(M("FILEBROWSER_AUTODARKFRAME"), getActionName(AUTO));
+
+    const char* MOVE = "move-to-dark-frame";
+    pmenuActions->add_action(MOVE, [&]() { activateMoveToDarkFrameDir(); });
+    menu->append(M("FILEBROWSER_MOVETODARKFDIR"), getActionName(MOVE));
+
     section->append_submenu(M("FILEBROWSER_DARKFRAME"), menu);
 }
 
 void FileBrowser::appendFlatFieldMenu(Glib::RefPtr<Gio::Menu>& section)
 {
     auto menu = Gio::Menu::create();
-    menu->append(M("FILEBROWSER_SELECTFLATFIELD"));
-    menu->append(M("FILEBROWSER_AUTOFLATFIELD"));
-    menu->append(M("FILEBROWSER_MOVETOFLATFIELDDIR"));
+
+    const char* SELECT = "select-flat-field";
+    pmenuActions->add_action(SELECT, [&]() { activateSelectFlatField(); });
+    menu->append(M("FILEBROWSER_SELECTFLATFIELD"), getActionName(SELECT));
+
+    const char* AUTO = "auto-flat-field";
+    pmenuActions->add_action(AUTO, [&]() { activateAutoFlatField(); });
+    menu->append(M("FILEBROWSER_AUTOFLATFIELD"), getActionName(AUTO));
+
+    const char* MOVE = "move-to-flat-field";
+    pmenuActions->add_action(MOVE, [&]() { activateMoveToFlatFieldDir(); });
+    menu->append(M("FILEBROWSER_MOVETOFLATFIELDDIR"), getActionName(MOVE));
+
     section->append_submenu(M("FILEBROWSER_FLATFIELD"), menu);
 }
 
 void FileBrowser::appendCacheMenu(Glib::RefPtr<Gio::Menu>& section)
 {
     auto menu = Gio::Menu::create();
-    menu->append(M("FILEBROWSER_CACHECLEARFROMPARTIAL"));
-    menu->append(M("FILEBROWSER_CACHECLEARFROMFULL"));
+
+    const char* CLEAR_PARTIAL = "clear-cache-partial";
+    pmenuActions->add_action(CLEAR_PARTIAL, [&]() {
+        GET_SELECTED_ITEMS();
+        tbl->clearFromCacheRequested(mselected, false);
+    });
+    menu->append(M("FILEBROWSER_CACHECLEARFROMPARTIAL"), getActionName(CLEAR_PARTIAL));
+
+    const char* CLEAR_FULL = "clear-cache-full";
+    pmenuActions->add_action(CLEAR_FULL, [&]() {
+        GET_SELECTED_ITEMS();
+        tbl->clearFromCacheRequested(mselected, true);
+    });
+    menu->append(M("FILEBROWSER_CACHECLEARFROMFULL"), getActionName(CLEAR_FULL));
+
     section->append_submenu(M("FILEBROWSER_CACHE"), menu);
 }
-
 
 void FileBrowser::rightClicked (double x, double y)
 {
     pmenu->set_pointing_to(Gdk::Rectangle(x, y, 1, 1));
     pmenu->popup();
 
-//     {
-//         MYREADERLOCK(l, entryRW);
-//
-//         trash->set_sensitive (false);
-//         untrash->set_sensitive (false);
-//
-//         for (size_t i = 0; i < selected.size(); i++)
-//             if ((static_cast<FileBrowserEntry*>(selected[i]))->thumbnail->getTrashed()) {
-//                 untrash->set_sensitive (true);
-//                 break;
-//             }
-//
-//         for (size_t i = 0; i < selected.size(); i++)
-//             if (!(static_cast<FileBrowserEntry*>(selected[i]))->thumbnail->getTrashed()) {
-//                 trash->set_sensitive (true);
-//                 break;
-//             }
-//
-//         pasteprof->set_sensitive (clipboard.hasProcParams());
-//         partpasteprof->set_sensitive (clipboard.hasProcParams());
-//         copyprof->set_sensitive (selected.size() == 1);
-//         clearprof->set_sensitive (!selected.empty());
-//         copyTo->set_sensitive (!selected.empty());
-//         moveTo->set_sensitive (!selected.empty());
-//     }
+    {
+        MYREADERLOCK(l, entryRW);
+        bool isTrashSensitive = true;
+        for (size_t i = 0; i < selected.size(); i++) {
+            if ((static_cast<FileBrowserEntry*>(selected[i]))->thumbnail->getTrashed()) {
+                isTrashSensitive = false;
+                break;
+            }
+        }
+
+        bool isUntrashSensitive = true;
+        for (size_t i = 0; i < selected.size(); i++) {
+            if (!(static_cast<FileBrowserEntry*>(selected[i]))->thumbnail->getTrashed()) {
+                isUntrashSensitive = false;
+                break;
+            }
+        }
+
+        trashAction->set_enabled(isTrashSensitive);
+        untrashAction->set_enabled(isUntrashSensitive);
+        pasteProfileAction->set_enabled(clipboard.hasProcParams());
+        partialPasteProfileAction->set_enabled(clipboard.hasProcParams());
+        copyProfileAction->set_enabled(selected.size() == 1);
+        clearProfileAction->set_enabled(!selected.empty());
+        copyToAction->set_enabled(!selected.empty());
+        moveToAction->set_enabled(!selected.empty());
+    }
 }
 
 void FileBrowser::doubleClicked (ThumbBrowserEntryBase* entry)
@@ -618,329 +764,335 @@ void FileBrowser::close ()
 //             return;
 //         }
 // }
-//
-// void FileBrowser::menuItemActivated (Gtk::MenuItem* m)
-// {
-//     std::vector<FileBrowserEntry*> mselected;
-//
-//     {
-//         MYREADERLOCK(l, entryRW);
-//
-//         for (size_t i = 0; i < selected.size(); i++) {
-//             mselected.push_back (static_cast<FileBrowserEntry*>(selected[i]));
-//         }
-//     }
-//
-//
-//     if (!tbl || (m != selall && mselected.empty()) ) {
-//         return;
-//     }
-//
-//     for (int i = 0; i < 2; i++)
-//         if (m == sortOrder[i]) {
-//             sortOrderRequested (i);
-//             return;
-//         }
-//
-//     for (int i = 0; i < Options::SORT_METHOD_COUNT; i++)
-//         if (m == sortMethod[i]) {
-//             sortMethodRequested (i);
-//             return;
-//         }
-//
-//     for (int i = 0; i < 6; i++)
-//         if (m == rank[i]) {
-//             rankingRequested (mselected, i);
-//             return;
-//         }
-//
-//     for (int i = 0; i < 6; i++)
-//         if (m == colorlabel[i]) {
-//             colorlabelRequested (mselected, i);
-//             return;
-//         }
-//
-//     for (size_t j = 0; j < mMenuExtProgs.size(); j++) {
-//         if (m == amiExtProg[j]) {
-//             const auto pAct = mMenuExtProgs[m->get_label()];
-//
-//             // Build vector of all file names
-//             std::vector<Glib::ustring> selFileNames;
-//
-//             for (size_t i = 0; i < mselected.size(); i++) {
-//                 Glib::ustring fn = mselected[i]->thumbnail->getFileName();
-//
-//                 // Maybe batch processed version
-//                 if (pAct->target == 2) {
-//                     fn = Glib::ustring::compose ("%1.%2", BatchQueue::calcAutoFileNameBase(fn), options.saveFormatBatch.format);
-//                 }
-//
-//                 selFileNames.push_back(fn);
-//             }
-//
-//             pAct->execute (selFileNames);
-//             return;
-//         }
-//     }
-//
-//     if (m == open) {
-//         openRequested(mselected);
-// //     } else if (options.inspectorWindow && m == inspect) {
-// //         inspectRequested(mselected);
-//     } else if (m == remove) {
-//         tbl->deleteRequested (mselected, false, true);
-//     } else if (m == removeInclProc) {
-//         tbl->deleteRequested (mselected, true, true);
-//     } else if (m == trash) {
-//         toTrashRequested (mselected);
-//     } else if (m == untrash) {
-//         fromTrashRequested (mselected);
-//     }
-//
-//     else if (m == develop) {
-//         tbl->developRequested (mselected, false);
-//     } else if (m == developfast) {
-//         if (exportPanel) {
-//             // force saving export panel settings
-//             exportPanel->setExportPanelListener(nullptr);
-//             exportPanel->FastExportPressed();
-//             exportPanel->setExportPanelListener(this);
-//         }
-//         tbl->developRequested (mselected, true);
-//     }
-//
-//     else if (m == rename) {
-//         tbl->renameRequested (mselected);
-//     } else if (m == selall) {
-//         lastClicked = nullptr;
-//         {
-//             MYWRITERLOCK(l, entryRW);
-//
-//             selected.clear();
-//
-//             for (size_t i = 0; i < fd.size(); ++i) {
-//                 if (checkFilter(fd[i])) {
-//                     fd[i]->selected = true;
-//                     selected.push_back(fd[i]);
-//                 }
-//             }
-//             if (!anchor && !selected.empty()) {
-//                 anchor = selected[0];
-//             }
-//         }
-//         queue_draw ();
-//         notifySelectionListener();
-//     } else if( m == copyTo) {
-//         tbl->copyMoveRequested (mselected, false);
-//     }
-//
-//     else if( m == moveTo) {
-//         tbl->copyMoveRequested (mselected, true);
-//     }
-//
-//     else if (m == autoDF) {
-//         if (!mselected.empty() && bppcl) {
-//             bppcl->beginBatchPParamsChange(mselected.size());
-//         }
-//
-//         for (size_t i = 0; i < mselected.size(); i++) {
-//             rtengine::procparams::ProcParams pp = mselected[i]->thumbnail->getProcParams();
-//             pp.raw.df_autoselect = true;
-//             pp.raw.dark_frame.clear();
-//             mselected[i]->thumbnail->setProcParams(pp, nullptr, FILEBROWSER, false);
-//         }
-//
-//         if (!mselected.empty() && bppcl) {
-//             bppcl->endBatchPParamsChange();
-//         }
-//
-//     } else if (m == selectDF) {
-//         if( !mselected.empty() ) {
-//             rtengine::procparams::ProcParams pp = mselected[0]->thumbnail->getProcParams();
-//             Gtk::FileChooserDialog fc (getToplevelWindow (this), "Dark Frame", Gtk::FileChooser::Action::OPEN );
-//             bindCurrentFolder (fc, options.lastDarkframeDir);
-//             fc.add_button( M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
-//             fc.add_button( M("GENERAL_APPLY"), Gtk::ResponseType::APPLY);
-//
-//             if(!pp.raw.dark_frame.empty()) {
-//                 fc.set_filename( pp.raw.dark_frame );
-//             }
-//
-//             if( fc.run() == Gtk::ResponseType::APPLY ) {
-//                 if (bppcl) {
-//                     bppcl->beginBatchPParamsChange(mselected.size());
-//                 }
-//
-//                 for (size_t i = 0; i < mselected.size(); i++) {
-//                     rtengine::procparams::ProcParams lpp = mselected[i]->thumbnail->getProcParams();
-//                     lpp.raw.dark_frame = fc.get_filename();
-//                     lpp.raw.df_autoselect = false;
-//                     mselected[i]->thumbnail->setProcParams(lpp, nullptr, FILEBROWSER, false);
-//                 }
-//
-//                 if (bppcl) {
-//                     bppcl->endBatchPParamsChange();
-//                 }
-//             }
-//         }
-//     } else if( m == thisIsDF) {
-//         if( !options.rtSettings.darkFramesPath.empty()) {
-//             if (Gio::File::create_for_path(options.rtSettings.darkFramesPath)->query_exists() ) {
-//                 for (size_t i = 0; i < mselected.size(); i++) {
-//                     Glib::RefPtr<Gio::File> file = Gio::File::create_for_path ( mselected[i]->filename );
-//
-//                     if( !file ) {
-//                         continue;
-//                     }
-//
-//                     Glib::ustring destName = options.rtSettings.darkFramesPath + "/" + file->get_basename();
-//                     Glib::RefPtr<Gio::File> dest = Gio::File::create_for_path ( destName );
-//                     file->move(  dest );
-//                 }
-//
-//                 // Reinit cache
-//                 rtengine::DFManager::getInstance().init( options.rtSettings.darkFramesPath );
-//             } else {
-//                 // Target directory creation failed, we clear the darkFramesPath setting
-//                 options.rtSettings.darkFramesPath.clear();
-//                 Glib::ustring msg_ = Glib::ustring::compose (M("MAIN_MSG_PATHDOESNTEXIST"), escapeHtmlChars(options.rtSettings.darkFramesPath))
-//                                      + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
-//                 Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-//                 msgd.set_title(M("TP_DARKFRAME_LABEL"));
-//                 msgd.run ();
-//             }
-//         } else {
-//             Glib::ustring msg_ = M("MAIN_MSG_SETPATHFIRST") + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
-//             Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-//             msgd.set_title(M("TP_DARKFRAME_LABEL"));
-//             msgd.run ();
-//         }
-//     } else if (m == autoFF) {
-//         if (!mselected.empty() && bppcl) {
-//             bppcl->beginBatchPParamsChange(mselected.size());
-//         }
-//
-//         for (size_t i = 0; i < mselected.size(); i++) {
-//             rtengine::procparams::ProcParams pp = mselected[i]->thumbnail->getProcParams();
-//             pp.raw.ff_AutoSelect = true;
-//             pp.raw.ff_file.clear();
-//             mselected[i]->thumbnail->setProcParams(pp, nullptr, FILEBROWSER, false);
-//         }
-//
-//         if (!mselected.empty() && bppcl) {
-//             bppcl->endBatchPParamsChange();
-//         }
-//     } else if (m == selectFF) {
-//         if( !mselected.empty() ) {
-//             rtengine::procparams::ProcParams pp = mselected[0]->thumbnail->getProcParams();
-//             Gtk::FileChooserDialog fc (getToplevelWindow (this), "Flat Field", Gtk::FileChooser::Action::OPEN );
-//             bindCurrentFolder (fc, options.lastFlatfieldDir);
-//             fc.add_button( M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
-//             fc.add_button( M("GENERAL_APPLY"), Gtk::ResponseType::APPLY);
-//
-//             if(!pp.raw.ff_file.empty()) {
-//                 fc.set_filename( pp.raw.ff_file );
-//             }
-//
-//             if( fc.run() == Gtk::ResponseType::APPLY ) {
-//                 if (bppcl) {
-//                     bppcl->beginBatchPParamsChange(mselected.size());
-//                 }
-//
-//                 for (size_t i = 0; i < mselected.size(); i++) {
-//                     rtengine::procparams::ProcParams lpp = mselected[i]->thumbnail->getProcParams();
-//                     lpp.raw.ff_file = fc.get_filename();
-//                     lpp.raw.ff_AutoSelect = false;
-//                     mselected[i]->thumbnail->setProcParams(lpp, nullptr, FILEBROWSER, false);
-//                 }
-//
-//                 if (bppcl) {
-//                     bppcl->endBatchPParamsChange();
-//                 }
-//             }
-//         }
-//     } else if( m == thisIsFF) {
-//         if( !options.rtSettings.flatFieldsPath.empty()) {
-//             if (Gio::File::create_for_path(options.rtSettings.flatFieldsPath)->query_exists() ) {
-//                 for (size_t i = 0; i < mselected.size(); i++) {
-//                     Glib::RefPtr<Gio::File> file = Gio::File::create_for_path ( mselected[i]->filename );
-//
-//                     if( !file ) {
-//                         continue;
-//                     }
-//
-//                     Glib::ustring destName = options.rtSettings.flatFieldsPath + "/" + file->get_basename();
-//                     Glib::RefPtr<Gio::File> dest = Gio::File::create_for_path ( destName );
-//                     file->move(  dest );
-//                 }
-//
-//                 // Reinit cache
-//                 rtengine::ffm.init( options.rtSettings.flatFieldsPath );
-//             } else {
-//                 // Target directory creation failed, we clear the flatFieldsPath setting
-//                 options.rtSettings.flatFieldsPath.clear();
-//                 Glib::ustring msg_ = Glib::ustring::compose (M("MAIN_MSG_PATHDOESNTEXIST"), escapeHtmlChars(options.rtSettings.flatFieldsPath))
-//                                      + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
-//                 Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-//                 msgd.set_title(M("TP_FLATFIELD_LABEL"));
-//                 msgd.run ();
-//             }
-//         } else {
-//             Glib::ustring msg_ = M("MAIN_MSG_SETPATHFIRST") + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED");
-//             Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-//             msgd.set_title(M("TP_FLATFIELD_LABEL"));
-//             msgd.run ();
-//         }
-//     } else if (m == copyprof) {
-//         copyProfile ();
-//     } else if (m == pasteprof) {
-//         pasteProfile ();
-//     } else if (m == partpasteprof) {
-//         partPasteProfile ();
-//     } else if (m == clearprof) {
-//         for (size_t i = 0; i < mselected.size(); i++) {
-//             mselected[i]->thumbnail->clearProcParams (FILEBROWSER);
-//         }
-//
-//         queue_draw ();
-//     } else if (m == resetdefaultprof) {
-//         if (!mselected.empty() && bppcl) {
-//             bppcl->beginBatchPParamsChange(mselected.size());
-//         }
-//
-//         for (size_t i = 0; i < mselected.size(); i++)  {
-//             const auto thumbnail = mselected[i]->thumbnail;
-//             const auto rank = thumbnail->getRank();
-//             const auto colorLabel = thumbnail->getColorLabel();
-//             const auto stage = thumbnail->getTrashed();
-//
-//             thumbnail->createProcParamsForUpdate (false, true);
-//             thumbnail->setRank(rank);
-//             thumbnail->setColorLabel(colorLabel);
-//             thumbnail->setTrashed(stage);
-//
-//             // Empty run to update the thumb
-//             rtengine::procparams::ProcParams params = thumbnail->getProcParams ();
-//             thumbnail->setProcParams (params, nullptr, FILEBROWSER, true, true);
-//         }
-//
-//         if (!mselected.empty() && bppcl) {
-//             bppcl->endBatchPParamsChange();
-//         }
-//     } else if (m == clearFromCache) {
-//         tbl->clearFromCacheRequested (mselected, false);
-//
-//         //queue_draw ();
-//     } else if (m == clearFromCacheFull) {
-//         tbl->clearFromCacheRequested (mselected, true);
-//
-//         //queue_draw ();
-// #ifdef _WIN32
-//     } else if (miOpenDefaultViewer && m == miOpenDefaultViewer) {
-//         openDefaultViewer(1);
-// #endif
-//     }
-// }
+
+std::vector<FileBrowserEntry*> FileBrowser::getSelected()
+{
+    std::vector<FileBrowserEntry*> mselected;
+
+    MYREADERLOCK(l, entryRW);
+
+    for (size_t i = 0; i < selected.size(); i++) {
+        mselected.push_back (static_cast<FileBrowserEntry*>(selected[i]));
+    }
+    return mselected;
+}
+
+void FileBrowser::activateProcessFast()
+{
+    GET_SELECTED_ITEMS();
+    if (exportPanel) {
+        // force saving export panel settings
+        exportPanel->setExportPanelListener(nullptr);
+        exportPanel->FastExportPressed();
+        exportPanel->setExportPanelListener(this);
+    }
+    tbl->developRequested(mselected, true);
+}
+
+void FileBrowser::activateSelectAll()
+{
+    lastClicked = nullptr;
+    {
+        MYWRITERLOCK(l, entryRW);
+
+        selected.clear();
+
+        for (size_t i = 0; i < fd.size(); ++i) {
+            if (checkFilter(fd[i])) {
+                fd[i]->selected = true;
+                selected.push_back(fd[i]);
+            }
+        }
+        if (!anchor && !selected.empty()) {
+            anchor = selected[0];
+        }
+    }
+    queue_draw ();
+    notifySelectionListener();
+}
+
+void FileBrowser::activateRank(int rank)
+{
+    GET_SELECTED_ITEMS();
+    rankingRequested(mselected, rank);
+}
+
+void FileBrowser::activateColorLabel(int label)
+{
+    GET_SELECTED_ITEMS();
+    colorlabelRequested(mselected, label);
+}
+
+void FileBrowser::activateResetDefaultProfile()
+{
+    GET_SELECTED_ITEMS();
+    if (!mselected.empty() && bppcl) {
+        bppcl->beginBatchPParamsChange(mselected.size());
+    }
+
+    for (size_t i = 0; i < mselected.size(); i++)  {
+        const auto thumbnail = mselected[i]->thumbnail;
+        const auto rank = thumbnail->getRank();
+        const auto colorLabel = thumbnail->getColorLabel();
+        const auto stage = thumbnail->getTrashed();
+
+        thumbnail->createProcParamsForUpdate (false, true);
+        thumbnail->setRank(rank);
+        thumbnail->setColorLabel(colorLabel);
+        thumbnail->setTrashed(stage);
+
+        // Empty run to update the thumb
+        rtengine::procparams::ProcParams params = thumbnail->getProcParams ();
+        thumbnail->setProcParams (params, nullptr, FILEBROWSER, true, true);
+    }
+
+    if (!mselected.empty() && bppcl) {
+        bppcl->endBatchPParamsChange();
+    }
+}
+
+void FileBrowser::activateExternalProgram(const Glib::ustring& name)
+{
+    GET_SELECTED_ITEMS();
+
+    const auto pAct = mMenuExtProgs[name];
+
+    // Build vector of all file names
+    std::vector<Glib::ustring> selFileNames;
+
+    for (size_t i = 0; i < mselected.size(); i++) {
+        Glib::ustring fn = mselected[i]->thumbnail->getFileName();
+
+        // Maybe batch processed version
+        if (pAct->target == 2) {
+            fn = Glib::ustring::compose("%1.%2", Thumbnail::calcAutoFileNameBase(fn),
+                                        options.saveFormatBatch.format);
+        }
+
+        selFileNames.push_back(fn);
+    }
+
+    pAct->execute(selFileNames);
+}
+
+void FileBrowser::activateSelectDarkFrame()
+{
+    GET_SELECTED_ITEMS();
+
+    const rtengine::procparams::ProcParams& pp = mselected[0]->thumbnail->getProcParams();
+
+    auto dialog = Gtk::FileDialog::create();
+    dialog->set_title(M("TP_DARKFRAME_LABEL"));
+    dialog->set_modal();
+    if (!options.lastDarkframeDir.empty()) {
+        dialog->set_initial_folder(Gio::File::create_for_path(options.lastDarkframeDir));
+    }
+    if(!pp.raw.dark_frame.empty()) {
+        dialog->set_initial_file(Gio::File::create_for_path(pp.raw.dark_frame));
+    }
+
+    auto onResponse = [&, dialog, sel=std::move(mselected)](Glib::RefPtr<Gio::AsyncResult>& result) {
+        Glib::RefPtr<Gio::File> file = dialog->open_finish(result);
+        if (!file) return;
+
+        auto folder = file->get_parent();
+        if (folder) {
+            options.lastDarkframeDir = folder->get_path();
+        }
+
+        if (bppcl) {
+            bppcl->beginBatchPParamsChange(sel.size());
+        }
+
+        for (size_t i = 0; i < sel.size(); i++) {
+            rtengine::procparams::ProcParams lpp = sel[i]->thumbnail->getProcParams();
+            lpp.raw.dark_frame = file->get_path();
+            lpp.raw.df_autoselect = false;
+            sel[i]->thumbnail->setProcParams(lpp, nullptr, FILEBROWSER, false);
+        }
+
+        if (bppcl) {
+            bppcl->endBatchPParamsChange();
+        }
+    };
+
+    dialog->set_accept_label(M("GENERAL_APPLY"));
+    dialog->open(*getToplevelWindow(this), onResponse);
+}
+
+void FileBrowser::activateAutoDarkFrame()
+{
+    GET_SELECTED_ITEMS();
+
+    if (bppcl) {
+        bppcl->beginBatchPParamsChange(mselected.size());
+    }
+
+    for (size_t i = 0; i < mselected.size(); i++) {
+        rtengine::procparams::ProcParams pp = mselected[i]->thumbnail->getProcParams();
+        pp.raw.df_autoselect = true;
+        pp.raw.dark_frame.clear();
+        mselected[i]->thumbnail->setProcParams(pp, nullptr, FILEBROWSER, false);
+    }
+
+    if (bppcl) {
+        bppcl->endBatchPParamsChange();
+    }
+}
+
+void FileBrowser::activateMoveToDarkFrameDir()
+{
+    GET_SELECTED_ITEMS();
+
+    if (!options.rtSettings.darkFramesPath.empty()) {
+        if (Gio::File::create_for_path(options.rtSettings.darkFramesPath)->query_exists()) {
+            for (size_t i = 0; i < mselected.size(); i++) {
+                Glib::RefPtr<Gio::File> file = Gio::File::create_for_path(mselected[i]->filename);
+
+                if (!file) {
+                    continue;
+                }
+
+                Glib::ustring destName = options.rtSettings.darkFramesPath + "/" + file->get_basename();
+                Glib::RefPtr<Gio::File> dest = Gio::File::create_for_path(destName);
+                file->move(dest);
+            }
+
+            // Reinit cache
+            rtengine::DFManager::getInstance().init(options.rtSettings.darkFramesPath);
+        } else {
+            // Target directory creation failed, we clear the darkFramesPath setting
+            options.rtSettings.darkFramesPath.clear();
+            Glib::ustring msg_ = Glib::ustring::compose(
+                M("MAIN_MSG_PATHDOESNTEXIST"),
+                escapeHtmlChars(options.rtSettings.darkFramesPath));
+            msg_ += "\n\n";
+            msg_ += M("MAIN_MSG_OPERATIONCANCELLED");
+
+            auto msgd = Gtk::make_managed<RtMessageDialog>(msg_,
+                RtMessageDialog::Type::ERROR,
+                RtMessageDialog::ButtonSet::OK);
+            msgd->set_title(M("TP_DARKFRAME_LABEL"));
+            msgd->show();
+        }
+    } else {
+        auto msgd = Gtk::make_managed<RtMessageDialog>(
+            M("MAIN_MSG_SETPATHFIRST") + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED"),
+            RtMessageDialog::Type::ERROR,
+            RtMessageDialog::ButtonSet::OK);
+        msgd->set_title(M("TP_DARKFRAME_LABEL"));
+        msgd->show();
+    }
+}
+
+void FileBrowser::activateSelectFlatField()
+{
+    GET_SELECTED_ITEMS();
+
+    const rtengine::procparams::ProcParams& pp = mselected[0]->thumbnail->getProcParams();
+
+    auto dialog = Gtk::FileDialog::create();
+    dialog->set_title(M("TP_FLATFIELD_LABEL"));
+    dialog->set_modal();
+    if (!options.lastFlatfieldDir.empty()) {
+        dialog->set_initial_folder(Gio::File::create_for_path(options.lastFlatfieldDir));
+    }
+    if(!pp.raw.ff_file.empty()) {
+        dialog->set_initial_file(Gio::File::create_for_path(pp.raw.ff_file));
+    }
+
+    auto onResponse = [&, dialog, sel=std::move(mselected)](Glib::RefPtr<Gio::AsyncResult>& result) {
+        Glib::RefPtr<Gio::File> file = dialog->open_finish(result);
+        if (!file) return;
+
+        auto folder = file->get_parent();
+        if (folder) {
+            options.lastFlatfieldDir = folder->get_path();
+        }
+
+        if (bppcl) {
+            bppcl->beginBatchPParamsChange(sel.size());
+        }
+
+        for (size_t i = 0; i < sel.size(); i++) {
+            rtengine::procparams::ProcParams lpp = sel[i]->thumbnail->getProcParams();
+            lpp.raw.ff_file = file->get_path();
+            lpp.raw.ff_AutoSelect = false;
+            sel[i]->thumbnail->setProcParams(lpp, nullptr, FILEBROWSER, false);
+        }
+
+        if (bppcl) {
+            bppcl->endBatchPParamsChange();
+        }
+    };
+
+    dialog->set_accept_label(M("GENERAL_APPLY"));
+    dialog->open(*getToplevelWindow(this), onResponse);
+}
+
+void FileBrowser::activateAutoFlatField()
+{
+    GET_SELECTED_ITEMS();
+
+    if (bppcl) {
+        bppcl->beginBatchPParamsChange(mselected.size());
+    }
+
+    for (size_t i = 0; i < mselected.size(); i++) {
+        rtengine::procparams::ProcParams pp = mselected[i]->thumbnail->getProcParams();
+        pp.raw.ff_AutoSelect = true;
+        pp.raw.ff_file.clear();
+        mselected[i]->thumbnail->setProcParams(pp, nullptr, FILEBROWSER, false);
+    }
+
+    if (bppcl) {
+        bppcl->endBatchPParamsChange();
+    }
+}
+
+void FileBrowser::activateMoveToFlatFieldDir()
+{
+    GET_SELECTED_ITEMS();
+
+    if (!options.rtSettings.flatFieldsPath.empty()) {
+        if (Gio::File::create_for_path(options.rtSettings.flatFieldsPath)->query_exists()) {
+            for (size_t i = 0; i < mselected.size(); i++) {
+                Glib::RefPtr<Gio::File> file = Gio::File::create_for_path(mselected[i]->filename);
+
+                if (!file) {
+                    continue;
+                }
+
+                Glib::ustring destName = options.rtSettings.flatFieldsPath + "/" + file->get_basename();
+                Glib::RefPtr<Gio::File> dest = Gio::File::create_for_path(destName);
+                file->move(dest);
+            }
+
+            // Reinit cache
+            rtengine::ffm.init(options.rtSettings.flatFieldsPath);
+        } else {
+            // Target directory creation failed, we clear the flatFieldsPath setting
+            options.rtSettings.flatFieldsPath.clear();
+            Glib::ustring msg_ = Glib::ustring::compose(
+                M("MAIN_MSG_PATHDOESNTEXIST"), escapeHtmlChars(options.rtSettings.flatFieldsPath));
+            msg_ += "\n\n";
+            msg_ += M("MAIN_MSG_OPERATIONCANCELLED");
+
+            auto msgd = Gtk::make_managed<RtMessageDialog>(msg_,
+                RtMessageDialog::Type::ERROR,
+                RtMessageDialog::ButtonSet::OK);
+            msgd->set_title(M("TP_DARKFRAME_LABEL"));
+            msgd->show();
+        }
+    } else {
+        auto msgd = Gtk::make_managed<RtMessageDialog>(
+            M("MAIN_MSG_SETPATHFIRST") + "\n\n" + M("MAIN_MSG_OPERATIONCANCELLED"),
+            RtMessageDialog::Type::ERROR,
+            RtMessageDialog::ButtonSet::OK);
+        msgd->set_title(M("TP_FLATFIELD_LABEL"));
+        msgd->show();
+    }
+}
 
 void FileBrowser::copyProfile ()
 {
@@ -1075,10 +1227,10 @@ bool FileBrowser::keyPressed (guint keyval, guint keycode, Gdk::ModifierType sta
     bool alt = isAltDown(state);
 
     if ((keyval == GDK_KEY_C || keyval == GDK_KEY_c) && ctrl && shift) {
-//         menuItemActivated (copyTo);
+        copyToAction->activate();
         return true;
     } else if ((keyval == GDK_KEY_M || keyval == GDK_KEY_m) && ctrl && shift) {
-//         menuItemActivated (moveTo);
+        moveToAction->activate();
         return true;
     } else if ((keyval == GDK_KEY_C || keyval == GDK_KEY_c || keyval == GDK_KEY_Insert) && ctrl) {
         copyProfile ();
@@ -1093,22 +1245,22 @@ bool FileBrowser::keyPressed (guint keyval, guint keycode, Gdk::ModifierType sta
         partPasteProfile ();
         return true;
     } else if (keyval == GDK_KEY_Delete && !shift) {
-//         menuItemActivated (trash);
+        trashAction->activate();
         return true;
     } else if (keyval == GDK_KEY_Delete && shift) {
-//         menuItemActivated (untrash);
+        untrashAction->activate();
         return true;
     } else if ((keyval == GDK_KEY_B || keyval == GDK_KEY_b) && ctrl && !shift) {
-//         menuItemActivated (develop);
+        pmenuActions->activate_action(PROCESS_ACTION_NAME);
         return true;
     } else if ((keyval == GDK_KEY_B || keyval == GDK_KEY_b) && ctrl && shift) {
-//         menuItemActivated (developfast);
+        activateProcessFast();
         return true;
     } else if ((keyval == GDK_KEY_A || keyval == GDK_KEY_a) && ctrl) {
-//         menuItemActivated (selall);
+        pmenuActions->activate_action(SELECT_ALL_ACTION_NAME);
         return true;
     } else if (keyval == GDK_KEY_F2 && !ctrl) {
-//         menuItemActivated (rename);
+        pmenuActions->activate_action(RENAME_ACTION_NAME);
         return true;
     } else if (keyval == GDK_KEY_F3 && !(ctrl || shift || alt)) { // open Previous image from FileBrowser perspective
         FileBrowser::openPrevImage ();
@@ -1920,7 +2072,7 @@ FileBrowser::type_trash_changed FileBrowser::trash_changed ()
 // ExportPanel interface
 void FileBrowser::exportRequested ()
 {
-//     FileBrowser::menuItemActivated(developfast);
+    activateProcessFast();
 }
 
 void FileBrowser::setExportPanel (ExportPanel* expanel)

@@ -1112,6 +1112,7 @@ void ThumbBrowserBase::redraw (ThumbBrowserEntryBase* entry)
 {
     GuiThreadSafety::assertInGuiThread();
     arrangeFiles(entry);
+    internal->queue_draw();
     queue_draw();
 }
 
