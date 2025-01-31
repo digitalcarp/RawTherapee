@@ -810,7 +810,7 @@ void FileBrowser::activateSelectAll()
             anchor = selected[0];
         }
     }
-    queue_draw ();
+    redraw();
     notifySelectionListener();
 }
 
@@ -1162,7 +1162,7 @@ void FileBrowser::pasteProfile ()
             bppcl->endBatchPParamsChange();
         }
 
-        queue_draw ();
+        redraw();
     }
 }
 
@@ -1217,7 +1217,7 @@ void FileBrowser::partPasteProfile ()
                 bppcl->endBatchPParamsChange();
             }
 
-            queue_draw ();
+            redraw();
         });
         partialPasteDlg->show();
     }
@@ -1515,7 +1515,7 @@ void FileBrowser::activateApplyProfile(size_t index)
             bppcl->endBatchPParamsChange();
         }
 
-        queue_draw ();
+        redraw();
     }
 }
 
@@ -1902,7 +1902,6 @@ void FileBrowser::openNextImage()
                             // set new selection
                             fd[k]->selected = true;
                             selected.push_back(fd[k]);
-                            //queue_draw();
 
                             MYWRITERLOCK_RELEASE(l);
 
@@ -1965,7 +1964,6 @@ void FileBrowser::openPrevImage()
                             // set new selection
                             fd[k]->selected = true;
                             selected.push_back(fd[k]);
-                            //queue_draw();
 
                             MYWRITERLOCK_RELEASE(l);
 
@@ -2025,7 +2023,7 @@ void FileBrowser::selectImage(const Glib::ustring& fname, bool doScroll)
                 // set new selection
                 fd[i]->selected = true;
                 selected.push_back(fd[i]);
-                queue_draw();
+                redraw();
 
                 MYWRITERLOCK_RELEASE(l);
 
@@ -2105,7 +2103,7 @@ void FileBrowser::notifySelectionListener ()
 // void FileBrowser::redrawNeeded (LWButton* button)
 // {
 //     GuiThreadSafety::assertInGuiThread();
-//     queue_draw ();
+//     redraw();
 // }
 
 FileBrowser::type_trash_changed FileBrowser::trash_changed ()

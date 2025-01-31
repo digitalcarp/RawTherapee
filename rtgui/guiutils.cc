@@ -554,6 +554,9 @@ bool removeIfThere(Gtk::Paned* paned, Gtk::Widget* w, bool increference)
 // TODO(gtk4): Make this and callers async safe
 bool confirmOverwrite (Gtk::Window& parent, const std::string& filename)
 {
+    std::cerr << "Not implemented yet\n";
+    std::abort();
+
     bool safe = true;
 
     if (Glib::file_test (filename, Glib::FileTest::EXISTS)) {

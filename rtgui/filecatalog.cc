@@ -918,7 +918,7 @@ void FileCatalog::setEnabled (bool e)
 
 void FileCatalog::redrawAll ()
 {
-    fileBrowser->queue_draw ();
+    fileBrowser->redraw ();
 }
 
 void FileCatalog::refreshThumbImages ()
@@ -976,9 +976,10 @@ void FileCatalog::openRequested(const std::vector<Thumbnail*>& tmb)
     }
 
     idle_register.add(
-        [this, tmb]() -> bool
+        [this, sel=tmb]() -> bool
         {
-            _openImage(tmb);
+            static_assert(!std::is_reference_v<decltype(sel)>);
+            _openImage(sel);
             return false;
         }
     );
