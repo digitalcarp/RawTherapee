@@ -148,17 +148,7 @@ void findOriginalEntries (const std::vector<ThumbBrowserEntryBase*>& entries)
 }
 
 FileBrowser::FileBrowser () :
-//     menuLabel(nullptr),
-//     miOpenDefaultViewer(nullptr),
-//     selectDF(nullptr),
-//     thisIsDF(nullptr),
-//     autoDF(nullptr),
-//     selectFF(nullptr),
-//     thisIsFF(nullptr),
-//     autoFF(nullptr),
-//     clearFromCache(nullptr),
-//     clearFromCacheFull(nullptr),
-//     colorLabel_actionData(nullptr),
+    colorLabel_actionData(nullptr),
     bppcl(nullptr),
     tbl(nullptr),
     numFiltered(0),
@@ -169,11 +159,12 @@ FileBrowser::FileBrowser () :
     ProfileStore::getInstance()->addListener(this);
 
     pmenuActions = Gio::SimpleActionGroup::create();
-    auto menuModel = Gio::Menu::create();
+    contextMenuModel = Gio::Menu::create();
+    colorLabelMenuModel = Gio::Menu::create();
     auto section = Gio::Menu::create();
 
     auto startNewSection = [&]() {
-        menuModel->append_section(section);
+        contextMenuModel->append_section(section);
         section = Gio::Menu::create();
     };
 
@@ -215,7 +206,10 @@ FileBrowser::FileBrowser () :
     if (!options.menuGroupRank || !options.menuGroupLabel) {
         startNewSection();
     }
+
+    // Populates contextMenuModel and colorLabelMenuModel
     appendColorLabelMenu(section);
+
     startNewSection();
     appendExternalProgramMenu(section);
     startNewSection();
@@ -227,11 +221,11 @@ FileBrowser::FileBrowser () :
     appendFlatFieldMenu(section);
     startNewSection();
     appendCacheMenu(section);
-    menuModel->append_section(section);
+    contextMenuModel->append_section(section);
 
     pmenu = std::make_shared<Gtk::PopoverMenu>();
     pmenu->insert_action_group("filebrowser", pmenuActions);
-    pmenu->set_menu_model(menuModel);
+    pmenu->set_menu_model(contextMenuModel);
     pmenu->set_flags(Gtk::PopoverMenu::Flags::NESTED);
     pmenu->set_has_arrow(false);
     popoverBin.set_popover(pmenu);
@@ -257,29 +251,14 @@ FileBrowser::FileBrowser () :
 //
 //     applyprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), applyprof));
 //     applypartprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), applypartprof));
-//
-//     // A separate pop-up menu for Color Labels
-//     int c = 0;
-//     pmenuColorLabels = new Gtk::Menu();
-//
-//     for (int i = 0; i <= 5; i++) {
-//         pmenuColorLabels->attach(*Gtk::manage(colorlabel_pop[i] = new MyImageMenuItem(M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPCOLORLABEL", i)), clabelActiveIcons[i])), 0, 1, c, c + 1);
-//         c++;
-//     }
 
     // Has to be located after creation of applyprof and applypartprof
     updateProfileList ();
-
-//     // Bind to event handlers
-//     for (int i = 0; i <= 5; i++) {
-//         colorlabel_pop[i]->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuColorlabelActivated), colorlabel_pop[i]));
-//     }
 }
 
 FileBrowser::~FileBrowser ()
 {
     ProfileStore::getInstance()->removeListener(this);
-//     delete pmenuColorLabels;
 }
 
 void FileBrowser::appendSortMenu(Glib::RefPtr<Gio::Menu>& section)
@@ -381,14 +360,24 @@ void FileBrowser::appendColorLabelMenu(Glib::RefPtr<Gio::Menu>& section)
     for (int i = 0; i < COLOR_LABEL_SIZE; i++) {
         auto actionName = Glib::ustring::compose("color%1", i);
         pmenuActions->add_action(actionName, [&, i]() { activateColorLabel(i); });
-        // TODO(gtk4): with active icon [i]
         colorLabelMenu->append(M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPCOLORLABEL", i)),
                                getActionName(actionName.c_str()));
     }
     if (options.menuGroupLabel) {
+        // TODO(gtk4): with active icon [i]
         section->append_submenu(M("FILEBROWSER_POPUPCOLORLABEL"), colorLabelMenu);
     } else {
+        // TODO(gtk4): with inactive icon [i]
+        section->append_submenu(M("FILEBROWSER_POPUPCOLORLABEL"), colorLabelMenu);
         section->append_section(colorLabelMenu);
+    }
+
+    for (int i = 0; i < COLOR_LABEL_SIZE; i++) {
+        auto actionName = Glib::ustring::compose("color-data%1", i);
+        pmenuActions->add_action(actionName, [&, i]() { activateActionDataColorLabel(i); });
+        // TODO(gtk4): with active icon [i]
+        colorLabelMenu->append(M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPCOLORLABEL", i)),
+                               getActionName(actionName.c_str()));
     }
 }
 
@@ -610,8 +599,9 @@ void FileBrowser::appendCacheMenu(Glib::RefPtr<Gio::Menu>& section)
     section->append_submenu(M("FILEBROWSER_CACHE"), menu);
 }
 
-void FileBrowser::rightClicked (double x, double y)
+void FileBrowser::rightClicked(double x, double y)
 {
+    pmenu->set_menu_model(contextMenuModel);
     pmenu->set_pointing_to(Gdk::Rectangle(x, y, 1, 1));
     pmenu->popup();
 
@@ -752,19 +742,6 @@ void FileBrowser::close ()
     lastClicked = nullptr;
 }
 
-// void FileBrowser::menuColorlabelActivated (Gtk::MenuItem* m)
-// {
-//
-//     std::vector<FileBrowserEntry*> tbe;
-//     tbe.push_back (static_cast<FileBrowserEntry*>(colorLabel_actionData));
-//
-//     for (int i = 0; i < 6; i++)
-//         if (m == colorlabel_pop[i]) {
-//             colorlabelRequested (tbe, i);
-//             return;
-//         }
-// }
-
 std::vector<FileBrowserEntry*> FileBrowser::getSelected()
 {
     std::vector<FileBrowserEntry*> mselected;
@@ -817,10 +794,17 @@ void FileBrowser::activateRank(int rank)
     rankingRequested(mselected, rank);
 }
 
-void FileBrowser::activateColorLabel(int label)
+void FileBrowser::activateColorLabel(int color)
 {
     GET_SELECTED_ITEMS();
-    colorlabelRequested(mselected, label);
+    colorlabelRequested(mselected, color);
+}
+
+void FileBrowser::activateActionDataColorLabel(int color)
+{
+    if (!colorLabel_actionData) return;
+    std::vector<FileBrowserEntry*> tbe = {static_cast<FileBrowserEntry*>(colorLabel_actionData)};
+    colorlabelRequested(tbe, color);
 }
 
 void FileBrowser::activateResetDefaultProfile()

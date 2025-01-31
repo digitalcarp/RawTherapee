@@ -69,6 +69,8 @@ private:
     using ThumbBrowserBase::redrawNeeded;
 
     Glib::RefPtr<Gtk::PopoverMenu> pmenu;
+    Glib::RefPtr<Gio::Menu> contextMenuModel;
+    Glib::RefPtr<Gio::Menu> colorLabelMenuModel;
     Glib::RefPtr<Gio::SimpleActionGroup> pmenuActions;
     Glib::RefPtr<Gio::SimpleAction> trashAction;
     Glib::RefPtr<Gio::SimpleAction> untrashAction;
@@ -78,6 +80,7 @@ private:
     Glib::RefPtr<Gio::SimpleAction> pasteProfileAction;
     Glib::RefPtr<Gio::SimpleAction> partialPasteProfileAction;
     Glib::RefPtr<Gio::SimpleAction> clearProfileAction;
+    void* colorLabel_actionData;
 
     IdleRegister idle_register;
     unsigned int session_id_;
@@ -96,7 +99,9 @@ private:
     void activateProcessFast();
     void activateSelectAll();
     void activateRank(int rank);
-    void activateColorLabel(int rank);
+    void activateColorLabel(int color);
+    // Used only when menu is invoked via FileBrowser::buttonPressed to pass actionData
+    void activateActionDataColorLabel(int color);
     void activateResetDefaultProfile();
     void activateExternalProgram(const Glib::ustring& name);
     void activateSelectDarkFrame();
@@ -108,11 +113,6 @@ private:
 
 protected:
     std::map<Glib::ustring, const ExtProgAction*> mMenuExtProgs;  // key is menuitem label
-
-    // void* colorLabel_actionData;
-    // void menuColorlabelActivated (Gtk::MenuItem* m); // use only when menu is invoked via FileBrowser::buttonPressed to pass actionData
-    //
-    // Glib::RefPtr<Gtk::AccelGroup> pmaccelgroup;
 
     BatchPParamsChangeListener* bppcl;
     FileBrowserListener* tbl;
