@@ -47,7 +47,7 @@ public:
     FilePanel ();
     ~FilePanel () override;
 
-    Gtk::Paned* placespaned;
+    Gtk::Paned placespaned;
     Gtk::Paned* dirpaned;
 
     Gtk::Box* rightBox;
@@ -56,7 +56,7 @@ public:
     FilterPanel* filterPanel;
     ExportPanel* exportPanel;
     FileCatalog* fileCatalog;
-    Gtk::Paned *ribbonPane;
+    Gtk::Paned* ribbonPane;
 
     void setParent (RtWindow* p)
     {

@@ -2120,10 +2120,10 @@ void FileCatalog::tbRightPanel_1_visible (bool visible)
 }
 void FileCatalog::tbLeftPanel_1_toggled ()
 {
-    removeIfThere (filepanel->dirpaned, filepanel->placespaned, false);
+    removeIfThere (filepanel->dirpaned, &(filepanel->placespaned), false);
 
     if (tbLeftPanel_1->get_active()) {
-        pack1 (filepanel->dirpaned, *filepanel->placespaned, false, true);
+        pack1 (filepanel->dirpaned, filepanel->placespaned, false, true);
         tbLeftPanel_1->set_child (*iLeftPanel_1_Hide);
         options.browserDirPanelOpened = true;
     } else {

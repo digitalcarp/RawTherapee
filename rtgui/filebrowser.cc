@@ -902,8 +902,13 @@ void FileBrowser::activateSelectDarkFrame()
     }
 
     auto onResponse = [&, dialog, sel=std::move(mselected)](Glib::RefPtr<Gio::AsyncResult>& result) {
-        Glib::RefPtr<Gio::File> file = dialog->open_finish(result);
-        if (!file) return;
+        Glib::RefPtr<Gio::File> file;
+        try {
+            file = dialog->open_finish(result);
+            if (!file) return;
+        } catch (const Glib::Error& err) {
+            return;
+        }
 
         auto folder = file->get_parent();
         if (folder) {
@@ -1012,8 +1017,13 @@ void FileBrowser::activateSelectFlatField()
     }
 
     auto onResponse = [&, dialog, sel=std::move(mselected)](Glib::RefPtr<Gio::AsyncResult>& result) {
-        Glib::RefPtr<Gio::File> file = dialog->open_finish(result);
-        if (!file) return;
+        Glib::RefPtr<Gio::File> file;
+        try {
+            file = dialog->open_finish(result);
+            if (!file) return;
+        } catch (const Glib::Error& err) {
+            return;
+        }
 
         auto folder = file->get_parent();
         if (folder) {
@@ -1176,7 +1186,7 @@ void FileBrowser::partPasteProfile ()
 
         partialPasteDlg->updateSpotWidget(clipboard.getPartialProfile().pparams);
         partialPasteDlg->signal_response().connect([&, partialPasteDlg, mselected](int response) {
-            partialPasteDlg->hide();
+            partialPasteDlg->destroy();
             if (response != Gtk::ResponseType::OK) return;
 
             if (!mselected.empty() && bppcl) {
@@ -1532,7 +1542,7 @@ void FileBrowser::activateApplyPartialProfile(size_t index)
         partialPasteDlg->updateSpotWidget(srcProfiles->pparams);
 
         partialPasteDlg->signal_response().connect([&, partialPasteDlg, srcProfiles](int response) {
-            partialPasteDlg->hide();
+            partialPasteDlg->destroy();
             if (response != Gtk::ResponseType::OK) return;
 
             MYREADERLOCK(l, entryRW);
@@ -2118,7 +2128,6 @@ void FileBrowser::storeCurrentValue()
 
 void FileBrowser::updateProfileList()
 {
-    printf("here\n");
     // Remove existing actions
     for (const auto& action : applyProfileActions) {
         pmenuActions->remove_action(action->property_name().get_value());

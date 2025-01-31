@@ -69,7 +69,6 @@ private:
         bool isD50 = false;
     };
     std::optional<SaveInfo> saveInfo;
-    Glib::RefPtr<Gtk::FileDialog> dialog;
 
     //-------------------------------------------------------
 
@@ -114,7 +113,8 @@ private:
     Glib::ustring getGammaPresetName(const Glib::ustring &preset);
     void getGamma(const Glib::ustring &preset, double &gamma, double &slope);
     void savePressed();
-    void onSaveFileResponse(Glib::RefPtr<Gio::AsyncResult>& result);
+    void onSaveFileResponse(const Glib::RefPtr<Gio::AsyncResult>& result,
+                            const Glib::RefPtr<Gtk::FileDialog>& dialog);
     void closePressed();
     void onResetCopyright();
 

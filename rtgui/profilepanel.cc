@@ -50,7 +50,7 @@ ProfilePanel::ProfilePanel () : storedPProfile(nullptr),
     modeOn("profile-filled"), modeOff("profile-partial"),
     profileFillImage(Gtk::manage(new RtImage(options.filledProfile ? modeOn : modeOff))),
     lastSavedPSE(nullptr), customPSE(nullptr),
-    fileDialog(nullptr), fileDialogState(Gdk::ModifierType::NO_MODIFIER_MASK)
+    fileDialogState(Gdk::ModifierType::NO_MODIFIER_MASK)
 {
     tpc = nullptr;
 
@@ -311,7 +311,6 @@ void ProfilePanel::choosePartialSaveFile(int response)
 
     if (response != Gtk::ResponseType::OK) {
         profileToSave = nullptr;
-        fileDialog = nullptr;
     } else {
         createSaveFileDialog();
     }
@@ -357,14 +356,22 @@ void ProfilePanel::createSaveFileDialog()
     dialog->set_default_filter(filter_pp);
 
     dialog->set_accept_label(M("GENERAL_SAVE"));
-    fileDialog = dialog.get();
-    dialog->save(*parent, sigc::mem_fun(*this, &ProfilePanel::onSaveFileResponse));
+    dialog->save(*parent, [&, dialog](auto result) {
+        onSaveFileResponse(result, dialog);
+    });
 }
 
-void ProfilePanel::onSaveFileResponse(Glib::RefPtr<Gio::AsyncResult>& result)
+void ProfilePanel::onSaveFileResponse(const Glib::RefPtr<Gio::AsyncResult>& result,
+                                      const Glib::RefPtr<Gtk::FileDialog>& dialog)
 {
-    Glib::RefPtr<Gio::File> file = fileDialog->open_finish(result);
-    fileDialog = nullptr;
+    Glib::RefPtr<Gio::File> file;
+    try {
+        file = dialog->open_finish(result);
+    } catch(const Glib::Error& err) {
+        profileToSave = nullptr;
+        return;
+    }
+
     if (!profileToSave) return;
     if (!file) {
         profileToSave = nullptr;
@@ -509,14 +516,21 @@ void ProfilePanel::load_clicked (Gdk::ModifierType state)
     dialog->set_default_filter(filter_pp);
 
     dialog->set_accept_label(M("GENERAL_OPEN"));
-    fileDialog = dialog.get();
-    dialog->open(*parent, sigc::mem_fun(*this, &ProfilePanel::onLoadFileResponse));
+    dialog->open(*parent, [&, dialog](auto result) {
+        onLoadFileResponse(result, dialog);
+    });
 }
 
-void ProfilePanel::onLoadFileResponse(Glib::RefPtr<Gio::AsyncResult>& result)
+void ProfilePanel::onLoadFileResponse(const Glib::RefPtr<Gio::AsyncResult>& result,
+                                      const Glib::RefPtr<Gtk::FileDialog>& dialog)
 {
-    Glib::RefPtr<Gio::File> file = fileDialog->open_finish(result);
-    fileDialog = nullptr;
+    Glib::RefPtr<Gio::File> file;
+    try {
+        file = dialog->open_finish(result);
+    } catch(const Glib::Error& err) {
+        return;
+    }
+
     if (!file) return;
 
     if (auto parent = file->get_parent(); parent) {

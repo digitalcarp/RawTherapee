@@ -31,7 +31,8 @@
 #include "windows.h"
 #endif
 
-FilePanel::FilePanel () : parent(nullptr), error(0)
+FilePanel::FilePanel ()
+    : placespaned(Gtk::Orientation::VERTICAL), parent(nullptr), error(0)
 {
 
     // Contains everything except for the batch Tool Panel and tabs (Fast Export, Inspect, etc)
@@ -46,20 +47,19 @@ FilePanel::FilePanel () : parent(nullptr), error(0)
     recentBrowser = Gtk::manage ( new RecentBrowser () );
 
     // The whole left panel. Contains Places, Recent Folders and Folders.
-    placespaned = Gtk::manage ( new Gtk::Paned (Gtk::Orientation::VERTICAL) );
-    placespaned->set_name ("PlacesPaned");
-    placespaned->set_size_request(250, 100);
-    placespaned->set_position (options.dirBrowserHeight);
+    placespaned.set_name ("PlacesPaned");
+    placespaned.set_size_request(250, 100);
+    placespaned.set_position (options.dirBrowserHeight);
 
     Gtk::Box* obox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     obox->get_style_context()->add_class ("plainback");
     pack_start(obox, *recentBrowser, Pack::SHRINK, 4);
     pack_start(obox, *dirBrowser);
 
-    pack1 (placespaned, *placesBrowser, false, true);
-    pack2 (placespaned, *obox, true, true);
+    pack1 (&placespaned, *placesBrowser, false, true);
+    pack2 (&placespaned, *obox, true, true);
 
-    pack1 (dirpaned, *placespaned, false, false);
+    pack1 (dirpaned, placespaned, false, false);
 
 // TODO(gtk4)
 //     tpc = new BatchToolPanelCoordinator (this);
@@ -185,7 +185,7 @@ void FilePanel::setAspect ()
 {
     int winW, winH;
     parent->get_default_size(winW, winH);
-    placespaned->set_position(options.dirBrowserHeight);
+    placespaned.set_position(options.dirBrowserHeight);
     dirpaned->set_position(options.dirBrowserWidth);
     tpcPaned->set_position(options.browserToolPanelHeight);
     set_position(winW - options.browserToolPanelWidth);
@@ -367,7 +367,7 @@ void FilePanel::saveOptions ()
     int winW, winH;
     parent->get_default_size(winW, winH);
     options.dirBrowserWidth = dirpaned->get_position ();
-    options.dirBrowserHeight = placespaned->get_position ();
+    options.dirBrowserHeight = placespaned.get_position ();
     options.browserToolPanelWidth = winW - get_position();
     options.browserToolPanelHeight = tpcPaned->get_position ();
 

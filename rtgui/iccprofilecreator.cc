@@ -952,7 +952,7 @@ void ICCProfileCreator::savePressed()
 
     // -------------------------------------------- Asking the file name
 
-    dialog = Gtk::FileDialog::create();
+    auto dialog = Gtk::FileDialog::create();
     dialog->set_title(M("ICCPROFCREATOR_SAVEDIALOG_TITLE"));
     dialog->set_modal();
     dialog->set_initial_name(fName);
@@ -976,12 +976,22 @@ void ICCProfileCreator::savePressed()
     dialog->set_default_filter(filter_icc);
 
     dialog->set_accept_label(M("GENERAL_SAVE"));
-    dialog->save(*this, sigc::mem_fun(*this, &ICCProfileCreator::onSaveFileResponse));
+    dialog->save(*this, [&, dialog](auto result) {
+        onSaveFileResponse(result, dialog);
+    });
 }
 
-void ICCProfileCreator::onSaveFileResponse(Glib::RefPtr<Gio::AsyncResult>& result)
+void ICCProfileCreator::onSaveFileResponse(const Glib::RefPtr<Gio::AsyncResult>& result,
+                                           const Glib::RefPtr<Gtk::FileDialog>& dialog)
 {
-    Glib::RefPtr<Gio::File> file = dialog->save_finish(result);
+    Glib::RefPtr<Gio::File> file;
+    try {
+        file = dialog->save_finish(result);
+    } catch (const Glib::Error& err) {
+        saveInfo = std::nullopt;
+        return;
+    }
+
     if (!file) {
         saveInfo = std::nullopt;
         return;

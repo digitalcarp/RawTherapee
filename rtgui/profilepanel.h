@@ -70,7 +70,6 @@ private:
     ProfileStoreEntry *customPSE;
 
     // Temporaries for async dialog handling
-    Gtk::FileDialog* fileDialog;
     Gdk::ModifierType fileDialogState;
     const rtengine::procparams::PartialProfile* profileToSave;
     std::unique_ptr<rtengine::procparams::ProcParams> pasteProcParams;
@@ -143,6 +142,8 @@ public:
     void selection_changed ();
     void writeOptions();
 
-    void onSaveFileResponse(Glib::RefPtr<Gio::AsyncResult>& result);
-    void onLoadFileResponse(Glib::RefPtr<Gio::AsyncResult>& result);
+    void onSaveFileResponse(const Glib::RefPtr<Gio::AsyncResult>& result,
+                            const Glib::RefPtr<Gtk::FileDialog>& dialog);
+    void onLoadFileResponse(const Glib::RefPtr<Gio::AsyncResult>& result,
+                            const Glib::RefPtr<Gtk::FileDialog>& dialog);
 };
