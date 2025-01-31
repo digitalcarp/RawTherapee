@@ -699,7 +699,7 @@ void FileCatalog::refreshDirectoryMonitors(const std::vector<Glib::RefPtr<Gio::F
         std::back_inserter(monitored_dir_names),
         [](const FileMonitorInfo &dir_monitor) { return dir_monitor.filePath; });
     for (const auto &dir_to_monitor : dirs_to_monitor) {
-        const auto dir_path = dir_to_monitor->get_path().c_str();
+        Glib::ustring dir_path(dir_to_monitor->get_path());
         if (std::find(monitored_dir_names.cbegin(), monitored_dir_names.cend(), dir_path) != monitored_dir_names.cend()) {
             continue; // A monitor exists already.
         }

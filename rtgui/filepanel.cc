@@ -154,13 +154,7 @@ FilePanel::FilePanel ()
 
     fileCatalog->setFileSelectionListener (this);
 
-    idle_register.add(
-        [this]() -> bool
-        {
-            init();
-            return false;
-        }
-    );
+    idle_register.add([this]() { init(); });
 }
 
 FilePanel::~FilePanel ()
