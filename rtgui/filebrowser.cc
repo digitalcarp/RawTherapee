@@ -31,7 +31,6 @@
 #include "multilangmgr.h"
 #include "options.h"
 #include "paramsedited.h"
-#include "profilestorecombobox.h"
 #include "procparamchangers.h"
 #include "rtimage.h"
 #include "rtmessagedialog.h"
@@ -214,7 +213,9 @@ FileBrowser::FileBrowser () :
     appendExternalProgramMenu(section);
     startNewSection();
     appendFileOperationsMenu(section);
-    startNewSection();
+    if (!options.menuGroupProfileOperations) {
+        startNewSection();
+    }
     appendProfileOperationsMenu(section);
     startNewSection();
     appendDarkFrameMenu(section);
@@ -248,12 +249,9 @@ FileBrowser::FileBrowser () :
 //     partpasteprof->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_V, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
 //     copyTo->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_C, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
 //     moveTo->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_M, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
-//
-//     applyprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), applyprof));
-//     applypartprof->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::menuItemActivated), applypartprof));
 
-    // Has to be located after creation of applyprof and applypartprof
-    updateProfileList ();
+    // Has to be located after creation of profileOperationsMenu
+    updateProfileList();
 }
 
 FileBrowser::~FileBrowser ()
@@ -460,6 +458,7 @@ void FileBrowser::appendFileOperationsMenu(Glib::RefPtr<Gio::Menu>& section)
 void FileBrowser::appendProfileOperationsMenu(Glib::RefPtr<Gio::Menu>& section)
 {
     auto menu = Gio::Menu::create();
+    profileOperationsMenu = menu;
 
     const char* COPY = "copy-profile";
     copyProfileAction = Gio::SimpleAction::create(COPY);
@@ -479,8 +478,9 @@ void FileBrowser::appendProfileOperationsMenu(Glib::RefPtr<Gio::Menu>& section)
     pmenuActions->add_action(partialPasteProfileAction);
     menu->append(M("FILEBROWSER_PARTIALPASTEPROFILE"), getActionName(PASTE_PARTIAL));
 
-    // TODO(gtk4): action?
-    menu->append(M("FILEBROWSER_APPLYPROFILE"));
+    // This positioning is hard-coded in updateProfileList()
+    menu->append_submenu(M("FILEBROWSER_APPLYPROFILE"), Gio::Menu::create());
+    menu->append_submenu(M("FILEBROWSER_APPLYPROFILE_PARTIAL"), Gio::Menu::create());
 
     const char* RESET = "reset-default-profile";
     pmenuActions->add_action(RESET, [&]() { activateResetDefaultProfile(); });
@@ -1435,6 +1435,7 @@ int FileBrowser::getThumbnailHeight ()
 void FileBrowser::enableTabMode(bool enable)
 {
     ThumbBrowserBase::enableTabMode(enable);
+// TODO(gtk4)
 //     if (options.inspectorWindow) {
 //         if (enable) {
 //             inspect->remove_accelerator(pmenu->get_accel_group(), GDK_KEY_f, (Gdk::ModifierType)0);
@@ -1445,11 +1446,20 @@ void FileBrowser::enableTabMode(bool enable)
 //     }
 }
 
-void FileBrowser::applyMenuItemActivated (ProfileStoreLabel *label)
+void FileBrowser::activateApplyProfile(size_t index)
 {
     MYREADERLOCK(l, entryRW);
 
-    const rtengine::procparams::PartialProfile* partProfile = ProfileStore::getInstance()->getProfile (label->entry);
+    const ProfileStoreEntry* entry = [&]() {
+        const std::vector<const ProfileStoreEntry*>* entries =
+            ProfileStore::getInstance()->getFileList();
+        auto entry = entries->at(index);
+        ProfileStore::getInstance()->releaseFileList();
+        return entry;
+    }();
+
+    const rtengine::procparams::PartialProfile* partProfile =
+        ProfileStore::getInstance()->getProfile(entry);
 
     if (partProfile->pparams && !selected.empty()) {
         if (bppcl) {
@@ -1468,7 +1478,7 @@ void FileBrowser::applyMenuItemActivated (ProfileStoreLabel *label)
     }
 }
 
-void FileBrowser::applyPartialMenuItemActivated (ProfileStoreLabel *label)
+void FileBrowser::activateApplyPartialProfile(size_t index)
 {
 
     {
@@ -1479,15 +1489,24 @@ void FileBrowser::applyPartialMenuItemActivated (ProfileStoreLabel *label)
         }
     }
 
-    const rtengine::procparams::PartialProfile* srcProfiles = ProfileStore::getInstance()->getProfile (label->entry);
+    const ProfileStoreEntry* entry = [&]() {
+        const std::vector<const ProfileStoreEntry*>* entries =
+            ProfileStore::getInstance()->getFileList();
+        auto entry = entries->at(index);
+        ProfileStore::getInstance()->releaseFileList();
+        return entry;
+    }();
+
+    const rtengine::procparams::PartialProfile* srcProfiles =
+        ProfileStore::getInstance()->getProfile(entry);
 
     if (srcProfiles->pparams) {
         auto toplevel = getToplevelWindow(this);
         auto partialPasteDlg = Gtk::make_managed<PartialPasteDlg>(
             M("PARTIALPASTE_DIALOGLABEL"), toplevel);
-
         partialPasteDlg->updateSpotWidget(srcProfiles->pparams);
-        partialPasteDlg->signal_response().connect([&](int response) {
+
+        partialPasteDlg->signal_response().connect([&, partialPasteDlg, srcProfiles](int response) {
             partialPasteDlg->hide();
             if (response != Gtk::ResponseType::OK) return;
 
@@ -1513,8 +1532,9 @@ void FileBrowser::applyPartialMenuItemActivated (ProfileStoreLabel *label)
                 bppcl->endBatchPParamsChange();
             }
 
-            queue_draw ();
+            redraw();
         });
+
         partialPasteDlg->show();
     }
 }
@@ -2073,96 +2093,88 @@ void FileBrowser::storeCurrentValue()
 
 void FileBrowser::updateProfileList()
 {
-//     // submenu applmenu
-//     int p = 0;
-//
-//     const std::vector<const ProfileStoreEntry*> *profEntries = ProfileStore::getInstance()->getFileList();  // lock and get a pointer to the profiles' list
-//
-//     std::map<unsigned short /* folderId */, Gtk::Menu*> subMenuList;  // store the Gtk::Menu that Gtk::MenuItem will have to be attached to
-//
-//     subMenuList[0] = Gtk::manage (new Gtk::Menu ()); // adding the root submenu
-//
-//     // iterate the profile store's profile list
-//     for (size_t i = 0; i < profEntries->size(); i++) {
-//         // create a new label for the current entry (be it a folder or file)
-//         ProfileStoreLabel *currLabel = Gtk::manage(new ProfileStoreLabel( profEntries->at(i) ));
-//
-//         // create the MenuItem object
-//         Gtk::MenuItem* mi = Gtk::manage (new Gtk::MenuItem (*currLabel));
-//
-//         // create a new Menu object if the entry is a folder and not the root one
-//         if (currLabel->entry->type == PSET_FOLDER) {
-//             // creating the new sub-menu
-//             Gtk::Menu* subMenu = Gtk::manage (new Gtk::Menu ());
-//
-//             // add it to the menu list
-//             subMenuList[currLabel->entry->folderId] = subMenu;
-//
-//             // add it to the parent MenuItem
-//             mi->set_submenu(*subMenu);
-//         }
-//
-//         // Hombre: ... does parentMenuId sounds like a hack?         ... Yes.
-//         int parentMenuId = !options.useBundledProfiles && currLabel->entry->parentFolderId == 1 ? 0 : currLabel->entry->parentFolderId;
-//         subMenuList[parentMenuId]->attach (*mi, 0, 1, p, p + 1);
-//         p++;
-//
-//         if (currLabel->entry->type == PSET_FILE) {
-//             mi->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::applyMenuItemActivated), currLabel));
-//         }
-//
-//         mi->show ();
-//     }
-//
-//     if (subMenuList.size() && applyprof)
-//         // TODO: Check that the previous one has been deleted, including all childrens
-//     {
-//         applyprof->set_submenu (*(subMenuList.at(0)));
-//     }
-//
-//     subMenuList.clear();
-//     subMenuList[0] = Gtk::manage (new Gtk::Menu ()); // adding the root submenu
-//     // keep profEntries list
-//
-//     // submenu applpartmenu
-//     p = 0;
-//
-//     for (size_t i = 0; i < profEntries->size(); i++) {
-//         ProfileStoreLabel *currLabel = Gtk::manage(new ProfileStoreLabel( profEntries->at(i) ));
-//
-//         Gtk::MenuItem* mi = Gtk::manage (new Gtk::MenuItem (*currLabel));
-//
-//         if (currLabel->entry->type == PSET_FOLDER) {
-//             // creating the new sub-menu
-//             Gtk::Menu* subMenu = Gtk::manage (new Gtk::Menu ());
-//
-//             // add it to the menu list
-//             subMenuList[currLabel->entry->folderId] = subMenu;
-//
-//             // add it to the parent MenuItem
-//             mi->set_submenu(*subMenu);
-//         }
-//
-//         // Hombre: ... does parentMenuId sounds like a hack?         ... yes.
-//         int parentMenuId = !options.useBundledProfiles && currLabel->entry->parentFolderId == 1 ? 0 : currLabel->entry->parentFolderId;
-//         subMenuList[parentMenuId]->attach (*mi, 0, 1, p, p + 1);
-//         p++;
-//
-//         if (currLabel->entry->type == PSET_FILE) {
-//             mi->signal_activate().connect (sigc::bind(sigc::mem_fun(*this, &FileBrowser::applyPartialMenuItemActivated), currLabel));
-//         }
-//
-//         mi->show ();
-//     }
-//
-//     if (subMenuList.size() && applypartprof)
-//         // TODO: Check that the previous one has been deleted, including all childrens
-//     {
-//         applypartprof->set_submenu (*(subMenuList.at(0)));
-//     }
-//
-//     ProfileStore::getInstance()->releaseFileList();
-//     subMenuList.clear();
+    printf("here\n");
+    // Remove existing actions
+    for (const auto& action : applyProfileActions) {
+        pmenuActions->remove_action(action->property_name().get_value());
+    }
+
+    // Lock and get list
+    const std::vector<const ProfileStoreEntry*>* profEntries =
+        ProfileStore::getInstance()->getFileList();
+
+    struct Menus {
+        Glib::RefPtr<Gio::Menu> full;
+        Glib::RefPtr<Gio::Menu> partial;
+    };
+    std::unordered_map<unsigned short /* folderId */, Menus> subMenuList;
+
+    auto fullMenu = Gio::Menu::create();
+    auto partialMenu = Gio::Menu::create();
+    {
+        Menus& menus = subMenuList[0];
+        menus.full = fullMenu;
+        menus.partial = partialMenu;
+    }
+    auto createMenus = [&](const ProfileStoreEntry* entry) {
+        Menus menus = {};
+        menus.full = Gio::Menu::create();
+        menus.partial = Gio::Menu::create();
+
+        Menus& parentMenus = subMenuList.at(entry->parentFolderId);
+        parentMenus.full->append_submenu(entry->label, menus.full);
+        parentMenus.partial->append_submenu(entry->label, menus.partial);
+
+        subMenuList.emplace(entry->folderId, std::move(menus));
+    };
+
+    // Hardcoded value...
+    constexpr unsigned short BUNDLED_PROFILES_FOLDER_ID = 1;
+
+    for (size_t i = 0; i < profEntries->size(); i++) {
+        const ProfileStoreEntry* entry = profEntries->at(i);
+        if (entry->type == PSET_FOLDER) {
+            // Skip bundled profiles folder
+            if (options.useBundledProfiles || entry->folderId != BUNDLED_PROFILES_FOLDER_ID) {
+                createMenus(entry);
+            }
+        } else {
+            // Skip bundled profiles
+            if (options.useBundledProfiles || entry->parentFolderId != BUNDLED_PROFILES_FOLDER_ID) {
+                auto fullActionName = Glib::ustring::compose("apply-profile%1", i);
+                auto fullAction = Gio::SimpleAction::create(fullActionName);
+                fullAction->signal_activate().connect([&, i](auto) {
+                    activateApplyProfile(i);
+                });
+                applyProfileActions.push_back(fullAction);
+                pmenuActions->add_action(fullAction);
+
+                auto partialActionName = Glib::ustring::compose("apply-profile-partial%1", i);
+                auto partialAction = Gio::SimpleAction::create(partialActionName);
+                partialAction->signal_activate().connect([&, i](auto) {
+                    activateApplyPartialProfile(i);
+                });
+                applyProfileActions.push_back(partialAction);
+                pmenuActions->add_action(partialAction);
+
+                Menus& parentMenus = subMenuList.at(entry->parentFolderId);
+                parentMenus.full->append(entry->label, getActionName(fullActionName.c_str()));
+                parentMenus.partial->append(entry->label, getActionName(partialActionName.c_str()));
+            }
+        }
+    }
+
+    ProfileStore::getInstance()->releaseFileList();
+
+    // Have to remove and re-insert in order to trigger menu redraw
+    constexpr int APPLY_POSITION = 3;
+    profileOperationsMenu->remove(APPLY_POSITION);
+    profileOperationsMenu->remove(APPLY_POSITION);
+    // Insert in reverse order to reuse the same index
+    profileOperationsMenu->insert_submenu(
+        APPLY_POSITION, M("FILEBROWSER_APPLYPROFILE_PARTIAL"), partialMenu);
+    profileOperationsMenu->insert_submenu(
+        APPLY_POSITION, M("FILEBROWSER_APPLYPROFILE"), fullMenu);
 }
 
 void FileBrowser::restoreValue()

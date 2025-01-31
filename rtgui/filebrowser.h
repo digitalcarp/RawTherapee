@@ -37,7 +37,6 @@
 
 class FileBrowser;
 class FileBrowserEntry;
-class ProfileStoreLabel;
 
 class FileBrowserListener
 {
@@ -71,6 +70,7 @@ private:
     Glib::RefPtr<Gtk::PopoverMenu> pmenu;
     Glib::RefPtr<Gio::Menu> contextMenuModel;
     Glib::RefPtr<Gio::Menu> colorLabelMenuModel;
+
     Glib::RefPtr<Gio::SimpleActionGroup> pmenuActions;
     Glib::RefPtr<Gio::SimpleAction> trashAction;
     Glib::RefPtr<Gio::SimpleAction> untrashAction;
@@ -80,6 +80,11 @@ private:
     Glib::RefPtr<Gio::SimpleAction> pasteProfileAction;
     Glib::RefPtr<Gio::SimpleAction> partialPasteProfileAction;
     Glib::RefPtr<Gio::SimpleAction> clearProfileAction;
+
+    Glib::RefPtr<Gio::Menu> profileOperationsMenu;
+    // Holds both full and partial apply actions
+    std::vector<Glib::RefPtr<Gio::SimpleAction>> applyProfileActions;
+
     void* colorLabel_actionData;
 
     IdleRegister idle_register;
@@ -110,6 +115,8 @@ private:
     void activateSelectFlatField();
     void activateAutoFlatField();
     void activateMoveToFlatFieldDir();
+    void activateApplyProfile(size_t index);
+    void activateApplyPartialProfile(size_t index);
 
 protected:
     std::map<Glib::ustring, const ExtProgAction*> mMenuExtProgs;  // key is menuitem label
@@ -153,9 +160,6 @@ public:
     {
         tbl = l;
     }
-
-    void applyMenuItemActivated (ProfileStoreLabel *label);
-    void applyPartialMenuItemActivated (ProfileStoreLabel *label);
 
     void applyFilter (const BrowserFilter& filter);
     int getNumFiltered()
