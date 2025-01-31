@@ -2295,6 +2295,7 @@ void RotateLabel::snapshot_vfunc(const Glib::RefPtr<Gtk::Snapshot>& snapshot)
 ModButton::ModButton()
 {
     m_controller = Gtk::GestureClick::create();
+    m_controller->set_propagation_phase(Gtk::PropagationPhase::CAPTURE);
     m_controller->set_button(GDK_BUTTON_PRIMARY);
     m_controller->signal_released().connect(
         sigc::mem_fun(*this, &ModButton::onClick));
@@ -2310,6 +2311,7 @@ void ModButton::onClick(int /*n_press*/, double /*x*/, double /*y*/)
 ModToggleButton::ModToggleButton()
 {
     m_controller = Gtk::GestureClick::create();
+    m_controller->set_propagation_phase(Gtk::PropagationPhase::CAPTURE);
     m_controller->set_button(GDK_BUTTON_PRIMARY);
     m_controller->signal_released().connect(
         sigc::mem_fun(*this, &ModToggleButton::onClick));
@@ -2318,6 +2320,7 @@ ModToggleButton::ModToggleButton()
 
 void ModToggleButton::onClick(int /*n_press*/, double /*x*/, double /*y*/)
 {
+    set_active(!get_active());
     auto state = m_controller->get_current_event_state();
     m_signal.emit(state);
 }

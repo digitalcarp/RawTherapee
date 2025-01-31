@@ -184,6 +184,7 @@ FileBrowser::FileBrowser () :
             const char* POPUP_INSPECT = "inspect";
             pmenuActions->add_action(POPUP_INSPECT, [&]() {
                 GET_SELECTED_ITEMS();
+                pmenu->popdown();
                 inspectRequested(mselected);
             });
             section->append(M("FILEBROWSER_POPUPINSPECT"), getActionName(POPUP_INSPECT));
@@ -376,8 +377,9 @@ void FileBrowser::appendColorLabelMenu(Glib::RefPtr<Gio::Menu>& section)
         auto actionName = Glib::ustring::compose("color-data%1", i);
         pmenuActions->add_action(actionName, [&, i]() { activateActionDataColorLabel(i); });
         // TODO(gtk4): with active icon [i]
-        colorLabelMenu->append(M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPCOLORLABEL", i)),
-                               getActionName(actionName.c_str()));
+        colorLabelMenuModel->append(
+            M(Glib::ustring::compose("%1%2", "FILEBROWSER_POPUPCOLORLABEL", i)),
+            getActionName(actionName.c_str()));
     }
 }
 
