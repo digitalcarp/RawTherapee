@@ -35,6 +35,7 @@
 
 class FilePanel;
 class CoarsePanel;
+class RenameDialog;
 class ToolBar;
 
 /*
@@ -160,6 +161,7 @@ private:
     BrowserFilter getFilter ();
     void refreshDirectoryMonitors(const std::vector<Glib::RefPtr<Gio::File>> &dirs_to_monitor);
     void trashChanged ();
+    bool tryRenameFile(RenameDialog* dialog, FileBrowserEntry* entry);
 
 public:
     // thumbnail browsers

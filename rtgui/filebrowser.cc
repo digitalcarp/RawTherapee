@@ -902,6 +902,8 @@ void FileBrowser::activateSelectDarkFrame()
     }
 
     auto onResponse = [&, dialog, sel=std::move(mselected)](Glib::RefPtr<Gio::AsyncResult>& result) {
+        static_assert(!std::is_reference_v<decltype(sel)>);
+
         Glib::RefPtr<Gio::File> file;
         try {
             file = dialog->open_finish(result);
@@ -1017,6 +1019,8 @@ void FileBrowser::activateSelectFlatField()
     }
 
     auto onResponse = [&, dialog, sel=std::move(mselected)](Glib::RefPtr<Gio::AsyncResult>& result) {
+        static_assert(!std::is_reference_v<decltype(sel)>);
+
         Glib::RefPtr<Gio::File> file;
         try {
             file = dialog->open_finish(result);
@@ -1185,7 +1189,9 @@ void FileBrowser::partPasteProfile ()
             M("PARTIALPASTE_DIALOGLABEL"), toplevel);
 
         partialPasteDlg->updateSpotWidget(clipboard.getPartialProfile().pparams);
-        partialPasteDlg->signal_response().connect([&, partialPasteDlg, mselected](int response) {
+        partialPasteDlg->signal_response().connect([&, partialPasteDlg, sel=std::move(mselected)](int response) {
+            static_assert(!std::is_reference_v<decltype(sel)>);
+
             partialPasteDlg->destroy();
             if (response != Gtk::ResponseType::OK) return;
 

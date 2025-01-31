@@ -37,6 +37,8 @@ Glib::ustring toString(RtMessageDialog::Type type) {
         return M("MESSAGE_ERROR");
     case Type::FATAL_ERROR:
         return M("MESSAGE_FATAL_ERROR");
+    case Type::QUESTION:
+        return M("MESSAGE_QUESTION");
     default:
         return "";
     }
@@ -53,6 +55,14 @@ RtMessageDialog::RtMessageDialog(const Glib::ustring& msg, Type type, ButtonSet 
     setupLayout();
 
     m_message.set_markup(msg);
+}
+
+void RtMessageDialog::setHeader(const Glib::ustring& text) {
+    m_header.set_markup(text);
+}
+
+void RtMessageDialog::setDetailedText(const Glib::ustring& text) {
+    m_message.set_markup(text);
 }
 
 void RtMessageDialog::show(Gtk::Window* parent) {
@@ -72,10 +82,9 @@ void RtMessageDialog::setupLayout() {
     main_box->set_hexpand(true);
     main_box->set_vexpand(true);
 
-    auto label = Gtk::make_managed<Gtk::Label>();
-    label->set_use_markup();
-    label->set_markup(toString(m_type));
-    main_box->append(*label);
+    m_header.set_use_markup();
+    m_header.set_markup(toString(m_type));
+    main_box->append(m_header);
 
     m_message.set_wrap();
     m_message.set_use_markup();
@@ -154,10 +163,11 @@ void RtMessageDialog::setupButtons(Gtk::Box& box, RtMessageDialog::ButtonSet but
 }
 
 void RtMessageDialog::onPositiveResponse() {
-    // TODO(gtk4): Expose way for parent to handle response
-    close();
+    m_positive_signal.emit();
+    destroy();
 }
 
 void RtMessageDialog::onNegativeResponse() {
-    close();
+    m_negative_signal.emit();
+    destroy();
 }

@@ -136,7 +136,7 @@ set(NONCLISOURCEFILES
     # rawcacorrection.cc
     # rawexposure.cc
     recentbrowser.cc
-    # renamedlg.cc
+    renamedlg.cc
     # resize.cc
     # retinex.cc
     # rgbcurves.cc

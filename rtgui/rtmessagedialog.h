@@ -26,14 +26,21 @@
 
 class RtMessageDialog : public Gtk::Window {
 public:
-    enum class Type { INFO, WARNING, ERROR, FATAL_ERROR };
+    enum class Type { INFO, WARNING, ERROR, FATAL_ERROR, QUESTION };
     enum class ButtonSet { NONE, OK, CLOSE, CANCEL, YES_NO, OK_CANCEL };
 
     RtMessageDialog();
     RtMessageDialog(const Glib::ustring& msg, Type type = Type::INFO,
                     ButtonSet buttons = ButtonSet::NONE);
 
+    void setHeader(const Glib::ustring& text);
+    void setDetailedText(const Glib::ustring& text);
+
     void show(Gtk::Window* parent = nullptr);
+
+    // Message dialog will be automatically closed after callbacks
+    sigc::signal<void()>& signalPositiveResponse() { return m_positive_signal; }
+    sigc::signal<void()>& signalNegativeResponse() { return m_negative_signal; }
 
 private:
     void setupLayout();
@@ -42,7 +49,10 @@ private:
     void onPositiveResponse();
     void onNegativeResponse();
 
+    Gtk::Label m_header;
     Gtk::Label m_message;
+    sigc::signal<void()> m_positive_signal;
+    sigc::signal<void()> m_negative_signal;
     Type m_type;
     ButtonSet m_button_set;
 };

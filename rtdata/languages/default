@@ -1836,6 +1836,7 @@ MAIN_TOOLTIP_TOGGLE;Toggle the <b>Before</b>/<b>After</b> view.\nShortcut: <b>Sh
 MESSAGE_ERROR;<b>Error</b>
 MESSAGE_FATAL_ERROR;<b>Fatal Error</b>
 MESSAGE_INFO;<b>Info</b>
+MESSAGE_QUESTION;<b>Question</b>
 MESSAGE_WARNING;<b>Warning</b>
 MONITOR_PROFILE_SYSTEM;System default
 NAVIGATOR_B;B:

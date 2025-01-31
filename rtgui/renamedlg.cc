@@ -41,7 +41,7 @@ RenameDialog::RenameDialog (Gtk::Window* parent)
     names->attach(*nnlab, 0, 1, 1, 1);
     names->attach(*newName, 1, 1, 1, 1);
 
-    get_content_area()->pack_start (*names, Pack::SHRINK, 4);
+    get_content_area()->append(*names);
 
 // Issue 316
 //    Gtk::Box* tbox = Gtk::manage (new Gtk::Box());
@@ -56,8 +56,8 @@ RenameDialog::RenameDialog (Gtk::Window* parent)
 
 //    get_content_area()->pack_start (*tbox, Pack::SHRINK, 4);
 
-    add_button ("_OK", Gtk::ResponseType::OK);
-    add_button ("_Cancel", Gtk::ResponseType::CANCEL);
+    add_button (M("GENERAL_OK"), Gtk::ResponseType::OK);
+    add_button (M("GENERAL_CANCEL"), Gtk::ResponseType::CANCEL);
 // Issue 316
 //    all = add_button ("All", RESPONSE_ALL);
 
@@ -71,8 +71,6 @@ RenameDialog::RenameDialog (Gtk::Window* parent)
 //    useTmpl->signal_toggled().connect( sigc::mem_fun(*this, &RenameDialog::useTemplToggled) );
 
 //    useTmpl->set_active (options.renameUseTemplates);
-
-    show_all_children ();
 }
 
 void RenameDialog::initName (const Glib::ustring& iname, const CacheImageData* cid)

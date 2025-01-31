@@ -42,6 +42,7 @@
 // #include "batchqueueentry.h"
 #include "placesbrowser.h"
 #include "pathutils.h"
+#include "rtmessagedialog.h"
 #include "thumbnail.h"
 #include "toolbar.h"
 #include "inspector.h"
@@ -985,47 +986,55 @@ void FileCatalog::openRequested(const std::vector<Thumbnail*>& tmb)
 
 void FileCatalog::deleteRequested(const std::vector<FileBrowserEntry*>& tbe, bool inclBatchProcessed, bool onlySelected)
 {
-//     if (tbe.empty()) {
-//         return;
-//     }
-//
-//     Gtk::MessageDialog msd (getToplevelWindow(this), M("FILEBROWSER_DELETEDIALOG_HEADER"), true, Gtk::MessageType::QUESTION, Gtk::ButtonsType::YES_NO, true);
-//     if (onlySelected) {
-//         msd.set_secondary_text(Glib::ustring::compose (inclBatchProcessed ? M("FILEBROWSER_DELETEDIALOG_SELECTEDINCLPROC") : M("FILEBROWSER_DELETEDIALOG_SELECTED"), tbe.size()), true);
-//     } else {
-//         msd.set_secondary_text(Glib::ustring::compose (M("FILEBROWSER_DELETEDIALOG_ALL"), tbe.size()), true);
-//     }
-//
-//     if (msd.run() == Gtk::ResponseType::YES) {
-//         for (unsigned int i = 0; i < tbe.size(); i++) {
-//             const auto fname = tbe[i]->filename;
-//             // remove from browser
-//             delete fileBrowser->delEntry (fname);
-//             // remove from cache
-//             cacheMgr->deleteEntry (fname);
-//             // delete from file system
-//             ::g_remove (fname.c_str ());
-//             // delete paramfile if found
-//             ::g_remove ((fname + paramFileExtension).c_str ());
-//             ::g_remove ((removeExtension(fname) + paramFileExtension).c_str ());
-//             // delete .thm file
-//             ::g_remove ((removeExtension(fname) + ".thm").c_str ());
-//             ::g_remove ((removeExtension(fname) + ".THM").c_str ());
-//
-//             if (inclBatchProcessed) {
-//                 Glib::ustring procfName = Glib::ustring::compose ("%1.%2", Thumbnail::calcAutoFileNameBase(fname), options.saveFormatBatch.format);
-//                 ::g_remove (procfName.c_str ());
-//
-//                 Glib::ustring procfNameParamFile = Glib::ustring::compose ("%1.%2.out%3", Thumbnail::calcAutoFileNameBase(fname), options.saveFormatBatch.format, paramFileExtension);
-//                 ::g_remove (procfNameParamFile.c_str ());
-//             }
-//
-//             previewsLoaded--;
-//         }
-//
-//         _refreshProgressBar();
-//         redrawAll ();
-//     }
+    if (tbe.empty()) return;
+
+    auto msgd = Gtk::make_managed<RtMessageDialog>(
+        "", RtMessageDialog::Type::QUESTION, RtMessageDialog::ButtonSet::YES_NO);
+    msgd->setHeader(M("FILEBROWSER_DELETEDIALOG_HEADER"));
+    if (onlySelected) {
+        auto format = inclBatchProcessed ?
+            M("FILEBROWSER_DELETEDIALOG_SELECTEDINCLPROC") :
+            M("FILEBROWSER_DELETEDIALOG_SELECTED");
+        msgd->setDetailedText(Glib::ustring::compose(format, tbe.size()));
+    } else {
+        msgd->setDetailedText(
+            Glib::ustring::compose(M("FILEBROWSER_DELETEDIALOG_ALL"), tbe.size()));
+    }
+
+    msgd->signalPositiveResponse().connect([this, inclBatchProcessed, entries = tbe]() {
+        static_assert(!std::is_reference_v<decltype(entries)>);
+
+        for (auto entry : entries) {
+            const auto fname = entry->filename;
+            // remove from browser
+            delete fileBrowser->delEntry (fname);
+            // remove from cache
+            cacheMgr->deleteEntry (fname);
+            // delete from file system
+            ::g_remove (fname.c_str ());
+            // delete paramfile if found
+            ::g_remove ((fname + paramFileExtension).c_str ());
+            ::g_remove ((removeExtension(fname) + paramFileExtension).c_str ());
+            // delete .thm file
+            ::g_remove ((removeExtension(fname) + ".thm").c_str ());
+            ::g_remove ((removeExtension(fname) + ".THM").c_str ());
+
+            if (inclBatchProcessed) {
+                Glib::ustring procfName = Glib::ustring::compose ("%1.%2", Thumbnail::calcAutoFileNameBase(fname), options.saveFormatBatch.format);
+                ::g_remove (procfName.c_str ());
+
+                Glib::ustring procfNameParamFile = Glib::ustring::compose ("%1.%2.out%3", Thumbnail::calcAutoFileNameBase(fname), options.saveFormatBatch.format, paramFileExtension);
+                ::g_remove (procfNameParamFile.c_str ());
+            }
+
+            previewsLoaded--;
+        }
+
+        _refreshProgressBar();
+        redrawAll ();
+    });
+
+    msgd->show(getToplevelWindow(this));
 }
 
 void FileCatalog::copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe, bool moveRequested)
@@ -1055,7 +1064,13 @@ void FileCatalog::copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe, b
     }
 
     auto onResponse = [=](Glib::RefPtr<Gio::AsyncResult>& result) {
-        Glib::RefPtr<Gio::File> file = dialog->select_folder_finish(result);
+        Glib::RefPtr<Gio::File> file;
+        try {
+            file = dialog->select_folder_finish(result);
+        } catch (const Glib::Error&) {
+            return;
+        }
+
         if (!file) return;
 
         options.lastCopyMovePath = file->get_path();
@@ -1151,6 +1166,7 @@ void FileCatalog::copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe, b
 
 void FileCatalog::developRequested(const std::vector<FileBrowserEntry*>& tbe, bool fastmode)
 {
+// TODO(gtk4)
 //     if (listener) {
 //         std::vector<BatchQueueEntry*> entries;
 //
@@ -1287,59 +1303,78 @@ void FileCatalog::developRequested(const std::vector<FileBrowserEntry*>& tbe, bo
 
 void FileCatalog::renameRequested(const std::vector<FileBrowserEntry*>& tbe)
 {
-//     auto renameDlg = Gtk::make_managed<>();
-//     RenameDialog* renameDlg = new RenameDialog ((Gtk::Window*)get_toplevel());
-//
-//     for (size_t i = 0; i < tbe.size(); i++) {
-//         renameDlg->initName (Glib::path_get_basename (tbe[i]->filename.c_str()), tbe[i]->thumbnail->getCacheImageData());
-//
-//         Glib::ustring ofname = tbe[i]->filename;
-//         Glib::ustring dirName = Glib::path_get_dirname (tbe[i]->filename.c_str());
-//         Glib::ustring baseName = Glib::path_get_basename (tbe[i]->filename.c_str());
-//
-//         bool success = false;
-//
-//         do {
-//             if (renameDlg->run () == Gtk::ResponseType::OK) {
-//                 Glib::ustring nBaseName = renameDlg->getNewName ();
-//
-//                 // if path has directory components, exit
-//                 if (Glib::path_get_dirname (nBaseName.c_str()) != ".") {
-//                     continue;
-//                 }
-//
-//                 // if no extension is given, concatenate the extension of the original file
-//                 Glib::ustring ext = getExtension (nBaseName);
-//
-//                 if (ext.empty()) {
-//                     nBaseName += "." + getExtension (baseName);
-//                 }
-//
-//                 Glib::ustring nfname = Glib::build_filename (dirName, nBaseName);
-//
-//                 /* check if filename already exists*/
-//                 if (Glib::file_test (nfname, Glib::FileTest::EXISTS)) {
-//                     Glib::ustring msg_ = Glib::ustring("<b>") + escapeHtmlChars(nfname) + ": " + M("MAIN_MSG_ALREADYEXISTS") + "</b>";
-//                     Gtk::MessageDialog msgd (msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-//                     msgd.run ();
-//                 } else {
-//                     success = true;
-//
-//                     if (::g_rename (ofname.c_str (), nfname.c_str ()) == 0) {
-//                         cacheMgr->renameEntry (ofname, tbe[i]->thumbnail->getMD5(), nfname);
-//                         ::g_remove((ofname + paramFileExtension).c_str ());
-//                         reparseDirectory ();
-//                     }
-//                 }
-//             } else {
-//                 success = true;
-//             }
-//         } while (!success);
-//
-//         renameDlg->hide ();
-//     }
-//
-//     delete renameDlg;
+    if (tbe.empty()) return;
+
+    auto renameDlg = Gtk::make_managed<RenameDialog>(getToplevelWindow(this));
+    // Process in reverse order to make popping from vector easier
+    renameDlg->initName(Glib::path_get_basename(tbe.back()->filename.c_str()),
+                        tbe.back()->thumbnail->getCacheImageData());
+
+    auto onResponse = [this, renameDlg, entries = tbe](int response) mutable {
+        static_assert(!std::is_reference_v<decltype(entries)>);
+        auto entry = entries.back();
+
+        if (response == Gtk::ResponseType::OK) {
+            bool success = tryRenameFile(renameDlg, entry);
+            if (success) {
+                entries.pop_back();
+            }
+        } else {
+            // Cancelled
+            entries.pop_back();
+        }
+
+        if (entries.empty()) {
+            // Nothing left to do, close the dialog
+            renameDlg->destroy();
+        } else {
+            // Continue with next file or reprompt same file
+            renameDlg->initName(Glib::path_get_basename(entries.back()->filename.c_str()),
+                                entries.back()->thumbnail->getCacheImageData());
+        }
+    };
+
+    renameDlg->signal_response().connect(onResponse);
+    renameDlg->show();
+}
+
+bool FileCatalog::tryRenameFile(RenameDialog* dialog, FileBrowserEntry* entry)
+{
+    Glib::ustring ofname = entry->filename;
+    Glib::ustring dirName = Glib::path_get_dirname(ofname.c_str());
+    Glib::ustring baseName = Glib::path_get_basename(ofname.c_str());
+
+    Glib::ustring nBaseName = dialog->getNewName();
+
+    // if path has directory components, exit
+    if (Glib::path_get_dirname(nBaseName.c_str()) != ".") return false;
+
+    // if no extension is given, concatenate the extension of the original file
+    Glib::ustring ext = getExtension (nBaseName);
+
+    if (ext.empty()) {
+        nBaseName += "." + getExtension (baseName);
+    }
+
+    Glib::ustring nfname = Glib::build_filename (dirName, nBaseName);
+
+    /* check if filename already exists*/
+    if (Glib::file_test (nfname, Glib::FileTest::EXISTS)) {
+        Glib::ustring msg_ = Glib::ustring("<b>") + escapeHtmlChars(nfname) + ": " + M("MAIN_MSG_ALREADYEXISTS") + "</b>";
+        auto msgd = Gtk::make_managed<RtMessageDialog>(
+            msg_, RtMessageDialog::Type::ERROR, RtMessageDialog::ButtonSet::OK);
+        msgd->show(dialog);
+
+        return false;
+    } else {
+        if (::g_rename (ofname.c_str (), nfname.c_str ()) == 0) {
+            cacheMgr->renameEntry (ofname, entry->thumbnail->getMD5(), nfname);
+            ::g_remove((ofname + paramFileExtension).c_str ());
+            reparseDirectory ();
+        }
+
+        return true;
+    }
 }
 
 void FileCatalog::selectionChanged(const std::vector<Thumbnail*>& tbe)
