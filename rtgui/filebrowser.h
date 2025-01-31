@@ -71,6 +71,9 @@ private:
     Glib::RefPtr<Gio::Menu> contextMenuModel;
     Glib::RefPtr<Gio::Menu> colorLabelMenuModel;
 
+    Glib::RefPtr<Gtk::ShortcutController> pmenuShortcutController;
+    Glib::RefPtr<Gtk::Shortcut> inspectShortcut;
+
     Glib::RefPtr<Gio::SimpleActionGroup> pmenuActions;
     Glib::RefPtr<Gio::SimpleAction> trashAction;
     Glib::RefPtr<Gio::SimpleAction> untrashAction;

@@ -160,8 +160,10 @@ FileBrowser::FileBrowser () :
     pmenuActions = Gio::SimpleActionGroup::create();
     contextMenuModel = Gio::Menu::create();
     colorLabelMenuModel = Gio::Menu::create();
-    auto section = Gio::Menu::create();
+    pmenuShortcutController = Gtk::ShortcutController::create();
+    pmenuShortcutController->set_scope(Gtk::ShortcutScope::LOCAL);
 
+    auto section = Gio::Menu::create();
     auto startNewSection = [&]() {
         contextMenuModel->append_section(section);
         section = Gio::Menu::create();
@@ -174,6 +176,10 @@ FileBrowser::FileBrowser () :
             openRequested(mselected);
         });
         section->append(M("FILEBROWSER_POPUPOPEN"), getActionName(POPUP_OPEN));
+        pmenuShortcutController->add_shortcut(Gtk::Shortcut::create(
+            Gtk::KeyvalTrigger::create(GDK_KEY_Return),
+            Gtk::NamedAction::create(getActionName(POPUP_OPEN))));
+
         if (options.inspectorWindow) {
             const char* POPUP_INSPECT = "inspect";
             pmenuActions->add_action(POPUP_INSPECT, [&]() {
@@ -181,6 +187,10 @@ FileBrowser::FileBrowser () :
                 inspectRequested(mselected);
             });
             section->append(M("FILEBROWSER_POPUPINSPECT"), getActionName(POPUP_INSPECT));
+            inspectShortcut = Gtk::Shortcut::create(
+                Gtk::KeyvalTrigger::create(GDK_KEY_f),
+                Gtk::NamedAction::create(getActionName(POPUP_INSPECT)));
+            pmenuShortcutController->add_shortcut(inspectShortcut);
         }
 
         pmenuActions->add_action(PROCESS_ACTION_NAME, [&]() {
@@ -189,14 +199,24 @@ FileBrowser::FileBrowser () :
         });
         // TODO(gtk4): Needs icon "gears"
         section->append(M("FILEBROWSER_POPUPPROCESS"), getActionName(PROCESS_ACTION_NAME));
+        pmenuShortcutController->add_shortcut(Gtk::Shortcut::create(
+            Gtk::KeyvalTrigger::create(GDK_KEY_b, Gdk::ModifierType::CONTROL_MASK),
+            Gtk::NamedAction::create(getActionName(PROCESS_ACTION_NAME))));
 
         const char* POPUP_PROCESS_FAST = "process-fast";
         pmenuActions->add_action(POPUP_PROCESS_FAST, [&]() { activateProcessFast(); });
         section->append(M("FILEBROWSER_POPUPPROCESSFAST"), getActionName(POPUP_PROCESS_FAST));
+        pmenuShortcutController->add_shortcut(Gtk::Shortcut::create(
+            Gtk::KeyvalTrigger::create(
+                GDK_KEY_b, Gdk::ModifierType::CONTROL_MASK | Gdk::ModifierType::SHIFT_MASK),
+            Gtk::NamedAction::create(getActionName(POPUP_PROCESS_FAST))));
 
         startNewSection();
         pmenuActions->add_action(SELECT_ALL_ACTION_NAME, [&]() { activateSelectAll(); });
         section->append(M("FILEBROWSER_POPUPSELECTALL"), getActionName(SELECT_ALL_ACTION_NAME));
+        pmenuShortcutController->add_shortcut(Gtk::Shortcut::create(
+            Gtk::KeyvalTrigger::create(GDK_KEY_a, Gdk::ModifierType::CONTROL_MASK),
+            Gtk::NamedAction::create(getActionName(SELECT_ALL_ACTION_NAME))));
     }
     appendSortMenu(section);
     appendRankMenu(section);
@@ -229,26 +249,8 @@ FileBrowser::FileBrowser () :
     pmenu->set_menu_model(contextMenuModel);
     pmenu->set_flags(Gtk::PopoverMenu::Flags::NESTED);
     pmenu->set_has_arrow(false);
+    pmenu->add_controller(pmenuShortcutController);
     popoverBin.set_popover(pmenu);
-
-//     /***********************
-//      * Accelerators
-//      * *********************/
-//     pmaccelgroup = Gtk::AccelGroup::create ();
-//     pmenu->set_accel_group (pmaccelgroup);
-//     selall->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_a, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-//     trash->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_Delete, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
-//     untrash->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_Delete, Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
-//     open->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_Return, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
-// //     if (options.inspectorWindow)
-// //         inspect->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_f, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
-//     develop->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_B, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-//     developfast->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_B, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
-//     copyprof->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_C, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-//     pasteprof->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_V, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-//     partpasteprof->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_V, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
-//     copyTo->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_C, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
-//     moveTo->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_M, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
 
     // Has to be located after creation of profileOperationsMenu
     updateProfileList();
@@ -391,6 +393,9 @@ void FileBrowser::appendFileOperationsMenu(Glib::RefPtr<Gio::Menu>& section)
     });
     pmenuActions->add_action(trashAction);
     section1->append(M("FILEBROWSER_POPUPTRASH"), getActionName(TRASH));
+    pmenuShortcutController->add_shortcut(Gtk::Shortcut::create(
+        Gtk::KeyvalTrigger::create(GDK_KEY_Delete),
+        Gtk::NamedAction::create(getActionName(TRASH))));
 
     const char* UNTRASH = "untrash";
     untrashAction = Gio::SimpleAction::create(UNTRASH);
@@ -400,6 +405,9 @@ void FileBrowser::appendFileOperationsMenu(Glib::RefPtr<Gio::Menu>& section)
     });
     pmenuActions->add_action(untrashAction);
     section1->append(M("FILEBROWSER_POPUPUNTRASH"), getActionName(UNTRASH));
+    pmenuShortcutController->add_shortcut(Gtk::Shortcut::create(
+        Gtk::KeyvalTrigger::create(GDK_KEY_Delete, Gdk::ModifierType::SHIFT_MASK),
+        Gtk::NamedAction::create(getActionName(UNTRASH))));
 
     auto section2 = Gio::Menu::create();
 
@@ -433,6 +441,10 @@ void FileBrowser::appendFileOperationsMenu(Glib::RefPtr<Gio::Menu>& section)
     });
     pmenuActions->add_action(copyToAction);
     section3->append(M("FILEBROWSER_POPUPCOPYTO"), getActionName(COPY_TO));
+    pmenuShortcutController->add_shortcut(Gtk::Shortcut::create(
+        Gtk::KeyvalTrigger::create(
+            GDK_KEY_c, Gdk::ModifierType::CONTROL_MASK | Gdk::ModifierType::SHIFT_MASK),
+        Gtk::NamedAction::create(getActionName(COPY_TO))));
 
     const char* MOVE_TO = "move-to";
     moveToAction = Gio::SimpleAction::create(MOVE_TO);
@@ -442,6 +454,10 @@ void FileBrowser::appendFileOperationsMenu(Glib::RefPtr<Gio::Menu>& section)
     });
     pmenuActions->add_action(moveToAction);
     section3->append(M("FILEBROWSER_POPUPMOVETO"), getActionName(MOVE_TO));
+    pmenuShortcutController->add_shortcut(Gtk::Shortcut::create(
+        Gtk::KeyvalTrigger::create(
+            GDK_KEY_m, Gdk::ModifierType::CONTROL_MASK | Gdk::ModifierType::SHIFT_MASK),
+        Gtk::NamedAction::create(getActionName(MOVE_TO))));
 
     auto menu = Gio::Menu::create();
     menu->append_section(section1);
@@ -465,18 +481,28 @@ void FileBrowser::appendProfileOperationsMenu(Glib::RefPtr<Gio::Menu>& section)
     copyProfileAction->signal_activate().connect([&](auto) { copyProfile(); });
     pmenuActions->add_action(copyProfileAction);
     menu->append(M("FILEBROWSER_COPYPROFILE"), getActionName(COPY));
+    pmenuShortcutController->add_shortcut(Gtk::Shortcut::create(
+        Gtk::KeyvalTrigger::create(GDK_KEY_c, Gdk::ModifierType::CONTROL_MASK),
+        Gtk::NamedAction::create(getActionName(COPY))));
 
     const char* PASTE = "paste-profile";
     pasteProfileAction = Gio::SimpleAction::create(PASTE);
     pasteProfileAction->signal_activate().connect([&](auto) { pasteProfile(); });
     pmenuActions->add_action(pasteProfileAction);
     menu->append(M("FILEBROWSER_PASTEPROFILE"), getActionName(PASTE));
+    pmenuShortcutController->add_shortcut(Gtk::Shortcut::create(
+        Gtk::KeyvalTrigger::create(GDK_KEY_v, Gdk::ModifierType::CONTROL_MASK),
+        Gtk::NamedAction::create(getActionName(PASTE))));
 
     const char* PASTE_PARTIAL = "partial-paste-profile";
     partialPasteProfileAction = Gio::SimpleAction::create(PASTE_PARTIAL);
     partialPasteProfileAction->signal_activate().connect([&](auto) { partPasteProfile(); });
     pmenuActions->add_action(partialPasteProfileAction);
     menu->append(M("FILEBROWSER_PARTIALPASTEPROFILE"), getActionName(PASTE_PARTIAL));
+    pmenuShortcutController->add_shortcut(Gtk::Shortcut::create(
+        Gtk::KeyvalTrigger::create(
+            GDK_KEY_v, Gdk::ModifierType::CONTROL_MASK | Gdk::ModifierType::SHIFT_MASK),
+        Gtk::NamedAction::create(getActionName(PASTE_PARTIAL))));
 
     // This positioning is hard-coded in updateProfileList()
     menu->append_submenu(M("FILEBROWSER_APPLYPROFILE"), Gio::Menu::create());
@@ -1435,15 +1461,14 @@ int FileBrowser::getThumbnailHeight ()
 void FileBrowser::enableTabMode(bool enable)
 {
     ThumbBrowserBase::enableTabMode(enable);
-// TODO(gtk4)
-//     if (options.inspectorWindow) {
-//         if (enable) {
-//             inspect->remove_accelerator(pmenu->get_accel_group(), GDK_KEY_f, (Gdk::ModifierType)0);
-//         }
-//         else {
-//             inspect->add_accelerator ("activate", pmenu->get_accel_group(), GDK_KEY_f, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
-//         }
-//     }
+    if (options.inspectorWindow) {
+        if (enable) {
+            pmenuShortcutController->add_shortcut(inspectShortcut);
+        }
+        else {
+            pmenuShortcutController->remove_shortcut(inspectShortcut);
+        }
+    }
 }
 
 void FileBrowser::activateApplyProfile(size_t index)
