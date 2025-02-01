@@ -454,9 +454,9 @@ FileCatalog::FileCatalog (FilePanel* filepanel) :
 
     // add default panel
     hBox = Gtk::manage( new Gtk::Box () );
-    pack_start (this, *fileBrowser);
+    hBox->append (*fileBrowser);
     hBox->set_name ("FilmstripPanel");
-    hBox->hide();
+    hBox->set_vexpand ();
     fileBrowser->applyFilter (getFilter()); // warning: can call this only after all objects used in getFilter (e.g. Query) are instantiated
     //printf("FileCatalog::FileCatalog  fileBrowser->applyFilter (getFilter())\n");
     pack_start (this, *hBox);
@@ -1640,7 +1640,7 @@ void FileCatalog::categoryButtonToggled (Gdk::ModifierType state, Gtk::ToggleBut
         removeIfThere (hBox, trashButtonBox);
 
         if (bTrash->get_active ()) {
-            pack_start (hBox, *trashButtonBox, Pack::SHRINK, 4);
+            hBox->prepend(*trashButtonBox);
         }
 
         hBox->queue_draw ();
