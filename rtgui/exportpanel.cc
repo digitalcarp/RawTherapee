@@ -78,7 +78,8 @@ ExportPanel::ExportPanel () : listener (nullptr)
     }
 
     raw_bayer_method->set_active (0);
-    pack_end(hb_raw_bayer_method, *raw_bayer_method, Pack::EXPAND_WIDGET, 4);
+    insertSpacer(hb_raw_bayer_method);
+    pack_start(hb_raw_bayer_method, *raw_bayer_method, Pack::EXPAND_WIDGET, 4);
 
     //bypass_raw_all_enhance  = Gtk::manage ( new Gtk::CheckButton (M("EXPORT_BYPASS_RAW_ALL_ENHANCE")));
     bypass_raw_bayer_linenoise    = Gtk::manage ( new Gtk::CheckButton (M ("EXPORT_BYPASS_RAW_LINENOISE")));
@@ -102,7 +103,8 @@ ExportPanel::ExportPanel () : listener (nullptr)
     }
 
     raw_xtrans_method->set_active (0);
-    pack_end (hb_raw_xtrans_method, *raw_xtrans_method, Pack::EXPAND_WIDGET, 4);
+    insertSpacer(hb_raw_xtrans_method);
+    pack_start(hb_raw_xtrans_method, *raw_xtrans_method, Pack::EXPAND_WIDGET, 4);
 
     // ----------------------------------------------------------------
 

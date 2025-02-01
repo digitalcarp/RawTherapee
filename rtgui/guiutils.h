@@ -76,7 +76,7 @@ enum class Pack {
 };
 void pack_start(Gtk::Box* box, Gtk::Widget& child, Pack pack = Pack::EXPAND_WIDGET, int padding = 0);
 void pack_start(Gtk::Box* box, Gtk::Widget& child, bool expand, bool fill, int padding = 0);
-void pack_end(Gtk::Box* box, Gtk::Widget& child, Pack pack = Pack::EXPAND_WIDGET, int padding = 0);
+void insertSpacer(Gtk::Box* box);
 void pack1(Gtk::Paned* paned, Gtk::Widget& child, bool resize, bool shrink);
 void pack2(Gtk::Paned* paned, Gtk::Widget& child, bool resize, bool shrink);
 
@@ -171,10 +171,9 @@ public:
     ClickedSignal& signal_clicked() { return m_signal; }
 
 private:
-    void onClick(int n_press, double x, double y);
-
     Glib::RefPtr<Gtk::GestureClick> m_controller;
     ClickedSignal m_signal;
+    Gdk::ModifierType m_modifier;
 };
 
 // ToggleButton with a toggled callback that provides the modifier state
@@ -187,10 +186,9 @@ public:
     ToggledSignal& signal_toggled() { return m_signal; }
 
 private:
-    void onClick(int n_press, double x, double y);
-
     Glib::RefPtr<Gtk::GestureClick> m_controller;
     ToggledSignal m_signal;
+    Gdk::ModifierType m_modifier;
 };
 
 /**

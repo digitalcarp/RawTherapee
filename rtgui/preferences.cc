@@ -59,7 +59,8 @@ void placeSpinBox(Container where, Gtk::SpinButton* &spin, const std::string &la
     spin->set_max_width_chars (maxLength);
     spin->set_range (range0, range1);
     pack_start(HB, *label, Pack::SHRINK, 0);
-    pack_end(HB, *spin, Pack::SHRINK, 0);
+    insertSpacer(HB);
+    pack_start(HB, *spin, Pack::SHRINK, 0);
 
     if constexpr (std::is_same_v<Container, Gtk::Box*>) {
         where->append(*HB);
@@ -506,8 +507,9 @@ Gtk::Widget* Preferences::getBatchProcPanel()
     behSetAll->signal_clicked().connect(sigc::mem_fun(*this, &Preferences::behSetAllPressed));
 
     Gtk::Box* buttonpanel1 = Gtk::manage(new Gtk::Box());
-    pack_end(buttonpanel1, *behSetAll, Pack::SHRINK, 4);
-    pack_end(buttonpanel1, *behAddAll, Pack::SHRINK, 4);
+    insertSpacer(buttonpanel1);
+    pack_start(buttonpanel1, *behSetAll, Pack::SHRINK, 4);
+    pack_start(buttonpanel1, *behAddAll, Pack::SHRINK, 4);
     pack_start(vbbeh, *buttonpanel1, Pack::SHRINK, 4);
 
     chOverwriteOutputFile = Gtk::manage(new Gtk::CheckButton(M("PREFERENCES_OVERWRITEOUTPUTFILE")));
@@ -1612,10 +1614,11 @@ Gtk::Widget* Preferences::getFileBrowserPanel()
     delExt->set_child(*delExtImg);
     moveExtUp->set_child(*moveExtUpImg);
     moveExtDown->set_child(*moveExtDownImg);
-    pack_end(hb0, *moveExtDown, Pack::SHRINK, 4);
-    pack_end(hb0, *moveExtUp, Pack::SHRINK, 4);
-    pack_end(hb0, *delExt, Pack::SHRINK, 4);
-    pack_end(hb0, *addExt, Pack::SHRINK, 4);
+    insertSpacer(hb0);
+    pack_start(hb0, *addExt, Pack::SHRINK, 4);
+    pack_start(hb0, *delExt, Pack::SHRINK, 4);
+    pack_start(hb0, *moveExtUp, Pack::SHRINK, 4);
+    pack_start(hb0, *moveExtDown, Pack::SHRINK, 4);
 
     extensions = Gtk::manage(new Gtk::TreeView());
     Gtk::ScrolledWindow* hscrollw = Gtk::manage(new Gtk::ScrolledWindow());
@@ -1699,7 +1702,8 @@ Gtk::Widget* Preferences::getFileBrowserPanel()
 
     pack_start(vb6, *fro);
     pack_start(vb6, *frmnu);
-    pack_end(vb6, *frc);
+    insertSpacer(vb6);
+    pack_start(vb6, *frc);
     pack_start(hb6, *vb6);
     pack_start(hb6, *fre);
     hb6->set_spacing(4);
@@ -1749,7 +1753,8 @@ Gtk::Widget* Preferences::getSoundsPanel ()
     pack_start(pBatchQueueDone, *lSndBatchQueueDone, Pack::SHRINK, 4);
 
     txtSndBatchQueueDone = Gtk::manage(new Gtk::Entry());
-    pack_end(pBatchQueueDone, *txtSndBatchQueueDone, Pack::EXPAND_WIDGET, 4);
+    insertSpacer(pBatchQueueDone);
+    pack_start(pBatchQueueDone, *txtSndBatchQueueDone, Pack::EXPAND_WIDGET, 4);
 
     pack_start(vbSounds, *pBatchQueueDone, Pack::SHRINK, 4);
 
@@ -1769,7 +1774,8 @@ Gtk::Widget* Preferences::getSoundsPanel ()
     spbSndLngEditProcDoneSecs->set_digits(1);
     spbSndLngEditProcDoneSecs->set_increments(0.5, 1);
     spbSndLngEditProcDoneSecs->set_range(0, 10);
-    pack_end(pSndLngEditProcDone, *spbSndLngEditProcDoneSecs, Pack::SHRINK, 4);
+    insertSpacer(pSndLngEditProcDone);
+    pack_start(pSndLngEditProcDone, *spbSndLngEditProcDoneSecs, Pack::SHRINK, 4);
 
     pack_start(vbSounds, *pSndLngEditProcDone, Pack::SHRINK, 4);
 

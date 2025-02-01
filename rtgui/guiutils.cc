@@ -444,26 +444,10 @@ void pack_start(Gtk::Box* box, Gtk::Widget& child, bool expand, bool fill, int /
     box->append(child);
 }
 
-void pack_end(Gtk::Box* box, Gtk::Widget& child, Pack pack, int /*padding*/)
-{
-    if (box->get_orientation() == Gtk::Orientation::HORIZONTAL) {
-        if (pack == Pack::EXPAND_WIDGET) {
-            child.set_halign(Gtk::Align::FILL);
-            child.set_hexpand(true);
-        } else {
-            child.set_halign(Gtk::Align::END);
-            child.set_hexpand(false);
-        }
-    } else {
-        if (pack == Pack::EXPAND_WIDGET) {
-            child.set_valign(Gtk::Align::FILL);
-            child.set_vexpand(true);
-        } else {
-            child.set_valign(Gtk::Align::END);
-            child.set_vexpand(false);
-        }
-    }
-    box->append(child);
+void insertSpacer(Gtk::Box* box) {
+    auto spacer = Gtk::make_managed<Gtk::Box>();
+    spacer->set_hexpand(true);
+    box->append(*spacer);
 }
 
 void pack1(Gtk::Paned* paned, Gtk::Widget& child, bool resize, bool shrink)
@@ -2254,9 +2238,7 @@ void RotateLabel::size_allocate_vfunc(int width, int height, int baseline)
 
 Gtk::SizeRequestMode RotateLabel::get_request_mode_vfunc() const
 {
-    return m_rotate90 ?
-        Gtk::SizeRequestMode::WIDTH_FOR_HEIGHT :
-        Gtk::SizeRequestMode::HEIGHT_FOR_WIDTH;
+    return m_label.get_request_mode();
 }
 
 void RotateLabel::measure_vfunc(Gtk::Orientation orientation, int for_size,
@@ -2295,32 +2277,33 @@ void RotateLabel::snapshot_vfunc(const Glib::RefPtr<Gtk::Snapshot>& snapshot)
 ModButton::ModButton()
 {
     m_controller = Gtk::GestureClick::create();
+    // Must be capture to save modifier state before the regular
+    // Gtk::Button::signal_clicked() is emitted.
     m_controller->set_propagation_phase(Gtk::PropagationPhase::CAPTURE);
     m_controller->set_button(GDK_BUTTON_PRIMARY);
-    m_controller->signal_released().connect(
-        sigc::mem_fun(*this, &ModButton::onClick));
+    m_controller->signal_released().connect([&](int, double, double) {
+        m_modifier = m_controller->get_current_event_state();
+    });
     add_controller(m_controller);
-}
 
-void ModButton::onClick(int /*n_press*/, double /*x*/, double /*y*/)
-{
-    auto state = m_controller->get_current_event_state();
-    m_signal.emit(state);
+    Gtk::Button::signal_clicked().connect([&]() {
+        m_signal.emit(m_modifier);
+    });
 }
 
 ModToggleButton::ModToggleButton()
 {
     m_controller = Gtk::GestureClick::create();
+    // Must be capture to save modifier state before the regular
+    // Gtk::ToggleButton::signal_toggled() is emitted.
     m_controller->set_propagation_phase(Gtk::PropagationPhase::CAPTURE);
     m_controller->set_button(GDK_BUTTON_PRIMARY);
-    m_controller->signal_released().connect(
-        sigc::mem_fun(*this, &ModToggleButton::onClick));
+    m_controller->signal_released().connect([&](int, double, double) {
+        m_modifier = m_controller->get_current_event_state();
+    });
     add_controller(m_controller);
-}
 
-void ModToggleButton::onClick(int /*n_press*/, double /*x*/, double /*y*/)
-{
-    set_active(!get_active());
-    auto state = m_controller->get_current_event_state();
-    m_signal.emit(state);
+    Gtk::ToggleButton::signal_toggled().connect([&]() {
+        m_signal.emit(m_modifier);
+    });
 }

@@ -417,13 +417,13 @@ FileCatalog::FileCatalog (FilePanel* filepanel) :
     zoomInButton->signal_clicked().connect (sigc::mem_fun(*this, &FileCatalog::zoomIn));
     zoomInButton->set_has_frame(false);
     zoomInButton->set_tooltip_markup (M("FILEBROWSER_ZOOMINHINT"));
-    pack_end (zoomBox, *zoomInButton, Pack::SHRINK);
+    pack_start (zoomBox, *zoomInButton, Pack::SHRINK);
     zoomOutButton  = Gtk::manage( new Gtk::Button () );
     zoomOutButton->set_child (*Gtk::manage(new RtImage ("magnifier-minus")));
     zoomOutButton->signal_clicked().connect (sigc::mem_fun(*this, &FileCatalog::zoomOut));
     zoomOutButton->set_has_frame(false);
     zoomOutButton->set_tooltip_markup (M("FILEBROWSER_ZOOMOUTHINT"));
-    pack_end (zoomBox, *zoomOutButton, Pack::SHRINK);
+    pack_start (zoomBox, *zoomOutButton, Pack::SHRINK);
 
     pack_start (buttonBar, *zoomBox, Pack::SHRINK);
     pack_start (buttonBar, *Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK);
@@ -432,6 +432,14 @@ FileCatalog::FileCatalog (FilePanel* filepanel) :
     if (options.FileBrowserToolbarSingleRow) {
         pack_start (buttonBar, *hbToolBar1, Pack::EXPAND_WIDGET, 0);
     }
+
+    insertSpacer(buttonBar);
+
+// TODO(gtk4)
+    pack_start (buttonBar, *Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
+//     pack_start (buttonBar, *toolBar, Pack::SHRINK);
+    pack_start (buttonBar, *Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
+//     pack_start (buttonBar, *coarsePanel, Pack::SHRINK);
 
     tbRightPanel_1 = new Gtk::ToggleButton ();
     iRightPanel_1_Show = new RtImage("panel-to-left");
@@ -442,16 +450,11 @@ FileCatalog::FileCatalog (FilePanel* filepanel) :
     tbRightPanel_1->set_tooltip_markup (M("MAIN_TOOLTIP_SHOWHIDERP1"));
     tbRightPanel_1->set_child (*iRightPanel_1_Hide);
     tbRightPanel_1->signal_toggled().connect( sigc::mem_fun(*this, &FileCatalog::tbRightPanel_1_toggled) );
-    pack_end (buttonBar, *tbRightPanel_1, Pack::SHRINK);
-
-//     pack_end (buttonBar, *coarsePanel, Pack::SHRINK);
-    pack_end (buttonBar, *Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
-//     pack_end (buttonBar, *toolBar, Pack::SHRINK);
-    pack_end (buttonBar, *Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
+    pack_start (buttonBar, *tbRightPanel_1, Pack::SHRINK);
 
     // add default panel
     hBox = Gtk::manage( new Gtk::Box () );
-    pack_end (this, *fileBrowser);
+    pack_start (this, *fileBrowser);
     hBox->set_name ("FilmstripPanel");
     hBox->hide();
     fileBrowser->applyFilter (getFilter()); // warning: can call this only after all objects used in getFilter (e.g. Query) are instantiated
