@@ -41,6 +41,11 @@ G_END_DECLS
 
 // --- END C GObject
 
+namespace Gtk {
+class Image;
+class Picture;
+}
+
 class SvgPaintableWrapper {
 public:
     static Glib::RefPtr<SvgPaintableWrapper>
@@ -57,6 +62,9 @@ public:
 
     SvgPaintable* gobj() const { return m_gobj; }
     GdkPaintable* base_gobj() const { return GDK_PAINTABLE(m_gobj); }
+
+    void setOnImage(Gtk::Image* image);
+    void setOnPicture(Gtk::Picture* picture);
 
     // Renders a MemoryTexture at the specified size
     // @returns nullptr if SVG rendering failed

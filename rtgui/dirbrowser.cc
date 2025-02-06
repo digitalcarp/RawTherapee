@@ -20,6 +20,8 @@
 
 #include <iostream>
 #include <cstring>
+#include <queue>
+#include <unordered_set>
 
 #ifdef _WIN32_WINNT
 #undef _WIN32_WINNT
@@ -30,9 +32,21 @@
 #include "guiutils.h"
 #include "multilangmgr.h"
 #include "options.h"
+#include "rtimage.h"
+#include "treelist.h"
 
 namespace
 {
+
+class NoopSorter : public Gtk::Sorter {
+public:
+    Gtk::Ordering compare_vfunc(gpointer lhs, gpointer rhs) override {
+        return Gtk::Ordering::EQUAL;
+    }
+    Gtk::Sorter::Order get_order_vfunc() override {
+        return Gtk::Sorter::Order::NONE;
+    }
+};
 
 std::vector<Glib::ustring> listSubDirs (const Glib::RefPtr<Gio::File>& dir, bool addHidden)
 {
@@ -99,7 +113,53 @@ DirBrowser::DirBrowser () : dirTreeModel(),
     , volumes(0)
 #endif
 {
+    openFolderSvg = SvgPaintableWrapper::createFromIcon("folder-open-small");
+    closeFolderSvg = SvgPaintableWrapper::createFromIcon("folder-closed-small");
+    cdromSvg = SvgPaintableWrapper::createFromIcon("device-optical");
+    floppySvg = SvgPaintableWrapper::createFromIcon("device-floppy");
+    hddSvg = SvgPaintableWrapper::createFromIcon("device-hdd");
+    networkSvg = SvgPaintableWrapper::createFromIcon("device-network");
+    usbSvg = SvgPaintableWrapper::createFromIcon("device-usb");
+
     set_orientation(Gtk::Orientation::VERTICAL);
+
+    scrollWindow.set_child(columnView);
+    scrollWindow.set_vexpand(true);
+    append(scrollWindow);
+
+    columnView.set_reorderable(false);
+    columnView.set_enable_rubberband(false);
+
+    dirTreeListModel = RtTreeListModel<DirColumns>::create();
+
+    auto selectionModel = Gtk::SingleSelection::create(dirTreeListModel);
+    selectionModel->set_autoselect(false);
+    selectionModel->set_can_unselect(true);
+    columnView.set_model(selectionModel);
+
+    auto factory = Gtk::SignalListItemFactory::create();
+    factory->signal_setup().connect(sigc::mem_fun(*this, &DirBrowser::setupRow));
+    factory->signal_bind().connect(sigc::mem_fun(*this, &DirBrowser::bindRow));
+    factory->signal_unbind().connect(sigc::mem_fun(*this, &DirBrowser::unbindRow));
+    factory->signal_teardown().connect(sigc::mem_fun(*this, &DirBrowser::teardownRow));
+
+    auto column = Gtk::ColumnViewColumn::create(M("DIRBROWSER_FOLDERS"), factory);
+    column->set_expand();
+    // Set a noop sorter so that column headers can be clicked to choose order
+    column->set_sorter(std::make_shared<NoopSorter>());
+    columnView.append_column(column);
+    columnView.sort_by_column(column, options.dirBrowserSortType);
+
+    // Only ColumnViewSorter knows the SortType
+    sorter = std::dynamic_pointer_cast<Gtk::ColumnViewSorter>(columnView.get_sorter());
+    if (sorter) {
+        sorter->property_primary_sort_order().signal_changed().connect(
+            sigc::mem_fun(*this, &DirBrowser::onSortChanged));
+    }
+
+    onSortChanged();
+    populateRootDirectories();
+
     dirtree = Gtk::manage ( new Gtk::TreeView() );
     scrolledwindow4 = Gtk::manage ( new Gtk::ScrolledWindow() );
     crt.property_ellipsize() = Pango::EllipsizeMode::END;
@@ -116,9 +176,210 @@ DirBrowser::DirBrowser () : dirTreeModel(),
 
     pack_start (this, *scrolledwindow4);
 
-    dispatcher.connect(sigc::mem_fun(*this, &DirBrowser::updateDirs));
+    dispatcher.connect(sigc::mem_fun(*this, &DirBrowser::processDirChanges));
     winDispatcher.connect(sigc::mem_fun(*this, &DirBrowser::updateVolumes));
 }
+
+void DirBrowser::setupRow(const Glib::RefPtr<Gtk::ListItem>& item)
+{
+    auto expander = Gtk::make_managed<RtTreeListExpander<DirColumns>>();
+    auto box = Gtk::make_managed<Gtk::Box>();
+    auto image = Gtk::make_managed<RtImage>();
+    auto label = Gtk::make_managed<Gtk::Label>();
+    box->append(*image);
+    box->append(*label);
+    expander->set_child(*box);
+    item->set_child(*expander);
+    // Required for expander shortcuts based on API docs
+    item->set_focusable(false);
+}
+
+void DirBrowser::bindRow(const Glib::RefPtr<Gtk::ListItem>& item)
+{
+    auto node = std::dynamic_pointer_cast<DirNode>(item->get_item());
+    if (!node) return;
+
+    Glib::RefPtr<DirColumns> col = node->data();
+    if (!col) return;
+
+    auto expander = static_cast<RtTreeListExpander<DirColumns>*>(item->get_child());
+    expander->set_node(node);
+    auto box = static_cast<Gtk::Box*>(expander->get_child());
+    auto image = static_cast<RtImage*>(box->get_first_child());
+    if (col->icon) {
+        col->icon->setOnImage(image);
+        image->show();
+    } else {
+        image->hide();
+    }
+    auto label = static_cast<Gtk::Label*>(box->get_last_child());
+    label->set_text(col->filename);
+
+    Connections& conn = row_to_connections[item.get()];
+    conn.expanded = node->property_expanded().signal_changed().connect(
+        [=]() {
+            if (node->property_expanded().get_value()) {
+                if (col->icon == nullptr || col->icon == closeFolderSvg) {
+                    col->icon = openFolderSvg;
+                    col->icon->setOnImage(image);
+                    image->show();
+                }
+
+                updateDir(node);
+            } else {
+                if (col->icon == openFolderSvg) {
+                    col->icon = closeFolderSvg;
+                    col->icon->setOnImage(image);
+                }
+            }
+        });
+}
+
+void DirBrowser::unbindRow(const Glib::RefPtr<Gtk::ListItem>& item)
+{
+    auto it = row_to_connections.find(item.get());
+    if (it == row_to_connections.end()) return;
+    it->second.disconnectAll();
+}
+
+void DirBrowser::teardownRow(const Glib::RefPtr<Gtk::ListItem>& item)
+{
+    row_to_connections.erase(item.get());
+}
+
+void DirBrowser::onSortChanged()
+{
+    Gtk::SortType sort = sorter->get_primary_sort_order();
+    options.dirBrowserSortType = sort;
+    if (sort == Gtk::SortType::ASCENDING) {
+        dirTreeListModel->set_sorter(
+            [](const Glib::RefPtr<DirNode>& lhs, const Glib::RefPtr<DirNode>& rhs) {
+                return lhs->data()->filename < rhs->data()->filename;
+            });
+    } else {
+        dirTreeListModel->set_sorter(
+            [](const Glib::RefPtr<DirNode>& lhs, const Glib::RefPtr<DirNode>& rhs) {
+                return lhs->data()->filename > rhs->data()->filename;
+            });
+    }
+}
+
+void DirBrowser::populateRootDirectories()
+{
+#ifdef _WIN32
+    volumes = GetLogicalDrives();
+    for (int i = 0; i < 32; i++) {
+        if ((volumes >> i) & 1) {
+            dirTreeListModel->add_node(createForVolume('A' + i), nullptr);
+        }
+    }
+#else
+    dirTreeListModel->add_node(DirColumns::create("/", "/", closeFolderSvg, nullptr), nullptr);
+#endif
+}
+
+void DirBrowser::onFileChanged(const Glib::RefPtr<Gio::File>& file,
+                               const Glib::RefPtr<Gio::File>& other_file,
+                               Gio::FileMonitor::Event event,
+                               const std::weak_ptr<DirNode>& weak_node)
+{
+    if (!file || event == Gio::FileMonitor::Event::ATTRIBUTE_CHANGED) return;
+
+    auto node = weak_node.lock();
+    if (!node) return;
+
+    const std::lock_guard<std::mutex> lock(mutex);
+    bool shouldEmit = updatedNodes.empty();
+    updatedNodes.push_back(node);
+    if (shouldEmit) {
+        dispatcher.emit();
+    }
+}
+
+void DirBrowser::updateDir(const Glib::RefPtr<DirNode>& node)
+{
+    GuiThreadSafety::assertInGuiThread();
+
+    if (!dirTreeListModel->owns_node(node)) return;
+
+    Glib::RefPtr<DirColumns> data = node->data();
+    if (!data) return;
+
+    if (!Glib::file_test(data->dirname, Glib::FileTest::EXISTS) ||
+            !Glib::file_test(data->dirname, Glib::FileTest::IS_DIR)) {
+        dirTreeListModel->remove_node(node);
+        return;
+    }
+
+    std::unordered_set<std::string> current_children;
+    for (const auto& child : node->children()) {
+        auto data = child->data();
+        if (!data) continue;
+
+        if (!Glib::file_test(data->dirname, Glib::FileTest::EXISTS) ||
+                !Glib::file_test(data->dirname, Glib::FileTest::IS_DIR)) {
+            dirTreeListModel->remove_node(child);
+        } else {
+            current_children.insert(data->filename.collate_key());
+        }
+    }
+
+    auto dir = Gio::File::create_for_path(data->dirname);
+    auto subDirs = listSubDirs(dir, options.fbShowHidden);
+
+    for (const auto& dirname : subDirs) {
+        auto it = current_children.find(dirname.collate_key());
+        if (it != current_children.end()) continue;
+
+        Glib::ustring fullname = Glib::build_filename(data->dirname, dirname);
+        auto newData = DirColumns::create(dirname, fullname, closeFolderSvg, nullptr);
+        auto newNode = dirTreeListModel->add_node(newData, node.get());
+
+        Glib::RefPtr<Gio::FileMonitor> monitor = dir->monitor_directory();
+        newData->monitor = dir->monitor_directory();
+        // Creating a weak_ptr here must use the shared_ptr from add_node().
+        // See RtTreeListModel<T> comments for why this is required.
+        newData->monitor->signal_changed().connect(
+            sigc::bind(sigc::mem_fun(*this, &DirBrowser::onFileChanged), std::weak_ptr(newNode)));
+    }
+}
+
+void DirBrowser::processDirChanges()
+{
+    const std::lock_guard<std::mutex> lock(mutex);
+    for (const auto& node : updatedNodes) {
+        updateDir(node);
+    }
+    updatedNodes.clear();
+}
+
+#ifdef _WIN32
+Glib::RefPtr<DirColumns> DirBrowser::createForVolume(char letter) const
+{
+    auto volume = Glib::ustring::compose("%1:\\", letter);
+    Glib::RefPtr<SvgPaintableWrapper> svg;
+
+    int type = GetDriveType(volume);
+    switch (type) {
+    case DRIVE_CDROM:
+        svg = cdromSvg;
+        break;
+    case DRIVE_REMOVABLE:
+        svg = (letter - 'A' < 2) ? floppySvg : usbSvg;
+        break;
+    case DRIVE_REMOTE:
+        svg = networkSvg;
+        break;
+    case DRIVE_FIXED:
+        svg = hddSvg;
+        break;
+    default:
+        break;
+    }
+
+    return DirColumns::create(volume, volume, svg, nullptr);
+}
+#endif  // _WIN32
 
 void DirBrowser::fillDirTree ()
 {

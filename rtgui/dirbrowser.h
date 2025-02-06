@@ -24,6 +24,12 @@
 #include <giomm.h>
 
 #include "guiutils.h"
+#include "svgpaintable.h"
+
+template <class T>
+class RtTreeListModel;
+template <class T>
+class RtTreeListNode;
 
 class DirBrowser : public Gtk::Box
 {
@@ -31,6 +37,77 @@ public:
     typedef sigc::signal<void(const Glib::ustring&, const Glib::ustring&)> DirSelectionSignal;
 
 private:
+
+    class DirColumns : public Glib::Object {
+    public:
+        Glib::ustring filename;
+        Glib::ustring dirname;
+        Glib::RefPtr<SvgPaintableWrapper> icon;
+        Glib::RefPtr<Gio::FileMonitor> monitor;
+
+        static Glib::RefPtr<DirColumns> create(
+            const Glib::ustring& filename,
+            const Glib::ustring& dirname,
+            const Glib::RefPtr<SvgPaintableWrapper>& icon,
+            const Glib::RefPtr<Gio::FileMonitor>& monitor)
+        {
+            return Glib::make_refptr_for_instance<DirColumns>(
+                new DirColumns(filename, dirname, icon, monitor));
+        }
+
+    private:
+        DirColumns(const Glib::ustring& a_filename, const Glib::ustring& a_dirname,
+                   const Glib::RefPtr<SvgPaintableWrapper>& a_icon,
+                   const Glib::RefPtr<Gio::FileMonitor>& a_monitor)
+            : filename(a_filename), dirname(a_dirname), icon(a_icon), monitor(a_monitor)
+        {}
+    };
+    using DirModel = RtTreeListModel<DirColumns>;
+    using DirNode = RtTreeListNode<DirColumns>;
+
+    Gtk::ColumnView columnView;
+    Gtk::ScrolledWindow scrollWindow;
+    Glib::RefPtr<Gtk::ColumnViewSorter> sorter;
+    Glib::RefPtr<DirModel> dirTreeListModel;
+
+    Glib::RefPtr<SvgPaintableWrapper> openFolderSvg;
+    Glib::RefPtr<SvgPaintableWrapper> closeFolderSvg;
+    Glib::RefPtr<SvgPaintableWrapper> cdromSvg;
+    Glib::RefPtr<SvgPaintableWrapper> floppySvg;
+    Glib::RefPtr<SvgPaintableWrapper> hddSvg;
+    Glib::RefPtr<SvgPaintableWrapper> networkSvg;
+    Glib::RefPtr<SvgPaintableWrapper> usbSvg;
+
+    struct Connections {
+        sigc::connection expanded;
+
+        void disconnectAll()
+        {
+            expanded.disconnect();
+        }
+    };
+    std::unordered_map<Gtk::ListItem*, Connections> row_to_connections;
+
+    void setupRow(const Glib::RefPtr<Gtk::ListItem>& item);
+    void bindRow(const Glib::RefPtr<Gtk::ListItem>& item);
+    void unbindRow(const Glib::RefPtr<Gtk::ListItem>& item);
+    void teardownRow(const Glib::RefPtr<Gtk::ListItem>& item);
+
+    void onSortChanged();
+
+    void populateRootDirectories();
+    void onFileChanged(const Glib::RefPtr<Gio::File>& file,
+                       const Glib::RefPtr<Gio::File>& other_file,
+                       Gio::FileMonitor::Event event,
+                       const std::weak_ptr<DirNode>& weak_node);
+    void updateDir(const Glib::RefPtr<DirNode>& node);
+    void processDirChanges();
+
+#ifdef _WIN32
+    Glib::RefPtr<DirColumns> createForVolume(char letter) const;
+#endif
+
+
 
     Glib::RefPtr<Gtk::TreeStore> dirTreeModel;
 
@@ -60,6 +137,7 @@ private:
     DirSelectionSignal dirSelectionSignal;
 
     std::mutex mutex;
+    std::vector<Glib::RefPtr<DirNode>> updatedNodes;
     std::vector<Gtk::TreeIter<Gtk::TreeRow>> updatedDirs;
     Glib::Dispatcher dispatcher;
     Glib::Dispatcher winDispatcher;

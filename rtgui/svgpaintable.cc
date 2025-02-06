@@ -23,6 +23,7 @@
 #include "rtscalable.h"
 
 #include <glibmm/fileutils.h>
+#include <gtkmm/image.h>
 #include <gtkmm/snapshot.h>
 #include <librsvg/rsvg.h>
 
@@ -273,6 +274,14 @@ SvgPaintableWrapper::~SvgPaintableWrapper() {
     if (m_gobj) {
         g_object_unref(m_gobj);
     }
+}
+
+void SvgPaintableWrapper::setOnImage(Gtk::Image* image) {
+    gtk_image_set_from_paintable (image->gobj(), GDK_PAINTABLE (m_gobj));
+}
+
+void SvgPaintableWrapper::setOnPicture(Gtk::Picture* picture) {
+    gtk_picture_set_paintable (picture->gobj(), GDK_PAINTABLE (m_gobj));
 }
 
 Glib::RefPtr<Gdk::Texture> SvgPaintableWrapper::createTexture(int width, int height) {
