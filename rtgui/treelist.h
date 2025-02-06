@@ -75,9 +75,22 @@ public:
     bool owns_node(const Glib::RefPtr<Node>& node) const;
 
     Node* find_node(guint position) const;
-    std::optional<guint> find_pos(Node* node) const;
+    std::optional<guint> find_pos(const Node* node) const;
 
     void set_sorter(const CompareFunc& compare);
+
+    /**
+     * @tparam Pred Function signature: bool(const RtTreeListNode<T>*)
+     * @param parent The parent node or nullptr for the top level root
+     */
+    template <class Pred>
+    void remove_children_if(Node* parent, Pred pred);
+    /**
+     * @tparam Pred Function signature: bool(const RtTreeListNode<T>*)
+     * @param parent The parent node or nullptr for the top level root
+     */
+    template <class Pred>
+    Glib::RefPtr<Node> find_if(const Node* parent, Pred pred) const;
 
 protected:
     GType get_item_type_vfunc() override { return Node::get_base_type(); }
@@ -160,6 +173,7 @@ public:
     static_assert(std::is_base_of_v<Glib::Object, T>);
 
     using Node = RtTreeListNode<T>;
+    using ActivateSignal = sigc::signal<void(RtTreeListExpander<T>*)>;
 
     RtTreeListExpander();
     ~RtTreeListExpander();
@@ -170,14 +184,20 @@ public:
     Glib::RefPtr<Node> get_node() const { return m_node; }
     void set_node(const Glib::RefPtr<Node>& node);
 
+    ActivateSignal& signal_activate() { return m_activate_signal; }
+
 private:
     void update_expander();
+
+    void on_expander_event(int n_press, double x, double y);
+    void on_activate_event(int n_press, double x, double y);
 
     Gtk::Box m_indent_box;
     Gtk::Box m_child_box;
     RtImage m_expander;
     Glib::RefPtr<Node> m_node;
     Glib::RefPtr<Gtk::GestureClick> m_click;
+    ActivateSignal m_activate_signal;
     sigc::connection m_node_expanded_conn;
     size_t m_depth;
 };
@@ -274,6 +294,41 @@ void RtTreeListModel<T>::remove_node(const Glib::RefPtr<Node>& node)
     if (found_pos) {
         notify_items_changed(*found_pos, removed, 0);
     }
+}
+
+template <class T>
+template <class Pred>
+void RtTreeListModel<T>::remove_children_if(Node* parent, Pred pred)
+{
+    std::vector<Glib::RefPtr<Node>> to_delete;
+
+    Node* real_parent = parent ? parent : m_root.get();
+    for (const auto& node : real_parent->m_children) {
+        if (std::invoke(pred, node.get())) {
+            to_delete.push_back(node);
+        }
+    }
+
+    for (const auto& node : to_delete) {
+        remove_node(node);
+    }
+}
+
+template <class T>
+template <class Pred>
+auto RtTreeListModel<T>::find_if(const Node* parent, Pred pred) const -> Glib::RefPtr<Node>
+{
+    Glib::RefPtr<Node> result = nullptr;
+
+    const Node* real_parent = parent ? parent : m_root.get();
+    for (const auto& node : real_parent->m_children) {
+        if (std::invoke(pred, node.get())) {
+            result = node;
+            break;
+        }
+    }
+
+    return result;
 }
 
 template <class T>
@@ -380,7 +435,7 @@ auto RtTreeListModel<T>::find_node(guint position) const -> Node*
 }
 
 template <class T>
-std::optional<guint> RtTreeListModel<T>::find_pos(Node* node) const
+std::optional<guint> RtTreeListModel<T>::find_pos(const Node* node) const
 {
     if (m_list_cache.empty()) {
         rebuild_cache();
@@ -518,11 +573,15 @@ RtTreeListExpander<T>::RtTreeListExpander() : m_depth(0)
 
     m_click = Gtk::GestureClick::create();
     m_click->set_button(GDK_BUTTON_PRIMARY);
-    m_click->signal_released().connect([&](int n_press, double x, double y) {
-        if (m_node) m_node->toggle_expanded();
-        m_click->set_state(Gtk::EventSequenceState::CLAIMED);
-    });
+    m_click->signal_released().connect(
+        sigc::mem_fun(*this, &RtTreeListExpander<T>::on_expander_event));
     m_expander.add_controller(m_click);
+
+    auto activateClick = Gtk::GestureClick::create();
+    activateClick->set_button(GDK_BUTTON_PRIMARY);
+    activateClick->signal_pressed().connect(
+        sigc::mem_fun(*this, &RtTreeListExpander<T>::on_activate_event));
+    add_controller(activateClick);
 
     signal_destroy().connect([&]() {
         if (m_expander.get_parent()) {
@@ -565,6 +624,7 @@ void RtTreeListExpander<T>::set_child(Gtk::Widget& child)
 template <class T>
 void RtTreeListExpander<T>::set_node(const Glib::RefPtr<Node>& node)
 {
+    m_activate_signal.clear();
     m_node_expanded_conn.disconnect();
 
     m_node = node;
@@ -606,5 +666,27 @@ void RtTreeListExpander<T>::update_expander()
         expanded_svg->setOnImage(&m_expander);
     } else {
         collapsed_svg->setOnImage(&m_expander);
+    }
+}
+
+template <class T>
+void RtTreeListExpander<T>::on_expander_event(int n_press, double x, double y)
+{
+    if (m_node) {
+        m_node->toggle_expanded();
+        if (m_node->is_expanded()) {
+            set_state_flags(Gtk::StateFlags::CHECKED, false);
+        } else {
+            unset_state_flags(Gtk::StateFlags::CHECKED);
+        }
+    }
+    m_click->set_state(Gtk::EventSequenceState::CLAIMED);
+}
+
+template <class T>
+void RtTreeListExpander<T>::on_activate_event(int n_press, double x, double y)
+{
+    if (n_press == 2) {
+        m_activate_signal.emit(this);
     }
 }

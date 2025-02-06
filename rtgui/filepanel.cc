@@ -195,8 +195,6 @@ void FilePanel::setAspect ()
 
 void FilePanel::init ()
 {
-
-    dirBrowser->fillDirTree ();
     placesBrowser->refreshPlacesList ();
 
     if (!argv1.empty() && Glib::file_test (argv1, Glib::FileTest::EXISTS)) {

@@ -30,6 +30,8 @@ template <class T>
 class RtTreeListModel;
 template <class T>
 class RtTreeListNode;
+template <class T>
+class RtTreeListExpander;
 
 class DirBrowser : public Gtk::Box
 {
@@ -67,6 +69,7 @@ private:
 
     Gtk::ColumnView columnView;
     Gtk::ScrolledWindow scrollWindow;
+    Glib::RefPtr<Gtk::ColumnViewColumn> column;
     Glib::RefPtr<Gtk::ColumnViewSorter> sorter;
     Glib::RefPtr<DirModel> dirTreeListModel;
 
@@ -86,7 +89,7 @@ private:
             expanded.disconnect();
         }
     };
-    std::unordered_map<Gtk::ListItem*, Connections> row_to_connections;
+    std::unordered_map<Gtk::ListItem*, Connections> rowToConnections;
 
     void setupRow(const Glib::RefPtr<Gtk::ListItem>& item);
     void bindRow(const Glib::RefPtr<Gtk::ListItem>& item);
@@ -94,95 +97,35 @@ private:
     void teardownRow(const Glib::RefPtr<Gtk::ListItem>& item);
 
     void onSortChanged();
+    void onRowActivated(RtTreeListExpander<DirColumns>* row);
 
     void populateRootDirectories();
     void onFileChanged(const Glib::RefPtr<Gio::File>& file,
-                       const Glib::RefPtr<Gio::File>& other_file,
+                       const Glib::RefPtr<Gio::File>& otherFile,
                        Gio::FileMonitor::Event event,
-                       const std::weak_ptr<DirNode>& weak_node);
+                       const std::weak_ptr<DirNode>& weakNode);
     void updateDir(const Glib::RefPtr<DirNode>& node);
     void processDirChanges();
+    guint expandTreeToDir(const Glib::ustring& absDirPath);
 
 #ifdef _WIN32
     Glib::RefPtr<DirColumns> createForVolume(char letter) const;
+    bool updateVolumes();
+
+    unsigned int volumes = 0;
 #endif
 
-
-
-    Glib::RefPtr<Gtk::TreeStore> dirTreeModel;
-
-    struct DirTreeColumns : public Gtk::TreeModelColumnRecord {
-    public:
-        Gtk::TreeModelColumn<Glib::ustring> filename;
-        Gtk::TreeModelColumn<Glib::ustring> icon_name;
-        Gtk::TreeModelColumn<Glib::ustring> dirname;
-        Gtk::TreeModelColumn<Glib::RefPtr<Gio::FileMonitor> > monitor;
-
-        DirTreeColumns()
-        {
-            add(icon_name);
-            add(filename);
-            add(dirname);
-            add(monitor);
-        }
-    };
-
-    DirTreeColumns dtColumns;
-    Gtk::TreeViewColumn tvc;
-    Gtk::CellRendererText crt;
-
-
-    Gtk::TreeView *dirtree;
-    Gtk::ScrolledWindow *scrolledwindow4;
     DirSelectionSignal dirSelectionSignal;
 
     std::mutex mutex;
     std::vector<Glib::RefPtr<DirNode>> updatedNodes;
-    std::vector<Gtk::TreeIter<Gtk::TreeRow>> updatedDirs;
     Glib::Dispatcher dispatcher;
-    Glib::Dispatcher winDispatcher;
-
-    void fillRoot ();
-
-    Glib::ustring openfolder;
-    Glib::ustring closedfolder;
-    Glib::ustring icdrom;
-    Glib::ustring ifloppy;
-    Glib::ustring ihdd;
-    Glib::ustring inetwork;
-    Glib::ustring iremovable;
-
-    bool expandSuccess;
-
-#ifdef _WIN32
-    unsigned int volumes;
-    void addRoot (char letter);
-public:
-    void requestUpdateVolumes ();
-private:
-#endif
-    void addDir (const Gtk::TreeModel::iterator& iter, const Glib::ustring& dirname);
-    Gtk::TreePath expandToDir (const Glib::ustring& dirName);
-    void updateVolumes ();
-    void updateDirs();
-    void updateDir (Gtk::TreeIter<Gtk::TreeRow>& iter);
 
 public:
     DirBrowser ();
 
-    void fillDirTree ();
-    void on_sort_column_changed() const;
-    void row_expanded   (const Gtk::TreeModel::iterator& iter, const Gtk::TreeModel::Path& path);
-    void row_collapsed  (const Gtk::TreeModel::iterator& iter, const Gtk::TreeModel::Path& path);
-    void row_activated  (const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column);
-    void file_changed   (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitor::Event event_type, const Gtk::TreeModel::iterator& iter, const Glib::ustring& dirName);
     void open           (const Glib::ustring& dirName, const Glib::ustring& fileName = ""); // goes to dir "dirName" and selects file "fileName"
-    void selectDir      (Glib::ustring dir);
+    void selectDir      (const Glib::ustring& dir);
 
-    DirSelectionSignal dirSelected () const;
+    DirSelectionSignal& dirSelected() { return dirSelectionSignal; }
 };
-
-inline DirBrowser::DirSelectionSignal DirBrowser::dirSelected () const
-{
-    return dirSelectionSignal;
-}
