@@ -158,7 +158,7 @@ void DirBrowser::setupRow(const Glib::RefPtr<Gtk::ListItem>& item)
     box->append(*label);
     expander->set_child(*box);
     item->set_child(*expander);
-    // Required for expander shortcuts based on API docs
+    // Required for expander shortcuts based on Gtk::TreeExpander API docs
     item->set_focusable(false);
 }
 
@@ -255,6 +255,8 @@ void DirBrowser::onRowActivated(RtTreeListExpander<DirColumns>* row)
 
 void DirBrowser::populateRootDirectories()
 {
+    auto transaction = dirTreeListModel->maybe_init_transaction();
+
 #ifdef _WIN32
     volumes = GetLogicalDrives();
     for (int i = 0; i < 32; i++) {
@@ -293,10 +295,12 @@ void DirBrowser::updateDir(const Glib::RefPtr<DirNode>& node)
 {
     GuiThreadSafety::assertInGuiThread();
 
-    if (!dirTreeListModel->owns_node(node)) return;
+    if (!dirTreeListModel->owns_node(node.get())) return;
 
     Glib::RefPtr<DirColumns> data = node->data();
     if (!data) return;
+
+    auto transaction = dirTreeListModel->maybe_init_transaction();
 
     if (!Glib::file_test(data->dirname, Glib::FileTest::EXISTS) ||
             !Glib::file_test(data->dirname, Glib::FileTest::IS_DIR)) {
@@ -340,6 +344,7 @@ void DirBrowser::updateDir(const Glib::RefPtr<DirNode>& node)
 void DirBrowser::processDirChanges()
 {
     const std::lock_guard<std::mutex> lock(mutex);
+    auto transaction = dirTreeListModel->maybe_init_transaction();
     for (const auto& node : updatedNodes) {
         updateDir(node);
     }
@@ -362,6 +367,8 @@ guint DirBrowser::expandTreeToDir(const Glib::ustring& absDirPath)
         path = parent;
     }
 
+    auto transaction = dirTreeListModel->maybe_init_transaction();
+
     Glib::RefPtr<DirNode> parent = nullptr;  // Start at tree root
     while (!dirStack.empty()) {
         Glib::ustring dir = std::move(dirStack.back());
@@ -373,12 +380,15 @@ guint DirBrowser::expandTreeToDir(const Glib::ustring& absDirPath)
         Glib::RefPtr<DirNode> found = dirTreeListModel->find_if(parent.get(), pred);
 
         if (found) {
+            updateDir(found);
             found->property_expanded().set_value(true);
             parent = found;
         } else {
             break;
         }
     }
+
+    transaction.commit();
 
     std::optional<guint> pos = dirTreeListModel->find_pos(parent.get());
     return pos ? *pos : 0;
@@ -419,6 +429,8 @@ bool DirBrowser::updateVolumes()
     if (nvolumes == volumes) return true;
 
     std::unordered_set<std::string> to_delete;
+
+    auto transaction = dirTreeListModel->maybe_init_transaction();
 
     for (int i = 0; i < 32; i++) {
         if (((volumes >> i) & 1) && !((nvolumes >> i) & 1)) {

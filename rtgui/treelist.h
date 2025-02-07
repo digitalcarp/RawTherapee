@@ -59,6 +59,26 @@ public:
         return Glib::make_refptr_for_instance<RtTreeListModel<T>>(new RtTreeListModel<T>());
     }
 
+    class Transaction {
+    public:
+        Transaction(const Transaction&) = delete;
+        Transaction& operator=(const Transaction&) = delete;
+        Transaction(Transaction&&) = default;
+        Transaction& operator=(Transaction&&) = default;
+
+        ~Transaction() { commit(); }
+
+        void commit();
+
+    private:
+        friend class RtTreeListModel<T>;
+
+        Transaction(RtTreeListModel<T>* model);
+
+        RtTreeListModel<T>* m_model;
+        guint m_old_size;
+    };
+
     RtTreeListModel(const RtTreeListModel&) = delete;
     RtTreeListModel& operator=(const RtTreeListModel&) = delete;
     RtTreeListModel(RtTreeListModel&&) = delete;
@@ -66,13 +86,15 @@ public:
 
     ~RtTreeListModel() = default;
 
+    Transaction maybe_init_transaction() { return Transaction(this); }
+
     /**
      * @param data The data contained in the new child tree node.
      * @param parent The parent tree node or nullptr for the root node.
      */
     Glib::RefPtr<Node> add_node(const Glib::RefPtr<T>& data, Node* parent);
     void remove_node(const Glib::RefPtr<Node>& node);
-    bool owns_node(const Glib::RefPtr<Node>& node) const;
+    bool owns_node(const Node* node) const;
 
     Node* find_node(guint position) const;
     std::optional<guint> find_pos(const Node* node) const;
@@ -112,6 +134,7 @@ private:
     Glib::RefPtr<Node> m_root;
     size_t m_tree_size;
     guint m_list_size;
+    bool m_inside_transaction;
 
     // Cached data that may be modified internally
     mutable std::vector<Node*> m_list_cache;
@@ -210,7 +233,8 @@ RtTreeListModel<T>::RtTreeListModel()
       Gio::ListModel(),
       m_root(Node::create(nullptr, nullptr, 0)),
       m_tree_size(0),
-      m_list_size(0)
+      m_list_size(0),
+      m_inside_transaction(false)
 {
     m_root->m_is_visible = true;
     m_root->m_prop_expanded.set_value(true);
@@ -258,9 +282,9 @@ void RtTreeListModel<T>::add_child_for_parent(Node* parent, const Glib::RefPtr<N
     size_t num_added = child->m_num_visible_descendants + 1;
     update_parent_visibility<true>(child.get(), num_added);
 
-    m_list_size = m_root->m_num_visible_descendants;
-    guint new_size = get_n_items();
-    notify_items_changed(0, old_size, new_size);
+    if (!m_inside_transaction) {
+        notify_items_changed(0, old_size, m_root->m_num_visible_descendants);
+    }
 }
 
 template <class T>
@@ -268,7 +292,7 @@ void RtTreeListModel<T>::remove_node(const Glib::RefPtr<Node>& node)
 {
     if (!node) return;
 
-    if (!owns_node(node)) {
+    if (!owns_node(node.get())) {
         throw std::invalid_argument("Attempting to remove node not owned by model");
     }
 
@@ -332,9 +356,9 @@ auto RtTreeListModel<T>::find_if(const Node* parent, Pred pred) const -> Glib::R
 }
 
 template <class T>
-bool RtTreeListModel<T>::owns_node(const Glib::RefPtr<Node>& node) const
+bool RtTreeListModel<T>::owns_node(const Node* node) const
 {
-    Node* curr = node.get();
+    const Node* curr = node;
     while (curr->m_parent) {
         curr = curr->m_parent;
     }
@@ -344,12 +368,13 @@ bool RtTreeListModel<T>::owns_node(const Glib::RefPtr<Node>& node) const
 template <class T>
 void RtTreeListModel<T>::on_expand(Node* node) {
     if (!node->m_parent || !node->m_is_visible) return;
+    if (!owns_node(node)) return;
 
     std::optional<guint> found = find_pos(node);
-    if (!found) return;
+    if (!m_inside_transaction && !found) return;
 
     // Updating list membership of children and not the current node
-    guint pos = *found + 1;
+    guint pos = m_inside_transaction ? 0 : *found + 1;
 
     if (node->is_expanded()) {
         guint before = node->m_num_visible_descendants;
@@ -361,7 +386,9 @@ void RtTreeListModel<T>::on_expand(Node* node) {
         }
         guint diff = node->m_num_visible_descendants - before;
         update_parent_visibility<true>(node, diff);
-        notify_items_changed(pos, 0, diff);
+        if (!m_inside_transaction) {
+            notify_items_changed(pos, 0, diff);
+        }
     } else {
         guint before = node->m_num_visible_descendants;
         for (auto& child : node->m_children) {
@@ -372,7 +399,9 @@ void RtTreeListModel<T>::on_expand(Node* node) {
         }
         guint diff = before - node->m_num_visible_descendants;
         update_parent_visibility<false>(node, diff);
-        notify_items_changed(pos, diff, 0);
+        if (!m_inside_transaction) {
+            notify_items_changed(pos, diff, 0);
+        }
     }
 }
 
@@ -437,6 +466,8 @@ auto RtTreeListModel<T>::find_node(guint position) const -> Node*
 template <class T>
 std::optional<guint> RtTreeListModel<T>::find_pos(const Node* node) const
 {
+    if (m_inside_transaction) return std::nullopt;
+
     if (m_list_cache.empty()) {
         rebuild_cache();
     }
@@ -451,7 +482,6 @@ std::optional<guint> RtTreeListModel<T>::find_pos(const Node* node) const
 template <class T>
 void RtTreeListModel<T>::rebuild_cache() const
 {
-    printf("rebuild cache\n");
     m_list_cache.reserve(m_tree_size);
 
     auto dfs = [&]() {
@@ -490,8 +520,10 @@ void RtTreeListModel<T>::set_sorter(const CompareFunc& compare)
 
     dfs();
 
-    guint size = get_n_items();
-    notify_items_changed(0, size, size);
+    if (!m_inside_transaction) {
+        guint size = get_n_items();
+        notify_items_changed(0, size, size);
+    }
 }
 
 template <class T>
@@ -499,8 +531,30 @@ void RtTreeListModel<T>::notify_items_changed(guint pos, guint removed, guint ad
 {
     m_list_cache.clear();
     m_list_size = m_root->m_num_visible_descendants;
-    printf("items changed %d -%d +%d\n", pos, removed, added);
+    // printf("items changed %d -%d +%d\n", pos, removed, added);
     items_changed(pos, removed, added);
+}
+
+template <class T>
+RtTreeListModel<T>::Transaction::Transaction(RtTreeListModel<T>* model)
+    : m_old_size(model->get_n_items())
+{
+    if (!model->m_inside_transaction) {
+        m_model = model;
+        m_model->m_inside_transaction = true;
+    } else {
+        m_model = nullptr;
+    }
+}
+
+template <class T>
+void RtTreeListModel<T>::Transaction::commit()
+{
+    if (m_model) {
+        m_model->m_inside_transaction = false;
+        m_model->notify_items_changed(0, m_old_size, m_model->m_root->m_num_visible_descendants);
+        m_model = nullptr;
+    }
 }
 
 template <class T>
