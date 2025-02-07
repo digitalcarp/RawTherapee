@@ -18,9 +18,8 @@
  */
 #pragma once
 
-#include <list>
 #include <functional>
-#include <map>
+#include <unordered_map>
 #include <type_traits>
 
 #include <gtkmm.h>
@@ -95,15 +94,23 @@ void assertInGuiThread();
 class IdleRegister final : public rtengine::NonCopyable
 {
 public:
-    IdleRegister();
+    static constexpr bool REMOVE = false;
+    static constexpr bool REPEAT = true;
 
-    void add(std::function<void()>&& function);
+    ~IdleRegister() { clear(); }
+
+    // Function should return false (i.e. G_SOURCE_REMOVE) to be automatically
+    // removed from the list of event sources.
+    void add(std::function<bool()> function, gint priority = G_PRIORITY_DEFAULT_IDLE);
+    void clear();
 
 private:
-    void runPendingTasks();
+    struct DataWrapper {
+        IdleRegister* const self;
+        std::function<bool()> function;
+    };
 
-    Glib::Dispatcher m_dispatcher;
-    std::list<std::function<void()>> m_pending_tasks;
+    std::unordered_map<const DataWrapper*, guint> m_data_to_source_id;
     std::mutex m_mutex;
 };
 

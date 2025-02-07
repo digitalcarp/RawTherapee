@@ -319,33 +319,39 @@ void assertInGuiThread() {
 
 }  // namespace GuiThreadSafety
 
-IdleRegister::IdleRegister()
+void IdleRegister::add(std::function<bool ()> function, gint priority)
 {
-    m_dispatcher.connect(sigc::mem_fun(*this, &IdleRegister::runPendingTasks));
+    const auto dispatch = [](gpointer data) -> gboolean {
+        DataWrapper* const data_wrapper = static_cast<DataWrapper*>(data);
+
+        if (!data_wrapper->function()) {
+            data_wrapper->self->m_mutex.lock();
+            data_wrapper->self->m_data_to_source_id.erase(data_wrapper);
+            data_wrapper->self->m_mutex.unlock();
+
+            delete data_wrapper;
+            return false;
+        }
+
+        return true;
+    };
+
+    DataWrapper* const data_wrapper = new DataWrapper { this, std::move(function) };
+
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_data_to_source_id[data_wrapper] = g_idle_add_full(priority, dispatch, data_wrapper, nullptr);
 }
 
-void IdleRegister::add(std::function<void()>&& function)
+void IdleRegister::clear()
 {
-    const std::lock_guard<std::mutex> guard(m_mutex);
-    bool shouldEmit = m_pending_tasks.empty();
-    m_pending_tasks.push_back(std::move(function));
-    if (shouldEmit) {
-        m_dispatcher.emit();
-    }
-}
+    std::lock_guard<std::mutex> lock(m_mutex);
 
-void IdleRegister::runPendingTasks()
-{
-    std::list<std::function<void()>> tasks;
-    {
-        const std::lock_guard<std::mutex> guard(m_mutex);
-        std::swap(m_pending_tasks, tasks);
+    for (const auto& [data, source_id] : m_data_to_source_id) {
+        g_source_remove(source_id);
+        delete data;
     }
 
-    while (!tasks.empty()) {
-        tasks.front()();
-        tasks.pop_front();
-    }
+    m_data_to_source_id.clear();
 }
 
 BlockAdjusterEvents::BlockAdjusterEvents(Adjuster* adjuster) : adj(adjuster)

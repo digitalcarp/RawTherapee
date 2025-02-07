@@ -750,7 +750,7 @@ void FileCatalog::_refreshProgressBar ()
         return;
     }
 
-    idle_register.add([this]() {
+    idle_register.add([this]() -> bool {
         if (!progressImage || !progressLabel) {
             // create tab label once
             Gtk::Grid* grid = Gtk::manage(new Gtk::Grid());
@@ -779,6 +779,8 @@ void FileCatalog::_refreshProgressBar ()
                                     + Glib::ustring::format(previewsToLoad) + "]" );
             filepanel->loadingThumbs("", (double)previewsLoaded / previewsToLoad);
         }
+
+        return IdleRegister::REMOVE;
     });
 }
 
@@ -906,12 +908,7 @@ void FileCatalog::previewsFinished (int dir_id)
         currentEFS = dirEFS;
     }
 
-    idle_register.add(
-        [this]()
-        {
-            previewsFinishedUI();
-        }
-    );
+    idle_register.add([this]() { previewsFinishedUI(); return IdleRegister::REMOVE; });
 }
 
 void FileCatalog::setEnabled (bool e)
@@ -983,7 +980,7 @@ void FileCatalog::openRequested(const std::vector<Thumbnail*>& tmb)
         {
             static_assert(!std::is_reference_v<decltype(sel)>);
             _openImage(sel);
-            return false;
+            return IdleRegister::REMOVE;
         }
     );
 }
@@ -1846,7 +1843,7 @@ void FileCatalog::on_dir_changed (const Glib::RefPtr<Gio::File>& file, const Gli
              || (event_type == Gio::FileMonitor::Event::CREATED && Glib::file_test(file->get_path(), Glib::FileTest::IS_DIR))
              || (event_type == Gio::FileMonitor::Event::DELETED && std::find_if(dirMonitors.cbegin(), dirMonitors.cend(), [&file](const FileMonitorInfo &monitor) { return monitor.filePath == file->get_path().c_str(); }) != dirMonitors.cend())) {
         if (!internal) {
-            idle_register.add([this]() { reparseDirectory(); });
+            idle_register.add([this]() { reparseDirectory(); return IdleRegister::REMOVE; });
         } else {
             reparseDirectory ();
         }
@@ -1906,7 +1903,7 @@ void FileCatalog::addAndOpenFile (const Glib::ustring& fname)
             [this, tmb]() -> bool
             {
                 _openImage({tmb});
-                return false;
+                return IdleRegister::REMOVE;
             }
         );
 

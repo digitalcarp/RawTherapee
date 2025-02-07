@@ -231,7 +231,7 @@ void FileBrowserEntry::updateImage(ThumbImageUpdateListener::ImageUpdate&& updat
     redrawRequests++;
     feih->pending++;
 
-    idle_register.add([&, up=std::move(update)]() mutable {
+    idle_register.add([&, up=std::move(update)]() mutable -> bool {
         if (feih->destroyed) {
             if (feih->pending == 1) {
                 delete feih;
@@ -240,11 +240,12 @@ void FileBrowserEntry::updateImage(ThumbImageUpdateListener::ImageUpdate&& updat
             }
 
             delete up.img;
-            return;
+            return IdleRegister::REMOVE;
         }
 
         feih->fbentry->_updateImage(std::move(up));
         --feih->pending;
+        return IdleRegister::REMOVE;
     });
 }
 

@@ -154,7 +154,7 @@ FilePanel::FilePanel ()
 
     fileCatalog->setFileSelectionListener (this);
 
-    idle_register.add([this]() { init(); });
+    idle_register.add([this]() { init(); return IdleRegister::REMOVE; });
 }
 
 FilePanel::~FilePanel ()
@@ -415,6 +415,7 @@ bool FilePanel::handleShortcutKeyRelease(guint keyval, guint keycode, Gdk::Modif
 
 void FilePanel::loadingThumbs(const Glib::ustring& str, double rate)
 {
+// TODO(gtk4)
 //     GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
 //
 //     if( !str.empty()) {
