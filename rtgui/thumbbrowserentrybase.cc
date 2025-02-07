@@ -18,6 +18,7 @@
  */
 #include "thumbbrowserentrybase.h"
 
+#include "lwbutton.h"
 #include "options.h"
 #include "thumbbrowserbase.h"
 #include "rtengine/rt_math.h"
@@ -169,15 +170,10 @@ ThumbBrowserEntryBase::ThumbBrowserEntryBase (const Glib::ustring& fname, Thumbn
 {
 }
 
-ThumbBrowserEntryBase::~ThumbBrowserEntryBase ()
+void ThumbBrowserEntryBase::addButtonSet (std::unique_ptr<LWButtonSet>&& bs)
 {
-//     delete buttonSet;
+    buttonSet = std::move(bs);
 }
-
-// void ThumbBrowserEntryBase::addButtonSet (LWButtonSet* bs)
-// {
-//     buttonSet = bs;
-// }
 
 void ThumbBrowserEntryBase::updateBackBuffer ()
 {
@@ -227,10 +223,10 @@ void ThumbBrowserEntryBase::updateBackBuffer ()
     // calculate height of button set
     int bsHeight = 0;
 
-//     if (buttonSet) {
-//         int tmp;
-//         buttonSet->getAllocatedDimensions(tmp, bsHeight);
-//     }
+    if (buttonSet) {
+        hidpi::LogicalSize size = buttonSet->getAllocatedDimensions();
+        bsHeight = size.height;
+    }
 
     int infow, infoh;
     getTextSizes(infow, infoh);
@@ -255,9 +251,9 @@ void ThumbBrowserEntryBase::updateBackBuffer ()
 
     customBackBufferUpdate (cc);
 
-//     // draw icons onto the thumbnail area
-//     bbIcons = getIconsOnImageArea ();
-//     bbSpecificityIcons = getSpecificityIconsOnImageArea ();
+    // draw icons onto the thumbnail area
+    bbIcons = getIconsOnImageArea ();
+    bbSpecificityIcons = getSpecificityIconsOnImageArea ();
 
     int iofs_x = 4, iofs_y = 4;
     int istartx = prex;
@@ -280,57 +276,58 @@ void ThumbBrowserEntryBase::updateBackBuffer ()
     istartx += iofs_x;
     istarty += iofs_y;
 
-//     if (!bbIcons.empty()) {
-//         int igap = 2;
-//         int iwidth = 0;
-//         int iheight = 0;
-//
-//         for (size_t i = 0; i < bbIcons.size(); i++) {
-//             iwidth += bbIcons[i]->getWidth() + (i > 0 ? igap : 0);
-//
-//             if (bbIcons[i]->getHeight() > iheight) {
-//                 iheight = bbIcons[i]->getHeight();
-//             }
-//         }
-//
-//         if ((parent->getLocation() != ThumbBrowserBase::THLOC_EDITOR && (!options.showFileNames || !options.overlayedFileNames))
-//                 || (parent->getLocation() == ThumbBrowserBase::THLOC_EDITOR && (!options.filmStripShowFileNames || !options.filmStripOverlayedFileNames))) {
-//             // Draw the transparent black background around icons
-//             cc->begin_new_path ();
-//             cc->move_to(istartx - igap, istarty);
-//             cc->rel_line_to(igap, -igap);
-//             cc->rel_line_to(iwidth, 0);
-//             cc->rel_line_to(igap, igap);
-//             cc->rel_line_to(0, iheight);
-//             cc->rel_line_to(-igap, igap);
-//             cc->rel_line_to(-iwidth, 0);
-//             cc->rel_line_to(-igap, -igap);
-//             cc->rel_line_to(0, -iheight);
-//             cc->set_source_rgba (0, 0, 0, 0.6);
-//             cc->fill ();
-//         }
-//
-//         for (size_t i = 0; i < bbIcons.size(); i++) {
-//             // Draw the image at 110, 90, except for the outermost 10 pixels.
-//             cc->set_source(bbIcons[i]->get(), istartx, istarty);
-//             cc->rectangle(istartx, istarty, bbIcons[i]->getWidth(), bbIcons[i]->getHeight());
-//             cc->fill();
-//             istartx += bbIcons[i]->getWidth() + igap;
-//         }
-//     }
-//
-//     if (!bbSpecificityIcons.empty()) {
-//         int igap = 2;
-//         int istartx2 = prex + previewSize.width - 1 + igap;
-//         int istarty2 = prey + previewSize.height - igap - 1;
-//
-//         for (size_t i = 0; i < bbSpecificityIcons.size(); ++i) {
-//             istartx2 -= bbSpecificityIcons[i]->getWidth() - igap;
-//             cc->set_source(bbSpecificityIcons[i]->get(), istartx2, istarty2 - bbSpecificityIcons[i]->getHeight());
-//             cc->rectangle(istartx2, istarty2 - bbSpecificityIcons[i]->getHeight(), bbSpecificityIcons[i]->getWidth(), bbSpecificityIcons[i]->getHeight());
-//             cc->fill();
-//         }
-//     }
+    if (!bbIcons.empty()) {
+        int igap = 2;
+        int iwidth = 0;
+        int iheight = 0;
+
+        for (size_t i = 0; i < bbIcons.size(); i++) {
+            hidpi::LogicalSize size = bbIcons[i].getLogicalSize();
+            iwidth += size.width + (i > 0 ? igap : 0);
+
+            if (size.height > iheight) {
+                iheight = size.height;
+            }
+        }
+
+        if ((parent->getLocation() != ThumbBrowserBase::THLOC_EDITOR && (!options.showFileNames || !options.overlayedFileNames))
+                || (parent->getLocation() == ThumbBrowserBase::THLOC_EDITOR && (!options.filmStripShowFileNames || !options.filmStripOverlayedFileNames))) {
+            // Draw the transparent black background around icons
+            cc->begin_new_path ();
+            cc->move_to(istartx - igap, istarty);
+            cc->rel_line_to(igap, -igap);
+            cc->rel_line_to(iwidth, 0);
+            cc->rel_line_to(igap, igap);
+            cc->rel_line_to(0, iheight);
+            cc->rel_line_to(-igap, igap);
+            cc->rel_line_to(-iwidth, 0);
+            cc->rel_line_to(-igap, -igap);
+            cc->rel_line_to(0, -iheight);
+            cc->set_source_rgba (0, 0, 0, 0.6);
+            cc->fill ();
+        }
+
+        for (size_t i = 0; i < bbIcons.size(); i++) {
+            // Draw the image at 110, 90, except for the outermost 10 pixels.
+            cc->set_source(bbIcons[i].getBaseSurface(), istartx, istarty);
+            cc->paint();
+            istartx += bbIcons[i].getLogicalSize().width + igap;
+        }
+    }
+
+    if (!bbSpecificityIcons.empty()) {
+        int igap = 2;
+        int istartx2 = prex + previewSize.width - 1 + igap;
+        int istarty2 = prey + previewSize.height - igap - 1;
+
+        for (size_t i = 0; i < bbSpecificityIcons.size(); ++i) {
+            hidpi::LogicalSize size = bbSpecificityIcons[i].getLogicalSize();
+            istartx2 -= size.width - igap;
+            cc->set_source(bbSpecificityIcons[i].getBaseSurface(),
+                           istartx2, istarty2 - size.height);
+            cc->paint();
+        }
+    }
 
     if ( ( (parent->getLocation() != ThumbBrowserBase::THLOC_EDITOR && options.showFileNames)
             || (parent->getLocation() == ThumbBrowserBase::THLOC_EDITOR && options.filmStripShowFileNames))
@@ -497,9 +494,11 @@ void ThumbBrowserEntryBase::resize (int h)
     // dimensions of the button set
     int bsw = 0, bsh = 0;
 
-//     if (buttonSet) {
-//         buttonSet->getMinimalDimensions (bsw, bsh);
-//     }
+    if (buttonSet) {
+        hidpi::LogicalSize size = buttonSet->getMinimalDimensions();
+        bsw = size.width;
+        bsh = size.height;
+    }
 
     if (parent->getLocation() == ThumbBrowserBase::THLOC_FILEBROWSER) {
         if (options.showFileNames) {
@@ -623,9 +622,8 @@ void ThumbBrowserEntryBase::draw (const Cairo::RefPtr<Cairo::Context>& cc)
         if (!backBuffer || backBuffer->isDirty()) return true;
 
         if (selected != bbSelected || framed != bbFramed
-//                 || getIconsOnImageArea() != bbIcons
-//                 || getSpecificityIconsOnImageArea() != bbSpecificityIcons) {
-                ) {
+                || getIconsOnImageArea() != bbIcons
+                || getSpecificityIconsOnImageArea() != bbSpecificityIcons) {
             return true;
         }
 
@@ -650,13 +648,14 @@ void ThumbBrowserEntryBase::draw (const Cairo::RefPtr<Cairo::Context>& cc)
 
     // check icon set changes!!!
 
+// TODO(gtk4)
 //    drawProgressBar (window, cc, selected ? texts : textn, selected ? bgs : bgn, ofsX+startx, expected.width, ofsY+starty + upperMargin+bsHeight+borderWidth+previewSize.height+borderWidth+textGap+tpos, fnlabh);
 
-//     // redraw button set above the thumbnail
-//     if (buttonSet) {
-//         buttonSet->setColors (selected ? parent->getSelectedBgColor() : parent->getNormalBgColor(), selected ? parent->getNormalBgColor() : parent->getSelectedBgColor());
-//         buttonSet->redraw (cc);
-//     }
+    // redraw button set above the thumbnail
+    if (buttonSet) {
+        buttonSet->setColors (selected ? parent->getSelectedBgColor() : parent->getNormalBgColor(), selected ? parent->getNormalBgColor() : parent->getSelectedBgColor());
+        buttonSet->redraw (cc);
+    }
 }
 
 void ThumbBrowserEntryBase::setPosition (int x, int y, int w, int h)
@@ -668,9 +667,9 @@ void ThumbBrowserEntryBase::setPosition (int x, int y, int w, int h)
     startx = x;
     starty = y;
 
-//     if (buttonSet) {
-//         buttonSet->arrangeButtons (ofsX + x + sideMargin, ofsY + y + upperMargin, w - 2 * sideMargin, -1);
-//     }
+    if (buttonSet) {
+        buttonSet->arrangeButtons (ofsX + x + sideMargin, ofsY + y + upperMargin, w - 2 * sideMargin, -1);
+    }
 }
 
 void ThumbBrowserEntryBase::setOffset (int x, int y)
@@ -680,9 +679,9 @@ void ThumbBrowserEntryBase::setOffset (int x, int y)
     ofsX = -x;
     ofsY = -y;
 
-//     if (buttonSet) {
-//         buttonSet->move (ofsX + startx + sideMargin, ofsY + starty + upperMargin);
-//     }
+    if (buttonSet) {
+        buttonSet->move (ofsX + startx + sideMargin, ofsY + starty + upperMargin);
+    }
 }
 
 bool ThumbBrowserEntryBase::inside (int x, int y) const
@@ -713,41 +712,38 @@ bool ThumbBrowserEntryBase::insideWindow (int x, int y, int w, int h) const
     return !(ofsX + startx > x + w || ofsX + startx + expected.width < x || ofsY + starty > y + h || ofsY + starty + expected.height < y);
 }
 
-// std::vector<std::shared_ptr<RTSurface>> ThumbBrowserEntryBase::getIconsOnImageArea()
-// {
-//     return std::vector<std::shared_ptr<RTSurface>>();
-// }
-//
-// std::vector<std::shared_ptr<RTSurface>> ThumbBrowserEntryBase::getSpecificityIconsOnImageArea()
-// {
-//     return std::vector<std::shared_ptr<RTSurface>>();
-// }
+auto ThumbBrowserEntryBase::getIconsOnImageArea() -> std::vector<Icon>
+{
+    return std::vector<Icon>();
+}
+
+auto ThumbBrowserEntryBase::getSpecificityIconsOnImageArea() -> std::vector<Icon>
+{
+    return std::vector<Icon>();
+}
 
 bool ThumbBrowserEntryBase::motionNotify  (int x, int y)
 {
-    return false;
-//     return buttonSet ? buttonSet->motionNotify (x, y) : false;
+    return buttonSet ? buttonSet->motionNotify (x, y) : false;
 }
 
 bool ThumbBrowserEntryBase::pressNotify   (int button, int type, int bstate, int x, int y)
 {
-    return false;
-//     return buttonSet ? buttonSet->pressNotify (x, y) : false;
+    return buttonSet ? buttonSet->pressNotify (x, y) : false;
 }
 
 bool ThumbBrowserEntryBase::releaseNotify (int button, int type, int bstate, int x, int y)
 {
-    return false;
-//     return buttonSet ? buttonSet->releaseNotify (x, y) : false;
+    return buttonSet ? buttonSet->releaseNotify (x, y) : false;
 }
 
 std::tuple<Glib::ustring, bool> ThumbBrowserEntryBase::getToolTip (int x, int y) const
 {
     Glib::ustring tooltip;
 
-//     if (buttonSet) {
-//         tooltip = buttonSet->getToolTip(x, y);
-//     }
+    if (buttonSet) {
+        tooltip = buttonSet->getToolTip(x, y);
+    }
 
     // Always show the filename in the tooltip since the filename in the thumbnail could be truncated.
     // If "Show Exif info" is disabled, also show Exif info in the tooltip.
@@ -768,5 +764,3 @@ std::tuple<Glib::ustring, bool> ThumbBrowserEntryBase::getToolTip (int x, int y)
 
     return std::make_tuple(std::move(tooltip), useMarkup);
 }
-
-

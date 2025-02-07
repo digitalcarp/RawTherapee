@@ -20,12 +20,14 @@
 
 #include <atomic>
 #include <tuple>
+#include <cairomm/refptr.h>
+#include <cairomm/surface.h>
 #include <gtkmm.h>
 
 #include "cursormanager.h"
 #include "guiutils.h"
 #include "hidpi.h"
-// #include "lwbuttonset.h"
+#include "lwbuttonset.h"
 #include "threadutils.h"
 #include "options.h"
 #include "thumbnail.h"
@@ -45,7 +47,10 @@ public:
         WFNAME_FULL
     };
 
+    using Icon = hidpi::ScaledImageSurface;
+
 protected:
+
     int fnlabw, fnlabh; // dimensions of the filename label
     int dtlabw, dtlabh; // dimensions of the date/time label
     int exlabw, exlabh; // dimensions of the exif label
@@ -74,7 +79,7 @@ protected:
 
     Glib::ustring dispname;
 
-//     LWButtonSet* buttonSet;
+    std::unique_ptr<LWButtonSet> buttonSet;
 
     int width;      // minimal width
     int height;     // minimal height
@@ -94,8 +99,8 @@ protected:
     Glib::RefPtr<BackBuffer> backBuffer;
     bool bbSelected, bbFramed;
     guint8* bbPreview;
-//     std::vector<std::shared_ptr<RTSurface>> bbIcons;
-//     std::vector<std::shared_ptr<RTSurface>> bbSpecificityIcons;
+    std::vector<Icon> bbIcons;
+    std::vector<Icon> bbSpecificityIcons;
     CursorShape cursor_type;
 
     void drawFrame (const Cairo::RefPtr<Cairo::Context>& cr, const Gdk::RGBA& bg, const Gdk::RGBA& fg);
@@ -112,12 +117,12 @@ public:
 
     Thumbnail* thumbnail;
 
-// thumbnail preview properties:
+    // thumbnail preview properties:
     Glib::ustring filename;
     Glib::ustring exifline;
     Glib::ustring datetimeline;
 
-// misc attributes
+    // misc attributes
     bool selected;
     bool drawable;
     bool filtered;
@@ -130,7 +135,7 @@ public:
     eWithFilename withFilename;
 
     explicit ThumbBrowserEntryBase (const Glib::ustring& fname, Thumbnail *thm);
-    virtual ~ThumbBrowserEntryBase ();
+    virtual ~ThumbBrowserEntryBase () = default;
 
     void setParent (ThumbBrowserBase* l)
     {
@@ -141,7 +146,7 @@ public:
     void resize (int h);
     virtual void draw (const Cairo::RefPtr<Cairo::Context>& cc);
 
-//     void addButtonSet (LWButtonSet* bs);
+    void addButtonSet (std::unique_ptr<LWButtonSet>&& bs);
     int getMinimalHeight () const
     {
         return height;
@@ -223,8 +228,8 @@ public:
 
     virtual void drawProgressBar (Glib::RefPtr<Gtk::Window> win, const Gdk::RGBA& foregr, const Gdk::RGBA& backgr, int x, int w, int y, int h) {}
 
-//     virtual std::vector<std::shared_ptr<RTSurface>> getIconsOnImageArea ();
-//     virtual std::vector<std::shared_ptr<RTSurface>> getSpecificityIconsOnImageArea ();
+    virtual std::vector<Icon> getIconsOnImageArea ();
+    virtual std::vector<Icon> getSpecificityIconsOnImageArea ();
     virtual void getIconSize (int& w, int& h) const = 0;
 
     virtual bool motionNotify (int x, int y);

@@ -25,6 +25,8 @@
 #include "cursormanager.h"
 #include "guiutils.h"
 #include "inspector.h"
+#include "lwbutton.h"
+#include "svgpaintable.h"
 #include "threadutils.h"
 #include "thumbbrowserbase.h"
 #include "thumbnail.h"
@@ -34,11 +36,13 @@
 
 #define CROPRESIZEBORDER 4
 
-// std::shared_ptr<RTSurface> FileBrowserEntry::editedIcon(std::shared_ptr<RTSurface>(nullptr));
-// std::shared_ptr<RTSurface> FileBrowserEntry::recentlySavedIcon(std::shared_ptr<RTSurface>(nullptr));
-// std::shared_ptr<RTSurface> FileBrowserEntry::enqueuedIcon(std::shared_ptr<RTSurface>(nullptr));
-// std::shared_ptr<RTSurface> FileBrowserEntry::hdr(std::shared_ptr<RTSurface>(nullptr));
-// std::shared_ptr<RTSurface> FileBrowserEntry::ps(std::shared_ptr<RTSurface>(nullptr));
+using Icon = ThumbBrowserEntryBase::Icon;
+
+Icon FileBrowserEntry::editedIcon = nullptr;
+Icon FileBrowserEntry::recentlySavedIcon = nullptr;
+Icon FileBrowserEntry::enqueuedIcon = nullptr;
+Icon FileBrowserEntry::hdr = nullptr;
+Icon FileBrowserEntry::ps = nullptr;
 
 FileBrowserEntry::FileBrowserEntry (Thumbnail* thm, const Glib::ustring& fname)
     : ThumbBrowserEntryBase (fname, thm), wasInside(false), iatlistener(nullptr), press_x(0), press_y(0), action_x(0), action_y(0), rot_deg(0.0), landscape(true), cropParams(new rtengine::procparams::CropParams), cropgl(nullptr), state(SNormal), crop_custom_ratio(0.f)
@@ -75,13 +79,31 @@ FileBrowserEntry::~FileBrowserEntry ()
     }
 }
 
-void FileBrowserEntry::init ()
+void FileBrowserEntry::refreshIcons ()
 {
-//     editedIcon = std::shared_ptr<RTSurface>(new RTSurface("tick-small", Gtk::ICON_SIZE_SMALL_TOOLBAR));
-//     recentlySavedIcon = std::shared_ptr<RTSurface>(new RTSurface("save-small", Gtk::ICON_SIZE_SMALL_TOOLBAR));
-//     enqueuedIcon = std::shared_ptr<RTSurface>(new RTSurface("gears-small", Gtk::ICON_SIZE_SMALL_TOOLBAR));
-//     hdr = std::shared_ptr<RTSurface>(new RTSurface("filetype-hdr", Gtk::ICON_SIZE_SMALL_TOOLBAR));
-//     ps = std::shared_ptr<RTSurface>(new RTSurface("filetype-ps", Gtk::ICON_SIZE_SMALL_TOOLBAR));
+    if (!parent) return;
+
+    // See if we can skip refresh
+    int device_scale = parent->get_scale_factor();
+    if (editedIcon) {
+        int scale =  editedIcon.getDeviceScale();
+        device_scale = parent->get_scale_factor();
+
+        if (scale == device_scale) {
+            return;
+        }
+    }
+
+    auto loadIcon = [&](const char* name) {
+        return SvgPaintableWrapper::createFromIcon(name)->createSurface(
+            SvgPaintableWrapper::IconSize::SMALL, device_scale);
+    };
+
+    editedIcon = loadIcon("tick-small");
+    recentlySavedIcon = loadIcon("save-small");
+    enqueuedIcon = loadIcon("gears-small");
+    hdr = loadIcon("filetype-hdr");
+    ps = loadIcon("filetype-ps");
 }
 
 void FileBrowserEntry::refreshThumbnailImage(bool upgradeHint)
@@ -127,47 +149,51 @@ void FileBrowserEntry::calcThumbnailSize ()
     }
 }
 
-// std::vector<std::shared_ptr<RTSurface>> FileBrowserEntry::getIconsOnImageArea ()
-// {
-//     if (!thumbnail) {
-//         return {};
-//     }
-//
-//     std::vector<std::shared_ptr<RTSurface>> ret;
-//
-//     if (thumbnail->hasProcParams() && editedIcon) {
-//         ret.push_back(editedIcon);
-//     }
-//
-//     if (thumbnail->isRecentlySaved() && recentlySavedIcon) {
-//         ret.push_back(recentlySavedIcon);
-//     }
-//
-//     if (thumbnail->isEnqueued () && enqueuedIcon) {
-//         ret.push_back(enqueuedIcon);
-//     }
-//
-//     return ret;
-// }
-//
-// std::vector<std::shared_ptr<RTSurface>> FileBrowserEntry::getSpecificityIconsOnImageArea ()
-// {
-//     if (!thumbnail) {
-//         return {};
-//     }
-//
-//     std::vector<std::shared_ptr<RTSurface>> ret;
-//
-//     if (thumbnail->isHDR() && hdr) {
-//         ret.push_back (hdr);
-//     }
-//
-//     if (thumbnail->isPixelShift() && ps) {
-//         ret.push_back (ps);
-//     }
-//
-//     return ret;
-// }
+std::vector<Icon> FileBrowserEntry::getIconsOnImageArea ()
+{
+    if (!thumbnail) {
+        return {};
+    }
+
+    refreshIcons();
+
+    std::vector<Icon> ret;
+
+    if (thumbnail->hasProcParams() && editedIcon) {
+        ret.push_back(editedIcon);
+    }
+
+    if (thumbnail->isRecentlySaved() && recentlySavedIcon) {
+        ret.push_back(recentlySavedIcon);
+    }
+
+    if (thumbnail->isEnqueued () && enqueuedIcon) {
+        ret.push_back(enqueuedIcon);
+    }
+
+    return ret;
+}
+
+std::vector<Icon> FileBrowserEntry::getSpecificityIconsOnImageArea ()
+{
+    if (!thumbnail) {
+        return {};
+    }
+
+    std::vector<Icon> ret;
+
+    refreshIcons();
+
+    if (thumbnail->isHDR() && hdr) {
+        ret.push_back (hdr);
+    }
+
+    if (thumbnail->isPixelShift() && ps) {
+        ret.push_back (ps);
+    }
+
+    return ret;
+}
 
 void FileBrowserEntry::customBackBufferUpdate (const Cairo::RefPtr<Cairo::Context>& c)
 {
@@ -204,14 +230,15 @@ void FileBrowserEntry::customBackBufferUpdate (const Cairo::RefPtr<Cairo::Contex
 
 void FileBrowserEntry::getIconSize (int& w, int& h) const
 {
-//     w = editedIcon->getWidth ();
-//     h = editedIcon->getHeight ();
+    int size = SvgPaintableWrapper::mapIconSize(SvgPaintableWrapper::IconSize::SMALL);
+    w = size;
+    h = size;
 }
 
-// FileThumbnailButtonSet* FileBrowserEntry::getThumbButtonSet ()
-// {
-//     return (static_cast<FileThumbnailButtonSet*>(buttonSet));
-// }
+FileThumbnailButtonSet* FileBrowserEntry::getThumbButtonSet ()
+{
+    return (static_cast<FileThumbnailButtonSet*>(buttonSet.get()));
+}
 
 void FileBrowserEntry::procParamsChanged (Thumbnail* thm, int whoChangedIt, bool upgradeHint)
 {

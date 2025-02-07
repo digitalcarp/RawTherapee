@@ -698,12 +698,13 @@ void FileBrowser::addEntry_ (FileBrowserEntry* entry)
     entry->drawable = false;
     entry->framed = editedFiles.find(entry->filename) != editedFiles.end();
 
-//     // add button set to the thumbbrowserentry
-//     entry->addButtonSet(new FileThumbnailButtonSet(entry));
-//     entry->getThumbButtonSet()->setRank(entry->thumbnail->getRank());
-//     entry->getThumbButtonSet()->setColorLabel(entry->thumbnail->getColorLabel());
-//     entry->getThumbButtonSet()->setInTrash(entry->thumbnail->getTrashed());
-//     entry->getThumbButtonSet()->setButtonListener(this);
+    // add button set to the thumbbrowserentry
+    entry->addButtonSet(
+        std::make_unique<FileThumbnailButtonSet>(entry, get_scale_factor()));
+    entry->getThumbButtonSet()->setRank(entry->thumbnail->getRank());
+    entry->getThumbButtonSet()->setColorLabel(entry->thumbnail->getColorLabel());
+    entry->getThumbButtonSet()->setInTrash(entry->thumbnail->getTrashed());
+    entry->getThumbButtonSet()->setButtonListener(this);
     entry->resize(getThumbnailHeight());
     entry->filtered = !checkFilter(entry);
     insertEntry(entry);
@@ -1717,12 +1718,12 @@ void FileBrowser::toTrashRequested (std::vector<FileBrowserEntry*> tbe)
 
         tbe[i]->thumbnail->setTrashed (true);
 
-//         if (tbe[i]->getThumbButtonSet()) {
-//             tbe[i]->getThumbButtonSet()->setRank (tbe[i]->thumbnail->getRank());
-//             tbe[i]->getThumbButtonSet()->setColorLabel (tbe[i]->thumbnail->getColorLabel());
-//             tbe[i]->getThumbButtonSet()->setInTrash (true);
-//             tbe[i]->thumbnail->updateCache (); // needed to save the colorlabel to disk in the procparam file(s) and the cache image data file
-//         }
+        if (tbe[i]->getThumbButtonSet()) {
+            tbe[i]->getThumbButtonSet()->setRank (tbe[i]->thumbnail->getRank());
+            tbe[i]->getThumbButtonSet()->setColorLabel (tbe[i]->thumbnail->getColorLabel());
+            tbe[i]->getThumbButtonSet()->setInTrash (true);
+            tbe[i]->thumbnail->updateCache (); // needed to save the colorlabel to disk in the procparam file(s) and the cache image data file
+        }
     }
 
     trash_changed().emit();
@@ -1741,12 +1742,12 @@ void FileBrowser::fromTrashRequested (std::vector<FileBrowserEntry*> tbe)
 
         tbe[i]->thumbnail->setTrashed (false);
 
-//         if (tbe[i]->getThumbButtonSet()) {
-//             tbe[i]->getThumbButtonSet()->setRank (tbe[i]->thumbnail->getRank());
-//             tbe[i]->getThumbButtonSet()->setColorLabel (tbe[i]->thumbnail->getColorLabel());
-//             tbe[i]->getThumbButtonSet()->setInTrash (false);
-//             tbe[i]->thumbnail->updateCache (); // needed to save the colorlabel to disk in the procparam file(s) and the cache image data file
-//         }
+        if (tbe[i]->getThumbButtonSet()) {
+            tbe[i]->getThumbButtonSet()->setRank (tbe[i]->thumbnail->getRank());
+            tbe[i]->getThumbButtonSet()->setColorLabel (tbe[i]->thumbnail->getColorLabel());
+            tbe[i]->getThumbButtonSet()->setInTrash (false);
+            tbe[i]->thumbnail->updateCache (); // needed to save the colorlabel to disk in the procparam file(s) and the cache image data file
+        }
     }
 
     trash_changed().emit();
@@ -1784,9 +1785,9 @@ void FileBrowser::rankingRequested (std::vector<FileBrowserEntry*> tbe, int rank
         tbe[i]->thumbnail->updateCache (); // needed to save the colorlabel to disk in the procparam file(s) and the cache image data file
         //TODO? - should update pparams instead?
 
-//         if (tbe[i]->getThumbButtonSet()) {
-//             tbe[i]->getThumbButtonSet()->setRank (tbe[i]->thumbnail->getRank());
-//         }
+        if (tbe[i]->getThumbButtonSet()) {
+            tbe[i]->getThumbButtonSet()->setRank (tbe[i]->thumbnail->getRank());
+        }
     }
 
     applyFilter (filter);
@@ -1814,9 +1815,9 @@ void FileBrowser::colorlabelRequested (std::vector<FileBrowserEntry*> tbe, int c
         tbe[i]->thumbnail->updateCache(); // needed to save the colorlabel to disk in the procparam file(s) and the cache image data file
 
         //TODO? - should update pparams instead?
-//         if (tbe[i]->getThumbButtonSet()) {
-//             tbe[i]->getThumbButtonSet()->setColorLabel (tbe[i]->thumbnail->getColorLabel());
-//         }
+        if (tbe[i]->getThumbButtonSet()) {
+            tbe[i]->getThumbButtonSet()->setColorLabel (tbe[i]->thumbnail->getColorLabel());
+        }
     }
 
     applyFilter (filter);
@@ -1854,33 +1855,38 @@ void FileBrowser::requestColorLabel(int colorlabel)
     colorlabelRequested (mselected, colorlabel);
 }
 
-// void FileBrowser::buttonPressed (LWButton* button, int actionCode, void* actionData)
-// {
-//
-//     if (actionCode >= 0 && actionCode <= 5) { // rank
-//         std::vector<FileBrowserEntry*> tbe;
-//         tbe.push_back (static_cast<FileBrowserEntry*>(actionData));
-//         rankingRequested (tbe, actionCode);
-//     } else if (actionCode == 6 && tbl) { // to processing queue
-//         std::vector<FileBrowserEntry*> tbe;
-//         tbe.push_back (static_cast<FileBrowserEntry*>(actionData));
-//         tbl->developRequested (tbe, false); // not a fast, but a FULL mode
-//     } else if (actionCode == 7) { // to trash / undelete
-//         std::vector<FileBrowserEntry*> tbe;
-//         FileBrowserEntry* entry = static_cast<FileBrowserEntry*>(actionData);
-//         tbe.push_back (entry);
-//
-//         if (!entry->thumbnail->getTrashed()) {
-//             toTrashRequested (tbe);
-//         } else {
-//             fromTrashRequested (tbe);
-//         }
-//     } else if (actionCode == 8 && tbl) { // color label
-//         // show popup menu
-//         colorLabel_actionData = actionData;// this will be reused when pmenuColorLabels is clicked
-//         pmenuColorLabels->popup (3, this->eventTime);
-//     }
-// }
+void FileBrowser::buttonPressed (LWButton* button, int actionCode, void* actionData)
+{
+
+    if (actionCode >= 0 && actionCode <= 5) { // rank
+        std::vector<FileBrowserEntry*> tbe;
+        tbe.push_back (static_cast<FileBrowserEntry*>(actionData));
+        rankingRequested (tbe, actionCode);
+    } else if (actionCode == 6 && tbl) { // to processing queue
+        std::vector<FileBrowserEntry*> tbe;
+        tbe.push_back (static_cast<FileBrowserEntry*>(actionData));
+        tbl->developRequested (tbe, false); // not a fast, but a FULL mode
+    } else if (actionCode == 7) { // to trash / undelete
+        std::vector<FileBrowserEntry*> tbe;
+        FileBrowserEntry* entry = static_cast<FileBrowserEntry*>(actionData);
+        tbe.push_back (entry);
+
+        if (!entry->thumbnail->getTrashed()) {
+            toTrashRequested (tbe);
+        } else {
+            fromTrashRequested (tbe);
+        }
+    } else if (actionCode == 8 && tbl) { // color label
+        // show popup menu
+        colorLabel_actionData = actionData;// this will be reused when pmenu is clicked
+
+        hidpi::LogicalCoord pos = button->getPosition();
+        hidpi::LogicalSize size = button->getSize();
+        pmenu->set_menu_model(colorLabelMenuModel);
+        pmenu->set_pointing_to(Gdk::Rectangle(pos.x, pos.y, size.width, size.height));
+        pmenu->popup();
+    }
+}
 
 void FileBrowser::openNextImage()
 {
@@ -2102,11 +2108,11 @@ void FileBrowser::notifySelectionListener ()
     }
 }
 
-// void FileBrowser::redrawNeeded (LWButton* button)
-// {
-//     GuiThreadSafety::assertInGuiThread();
-//     redraw();
-// }
+void FileBrowser::redrawNeeded (LWButton* button)
+{
+    GuiThreadSafety::assertInGuiThread();
+    redraw();
+}
 
 FileBrowser::type_trash_changed FileBrowser::trash_changed ()
 {

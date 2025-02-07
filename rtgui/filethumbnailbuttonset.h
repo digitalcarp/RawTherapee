@@ -20,12 +20,13 @@
 
 #include <array>
 
-#include <gtkmm.h>
+#include <glibmm/ustring.h>
+
+#include "hidpi.h"
 
 #include "lwbuttonset.h"
 
 class FileBrowserEntry;
-class RTSurface;
 
 class FileThumbnailButtonSet :
     public LWButtonSet
@@ -34,14 +35,14 @@ class FileThumbnailButtonSet :
     static bool iconsLoaded;
 
 public:
-    static std::shared_ptr<RTSurface> rankIcon;
-    static std::shared_ptr<RTSurface> gRankIcon;
-    static std::shared_ptr<RTSurface> unRankIcon;
-    static std::shared_ptr<RTSurface> trashIcon;
-    static std::shared_ptr<RTSurface> unTrashIcon;
-    static std::shared_ptr<RTSurface> processIcon;
+    static hidpi::ScaledImageSurface rankIcon;
+    static hidpi::ScaledImageSurface gRankIcon;
+    static hidpi::ScaledImageSurface unRankIcon;
+    static hidpi::ScaledImageSurface trashIcon;
+    static hidpi::ScaledImageSurface unTrashIcon;
+    static hidpi::ScaledImageSurface processIcon;
 
-    static std::array<std::shared_ptr<RTSurface>, 6> colorLabelIcon;
+    static std::array<hidpi::ScaledImageSurface, 6> colorLabelIcon;
 
     static Glib::ustring processToolTip;
     static Glib::ustring unrankToolTip;
@@ -50,7 +51,7 @@ public:
     static Glib::ustring colorLabelToolTip;
     static std::array<Glib::ustring, 5> rankToolTip;
 
-    explicit FileThumbnailButtonSet (FileBrowserEntry* myEntry);
+    explicit FileThumbnailButtonSet (FileBrowserEntry* myEntry, double device_scale);
     void    setRank (int stars);
     void    setColorLabel (int colorlabel);
     void    setInTrash (bool inTrash);

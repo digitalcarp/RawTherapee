@@ -24,7 +24,8 @@
 Cairo::RefPtr<Cairo::ImageSurface>
 TextureBackBuffer::createImageSurface(hidpi::ScaledDeviceSize size)
 {
-    auto surface = createMemoryTextureImageSurface(size.width, size.height);
+    hidpi::DeviceSize dsize = {size.width, size.height};
+    auto surface = createMemoryTextureImageSurface(dsize);
     hidpi::setDeviceScale(surface, size.device_scale);
     return surface;
 }

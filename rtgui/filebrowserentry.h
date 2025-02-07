@@ -69,14 +69,15 @@ class FileBrowserEntry final : public ThumbBrowserEntryBase,
     void drawStraightenGuide (const Cairo::RefPtr<Cairo::Context>& c);
     void customBackBufferUpdate (const Cairo::RefPtr<Cairo::Context>& c) override;
     void refreshThumbnailImage(bool upgradeHint);
+    void refreshIcons();
 
 public:
 
-//     static std::shared_ptr<RTSurface> editedIcon;
-//     static std::shared_ptr<RTSurface> recentlySavedIcon;
-//     static std::shared_ptr<RTSurface> enqueuedIcon;
-//     static std::shared_ptr<RTSurface> hdr;
-//     static std::shared_ptr<RTSurface> ps;
+    static Icon editedIcon;
+    static Icon recentlySavedIcon;
+    static Icon enqueuedIcon;
+    static Icon hdr;
+    static Icon ps;
 
     FileBrowserEntry (Thumbnail* thm, const Glib::ustring& fname);
     ~FileBrowserEntry () override;
@@ -88,14 +89,14 @@ public:
         iatlistener = l;
     }
 
-//     FileThumbnailButtonSet* getThumbButtonSet ();
+    FileThumbnailButtonSet* getThumbButtonSet ();
 
     void refreshThumbnailImage () override;
     void refreshQuickThumbnailImage () override;
     void calcThumbnailSize () override;
 
-//     std::vector<std::shared_ptr<RTSurface>> getIconsOnImageArea () override;
-//     std::vector<std::shared_ptr<RTSurface>> getSpecificityIconsOnImageArea () override;
+    std::vector<Icon> getIconsOnImageArea () override;
+    std::vector<Icon> getSpecificityIconsOnImageArea () override;
     void getIconSize (int& w, int& h) const override;
 
     // thumbnaillistener interface

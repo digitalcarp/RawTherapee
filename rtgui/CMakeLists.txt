@@ -72,7 +72,7 @@ set(NONCLISOURCEFILES
     filebrowserentry.cc
     filecatalog.cc
     filepanel.cc
-    # filethumbnailbuttonset.cc
+    filethumbnailbuttonset.cc
     # filmnegative.cc
     # filmsimulation.cc
     filterpanel.cc
@@ -102,8 +102,8 @@ set(NONCLISOURCEFILES
     # locallabtools.cc
     # locallabtools2.cc
     # lockablecolorpicker.cc
-    # lwbutton.cc
-    # lwbuttonset.cc
+    lwbutton.cc
+    lwbuttonset.cc
     main.cc
     # metadatapanel.cc
     multilangmgr.cc

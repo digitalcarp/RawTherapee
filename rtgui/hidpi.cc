@@ -17,11 +17,12 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "rtscalable.h"
 #include "hidpi.h"
 
+#include "cairotexture.h"
+#include "rtscalable.h"
+
 #include <cairomm/pattern.h>
-#include <cairomm/surface.h>
 #include <gdkmm/pixbuf.h>
 
 #include <utility>
@@ -116,6 +117,20 @@ void swap(DevicePixbuf& lhs, DevicePixbuf& rhs) {
     swap(lhs.m_device_scale, rhs.m_device_scale);
 }
 
+ScaledImageSurface::ScaledImageSurface(Cairo::Surface::Format format, hidpi::LogicalSize size,
+                                       int device_scale)
+        : m_logical(size), m_device_scale(device_scale) {
+    m_surface = Cairo::ImageSurface::create(format, size.width, size.height);
+}
+
+ScaledImageSurface::ScaledImageSurface(MemoryTextureSurface /*ignore*/, hidpi::LogicalSize size,
+                                       int device_scale)
+        : m_logical(size), m_device_scale(device_scale) {
+    ScaledDeviceSize scaled = getScaledDeviceSize();
+    m_surface = createMemoryTextureImageSurface({scaled.width, scaled.height});
+    m_surface->set_device_scale(device_scale);
+}
+
 Cairo::RefPtr<Cairo::SurfacePattern>
 getSourceForSurface(const Cairo::RefPtr<Cairo::Context>& context) {
     Cairo::RefPtr<Cairo::SurfacePattern> result;
@@ -132,14 +147,12 @@ getSourceForSurface(const Cairo::RefPtr<Cairo::Context>& context) {
 
 void setDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,
                     int x_scale, int y_scale) {
-    cairo_surface_t* cobj = surface->cobj();
-    cairo_surface_set_device_scale(cobj, x_scale, y_scale);
+    surface->set_device_scale(x_scale, y_scale);
 }
 
 void setDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface,
                     int x_scale, int y_scale) {
-    cairo_surface_t* cobj = surface->cobj();
-    cairo_surface_set_device_scale(cobj, x_scale, y_scale);
+    surface->set_device_scale(x_scale, y_scale);
 }
 
 }  // namespace hidpi

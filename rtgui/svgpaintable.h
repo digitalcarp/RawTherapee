@@ -19,6 +19,9 @@
 
 #pragma once
 
+#include "hidpi.h"
+
+#include <cairomm/refptr.h>
 #include <gdk/gdk.h>
 #include <gdkmm/texture.h>
 #include <glibmm/refptr.h>
@@ -41,6 +44,10 @@ G_END_DECLS
 
 // --- END C GObject
 
+namespace Cairo {
+class ImageSurface;
+}
+
 namespace Gtk {
 class Image;
 class Picture;
@@ -48,12 +55,16 @@ class Picture;
 
 class SvgPaintableWrapper {
 public:
+    enum class IconSize { SMALL, LARGE };
+
     static Glib::RefPtr<SvgPaintableWrapper>
     createFromFilename(const Glib::ustring& filepath, bool cached = true);
     static Glib::RefPtr<SvgPaintableWrapper>
     createFromIcon(const Glib::ustring& name, bool cached = true);
     static Glib::RefPtr<SvgPaintableWrapper>
     createFromImage(const Glib::ustring& fname, bool cached = true);
+
+    static int mapIconSize(IconSize icon_size);
 
     // This takes ownership of the pointer so the caller does not need to
     // call g_object_unref().
@@ -66,9 +77,14 @@ public:
     void setOnImage(Gtk::Image* image);
     void setOnPicture(Gtk::Picture* picture);
 
+    // Renders an ImageSurface at the specified size
+    // @returns Empty surface if SVG rendering failed
+    hidpi::ScaledImageSurface createSurface(hidpi::LogicalSize size, int device_scale) const;
+    hidpi::ScaledImageSurface createSurface(IconSize icon_size, int device_scale) const;
+
     // Renders a MemoryTexture at the specified size
     // @returns nullptr if SVG rendering failed
-    Glib::RefPtr<Gdk::Texture> createTexture(int width, int height);
+    Glib::RefPtr<Gdk::Texture> createTexture(hidpi::DeviceSize size) const;
 
 private:
     SvgPaintable* m_gobj;

@@ -26,8 +26,7 @@
 #include "exportpanel.h"
 #include "extprog.h"
 #include "filebrowserentry.h"
-// TODO(gtk4)
-// #include "lwbutton.h"
+#include "lwbutton.h"
 #include "partialpastedlg.h"
 #include "pparamschangelistener.h"
 #include "rtengine/profilestore.h"
@@ -57,7 +56,7 @@ public:
  * Class handling actions common to all thumbnails of the file browser
  */
 class FileBrowser final : public ThumbBrowserBase,
-    // public LWButtonListener,
+    public LWButtonListener,
     public ExportPanelListener,
     public ProfileStoreListener,
     public rtengine::NonCopyable
@@ -170,8 +169,8 @@ public:
         return numFiltered;
     }
 
-    // void buttonPressed (LWButton* button, int actionCode, void* actionData) override;
-    // void redrawNeeded  (LWButton* button) override;
+    void buttonPressed (LWButton* button, int actionCode, void* actionData) override;
+    void redrawNeeded  (LWButton* button) override;
     bool checkFilter (ThumbBrowserEntryBase* entry) const override;
     void rightClicked (double x, double y) override;
     void doubleClicked (ThumbBrowserEntryBase* entry) override;

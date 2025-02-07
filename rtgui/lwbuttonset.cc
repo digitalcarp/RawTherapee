@@ -20,99 +20,87 @@
 #include "lwbutton.h"
 #include "rtscalable.h"
 
-LWButtonSet::LWButtonSet () : aw(0), ah(0), ax(-1), ay(-1)
+LWButtonSet::LWButtonSet() = default;
+
+void LWButtonSet::add(std::unique_ptr<LWButton>&& b)
 {
+    buttons.push_back(std::move(b));
 }
 
-LWButtonSet::~LWButtonSet ()
+hidpi::LogicalSize LWButtonSet::getMinimalDimensions () const
 {
-    for (const auto entry : buttons) {
-        delete entry;
+    hidpi::LogicalSize size(0, 0);
+
+    for (const auto& entry : buttons) {
+        hidpi::LogicalSize buttonSize = entry->getSize();
+        size.width += buttonSize.width;
+        size.height = std::max(buttonSize.height, size.height);
     }
-}
 
-void LWButtonSet::add (LWButton* b)
-{
-    buttons.push_back (b);
-}
-
-void LWButtonSet::getMinimalDimensions (int& w, int& h) const
-{
-    w = 0;
-    h = 0;
-
-    for (const auto entry : buttons) {
-        int bw, bh;
-        entry->getSize(bw, bh);
-        w += bw;
-        h = std::max(bh, h);
-    }
+    return size;
 }
 
 void LWButtonSet::arrangeButtons (int x, int y, int w, int h)
 {
-
-    if (x == ax && y == ay && w == aw && (h == -1 || h == ah )) {
+    if (x == pos.x && y == pos.y && w == allocSize.width && (h == -1 || h == allocSize.height)) {
         return;
     }
 
-    int mw, mh;
-    getMinimalDimensions (mw, mh);
-
+    hidpi::LogicalSize min = getMinimalDimensions();
     if (w < 0) {
-        w = mw;
+        w = min.width;
     }
-
     if (h < 0) {
-        h = mh;
+        h = min.height;
     }
 
     int begx = x;
     int endx = x + w - 1;
 
-    for (size_t i = 0; i < buttons.size(); i++) {
+    for (const auto& button : buttons) {
+        hidpi::LogicalCoord bPos;
+        hidpi::LogicalSize bSize = button->getSize();
+
         LWButton::Alignment halign, valign;
-        int bx = 0, by = 0, bw = 0, bh = 0;
-        buttons[i]->getSize (bw, bh);
-        buttons[i]->getAlignment (halign, valign);
+        button->getAlignment (halign, valign);
 
         if (halign == LWButton::Left) {
-            bx = begx;
-            begx += bw;
+            bPos.x = begx;
+            begx += bSize.width;
         } else if (halign == LWButton::Right) {
-            bx = endx - bw;
-            endx -= bw;
+            bPos.x = endx - bSize.width;
+            endx -= bSize.width;
         }
 
         if (valign == LWButton::Top) {
-            by = y;
+            bPos.y = y;
         } else if (valign == LWButton::Bottom) {
-            by = y + h - bh - 1;
+            bPos.y = y + h - bSize.height - 1;
         } else if (valign == LWButton::Center) {
-            by = y + (h - bh) / 2;
+            bPos.y = y + (h - bSize.height) / 2;
         }
 
-        buttons[i]->setPosition (bx, by);
+        button->setPosition(bPos);
     }
 
-    aw = w;
-    ah = h;
-    ax = x;
-    ay = y;
+    pos.x = x;
+    pos.y = y;
+    allocSize.width = w;
+    allocSize.height = h;
 }
 
 void LWButtonSet::move (int nx, int ny)
 {
-    for (const auto entry : buttons) {
-        entry->addPosition(nx - ax, ny - ay);
+    for (const auto& entry : buttons) {
+        entry->addPosition(hidpi::LogicalCoord(nx, ny) - pos);
     }
-    ax = nx;
-    ay = ny;
+    pos.x = nx;
+    pos.y = ny;
 }
 
-void LWButtonSet::redraw (Cairo::RefPtr<Cairo::Context> context)
+void LWButtonSet::redraw (const Cairo::RefPtr<Cairo::Context>& context)
 {
-    for (const auto entry : buttons) {
+    for (const auto& entry : buttons) {
         entry->redraw(context);
     }
 }
@@ -120,7 +108,7 @@ void LWButtonSet::redraw (Cairo::RefPtr<Cairo::Context> context)
 bool LWButtonSet::motionNotify (int x, int y)
 {
     bool res = false;
-    for (const auto entry : buttons) {
+    for (const auto& entry : buttons) {
         res = entry->motionNotify(x, y) || res;
     }
     return res;
@@ -129,7 +117,7 @@ bool LWButtonSet::motionNotify (int x, int y)
 bool LWButtonSet::pressNotify (int x, int y)
 {
     bool res = false;
-    for (const auto entry : buttons) {
+    for (const auto& entry : buttons) {
         res = entry->pressNotify(x, y) || res;
     }
     return res;
@@ -138,17 +126,17 @@ bool LWButtonSet::pressNotify (int x, int y)
 bool LWButtonSet::releaseNotify (int x, int y)
 {
     bool res = false;
-    for (const auto entry : buttons) {
+    for (const auto& entry : buttons) {
         res = entry->releaseNotify(x, y) || res;
     }
     return res;
 }
 
-bool LWButtonSet::inside (int x, int y) const
+bool LWButtonSet::inside (hidpi::LogicalCoord pos) const
 {
 
-    for (const auto entry : buttons) {
-        if (entry->inside(x, y)) {
+    for (const auto& entry : buttons) {
+        if (entry->inside(pos)) {
             return true;
         }
     }
@@ -157,27 +145,21 @@ bool LWButtonSet::inside (int x, int y) const
 
 void LWButtonSet::setButtonListener (LWButtonListener* bl)
 {
-    for (const auto entry : buttons) {
+    for (const auto& entry : buttons) {
         entry->setButtonListener(bl);
     }
 }
 
-void LWButtonSet::getAllocatedDimensions (int& w, int& h) const
-{
-    w = aw;
-    h = ah;
-}
-
 void LWButtonSet::setColors (const Gdk::RGBA& bg, const Gdk::RGBA& fg)
 {
-    for (const auto entry : buttons) {
+    for (const auto& entry : buttons) {
         entry->setColors(bg, fg);
     }
 }
 
 Glib::ustring LWButtonSet::getToolTip (int x, int y) const
 {
-    for (const auto entry : buttons) {
+    for (const auto& entry : buttons) {
         const auto ttip = entry->getToolTip(x, y);
 
         if (!ttip.empty()) {

@@ -18,7 +18,10 @@
  */
 #pragma once
 
+#include "hidpi.h"
+
 #include <gtkmm.h>
+#include <memory>
 #include <vector>
 
 class LWButton;
@@ -27,26 +30,27 @@ class LWButtonSet
 {
 
 protected:
-    std::vector<LWButton*> buttons;
-    int aw, ah, ax, ay;
+    std::vector<std::unique_ptr<LWButton>> buttons;
+    hidpi::LogicalCoord pos;
+    hidpi::LogicalSize allocSize;
+
 public:
     LWButtonSet ();
-    ~LWButtonSet ();
 
-    void add (LWButton* b);
+    void add (std::unique_ptr<LWButton>&& b);
 
-    void    getMinimalDimensions (int& w, int& h) const;
-    void    getAllocatedDimensions (int& w, int& h) const;
+    hidpi::LogicalSize getMinimalDimensions() const;
+    hidpi::LogicalSize getAllocatedDimensions() const { return allocSize; }
     void    arrangeButtons (int x, int y, int w, int h);
     void    setColors     (const Gdk::RGBA& bg, const Gdk::RGBA& fg);
     bool    motionNotify  (int x, int y);
     bool    pressNotify   (int x, int y);
     bool    releaseNotify (int x, int y);
     void    move          (int nx, int ny);
-    bool    inside        (int x, int y) const;
+    bool    inside        (hidpi::LogicalCoord) const;
 
     Glib::ustring getToolTip (int x, int y) const;
 
     void    setButtonListener   (LWButtonListener* bl);
-    void    redraw              (Cairo::RefPtr<Cairo::Context> context);
+    void    redraw              (const Cairo::RefPtr<Cairo::Context>& context);
 };

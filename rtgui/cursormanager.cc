@@ -37,7 +37,10 @@ CursorManager::CursorInfo::generateTexture(int cursor_size, double scale,
         return texture;
     }
 
-    texture = svg->createTexture(out_width, out_height);
+    hidpi::DeviceSize size;
+    size.width = out_width;
+    size.height = out_height;
+    texture = svg->createTexture(size);
     return texture;
 }
 

@@ -18,20 +18,19 @@
  */
 #include "filethumbnailbuttonset.h"
 
-#include "rtsurface.h"
 #include "multilangmgr.h"
 #include "lwbutton.h"
-#include "rtsurface.h"
+#include "svgpaintable.h"
 
 bool FileThumbnailButtonSet::iconsLoaded = false;
 
-std::shared_ptr<RTSurface> FileThumbnailButtonSet::rankIcon = std::shared_ptr<RTSurface>(nullptr);
-std::shared_ptr<RTSurface> FileThumbnailButtonSet::gRankIcon = std::shared_ptr<RTSurface>(nullptr);
-std::shared_ptr<RTSurface> FileThumbnailButtonSet::unRankIcon = std::shared_ptr<RTSurface>(nullptr);
-std::shared_ptr<RTSurface> FileThumbnailButtonSet::trashIcon = std::shared_ptr<RTSurface>(nullptr);
-std::shared_ptr<RTSurface> FileThumbnailButtonSet::unTrashIcon = std::shared_ptr<RTSurface>(nullptr);
-std::shared_ptr<RTSurface> FileThumbnailButtonSet::processIcon = std::shared_ptr<RTSurface>(nullptr);
-std::array<std::shared_ptr<RTSurface>, 6> FileThumbnailButtonSet::colorLabelIcon;
+hidpi::ScaledImageSurface FileThumbnailButtonSet::rankIcon = nullptr;
+hidpi::ScaledImageSurface FileThumbnailButtonSet::gRankIcon = nullptr;
+hidpi::ScaledImageSurface FileThumbnailButtonSet::unRankIcon = nullptr;
+hidpi::ScaledImageSurface FileThumbnailButtonSet::trashIcon = nullptr;
+hidpi::ScaledImageSurface FileThumbnailButtonSet::unTrashIcon = nullptr;
+hidpi::ScaledImageSurface FileThumbnailButtonSet::processIcon = nullptr;
+std::array<hidpi::ScaledImageSurface, 6> FileThumbnailButtonSet::colorLabelIcon;
 
 Glib::ustring FileThumbnailButtonSet::processToolTip;
 Glib::ustring FileThumbnailButtonSet::unrankToolTip;
@@ -40,22 +39,26 @@ Glib::ustring FileThumbnailButtonSet::untrashToolTip;
 Glib::ustring FileThumbnailButtonSet::colorLabelToolTip;
 std::array<Glib::ustring, 5> FileThumbnailButtonSet::rankToolTip;
 
-FileThumbnailButtonSet::FileThumbnailButtonSet (FileBrowserEntry* myEntry)
+FileThumbnailButtonSet::FileThumbnailButtonSet (FileBrowserEntry* myEntry, double device_scale)
 {
+    auto loadIcon = [&](const char* name) {
+        return SvgPaintableWrapper::createFromIcon(name)->createSurface(
+            SvgPaintableWrapper::IconSize::SMALL, device_scale);
+    };
 
     if (!iconsLoaded) {
-        unRankIcon  = std::shared_ptr<RTSurface>(new RTSurface("star-hollow-narrow", Gtk::ICON_SIZE_BUTTON));
-        rankIcon    = std::shared_ptr<RTSurface>(new RTSurface("star-gold-narrow", Gtk::ICON_SIZE_BUTTON));
-        gRankIcon   = std::shared_ptr<RTSurface>(new RTSurface("star-narrow", Gtk::ICON_SIZE_BUTTON));
-        trashIcon   = std::shared_ptr<RTSurface>(new RTSurface("trash-small", Gtk::ICON_SIZE_BUTTON));
-        unTrashIcon = std::shared_ptr<RTSurface>(new RTSurface("trash-remove-small", Gtk::ICON_SIZE_BUTTON));
-        processIcon = std::shared_ptr<RTSurface>(new RTSurface("gears-small", Gtk::ICON_SIZE_BUTTON));
-        colorLabelIcon[0] = std::shared_ptr<RTSurface>(new RTSurface("circle-empty-gray-small", Gtk::ICON_SIZE_BUTTON));
-        colorLabelIcon[1] = std::shared_ptr<RTSurface>(new RTSurface("circle-red-small", Gtk::ICON_SIZE_BUTTON));
-        colorLabelIcon[2] = std::shared_ptr<RTSurface>(new RTSurface("circle-yellow-small", Gtk::ICON_SIZE_BUTTON));
-        colorLabelIcon[3] = std::shared_ptr<RTSurface>(new RTSurface("circle-green-small", Gtk::ICON_SIZE_BUTTON));
-        colorLabelIcon[4] = std::shared_ptr<RTSurface>(new RTSurface("circle-blue-small", Gtk::ICON_SIZE_BUTTON));
-        colorLabelIcon[5] = std::shared_ptr<RTSurface>(new RTSurface("circle-purple-small", Gtk::ICON_SIZE_BUTTON));
+        unRankIcon  = loadIcon("star-hollow-narrow");
+        rankIcon    = loadIcon("star-gold-narrow");
+        gRankIcon   = loadIcon("star-narrow");
+        trashIcon   = loadIcon("trash-small");
+        unTrashIcon = loadIcon("trash-remove-small");
+        processIcon = loadIcon("gears-small");
+        colorLabelIcon[0] = loadIcon("circle-empty-gray-small");
+        colorLabelIcon[1] = loadIcon("circle-red-small");
+        colorLabelIcon[2] = loadIcon("circle-yellow-small");
+        colorLabelIcon[3] = loadIcon("circle-green-small");
+        colorLabelIcon[4] = loadIcon("circle-blue-small");
+        colorLabelIcon[5] = loadIcon("circle-purple-small");
 
         processToolTip = M("FILEBROWSER_POPUPPROCESS");
         unrankToolTip = M("FILEBROWSER_UNRANK_TOOLTIP");
@@ -71,15 +74,15 @@ FileThumbnailButtonSet::FileThumbnailButtonSet (FileBrowserEntry* myEntry)
         iconsLoaded = true;
     }
 
-    add(new LWButton(processIcon, 6, myEntry, LWButton::Left, LWButton::Center, &processToolTip));
-    add(new LWButton(unRankIcon, 0, myEntry, LWButton::Left, LWButton::Center, &unrankToolTip));
+    add(std::make_unique<LWButton>(processIcon, 6, myEntry, LWButton::Left, LWButton::Center, &processToolTip));
+    add(std::make_unique<LWButton>(unRankIcon, 0, myEntry, LWButton::Left, LWButton::Center, &unrankToolTip));
 
     for (int i = 0; i < 5; i++) {
-        add(new LWButton(rankIcon, i + 1, myEntry, LWButton::Left, LWButton::Center, &rankToolTip[i]));
+        add(std::make_unique<LWButton>(rankIcon, i + 1, myEntry, LWButton::Left, LWButton::Center, &rankToolTip[i]));
     }
 
-    add(new LWButton(trashIcon, 7, myEntry, LWButton::Right, LWButton::Center, &trashToolTip));
-    add(new LWButton(colorLabelIcon[0], 8, myEntry, LWButton::Right, LWButton::Center, &colorLabelToolTip));
+    add(std::make_unique<LWButton>(trashIcon, 7, myEntry, LWButton::Right, LWButton::Center, &trashToolTip));
+    add(std::make_unique<LWButton>(colorLabelIcon[0], 8, myEntry, LWButton::Right, LWButton::Center, &colorLabelToolTip));
 }
 
 void FileThumbnailButtonSet::setRank (int stars)

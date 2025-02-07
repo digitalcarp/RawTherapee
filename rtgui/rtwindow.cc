@@ -144,9 +144,6 @@ RtWindow::RtWindow ()
 
     // ------- end loading theme files
 
-//     // Initialize FileBrowserEntry icons
-//     FileBrowserEntry::init();
-
     versionStr = "RawTherapee " + versionString;
 
     set_icon_name("rawtherapee");

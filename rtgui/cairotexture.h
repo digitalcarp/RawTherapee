@@ -19,10 +19,13 @@
 
 #pragma once
 
+#include "hidpi.h"
+
 #include <cairomm/refptr.h>
 #include <cairomm/surface.h>
 #include <gdkmm/memorytexture.h>
 #include <glibmm/refptr.h>
 
-Cairo::RefPtr<Cairo::ImageSurface> createMemoryTextureImageSurface(int width, int height);
+// device_scale is not set
+Cairo::RefPtr<Cairo::ImageSurface> createMemoryTextureImageSurface(hidpi::DeviceSize size);
 Glib::RefPtr<Gdk::Texture> createMemoryTexture(const Cairo::RefPtr<Cairo::ImageSurface>& surface);

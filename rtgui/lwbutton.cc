@@ -19,60 +19,31 @@
 #include "lwbutton.h"
 #include "guiutils.h"
 
-LWButton::LWButton (const std::shared_ptr<RtImage>& i, int aCode, void* aData, Alignment ha, Alignment va, Glib::ustring* tooltip)
-    : xpos(0), ypos(0), halign(ha), valign(va), icon(i), bgr(0.0), bgg(0.0), bgb(0.0), fgr(0.0), fgg(0.0), fgb(0.0), state(Normal), listener(nullptr), actionCode(aCode), actionData(aData), toolTip(tooltip)
+LWButton::LWButton (const Icon& i, int aCode, void* aData, Alignment ha, Alignment va, Glib::ustring* tooltip)
+    : halign(ha), valign(va), icon(i), bgr(0.0), bgg(0.0), bgb(0.0), fgr(0.0), fgg(0.0), fgb(0.0), state(Normal), listener(nullptr), actionCode(aCode), actionData(aData), toolTip(tooltip)
 {
-
     if (i)  {
-        w = i->getWidth ();
-        h = i->getHeight ();
+        size = i.getLogicalSize();
     } else {
-        w = h = 2;
+        size = {2, 2};
     }
 }
 
-void LWButton::getSize (int& minw, int& minh) const
+void LWButton::addPosition (hidpi::LogicalCoord offset)
 {
-
-    minw = w;
-    minh = h;
+    currPos.x += offset.x;
+    currPos.y += offset.y;
 }
 
-void LWButton::setPosition (int x, int y)
-{
-
-    xpos = x;
-    ypos = y;
-}
-
-void LWButton::addPosition (int x, int y)
-{
-    xpos += x;
-    ypos += y;
-}
-
-void LWButton::getPosition (int& x, int& y) const
-{
-
-    x = xpos;
-    y = ypos;
-}
-
-void LWButton::setIcon (const std::shared_ptr<RtImage>& i)
+void LWButton::setIcon (const Icon& i)
 {
     icon = i;
 
-    if (i)  {
-        w = i->getWidth ();
-        h = i->getHeight ();
+    if (i) {
+        size = i.getLogicalSize();
     } else {
-        w = h = 2;
+        size = {2, 2};
     }
-}
-
-const std::shared_ptr<RtImage>& LWButton::getIcon () const
-{
-    return icon;
 }
 
 void LWButton::setColors (const Gdk::RGBA& bg, const Gdk::RGBA& fg)
@@ -86,16 +57,17 @@ void LWButton::setColors (const Gdk::RGBA& bg, const Gdk::RGBA& fg)
     fgb = fg.get_blue ();
 }
 
-bool LWButton::inside (int x, int y) const
+bool LWButton::inside (hidpi::LogicalCoord pos) const
 {
-
-    return x > xpos && x < xpos + w && y > ypos && y < ypos + h;
+    hidpi::LogicalCoord opposite = {currPos.x + size.width, currPos.y + size.height};
+    return pos.x > currPos.x && pos.y > currPos.y &&
+        pos.x < opposite.x && pos.y < opposite.y;
 }
 
 bool LWButton::motionNotify  (int x, int y)
 {
 
-    bool in = inside (x, y);
+    bool in = inside (hidpi::LogicalCoord{x, y});
     State nstate = state;
 
     if (state == Normal && in) {
@@ -124,7 +96,7 @@ bool LWButton::motionNotify  (int x, int y)
 bool LWButton::pressNotify   (int x, int y)
 {
 
-    bool in = inside (x, y);
+    bool in = inside (hidpi::LogicalCoord(x, y));
     State nstate = state;
 
     if (in && (state == Normal || state == Over || state == Pressed_Out)) {
@@ -149,7 +121,7 @@ bool LWButton::pressNotify   (int x, int y)
 bool LWButton::releaseNotify (int x, int y)
 {
 
-    bool in = inside (x, y);
+    bool in = inside (hidpi::LogicalCoord(x, y));
     State nstate;
     bool action = false;
 
@@ -179,10 +151,13 @@ bool LWButton::releaseNotify (int x, int y)
     return ret;
 }
 
-void LWButton::redraw (Cairo::RefPtr<Cairo::Context> context)
+void LWButton::redraw (const Cairo::RefPtr<Cairo::Context>& context)
 {
+    int xpos = currPos.x;
+    int ypos = currPos.y;
+    int w = size.width;
+    int h = size.height;
 
-    GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
     context->set_line_width (2.0); // Line width shall be even to avoid blur effect when upscaling
     context->set_antialias (Cairo::ANTIALIAS_SUBPIXEL);
     context->rectangle (xpos, ypos, w, h);
@@ -208,8 +183,8 @@ void LWButton::redraw (Cairo::RefPtr<Cairo::Context> context)
         dilat++;
     }
 
-    if (icon && icon->hasSurface()) {
-        context->set_source (icon->get(), xpos + dilat, ypos + dilat);
+    if (icon) {
+        context->set_source (icon.getBaseSurface(), xpos + dilat, ypos + dilat);
         context->paint ();
     }
 }
@@ -223,7 +198,7 @@ void LWButton::getAlignment (Alignment& ha, Alignment& va) const
 
 Glib::ustring LWButton::getToolTip (int x, int y) const
 {
-    if (inside(x, y) && toolTip) {
+    if (inside(hidpi::LogicalCoord(x, y)) && toolTip) {
         return *toolTip;
     } else {
         return {};

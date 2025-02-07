@@ -26,8 +26,8 @@ constexpr auto TEXTURE_FORMAT =
 constexpr auto CAIRO_FORMAT = Cairo::Surface::Format::ARGB32;
 static_assert(static_cast<int>(TEXTURE_FORMAT) == static_cast<int>(CAIRO_FORMAT));
 
-Cairo::RefPtr<Cairo::ImageSurface> createMemoryTextureImageSurface(int width, int height) {
-    return Cairo::ImageSurface::create(CAIRO_FORMAT, width, height);
+Cairo::RefPtr<Cairo::ImageSurface> createMemoryTextureImageSurface(hidpi::DeviceSize size) {
+    return Cairo::ImageSurface::create(CAIRO_FORMAT, size.width, size.height);
 }
 
 Glib::RefPtr<Gdk::Texture> createMemoryTexture(const Cairo::RefPtr<Cairo::ImageSurface>& surface) {

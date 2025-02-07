@@ -22,6 +22,7 @@
 #include "cairotexture.h"
 #include "rtscalable.h"
 
+#include <cairomm/surface.h>
 #include <glibmm/fileutils.h>
 #include <gtkmm/image.h>
 #include <gtkmm/snapshot.h>
@@ -284,12 +285,53 @@ void SvgPaintableWrapper::setOnPicture(Gtk::Picture* picture) {
     gtk_picture_set_paintable (picture->gobj(), GDK_PAINTABLE (m_gobj));
 }
 
-Glib::RefPtr<Gdk::Texture> SvgPaintableWrapper::createTexture(int width, int height) {
-    auto surface = createMemoryTextureImageSurface(width, height);
-    auto cr = Cairo::Context::create(surface);
+hidpi::ScaledImageSurface
+SvgPaintableWrapper::createSurface(hidpi::LogicalSize size, int device_scale) const {
+    hidpi::ScaledImageSurface scaled(hidpi::ScaledImageSurface::MemoryTextureSurface{},
+                                     size, device_scale);
+
+    auto cr = Cairo::Context::create(scaled.getBaseSurface());
 
     GError *error = NULL;
-    RsvgRectangle rsvg_rect = {0, 0, static_cast<double>(width), static_cast<double>(height)};
+    RsvgRectangle rsvg_rect = {
+        0, 0, static_cast<double>(size.width), static_cast<double>(size.height)
+    };
+
+    if (!rsvg_handle_render_document(m_gobj->handle, cr->cobj(), &rsvg_rect, &error))
+    {
+        g_error("%s", error->message);
+        return nullptr;
+    }
+
+    return scaled;
+}
+
+int SvgPaintableWrapper::mapIconSize(IconSize icon_size) {
+    // Sizes taken from GTK3 IconSize
+    switch (icon_size) {
+    case IconSize::LARGE:
+        return 24;
+    case IconSize::SMALL:
+    default:
+        return 16;
+    }
+}
+
+hidpi::ScaledImageSurface
+SvgPaintableWrapper::createSurface(IconSize icon_size, int device_scale) const {
+    int len = mapIconSize(icon_size) * device_scale;
+    hidpi::LogicalSize size = {len, len};
+    return createSurface(size, device_scale);
+}
+
+Glib::RefPtr<Gdk::Texture> SvgPaintableWrapper::createTexture(hidpi::DeviceSize size) const {
+    auto surface = createMemoryTextureImageSurface(size);
+    auto cr = Cairo::Context::create(std::static_pointer_cast<Cairo::Surface>(surface));
+
+    GError *error = NULL;
+    RsvgRectangle rsvg_rect = {
+        0, 0, static_cast<double>(size.width), static_cast<double>(size.height)
+    };
     if (!rsvg_handle_render_document(m_gobj->handle, cr->cobj(), &rsvg_rect, &error))
     {
         g_error("%s", error->message);

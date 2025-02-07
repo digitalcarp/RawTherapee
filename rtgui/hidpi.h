@@ -20,12 +20,11 @@
 #pragma once
 
 #include <cairomm/refptr.h>
+#include <cairomm/surface.h>
 #include <glibmm/refptr.h>
 
 namespace Cairo {
 class Context;
-class ImageSurface;
-class Surface;
 class SurfacePattern;
 }
 
@@ -133,6 +132,49 @@ public:
 
 private:
     Glib::RefPtr<Gdk::Pixbuf> m_pixbuf;
+    int m_device_scale;
+};
+
+class ScaledImageSurface {
+public:
+    struct MemoryTextureSurface {};
+
+    ScaledImageSurface() : m_surface(nullptr), m_logical(0, 0), m_device_scale(1) {}
+    ScaledImageSurface(std::nullptr_t) : ScaledImageSurface() {}
+
+    ScaledImageSurface(Cairo::Surface::Format format, hidpi::LogicalSize size, int device_scale);
+    ScaledImageSurface(MemoryTextureSurface, hidpi::LogicalSize size, int device_scale);
+
+    ScaledImageSurface(const ScaledImageSurface&) = default;
+    ScaledImageSurface(ScaledImageSurface&&) = default;
+
+    ScaledImageSurface& operator=(const ScaledImageSurface&) = default;
+    ScaledImageSurface& operator=(ScaledImageSurface&&) = default;
+    ScaledImageSurface& operator=(std::nullptr_t) {
+        m_surface = nullptr;
+        m_logical = {0, 0};
+        m_device_scale = 1;
+        return *this;
+    }
+
+    ~ScaledImageSurface() = default;
+
+    Cairo::RefPtr<Cairo::Surface> getBaseSurface() const {
+        return std::static_pointer_cast<Cairo::Surface>(m_surface);
+    }
+    const Cairo::RefPtr<Cairo::ImageSurface>& getImageSurface() const { return m_surface; }
+
+    hidpi::LogicalSize getLogicalSize() const { return m_logical; }
+    int getDeviceScale() const { return m_device_scale; }
+    hidpi::ScaledDeviceSize getScaledDeviceSize() const {
+        return m_logical.scaleToDevice(m_device_scale);
+    }
+
+    operator bool() const { return m_surface != nullptr; }
+
+private:
+    Cairo::RefPtr<Cairo::ImageSurface> m_surface;
+    hidpi::LogicalSize m_logical;
     int m_device_scale;
 };
 

@@ -18,9 +18,11 @@
  */
 #pragma once
 
-#include "rtimage.h"
+#include "hidpi.h"
 
-#include <gtkmm.h>
+#include <cairomm/context.h>
+#include <gdkmm/rgba.h>
+#include <glibmm/ustring.h>
 
 class LWButton;
 
@@ -39,10 +41,13 @@ public:
     enum Alignment {Left, Right, Top, Bottom, Center};
     enum State { Normal, Over, Pressed_In, Pressed_Out};
 
+    using Icon = hidpi::ScaledImageSurface;
+
 private:
-    int xpos, ypos, w, h;
+    hidpi::LogicalCoord currPos;
+    hidpi::LogicalSize size;
     Alignment halign, valign;
-    std::shared_ptr<RtImage> icon;
+    Icon icon;
     double bgr, bgg, bgb;
     double fgr, fgg, fgb;
     State state;
@@ -52,18 +57,20 @@ private:
     Glib::ustring* toolTip;
 
 public:
-    LWButton (const std::shared_ptr<RtImage>& i, int aCode, void* aData, Alignment ha = Left, Alignment va = Center, Glib::ustring* tooltip = nullptr);
+    LWButton (const Icon& i, int aCode, void* aData, Alignment ha = Left, Alignment va = Center, Glib::ustring* tooltip = nullptr);
 
-    void    getSize             (int& minw, int& minh) const;
+    hidpi::LogicalSize getSize() const { return size; }
+    hidpi::LogicalCoord getPosition() const { return currPos; }
+
     void    getAlignment        (Alignment& ha, Alignment& va) const;
-    void    setPosition         (int x, int y);
-    void    addPosition         (int x, int y);
-    void    getPosition         (int& x, int& y) const;
-    bool    inside              (int x, int y) const;
-    void    setIcon             (const std::shared_ptr<RtImage>& i);
-    const std::shared_ptr<RtImage>& getIcon () const;
+    void    setPosition         (hidpi::LogicalCoord pos) { currPos = pos; }
+    void    addPosition         (hidpi::LogicalCoord offset);
+    bool    inside              (hidpi::LogicalCoord pos) const;
     void    setColors           (const Gdk::RGBA& bg, const Gdk::RGBA& fg);
     void    setToolTip          (Glib::ustring* tooltip);
+
+    void setIcon(const Icon& i);
+    const Icon& getIcon() const { return icon; }
 
     bool    motionNotify        (int x, int y);
     bool    pressNotify         (int x, int y);
@@ -76,5 +83,5 @@ public:
         listener = bl;
     }
 
-    void    redraw              (Cairo::RefPtr<Cairo::Context> context);
+    void    redraw              (const Cairo::RefPtr<Cairo::Context>& context);
 };
