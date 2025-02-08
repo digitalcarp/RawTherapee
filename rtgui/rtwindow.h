@@ -46,27 +46,25 @@ class RtWindow final :
 private:
     Gtk::Notebook* mainNB;
     // BatchQueuePanel* bpanel;
-    // std::set<Glib::ustring> filesEdited;
-    // std::map<Glib::ustring, EditorPanel*> epanels;
-    //
-    // sigc::signal<void> externalEditorChangedSignal;
+    std::set<Glib::ustring> filesEdited;
+    std::map<Glib::ustring, EditorPanel*> epanels;
+
+    sigc::signal<void()> externalEditorChangedSignal;
 
     Gtk::ProgressBar prProgBar;
     PLDBridge* pldBridge;
     bool is_fullscreen;
     bool ignoreDefaultSizeChange;
-    // bool on_delete_has_run;
+    bool on_delete_has_run;
     Gtk::Button* btn_fullscreen;
 
     Gtk::Image *iFullscreen, *iFullscreen_exit;
 
     bool isSingleTabMode() const;
 
-    // bool on_expose_event_epanel (GdkEventExpose* event);
-    // bool on_expose_event_fpanel (GdkEventExpose* event);
     bool splashClosed ();
-    // bool isEditorPanel (Widget* panel);
-    // bool isEditorPanel (guint pageNum);
+    bool isEditorPanel (Widget* panel);
+    bool isEditorPanel (guint pageNum);
     void showErrors ();
 
     void onDefaultSizeChange();
@@ -79,8 +77,8 @@ public:
     RtWindow();
     ~RtWindow();
 
-    // void addEditorPanel (EditorPanel* ep, const std::string &name);
-    // void remEditorPanel (EditorPanel* ep);
+    void addEditorPanel (EditorPanel* ep, const std::string &name);
+    void remEditorPanel (EditorPanel* ep);
     bool selectEditorPanel (const std::string &name);
 
     void addBatchQueueJob       (BatchQueueEntry* bqe, bool head = false);
@@ -88,7 +86,7 @@ public:
 
     // bool keyPressed (GdkEventKey* event);
     // bool keyReleased(GdkEventKey *event);
-    // bool on_delete_event (GdkEventAny* event) override;
+    bool on_close_request ();
     void on_mainNB_switch_page (Gtk::Widget* widget, guint page_num);
 
     void showRawPedia();
@@ -107,13 +105,13 @@ public:
         return pldBridge;
     }
 
-    // EditorPanel*  epanel;
+    EditorPanel*  epanel;
     FilePanel* fpanel;
 
-    // void SetEditorCurrent();
+    void SetEditorCurrent();
     void SetMainCurrent();
-    // void MoveFileBrowserToEditor();
-    // void MoveFileBrowserToMain();
+    void MoveFileBrowserToEditor();
+    void MoveFileBrowserToMain();
 
     void updateExternalEditorWidget(int selectedIndex, const std::vector<ExternalEditor> &editors);
     void updateProfiles (const Glib::ustring &printerProfile, rtengine::RenderingIntent printerIntent, bool printerBPC);
@@ -130,9 +128,9 @@ public:
     }
     void setWindowSize ();
     void set_title_decorated (const Glib::ustring& fname);
-    // void closeOpenEditors();
+    void closeOpenEditors();
     void setEditorMode (bool tabbedUI);
-    // void createSetmEditor();
+    void createSetmEditor();
 
     void writeToolExpandedStatus (std::vector<int> &tpOpen);
 };

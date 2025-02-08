@@ -60,7 +60,7 @@ void CursorManager::init (const Glib::RefPtr<Gtk::Window>& mainWindow)
     cAddPicker  = createCursor("color-picker-add-hicontrast", "copy", -0.666, 0.75);
     cCropDraw   = createCursor("crop-point-hicontrast", "crosshair", -0.75, 0.75);
     cCrosshair  = createCursor("crosshair-hicontrast", "crosshair");
-    cEmpty      = createCursor("empty", "none");
+    cEmpty      = createCursor("", "none");
     cHandClosed = createCursor("hand-closed-hicontrast", "grabbing");
     cHandOpen   = createCursor("hand-open-hicontrast", "grab");
     cMoveBL     = createCursor("node-move-sw-ne-hicontrast", "nesw-resize");
@@ -89,7 +89,10 @@ CursorManager::createCursor(const Glib::ustring& name, const Glib::ustring& fall
 
     auto fallback_cursor = Gdk::Cursor::create(fallback);
 
-    info->svg = SvgPaintableWrapper::createFromIcon(name);
+    if (name != "") {
+        info->svg = SvgPaintableWrapper::createFromIcon(name);
+    }
+
     if (!info->svg) {
         info->cursor = fallback_cursor;
     } else {

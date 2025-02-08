@@ -40,30 +40,37 @@ public:
     // ProgressListener interface
     void setProgress(double p) override
     {
-        GuiThreadSafety::assertInGuiThread();
-        pl->setProgress(p);
+        idle_register.add([=]() {
+            pl->setProgress(p);
+            return IdleRegister::REMOVE;
+        });
     }
     void setProgressStr(const Glib::ustring& str) override
     {
-        GuiThreadSafety::assertInGuiThread();
-        Glib::ustring progrstr;
-        progrstr = M(str);
-        pl->setProgressStr(progrstr);
+        idle_register.add([=, progrstr = M(str)]() {
+            pl->setProgressStr(progrstr);
+            return IdleRegister::REMOVE;
+        });
     }
 
     void setProgressState(bool inProcessing) override
     {
-        GuiThreadSafety::assertInGuiThread();
-        pl->setProgressState(inProcessing);
+        idle_register.add([=]() {
+            pl->setProgressState(inProcessing);
+            return IdleRegister::REMOVE;
+        });
     }
 
     void error(const Glib::ustring& descr) override
     {
-        GuiThreadSafety::assertInGuiThread();
-        pl->error(descr);
+        idle_register.add([=]() {
+            pl->error(descr);
+            return IdleRegister::REMOVE;
+        });
     }
 
 private:
+    IdleRegister idle_register;
     rtengine::ProgressListener* const pl;
 };
 

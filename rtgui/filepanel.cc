@@ -20,7 +20,7 @@
 
 #include "dirbrowser.h"
 // #include "batchtoolpanelcoord.h"
-// #include "editorpanel.h"
+#include "editorpanel.h"
 #include "multilangmgr.h"
 #include "rtmessagedialog.h"
 #include "rtwindow.h"
@@ -265,9 +265,9 @@ bool FilePanel::fileSelected (Thumbnail* thm)
 
 bool FilePanel::addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries)
 {
-//     if (parent) {
-//         parent->addBatchQueueJobs (entries);
-//     }
+    if (parent) {
+        parent->addBatchQueueJobs (entries);
+    }
 
     return true;
 }
@@ -293,38 +293,38 @@ bool FilePanel::imageLoaded( Thumbnail* thm, ProgressConnector<rtengine::Initial
         pendingLoad *pl = pendingLoads.front();
 
         if (pl->pc->returnValue()) {
-// TODO(gtk4)
-//             if (options.tabbedUI) {
-//                 EditorPanel* epanel;
-//                 {
-// #ifdef _WIN32
-//                     int winGdiHandles = GetGuiResources( GetCurrentProcess(), GR_GDIOBJECTS);
-//                     if(winGdiHandles > 0 && winGdiHandles <= 6500) //(old settings 8500) 0 means we don't have the rights to access the function, 8500 because the limit is 10000 and we need about 1500 free handles
-//                     //J.Desmis october 2021 I change 8500 to 6500..Why ? because without while increasing size GUI system crash in multieditor
-// #endif
-//                     {
-//                     epanel = Gtk::manage (new EditorPanel ());
-//                     parent->addEditorPanel (epanel, pl->thm->getFileName());
-//                     }
-// #ifdef _WIN32
-//                     else {
-//                         Glib::ustring msg_ = Glib::ustring("<b>") + M("MAIN_MSG_CANNOTLOAD") + " \"" + escapeHtmlChars(thm->getFileName()) + "\" .\n" + M("MAIN_MSG_TOOMANYOPENEDITORS") + "</b>";
-//                         Gtk::MessageDialog msgd (*parent, msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-//                         msgd.run ();
-//                         goto MAXGDIHANDLESREACHED;
-//                     }
-// #endif
-//                 }
-//                 epanel->open(pl->thm, pl->pc->returnValue() );
-//
-//                 if (!(options.multiDisplayMode > 0)) {
-//                     parent->set_title_decorated(pl->thm->getFileName());
-//                 }
-//             } else {
-//                 parent->SetEditorCurrent();
-//                 parent->epanel->open(pl->thm, pl->pc->returnValue() );
-//                 parent->set_title_decorated(pl->thm->getFileName());
-//             }
+            if (options.tabbedUI) {
+                EditorPanel* epanel;
+                {
+#ifdef _WIN32
+                    int winGdiHandles = GetGuiResources( GetCurrentProcess(), GR_GDIOBJECTS);
+                    if(winGdiHandles > 0 && winGdiHandles <= 6500) //(old settings 8500) 0 means we don't have the rights to access the function, 8500 because the limit is 10000 and we need about 1500 free handles
+                    //J.Desmis october 2021 I change 8500 to 6500..Why ? because without while increasing size GUI system crash in multieditor
+#endif
+                    {
+                        epanel = Gtk::manage (new EditorPanel ());
+                        parent->addEditorPanel (epanel, pl->thm->getFileName());
+                    }
+#ifdef _WIN32
+                    else {
+                        Glib::ustring msg_ = Glib::ustring("<b>") + M("MAIN_MSG_CANNOTLOAD") + " \"" + escapeHtmlChars(thm->getFileName()) + "\" .\n" + M("MAIN_MSG_TOOMANYOPENEDITORS") + "</b>";
+                        auto msgd = Gtk::make_managed<RtMessageDialog>(
+                            msg_, RtMessageDialog::Type::ERROR, RtMessageDialog::ButtonSet::OK);
+                        msgd->show(parent);
+                        goto MAXGDIHANDLESREACHED;
+                    }
+#endif
+                }
+                epanel->open(pl->thm, pl->pc->returnValue() );
+
+                if (!(options.multiDisplayMode > 0)) {
+                    parent->set_title_decorated(pl->thm->getFileName());
+                }
+            } else {
+                parent->SetEditorCurrent();
+                parent->epanel->open(pl->thm, pl->pc->returnValue() );
+                parent->set_title_decorated(pl->thm->getFileName());
+            }
         } else {
             Glib::ustring msg_ = Glib::ustring("<b>") + M("MAIN_MSG_CANNOTLOAD") + " \"" + escapeHtmlChars(thm->getFileName()) + "\" .\n</b>";
             auto msgd = Gtk::make_managed<RtMessageDialog>(
@@ -412,14 +412,12 @@ bool FilePanel::handleShortcutKeyRelease(guint keyval, guint keycode, Gdk::Modif
 
 void FilePanel::loadingThumbs(const Glib::ustring& str, double rate)
 {
-// TODO(gtk4)
-//     GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
-//
-//     if( !str.empty()) {
-//         parent->setProgressStr(str);
-//     }
-//
-//     parent->setProgress( rate );
+    GuiThreadSafety::assertInGuiThread();
+    if( !str.empty()) {
+        parent->setProgressStr(str);
+    }
+
+    parent->setProgress( rate );
 }
 
 void FilePanel::updateTPVScrollbar (bool hide)
