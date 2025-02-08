@@ -39,8 +39,6 @@ PreviewHandler::PreviewHandler () :
 
 PreviewHandler::~PreviewHandler ()
 {
-    idle_register.destroy();
-
     if (pih->pending) {
         pih->destroyed = true;
     } else {
@@ -113,7 +111,7 @@ void PreviewHandler::delImage(IImage8* i)
 
             delete i;
             pih->phandler->previewImgMutex.lock();
-            pih->phandler->previewImg.clear();
+            pih->phandler->previewImg = nullptr;
             pih->phandler->previewImgMutex.unlock();
 
             --pih->pending;
@@ -141,7 +139,7 @@ void PreviewHandler::imageReady(const rtengine::procparams::CropParams& cp)
             }
 
             pih->phandler->previewImgMutex.lock();
-            pih->phandler->previewImg = Gdk::Pixbuf::create_from_data(pih->phandler->image->getData(), Gdk::COLORSPACE_RGB, false, 8, pih->phandler->image->getWidth(), pih->phandler->image->getHeight(), 3 * pih->phandler->image->getWidth());
+            pih->phandler->previewImg = Gdk::Pixbuf::create_from_data(pih->phandler->image->getData(), Gdk::Colorspace::RGB, false, 8, pih->phandler->image->getWidth(), pih->phandler->image->getHeight(), 3 * pih->phandler->image->getWidth());
             pih->phandler->previewImgMutex.unlock ();
 
             *pih->phandler->cropParams = cp;
@@ -180,7 +178,7 @@ Glib::RefPtr<Gdk::Pixbuf> PreviewHandler::getRoughImage (
         w = rtengine::LIM<int>(w, 0, int(previewImg->get_width() * totalZoom) - pos.x);
         h = rtengine::LIM<int>(h, 0, int(previewImg->get_height() * totalZoom) - pos.y);
 
-        resPixbuf = Gdk::Pixbuf::create (Gdk::COLORSPACE_RGB, false, 8, w, h);
+        resPixbuf = Gdk::Pixbuf::create (Gdk::Colorspace::RGB, false, 8, w, h);
         previewImg->scale (resPixbuf, 0, 0, w, h, -pos.x, -pos.y, totalZoom, totalZoom, Gdk::InterpType::NEAREST);
     }
 
@@ -202,7 +200,7 @@ hidpi::DevicePixbuf PreviewHandler::getRoughImage (hidpi::LogicalSize desiredSiz
         outLogicalZoom = zoom / previewScale;
         zoom = zoom * deviceScale;
 
-        auto pixbuf = Gdk::Pixbuf::create (Gdk::COLORSPACE_RGB, false, 8, image->getWidth() * zoom, image->getHeight() * zoom);
+        auto pixbuf = Gdk::Pixbuf::create (Gdk::Colorspace::RGB, false, 8, image->getWidth() * zoom, image->getHeight() * zoom);
         previewImg->scale (pixbuf, 0, 0, previewImg->get_width()*zoom, previewImg->get_height()*zoom, 0, 0, zoom, zoom, Gdk::InterpType::BILINEAR);
 
         result = hidpi::DevicePixbuf(pixbuf, deviceScale);

@@ -57,7 +57,7 @@ set(NONCLISOURCEFILES
     dynamicprofilepanel.cc
     # editbuffer.cc
     editcallbacks.cc
-    # editorpanel.cc
+    editorpanel.cc
     # editwidgets.cc
     # editwindow.cc
     # epd.cc
@@ -126,7 +126,7 @@ set(NONCLISOURCEFILES
     preferences.cc
     # preprocess.cc
     # preprocesswb.cc
-    # previewhandler.cc
+    previewhandler.cc
     previewloader.cc
     # previewmodepanel.cc
     # previewwindow.cc

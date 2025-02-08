@@ -21,13 +21,14 @@
 
 #include <gtkmm.h>
 
+// TODO(gtk4)
 #include "extprog.h"
-#include "histogrampanel.h"
+// #include "histogrampanel.h"
 #include "history.h"
-#include "imageareapanel.h"
+// #include "imageareapanel.h"
+#include "options.h"
 #include "profilepanel.h"
 #include "progressconnector.h"
-#include "saveasdlg.h"
 #include "thumbnaillistener.h"
 
 #include "rtengine/noncopyable.h"
@@ -39,7 +40,7 @@ template<typename T>
 class array2D;
 }
 
-using ExternalEditorChangedSignal = sigc::signal<void>;
+using ExternalEditorChangedSignal = sigc::signal<void()>;
 
 class BatchQueueEntry;
 class EditorPanel;
@@ -47,6 +48,7 @@ class FilePanel;
 class MyProgressBar;
 class Navigator;
 class PopUpButton;
+class PreviewHandler;
 class RTAppChooserDialog;
 class Thumbnail;
 class ToolPanelCoordinator;
@@ -57,16 +59,16 @@ struct EditorPanelIdleHelper {
     int pending;
 };
 
-class RTWindow;
+class RtWindow;
 
 class EditorPanel final :
     public Gtk::Box,
     public PParamsChangeListener,
     public rtengine::ProgressListener,
     public ThumbnailListener,
-    public HistoryBeforeLineListener,
-    public rtengine::HistogramListener,
-    public HistogramPanelListener,
+//     public HistoryBeforeLineListener,
+//     public rtengine::HistogramListener,
+//     public HistogramPanelListener,
     public rtengine::NonCopyable
 {
 public:
@@ -77,10 +79,10 @@ public:
     void open (Thumbnail* tmb, rtengine::InitialImage* isrc);
     void setAspect ();
     void on_realize () override;
-    void leftPaneButtonReleased (GdkEventButton *event);
-    void rightPaneButtonReleased (GdkEventButton *event);
+//     void leftPaneButtonReleased (int n_press, double x, double y);
+//     void rightPaneButtonReleased (int n_press, double x, double y);
 
-    void setParent (RTWindow* p)
+    void setParent (RtWindow* p)
     {
         parent = p;
     }
@@ -122,42 +124,42 @@ public:
     void procParamsChanged (Thumbnail* thm, int whoChangedIt, bool upgradeHint) override;
 
     // HistoryBeforeLineListener
-    void historyBeforeLineChanged (const rtengine::procparams::ProcParams& params) override;
+//     void historyBeforeLineChanged (const rtengine::procparams::ProcParams& params) override;
 
-    // HistogramListener
-    void histogramChanged(
-        const LUTu& histRed,
-        const LUTu& histGreen,
-        const LUTu& histBlue,
-        const LUTu& histLuma,
-        const LUTu& histToneCurve,
-        const LUTu& histLCurve,
-        const LUTu& histCCurve,
-        const LUTu& histLCAM,
-        const LUTu& histCCAM,
-        const LUTu& histRedRaw,
-        const LUTu& histGreenRaw,
-        const LUTu& histBlueRaw,
-        const LUTu& histChroma,
-        const LUTu& histLRETI,
-        int vectorscopeScale,
-        const array2D<int>& vectorscopeHC,
-        const array2D<int>& vectorscopeHS,
-        int waveformScale,
-        const array2D<int>& waveformRed,
-        const array2D<int>& waveformGreen,
-        const array2D<int>& waveformBlue,
-        const array2D<int>& waveformLuma
-    ) override;
-    void setObservable(rtengine::HistogramObservable* observable) override;
-    bool updateHistogram(void) const override;
-    bool updateHistogramRaw(void) const override;
-    bool updateVectorscopeHC(void) const override;
-    bool updateVectorscopeHS(void) const override;
-    bool updateWaveform(void) const override;
+// //     // HistogramListener
+//     void histogramChanged(
+//         const LUTu& histRed,
+//         const LUTu& histGreen,
+//         const LUTu& histBlue,
+//         const LUTu& histLuma,
+//         const LUTu& histToneCurve,
+//         const LUTu& histLCurve,
+//         const LUTu& histCCurve,
+//         const LUTu& histLCAM,
+//         const LUTu& histCCAM,
+//         const LUTu& histRedRaw,
+//         const LUTu& histGreenRaw,
+//         const LUTu& histBlueRaw,
+//         const LUTu& histChroma,
+//         const LUTu& histLRETI,
+//         int vectorscopeScale,
+//         const array2D<int>& vectorscopeHC,
+//         const array2D<int>& vectorscopeHS,
+//         int waveformScale,
+//         const array2D<int>& waveformRed,
+//         const array2D<int>& waveformGreen,
+//         const array2D<int>& waveformBlue,
+//         const array2D<int>& waveformLuma
+//     ) override;
+//     void setObservable(rtengine::HistogramObservable* observable) override;
+//     bool updateHistogram(void) const override;
+//     bool updateHistogramRaw(void) const override;
+//     bool updateVectorscopeHC(void) const override;
+//     bool updateVectorscopeHS(void) const override;
+//     bool updateWaveform(void) const override;
 
-    // HistogramPanelListener
-    void scopeTypeChanged(Options::ScopeType new_type) override;
+//     // HistogramPanelListener
+//     void scopeTypeChanged(Options::ScopeType new_type) override;
 
     // event handlers
     void info_toggled ();
@@ -188,7 +190,7 @@ public:
     void saveProfile ();
     Glib::ustring getShortName ();
     Glib::ustring getFileName () const;
-    bool handleShortcutKey (GdkEventKey* event);
+//     bool handleShortcutKey (GdkEventKey* event);
 
     bool getIsProcessing() const
     {
@@ -224,7 +226,7 @@ private:
     Glib::ustring lastSaveAsFileName;
     bool realized;
 
-    MyProgressBar  *progressLabel;
+//     MyProgressBar  *progressLabel;
     Gtk::ToggleButton* info;
     Gtk::ToggleButton* hidehp;
     Gtk::ToggleButton* tbShowHideSidePanels;
@@ -248,8 +250,8 @@ private:
 
     Gtk::Button* queueimg;
     Gtk::Button* saveimgas;
-    PopUpButton* send_to_external;
-    Gtk::RadioButtonGroup send_to_external_radio_group;
+//     PopUpButton* send_to_external;
+//     Gtk::RadioButtonGroup send_to_external_radio_group;
     Gtk::Button* navSync;
     Gtk::Button* navNext;
     Gtk::Button* navPrev;
@@ -262,14 +264,14 @@ private:
     rtengine::procparams::ProcParams cached_exported_pparams;
     Glib::ustring cached_exported_filename;
 
-    class ColorManagementToolbar;
-    std::unique_ptr<ColorManagementToolbar> colorMgmtToolBar;
+//     class ColorManagementToolbar;
+//     std::unique_ptr<ColorManagementToolbar> colorMgmtToolBar;
 
-    ImageAreaPanel* iareapanel;
+//     ImageAreaPanel* iareapanel;
     PreviewHandler* previewHandler;
     PreviewHandler* beforePreviewHandler;   // for the before-after view
-    Navigator* navigator;
-    ImageAreaPanel* beforeIarea;    // for the before-after view
+//     Navigator* navigator;
+//     ImageAreaPanel* beforeIarea;    // for the before-after view
     Gtk::Box* beforeBox;
     Gtk::Box* afterBox;
     Gtk::Label* beforeLabel;
@@ -281,12 +283,11 @@ private:
 
     Gtk::Frame* ppframe;
     ProfilePanel* profilep;
-    History* history;
-    HistogramPanel* histogramPanel;
-    ToolPanelCoordinator* tpc;
-    RTWindow* parent;
+//     History* history;
+//     HistogramPanel* histogramPanel;
+//     ToolPanelCoordinator* tpc;
+    RtWindow* parent;
     Gtk::Window* parentWindow;
-    //SaveAsDialog* saveAsDialog;
     FilePanel* fPanel;
 
     bool firstProcessingDone;
@@ -312,6 +313,6 @@ private:
 
     IdleRegister idle_register;
 
-    rtengine::HistogramObservable* histogram_observable;
-    Options::ScopeType histogram_scope_type;
+//     rtengine::HistogramObservable* histogram_observable;
+//     Options::ScopeType histogram_scope_type;
 };
