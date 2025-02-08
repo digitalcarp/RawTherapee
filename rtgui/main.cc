@@ -26,6 +26,8 @@
 #include "cachemanager.h"
 #include "config.h"
 #include "extprog.h"
+#include "filecatalog.h"
+#include "filepanel.h"
 #include "guiutils.h"
 #include "multilangmgr.h"
 #include "options.h"
@@ -34,8 +36,6 @@
 #include "pathutils.h"
 #include "version.h"
 // #include "editorpanel.h"
-// #include "filecatalog.h"
-// #include "filepanel.h"
 // #include "rtimage.h"
 // #include "soundman.h"
 
@@ -303,37 +303,36 @@ void RtApplication::on_open(const Gio::Application::type_vec_files& files,
 {
     if (!create_window()) return;
 
-    // TODO(gtk4)
-    // struct Data {
-    //     std::vector<Thumbnail *> entries;
-    //     Glib::ustring lastfilename;
-    //     FileCatalog *filecatalog;
-    // };
-    // Data *d = new Data;
-    // d->filecatalog = rtWindow->fpanel->fileCatalog;
-    //
-    // for (const auto &f : files) {
-    //     Thumbnail *thm = cacheMgr->getEntry (f->get_path());
-    //
-    //     if (thm) {
-    //         d->entries.push_back (thm);
-    //         d->lastfilename = f->get_path();
-    //     }
-    // }
-    //
-    // if (!d->entries.empty()) {
-    //     const auto doit =
-    //         [] (gpointer data) -> gboolean {
-    //             Data *d = static_cast<Data *> (data);
-    //             d->filecatalog->openRequested (d->entries);
-    //             d->filecatalog->selectImage (d->lastfilename, true);
-    //             delete d;
-    //             return FALSE;
-    //         };
-    //     gdk_threads_add_idle (doit, d);
-    // } else {
-    //     delete d;
-    // }
+    struct Data {
+        std::vector<Thumbnail *> entries;
+        Glib::ustring lastfilename;
+        FileCatalog *filecatalog;
+    };
+    Data *d = new Data;
+    d->filecatalog = m_window->fpanel->fileCatalog;
+
+    for (const auto &f : files) {
+        Thumbnail *thm = cacheMgr->getEntry (f->get_path());
+
+        if (thm) {
+            d->entries.push_back (thm);
+            d->lastfilename = f->get_path();
+        }
+    }
+
+    if (!d->entries.empty()) {
+        const auto doit =
+            [] (gpointer data) -> gboolean {
+                Data *d = static_cast<Data *> (data);
+                d->filecatalog->openRequested (d->entries);
+                d->filecatalog->selectImage (d->lastfilename, true);
+                delete d;
+                return false;
+            };
+        g_idle_add_full (G_PRIORITY_DEFAULT_IDLE, doit, d, nullptr);
+    } else {
+        delete d;
+    }
 
     m_window->present();
 }
