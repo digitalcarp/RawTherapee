@@ -29,6 +29,7 @@
 #include <gtkmm/box.h>
 
 #include <algorithm>
+#include <memory>
 #include <vector>
 
 template <class T>
@@ -42,6 +43,7 @@ class RtTreeListNode;
  *
  * You should only create a weak_ptr from the Glib::RefPtr returned by
  * add_node() and not the ones queried by ListItem/ListItemFactory.
+ * Alternatively, use RtTreeListNode<T>::safe_weak_ptr().
  *
  * See get_item_vfunc() implementation.
  */
@@ -93,6 +95,7 @@ public:
      * @param parent The parent tree node or nullptr for the root node.
      */
     Glib::RefPtr<Node> add_node(const Glib::RefPtr<T>& data, Node* parent);
+    // Warning: This invalidates any node->children() iterators!
     void remove_node(const Glib::RefPtr<Node>& node);
     bool owns_node(const Node* node) const;
 
@@ -144,12 +147,25 @@ private:
  * Warning!
  * Glib::RefPtr<RtTreeListNode<T>> is not necessarily a unique shared_ptr to
  * the underlying GObject. That means you should be careful using weak_ptr and
- * must compare pointers using the raw pointer. See RtTreeListModel<T>.
+ * must compare pointers using the raw pointer. If you want to create a
+ * weak_ptr, make sure to use RtTreeListNode<T>::safe_weak_ptr().
  */
 template <class T>
-class RtTreeListNode final : public Glib::Object {
+class RtTreeListNode final
+    : public Glib::Object,
+      public std::enable_shared_from_this<RtTreeListNode<T>> {
 public:
     static_assert(std::is_base_of_v<Glib::Object, T>);
+
+    // This is a workaround for the non-unique shared_ptr issue.
+    //
+    // std::enabled_shared_from_this adds a weak_ptr member variable that is
+    // populated when a shared_ptr is created. Since the first and only way
+    // of constructing this class is using the create() function, this weak_ptr
+    // is always populated to the correct shared_ptr instance.
+    std::weak_ptr<RtTreeListNode> safe_weak_ptr() {
+        return this->weak_from_this();
+    };
 
     Glib::RefPtr<T> data() const { return m_data; }
     RtTreeListNode* parent() const { return m_parent; }
@@ -558,7 +574,8 @@ void RtTreeListModel<T>::Transaction::commit()
 }
 
 template <class T>
-RtTreeListNode<T>::RtTreeListNode(const Glib::RefPtr<T>& data, RtTreeListNode* parent, size_t depth)
+RtTreeListNode<T>::RtTreeListNode(const Glib::RefPtr<T>& data, RtTreeListNode<T>* parent,
+                                  size_t depth)
     : Glib::ObjectBase(typeid(RtTreeListNode<T>)),
       m_prop_expanded(*this, "expanded", false),
       m_data(data),

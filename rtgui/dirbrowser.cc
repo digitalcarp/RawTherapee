@@ -297,28 +297,29 @@ void DirBrowser::updateDir(const Glib::RefPtr<DirNode>& node)
 
     if (!dirTreeListModel->owns_node(node.get())) return;
 
-    Glib::RefPtr<DirColumns> data = node->data();
-    if (!data) return;
-
     auto transaction = dirTreeListModel->maybe_init_transaction();
 
-    if (!Glib::file_test(data->dirname, Glib::FileTest::EXISTS) ||
+    Glib::RefPtr<DirColumns> data = node->data();
+    if (!data || !Glib::file_test(data->dirname, Glib::FileTest::EXISTS) ||
             !Glib::file_test(data->dirname, Glib::FileTest::IS_DIR)) {
         dirTreeListModel->remove_node(node);
         return;
     }
 
     std::unordered_set<std::string> current_children;
+    std::vector<Glib::RefPtr<DirNode>> to_remove;
     for (const auto& child : node->children()) {
         auto data = child->data();
-        if (!data) continue;
-
-        if (!Glib::file_test(data->dirname, Glib::FileTest::EXISTS) ||
+        if (!data || !Glib::file_test(data->dirname, Glib::FileTest::EXISTS) ||
                 !Glib::file_test(data->dirname, Glib::FileTest::IS_DIR)) {
-            dirTreeListModel->remove_node(child);
+            to_remove.push_back(child);
         } else {
             current_children.insert(data->filename.collate_key());
         }
+    }
+
+    for (const auto& del : to_remove) {
+        dirTreeListModel->remove_node(del);
     }
 
     auto dir = Gio::File::create_for_path(data->dirname);
@@ -331,14 +332,12 @@ void DirBrowser::updateDir(const Glib::RefPtr<DirNode>& node)
         Glib::ustring fullname = Glib::build_filename(data->dirname, dirname);
         auto newData = DirColumns::create(dirname, fullname, closeFolderSvg, nullptr);
         auto newNode = dirTreeListModel->add_node(newData, node.get());
-
-        Glib::RefPtr<Gio::FileMonitor> monitor = dir->monitor_directory();
-        newData->monitor = dir->monitor_directory();
-        // Creating a weak_ptr here must use the shared_ptr from add_node().
-        // See RtTreeListModel<T> comments for why this is required.
-        newData->monitor->signal_changed().connect(
-            sigc::bind(sigc::mem_fun(*this, &DirBrowser::onFileChanged), std::weak_ptr(newNode)));
     }
+
+    Glib::RefPtr<Gio::FileMonitor> monitor = dir->monitor_directory();
+    data->monitor = dir->monitor_directory();
+    data->monitor->signal_changed().connect(
+        sigc::bind(sigc::mem_fun(*this, &DirBrowser::onFileChanged), node->safe_weak_ptr()));
 }
 
 void DirBrowser::processDirChanges()
