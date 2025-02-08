@@ -22,6 +22,7 @@
 // #include "batchtoolpanelcoord.h"
 // #include "editorpanel.h"
 #include "multilangmgr.h"
+#include "rtmessagedialog.h"
 #include "rtwindow.h"
 #include "inspector.h"
 #include "placesbrowser.h"
@@ -232,35 +233,34 @@ void FilePanel::on_NB_switch_page(Gtk::Widget* page, guint page_num)
 
 bool FilePanel::fileSelected (Thumbnail* thm)
 {
-    return false;
-//     if (!parent) {
-//         return false;
-//     }
-//
-//     // Check if it's already open BEFORE loading the file
-//     if (options.tabbedUI && parent->selectEditorPanel(thm->getFileName())) {
-//         return true;
-//     }
-//
-//     // try to open the file
-//     bool loading = thm->imageLoad( true );
-//
-//     if( !loading ) {
-//         return false;
-//     }
-//
-//     pendingLoadMutex.lock();
-//     pendingLoad *pl = new pendingLoad();
-//     pl->complete = false;
-//     pl->pc = nullptr;
-//     pl->thm = thm;
-//     pendingLoads.push_back(pl);
-//     pendingLoadMutex.unlock();
-//
-//     ProgressConnector<rtengine::InitialImage*> *ld = new ProgressConnector<rtengine::InitialImage*>();
-//     ld->startFunc (sigc::bind(sigc::ptr_fun(&rtengine::InitialImage::load), thm->getFileName (), thm->getType() == FT_Raw, &error, parent->getProgressListener()),
-//                    sigc::bind(sigc::mem_fun(*this, &FilePanel::imageLoaded), thm, ld) );
-//     return true;
+    if (!parent) {
+        return false;
+    }
+
+    // Check if it's already open BEFORE loading the file
+    if (options.tabbedUI && parent->selectEditorPanel(thm->getFileName())) {
+        return true;
+    }
+
+    // try to open the file
+    bool loading = thm->imageLoad( true );
+
+    if( !loading ) {
+        return false;
+    }
+
+    pendingLoadMutex.lock();
+    pendingLoad *pl = new pendingLoad();
+    pl->complete = false;
+    pl->pc = nullptr;
+    pl->thm = thm;
+    pendingLoads.push_back(pl);
+    pendingLoadMutex.unlock();
+
+    ProgressConnector<rtengine::InitialImage*> *ld = new ProgressConnector<rtengine::InitialImage*>();
+    ld->startFunc (sigc::bind(sigc::ptr_fun(&rtengine::InitialImage::load), thm->getFileName (), thm->getType() == FT_Raw, &error, parent->getProgressListener()),
+                   sigc::bind(sigc::mem_fun(*this, &FilePanel::imageLoaded), thm, ld) );
+    return true;
 }
 
 bool FilePanel::addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries)
@@ -272,25 +272,28 @@ bool FilePanel::addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries)
     return true;
 }
 
-// bool FilePanel::imageLoaded( Thumbnail* thm, ProgressConnector<rtengine::InitialImage*> *pc )
-// {
-//
-//     pendingLoadMutex.lock();
-//
-//     // find our place in the array and mark the entry as complete
-//     for (unsigned int i = 0; i < pendingLoads.size(); i++) {
-//         if (pendingLoads[i]->thm == thm) {
-//             pendingLoads[i]->pc = pc;
-//             pendingLoads[i]->complete = true;
-//             break;
-//         }
-//     }
-//
-//     // The purpose of the pendingLoads vector is to open tabs in the same order as the loads where initiated. It has no effect on single editor mode.
-//     while (pendingLoads.size() > 0 && pendingLoads.front()->complete) {
-//         pendingLoad *pl = pendingLoads.front();
-//
-//         if (pl->pc->returnValue()) {
+bool FilePanel::imageLoaded( Thumbnail* thm, ProgressConnector<rtengine::InitialImage*> *pc )
+{
+    // Acquiring the GUI... not sure that it's necessary, but it shouldn't harm
+    GuiThreadSafety::assertInGuiThread();
+
+    pendingLoadMutex.lock();
+
+    // find our place in the array and mark the entry as complete
+    for (unsigned int i = 0; i < pendingLoads.size(); i++) {
+        if (pendingLoads[i]->thm == thm) {
+            pendingLoads[i]->pc = pc;
+            pendingLoads[i]->complete = true;
+            break;
+        }
+    }
+
+    // The purpose of the pendingLoads vector is to open tabs in the same order as the loads where initiated. It has no effect on single editor mode.
+    while (pendingLoads.size() > 0 && pendingLoads.front()->complete) {
+        pendingLoad *pl = pendingLoads.front();
+
+        if (pl->pc->returnValue()) {
+// TODO(gtk4)
 //             if (options.tabbedUI) {
 //                 EditorPanel* epanel;
 //                 {
@@ -300,7 +303,6 @@ bool FilePanel::addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries)
 //                     //J.Desmis october 2021 I change 8500 to 6500..Why ? because without while increasing size GUI system crash in multieditor
 // #endif
 //                     {
-//                     GThreadLock lock; // Acquiring the GUI... not sure that it's necessary, but it shouldn't harm
 //                     epanel = Gtk::manage (new EditorPanel ());
 //                     parent->addEditorPanel (epanel, pl->thm->getFileName());
 //                     }
@@ -319,39 +321,34 @@ bool FilePanel::addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries)
 //                     parent->set_title_decorated(pl->thm->getFileName());
 //                 }
 //             } else {
-//                 {
-//                     GThreadLock lock; // Acquiring the GUI... not sure that it's necessary, but it shouldn't harm
-//                     parent->SetEditorCurrent();
-//                 }
+//                 parent->SetEditorCurrent();
 //                 parent->epanel->open(pl->thm, pl->pc->returnValue() );
 //                 parent->set_title_decorated(pl->thm->getFileName());
 //             }
-//         } else {
-//             Glib::ustring msg_ = Glib::ustring("<b>") + M("MAIN_MSG_CANNOTLOAD") + " \"" + escapeHtmlChars(thm->getFileName()) + "\" .\n</b>";
-//             Gtk::MessageDialog msgd (*parent, msg_, true, Gtk::MessageType::ERROR, Gtk::ButtonsType::OK, true);
-//             msgd.run ();
-//         }
-// #ifdef _WIN32
-// MAXGDIHANDLESREACHED:
-// #endif
-//         delete pl->pc;
-//
-//         {
-//             GThreadLock lock; // Acquiring the GUI... not sure that it's necessary, but it shouldn't harm
-//             parent->setProgress(0.);
-//             parent->setProgressStr("");
-//         }
-//
-//         pendingLoads.erase(pendingLoads.begin());
-//         delete pl;
-//     }
-//
-//     pendingLoadMutex.unlock();
-//
-//     thm->imageLoad( false );
-//
-//     return false; // MUST return false from idle function
-// }
+        } else {
+            Glib::ustring msg_ = Glib::ustring("<b>") + M("MAIN_MSG_CANNOTLOAD") + " \"" + escapeHtmlChars(thm->getFileName()) + "\" .\n</b>";
+            auto msgd = Gtk::make_managed<RtMessageDialog>(
+                msg_, RtMessageDialog::Type::ERROR, RtMessageDialog::ButtonSet::OK);
+            msgd->show(parent);
+        }
+#ifdef _WIN32
+MAXGDIHANDLESREACHED:
+#endif
+        delete pl->pc;
+
+        parent->setProgress(0.);
+        parent->setProgressStr("");
+
+        pendingLoads.erase(pendingLoads.begin());
+        delete pl;
+    }
+
+    pendingLoadMutex.unlock();
+
+    thm->imageLoad( false );
+
+    return false; // MUST return false from idle function
+}
 
 void FilePanel::saveOptions ()
 {

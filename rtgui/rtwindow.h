@@ -22,7 +22,7 @@
 #include <gtkmm.h>
 #include <sigc++/signal.h>
 
-// #include "progressconnector.h"
+#include "progressconnector.h"
 
 #include "rtengine/noncopyable.h"
 
@@ -39,7 +39,7 @@ enum RenderingIntent : int;
 
 class RtWindow final :
     public Gtk::ApplicationWindow,
-    // public rtengine::ProgressListener,
+    public rtengine::ProgressListener,
     public rtengine::NonCopyable
 {
 
@@ -52,7 +52,7 @@ private:
     // sigc::signal<void> externalEditorChangedSignal;
 
     Gtk::ProgressBar prProgBar;
-    // PLDBridge* pldBridge;
+    PLDBridge* pldBridge;
     bool is_fullscreen;
     bool ignoreDefaultSizeChange;
     // bool on_delete_has_run;
@@ -81,11 +81,11 @@ public:
 
     // void addEditorPanel (EditorPanel* ep, const std::string &name);
     // void remEditorPanel (EditorPanel* ep);
-    // bool selectEditorPanel (const std::string &name);
-    //
-    // void addBatchQueueJob       (BatchQueueEntry* bqe, bool head = false);
-    // void addBatchQueueJobs      (const std::vector<BatchQueueEntry*>& entries);
-    //
+    bool selectEditorPanel (const std::string &name);
+
+    void addBatchQueueJob       (BatchQueueEntry* bqe, bool head = false);
+    void addBatchQueueJobs      (const std::vector<BatchQueueEntry*>& entries);
+
     // bool keyPressed (GdkEventKey* event);
     // bool keyReleased(GdkEventKey *event);
     // bool on_delete_event (GdkEventAny* event) override;
@@ -97,16 +97,16 @@ public:
     void on_realize () override;
     void toggle_fullscreen ();
 
-    // void setProgress(double p) override;
-    // void setProgressStr(const Glib::ustring& str) override;
-    // void setProgressState(bool inProcessing) override;
-    // void error(const Glib::ustring& descr) override;
-    //
-    // rtengine::ProgressListener* getProgressListener ()
-    // {
-    //     return pldBridge;
-    // }
-    //
+    void setProgress(double p) override;
+    void setProgressStr(const Glib::ustring& str) override;
+    void setProgressState(bool inProcessing) override;
+    void error(const Glib::ustring& descr) override;
+
+    rtengine::ProgressListener* getProgressListener ()
+    {
+        return pldBridge;
+    }
+
     // EditorPanel*  epanel;
     FilePanel* fpanel;
 

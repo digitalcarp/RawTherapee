@@ -530,9 +530,9 @@ void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 //         // TODO: ask what to do: close & apply, close & apply selection, close & revert, cancel
 //     }
 // }
-//
-// bool RtWindow::selectEditorPanel (const std::string &name)
-// {
+
+bool RtWindow::selectEditorPanel (const std::string &name)
+{
 //     if (options.multiDisplayMode > 0) {
 //         EditWindow * wndEdit = EditWindow::getInstance (this);
 //
@@ -553,10 +553,10 @@ void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 //             //printf("RtWindow::selectEditorPanel - plain set\n");
 //         }
 //     }
-//
-//     return false;
-// }
-//
+
+    return false;
+}
+
 // bool RtWindow::keyPressed (GdkEventKey* event)
 // {
 //
@@ -643,22 +643,22 @@ void RtWindow::on_mainNB_switch_page (Gtk::Widget* widget, guint page_num)
 //     }
 //     return false;
 // }
-//
-// void RtWindow::addBatchQueueJob (BatchQueueEntry* bqe, bool head)
-// {
-//
+
+void RtWindow::addBatchQueueJob (BatchQueueEntry* bqe, bool head)
+{
+
 //     std::vector<BatchQueueEntry*> entries;
 //     entries.push_back (bqe);
 //     bpanel->addBatchQueueJobs (entries, head);
 //     fpanel->queue_draw ();
-// }
-//
-// void RtWindow::addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries)
-// {
+}
+
+void RtWindow::addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries)
+{
 //     bpanel->addBatchQueueJobs (entries, false);
 //     fpanel->queue_draw ();
-// }
-//
+}
+
 // bool RtWindow::on_delete_event (GdkEventAny* event)
 // {
 //
@@ -827,31 +827,31 @@ void RtWindow::showPreferences ()
 //     }
 }
 
-// void RtWindow::setProgress(double p)
-// {
-//     prProgBar.set_fraction(p);
-// }
-//
-// void RtWindow::setProgressStr(const Glib::ustring& str)
-// {
-//     if (!options.mainNBVertical) {
-//         prProgBar.set_text(str);
-//     }
-// }
-//
-// void RtWindow::setProgressState(bool inProcessing)
-// {
-//     if (inProcessing) {
-//         prProgBar.show();
-//     } else {
-//         prProgBar.hide();
-//     }
-// }
-//
-// void RtWindow::error(const Glib::ustring& descr)
-// {
-//     prProgBar.set_text(descr);
-// }
+void RtWindow::setProgress(double p)
+{
+    prProgBar.set_fraction(p);
+}
+
+void RtWindow::setProgressStr(const Glib::ustring& str)
+{
+    if (!options.mainNBVertical) {
+        prProgBar.set_text(str);
+    }
+}
+
+void RtWindow::setProgressState(bool inProcessing)
+{
+    if (inProcessing) {
+        prProgBar.show();
+    } else {
+        prProgBar.hide();
+    }
+}
+
+void RtWindow::error(const Glib::ustring& descr)
+{
+    prProgBar.set_text(descr);
+}
 
 void RtWindow::toggle_fullscreen ()
 {

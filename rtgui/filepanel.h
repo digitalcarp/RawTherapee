@@ -27,7 +27,7 @@
 #include "history.h"
 #include "placesbrowser.h"
 #include "pparamschangelistener.h"
-// #include "progressconnector.h"
+#include "progressconnector.h"
 #include "recentbrowser.h"
 
 #include "rtengine/noncopyable.h"
@@ -82,7 +82,7 @@ public:
     bool addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries) override;
 
     void optionsChanged         ();
-//     bool imageLoaded( Thumbnail* thm, ProgressConnector<rtengine::InitialImage*> * );
+    bool imageLoaded( Thumbnail* thm, ProgressConnector<rtengine::InitialImage*> * );
 
     bool handleShortcutKey (guint keyval, guint keycode, Gdk::ModifierType state);
     bool handleShortcutKeyRelease(guint keyval, guint keycode, Gdk::ModifierType state);
@@ -111,7 +111,7 @@ private:
 
     struct pendingLoad {
         bool complete;
-//         ProgressConnector<rtengine::InitialImage*> *pc;
+        ProgressConnector<rtengine::InitialImage*> *pc;
         Thumbnail *thm;
     };
     MyMutex pendingLoadMutex;
