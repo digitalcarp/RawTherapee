@@ -42,6 +42,7 @@
 // #include "batchqueueentry.h"
 #include "placesbrowser.h"
 #include "pathutils.h"
+#include "rotatelabel.h"
 #include "rtmessagedialog.h"
 #include "thumbnail.h"
 #include "toolbar.h"

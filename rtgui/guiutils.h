@@ -778,30 +778,6 @@ public:
 //     void register_button(Gtk::ToggleButton &button);
 // };
 
-// Label that can be rotated 90 degrees
-class RotateLabel : public Gtk::Widget
-{
-public:
-    RotateLabel();
-    explicit RotateLabel(const Glib::ustring& text);
-    ~RotateLabel();
-
-    void set_text(const Glib::ustring& text);
-    void rotate90(bool val = true);
-
-protected:
-    void size_allocate_vfunc(int width, int height, int baseline) override;
-    Gtk::SizeRequestMode get_request_mode_vfunc() const override;
-    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
-                       int& minimum_baseline, int& natural_baseline) const override;
-    bool grab_focus_vfunc() override { return false; }
-    void snapshot_vfunc(const Glib::RefPtr<Gtk::Snapshot>& snapshot) override;
-
-private:
-    Gtk::Label m_label;
-    bool m_rotate90;
-};
-
 inline void setActiveTextOrIndex(Gtk::ComboBoxText &comboBox, const Glib::ustring &text, int index)
 {
     bool valueSet = false;

@@ -27,6 +27,7 @@
 #include "options.h"
 #include "preferences.h"
 #include "profilepanel.h"
+#include "rotatelabel.h"
 #include "rtimage.h"
 #include "rtmessagedialog.h"
 #include "rtscalable.h"

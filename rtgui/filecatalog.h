@@ -36,6 +36,7 @@
 class FilePanel;
 class CoarsePanel;
 class RenameDialog;
+class RotateLabel;
 class ToolBar;
 
 /*

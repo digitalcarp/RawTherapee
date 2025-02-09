@@ -141,6 +141,7 @@ set(NONCLISOURCEFILES
     # retinex.cc
     # rgbcurves.cc
     # rotate.cc
+    rotatelabel.cc
     rtappchooserdialog.cc
     rtimage.cc
     rtmessagedialog.cc

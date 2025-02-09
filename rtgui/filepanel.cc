@@ -22,6 +22,7 @@
 // #include "batchtoolpanelcoord.h"
 #include "editorpanel.h"
 #include "multilangmgr.h"
+#include "rotatelabel.h"
 #include "rtmessagedialog.h"
 #include "rtwindow.h"
 #include "inspector.h"
