@@ -709,8 +709,8 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
 //       beforeIarea (nullptr), beforeBox (nullptr), afterBox (nullptr), beforeLabel (nullptr), afterLabel (nullptr),
       beforeBox (nullptr), afterBox (nullptr), beforeLabel (nullptr), afterLabel (nullptr),
       beforeHeaderBox (nullptr), afterHeaderBox (nullptr), parent (nullptr), parentWindow (nullptr), openThm (nullptr),
-      selectedFrame(0), isrc (nullptr), ipc (nullptr), beforeIpc (nullptr), err (0), isProcessing (false)
-//       histogram_observable(nullptr), histogram_scope_type(ScopeType::NONE)
+      selectedFrame(0), isrc (nullptr), ipc (nullptr), beforeIpc (nullptr), err (0), isProcessing (false),
+      histogram_observable(nullptr), histogram_scope_type(ScopeType::NONE)
 {
 
     set_orientation(Gtk::Orientation::VERTICAL);
@@ -749,8 +749,8 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
 //     navigator->previewWindow->set_size_request(-1, RTScalable::scalePixelSize(150));
 //     pack_start(leftsubpaned, *navigator, false, false);
 
-//     history = Gtk::manage(new History());
-//     pack2(leftsubpaned, *history, true, false);
+    history = Gtk::manage(new History());
+    pack2(leftsubpaned, *history, true, false);
 
     leftsubpaned->set_position(0);
 
@@ -1054,7 +1054,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
 //     // connect listeners
 //     profilep->setProfileChangeListener (tpc);
 //     history->setProfileChangeListener (tpc);
-//     history->setHistoryBeforeLineListener (this);
+    history->setHistoryBeforeLineListener (this);
 //     tpc->addPParamsChangeListener (profilep);
 //     tpc->addPParamsChangeListener (history);
 //     tpc->addPParamsChangeListener (this);
@@ -1099,7 +1099,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
 
 EditorPanel::~EditorPanel ()
 {
-//     history->setHistoryBeforeLineListener (nullptr);
+    history->setHistoryBeforeLineListener (nullptr);
 //     // the order is important!
 //     iareapanel->setBeforeAfterViews (nullptr, iareapanel);
 //     delete iareapanel;
@@ -1256,7 +1256,7 @@ void EditorPanel::open (Thumbnail* tmb, rtengine::InitialImage* isrc)
     ipc->setPreviewImageListener (previewHandler);
     ipc->setPreviewScale (10);  // Important
 //     tpc->initImage (ipc, tmb->getType() == FT_Raw);
-//     ipc->setHistogramListener (this);
+    ipc->setHistogramListener (this);
 //     iareapanel->imageArea->indClippedPanel->silentlyDisableSharpMask();
 
 //    iarea->fitZoom ();   // tell to the editorPanel that the next image has to be fitted to the screen
@@ -1297,7 +1297,7 @@ void EditorPanel::open (Thumbnail* tmb, rtengine::InitialImage* isrc)
 //         EditorPanel::syncFileBrowser();
 //     }
 
-//     history->resetSnapShotNumber();
+    history->resetSnapShotNumber();
 //     navigator->setInvalid(ipc->getFullWidth(),ipc->getFullHeight());
 }
 
@@ -2478,15 +2478,15 @@ void EditorPanel::updateExternalEditorSelection()
 //     }
 }
 
-// void EditorPanel::historyBeforeLineChanged (const rtengine::procparams::ProcParams& params)
-// {
-//
-//     if (beforeIpc) {
-//         ProcParams* pparams = beforeIpc->beginUpdateParams ();
-//         *pparams = params;
-//         beforeIpc->endUpdateParams (rtengine::EvProfileChanged);  // starts the IPC processing
-//     }
-// }
+void EditorPanel::historyBeforeLineChanged (const rtengine::procparams::ProcParams& params)
+{
+
+    if (beforeIpc) {
+        ProcParams* pparams = beforeIpc->beginUpdateParams ();
+        *pparams = params;
+        beforeIpc->endUpdateParams (rtengine::EvProfileChanged);  // starts the IPC processing
+    }
+}
 
 void EditorPanel::beforeAfterToggled ()
 {
@@ -2595,7 +2595,7 @@ void EditorPanel::beforeAfterToggled ()
 
 void EditorPanel::tbBeforeLock_toggled ()
 {
-//     history->blistenerLock = tbBeforeLock->get_active();
+    history->blistenerLock = tbBeforeLock->get_active();
     tbBeforeLock->get_active() ? tbBeforeLock->set_child (*iBeforeLockON) : tbBeforeLock->set_child (*iBeforeLockOFF);
 }
 

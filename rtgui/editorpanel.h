@@ -66,7 +66,7 @@ class EditorPanel final :
     public PParamsChangeListener,
     public rtengine::ProgressListener,
     public ThumbnailListener,
-//     public HistoryBeforeLineListener,
+    public HistoryBeforeLineListener,
     public rtengine::HistogramListener,
     public HistogramPanelListener,
     public rtengine::NonCopyable
@@ -124,7 +124,7 @@ public:
     void procParamsChanged (Thumbnail* thm, int whoChangedIt, bool upgradeHint) override;
 
     // HistoryBeforeLineListener
-//     void historyBeforeLineChanged (const rtengine::procparams::ProcParams& params) override;
+    void historyBeforeLineChanged (const rtengine::procparams::ProcParams& params) override;
 
     // HistogramListener
     void histogramChanged(
@@ -283,7 +283,7 @@ private:
 
     Gtk::Frame* ppframe;
     ProfilePanel* profilep;
-//     History* history;
+    History* history;
     HistogramPanel* histogramPanel;
 //     ToolPanelCoordinator* tpc;
     RtWindow* parent;
