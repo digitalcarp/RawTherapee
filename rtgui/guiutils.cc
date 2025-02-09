@@ -1807,31 +1807,31 @@ void ImageLabelButton::set_image(Gtk::Image& image)
 // {
 //     return pimpl->getWidget()->getLabel();
 // }
-//
-// MyProgressBar::MyProgressBar(int width) : w(rtengine::max(width, RTScalable::scalePixelSize(10))) {}
-// MyProgressBar::MyProgressBar() : w(RTScalable::scalePixelSize(200)) {}
-//
-// void MyProgressBar::setPreferredWidth(int width)
-// {
-//     w = rtengine::max(width, RTScalable::scalePixelSize(10));
-// }
-//
-// void MyProgressBar::measure_vfunc(Gtk::Orientation orientation, int for_size,
-//                                   int& minimum, int& natural,
-//                                   int& minimum_baseline, int& natural_baseline) const
-// {
-//     if (orientation == Gtk::Orientation::HORIZONTAL) {
-//         int scaled = RTScalable::scalePixelSize(50);
-//         minimum = std::max(w / 2, scaled);
-//         natural = std::max(w, scaled);
-//         // Don't use baseline alignment
-//         minimum_baseline = -1;
-//         natural_baseline = -1;
-//     } else {
-//         Gtk::ComboBox::measure_vfunc(orientation, for_size, minimum, natural,
-//                                      minimum_baseline, natural_baseline);
-//     }
-// }
+
+MyProgressBar::MyProgressBar(int width) : w(rtengine::max(width, RTScalable::scalePixelSize(10))) {}
+MyProgressBar::MyProgressBar() : w(RTScalable::scalePixelSize(200)) {}
+
+void MyProgressBar::setPreferredWidth(int width)
+{
+    w = rtengine::max(width, RTScalable::scalePixelSize(10));
+}
+
+void MyProgressBar::measure_vfunc(Gtk::Orientation orientation, int for_size,
+                                  int& minimum, int& natural,
+                                  int& minimum_baseline, int& natural_baseline) const
+{
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        int scaled = RTScalable::scalePixelSize(50);
+        minimum = std::max(w / 2, scaled);
+        natural = std::max(w, scaled);
+        // Don't use baseline alignment
+        minimum_baseline = -1;
+        natural_baseline = -1;
+    } else {
+        Gtk::ProgressBar::measure_vfunc(orientation, for_size, minimum, natural,
+                                        minimum_baseline, natural_baseline);
+    }
+}
 
 BackBuffer::BackBuffer() : x(0), y(0), w(0), h(0), offset(0, 0), dirty(true) {}
 BackBuffer::BackBuffer(int width, int height, Cairo::Surface::Format format) : x(0), y(0), w(width), h(height), offset(0, 0), dirty(true)

@@ -226,7 +226,7 @@ private:
     Glib::ustring lastSaveAsFileName;
     bool realized;
 
-//     MyProgressBar  *progressLabel;
+    MyProgressBar  *progressLabel;
     Gtk::ToggleButton* info;
     Gtk::ToggleButton* hidehp;
     Gtk::ToggleButton* tbShowHideSidePanels;

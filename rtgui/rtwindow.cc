@@ -685,6 +685,8 @@ bool RtWindow::on_close_request ()
     }
 
     if (isProcessing) {
+        // TODO(gtk4): Can't close window after opening editor from filebrowser
+        // Possibly due to partially commented out code...
         return true;
     }
 
@@ -757,30 +759,30 @@ bool RtWindow::on_close_request ()
 
 void RtWindow::writeToolExpandedStatus (std::vector<int> &tpOpen)
 {
-//     if ((isSingleTabMode() || gimpPlugin) && epanel->isRealized()) {
-//         epanel->writeToolExpandedStatus (tpOpen);
-//     } else {
-//         // Storing the options of the last EditorPanel before Gtk destroys everything
-//         // Look at the active panel first, if any, otherwise look at the first one (sorted on the filename)
-//         if (epanels.size()) {
-//             int page = mainNB->get_current_page();
-//             Gtk::Widget *w = mainNB->get_nth_page (page);
-//             bool optionsWritten = false;
-//
-//             for (std::map<Glib::ustring, EditorPanel*>::iterator i = epanels.begin(); i != epanels.end(); ++i) {
-//                 if (i->second == w) {
-//                     i->second->writeToolExpandedStatus (tpOpen);
-//                     optionsWritten = true;
-//                 }
-//             }
-//
-//             if (!optionsWritten) {
-//                 // fallback solution: save the options of the first editor panel
-//                 std::map<Glib::ustring, EditorPanel*>::iterator i = epanels.begin();
-//                 i->second->writeToolExpandedStatus (tpOpen);
-//             }
-//         }
-//     }
+    if ((isSingleTabMode() || gimpPlugin) && epanel->isRealized()) {
+        epanel->writeToolExpandedStatus (tpOpen);
+    } else {
+        // Storing the options of the last EditorPanel before Gtk destroys everything
+        // Look at the active panel first, if any, otherwise look at the first one (sorted on the filename)
+        if (epanels.size()) {
+            int page = mainNB->get_current_page();
+            Gtk::Widget *w = mainNB->get_nth_page (page);
+            bool optionsWritten = false;
+
+            for (std::map<Glib::ustring, EditorPanel*>::iterator i = epanels.begin(); i != epanels.end(); ++i) {
+                if (i->second == w) {
+                    i->second->writeToolExpandedStatus (tpOpen);
+                    optionsWritten = true;
+                }
+            }
+
+            if (!optionsWritten) {
+                // fallback solution: save the options of the first editor panel
+                std::map<Glib::ustring, EditorPanel*>::iterator i = epanels.begin();
+                i->second->writeToolExpandedStatus (tpOpen);
+            }
+        }
+    }
 }
 
 void RtWindow::showRawPedia()
@@ -1061,19 +1063,18 @@ bool RtWindow::isEditorPanel (guint pageNum)
 
 void RtWindow::setEditorMode (bool tabbedUI)
 {
-//     MoveFileBrowserToMain();
-//     closeOpenEditors();
-//     SetMainCurrent();
-//
-//     if (tabbedUI) {
-//         mainNB->remove_page (*epanel);
-//         epanel = nullptr;
-//         set_title_decorated ("");
-//     } else {
-//         createSetmEditor();
-//         epanel->show_all();
-//         set_title_decorated ("");
-//     }
+    MoveFileBrowserToMain();
+    closeOpenEditors();
+    SetMainCurrent();
+
+    if (tabbedUI) {
+        mainNB->remove_page (*epanel);
+        epanel = nullptr;
+        set_title_decorated ("");
+    } else {
+        createSetmEditor();
+        set_title_decorated ("");
+    }
 }
 
 void RtWindow::createSetmEditor()

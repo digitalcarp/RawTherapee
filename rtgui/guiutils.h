@@ -568,20 +568,20 @@ public:
     const Gtk::Label* getLabel() const;
 };
 
-// class MyProgressBar final : public Gtk::ProgressBar
-// {
-// private:
-//     int w;
-//
-//     void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
-//                        int& minimum_baseline, int& natural_baseline) const override;
-//
-// public:
-//     explicit MyProgressBar(int width);
-//     MyProgressBar();
-//
-//     void setPreferredWidth(int width);
-// };
+class MyProgressBar final : public Gtk::ProgressBar
+{
+private:
+    int w;
+
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
+
+public:
+    explicit MyProgressBar(int width);
+    MyProgressBar();
+
+    void setPreferredWidth(int width);
+};
 
 /**
  * @brief Define a gradient milestone

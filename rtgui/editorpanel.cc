@@ -58,16 +58,16 @@ using ScopeType = Options::ScopeType;
 namespace
 {
 
-// void setprogressStrUI(double val, const Glib::ustring str, MyProgressBar* pProgress)
-// {
-//     if (!str.empty()) {
-//         pProgress->set_text(M(str));
-//     }
-//
-//     if (val >= 0.0) {
-//         pProgress->set_fraction(val);
-//     }
-// }
+void setprogressStrUI(double val, const Glib::ustring str, MyProgressBar* pProgress)
+{
+    if (!str.empty()) {
+        pProgress->set_text(M(str));
+    }
+
+    if (val >= 0.0) {
+        pProgress->set_fraction(val);
+    }
+}
 
 // #if !defined(__APPLE__) // monitor profile not supported on apple
 // bool find_default_monitor_profile (GdkWindow *rootwin, Glib::ustring &defprof, Glib::ustring &defprofname)
@@ -913,10 +913,10 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     );
 
     // Status box
-//     progressLabel = Gtk::manage (new MyProgressBar (300));
-//     progressLabel->set_show_text (true);
-//     setExpandAlignProperties (progressLabel, true, false, Gtk::Align::START, Gtk::Align::FILL);
-//     progressLabel->set_fraction (0.0);
+    progressLabel = Gtk::manage (new MyProgressBar (300));
+    progressLabel->set_show_text (true);
+    setExpandAlignProperties (progressLabel, true, false, Gtk::Align::START, Gtk::Align::FILL);
+    progressLabel->set_fraction (0.0);
 
     // tbRightPanel_1
     tbRightPanel_1 = Gtk::manage(new Gtk::ToggleButton());
@@ -1405,28 +1405,28 @@ void EditorPanel::clearParamChanges()
 
 void EditorPanel::setProgress(double p)
 {
-//     MyProgressBar* const pl = progressLabel;
-// 
-//     idle_register.add(
-//         [p, pl]() -> bool
-//         {
-//             setprogressStrUI(p, {}, pl);
-//             return false;
-//         }
-//     );
+    MyProgressBar* const pl = progressLabel;
+
+    idle_register.add(
+        [p, pl]() -> bool
+        {
+            setprogressStrUI(p, {}, pl);
+            return false;
+        }
+    );
 }
 
 void EditorPanel::setProgressStr(const Glib::ustring& str)
 {
-//     MyProgressBar* const pl = progressLabel;
-//
-//     idle_register.add(
-//         [str, pl]() -> bool
-//         {
-//             setprogressStrUI(-1.0, str, pl);
-//             return false;
-//         }
-//     );
+    MyProgressBar* const pl = progressLabel;
+
+    idle_register.add(
+        [str, pl]() -> bool
+        {
+            setprogressStrUI(-1.0, str, pl);
+            return false;
+        }
+    );
 }
 
 void EditorPanel::setProgressState(bool inProcessing)
@@ -1498,53 +1498,54 @@ void EditorPanel::displayError(const Glib::ustring& title, const Glib::ustring& 
 // This is only called from the ThreadUI, so within the gtk thread
 void EditorPanel::refreshProcessingState (bool inProcessingP)
 {
-//     double val;
-//     Glib::ustring str;
-//
-//     if (inProcessingP) {
-//         if (processingStartedTime == 0) {
-//             processingStartedTime = ::time (nullptr);
-//         }
-//
-//         val = 1.0;
-//         str = "PROGRESSBAR_PROCESSING";
-//     } else {
+    double val;
+    Glib::ustring str;
+
+    if (inProcessingP) {
+        if (processingStartedTime == 0) {
+            processingStartedTime = ::time (nullptr);
+        }
+
+        val = 1.0;
+        str = "PROGRESSBAR_PROCESSING";
+    } else {
 //         // Set proc params of thumbnail. It saves it into the cache and updates the file browser.
 //         if (ipc && openThm && tpc->getChangedState()) {
 //             rtengine::procparams::ProcParams pparams;
 //             ipc->getParams (&pparams);
 //             openThm->setProcParams (pparams, nullptr, EDITOR, false);
 //         }
-//
-//         // Ring a sound if it was a long event
-//         if (processingStartedTime != 0) {
-//             time_t curTime = ::time (nullptr);
-//
-//             if (::difftime (curTime, processingStartedTime) > options.sndLngEditProcDoneSecs) {
+
+        // Ring a sound if it was a long event
+        if (processingStartedTime != 0) {
+            time_t curTime = ::time (nullptr);
+
+            if (::difftime (curTime, processingStartedTime) > options.sndLngEditProcDoneSecs) {
+// TODO(gtk4)
 //                 SoundManager::playSoundAsync (options.sndLngEditProcDone);
-//             }
-//
-//             processingStartedTime = 0;
-//         }
-//
-//         // Set progress bar "done"
-//         val = 0.0;
-//         str = "PROGRESSBAR_READY";
-//
-// #ifdef _WIN32
-//
-//         // Maybe accessing "parent", which is a Gtk object, can justify to get the Gtk lock...
-//         if (!firstProcessingDone && static_cast<RtWindow*> (parent)->getIsFullscreen()) {
-//             parent->fullscreen();
-//         }
-//
-// #endif
-//         firstProcessingDone = true;
-//     }
-//
-//     isProcessing = inProcessingP;
-//
-//     setprogressStrUI(val, str, progressLabel);
+            }
+
+            processingStartedTime = 0;
+        }
+
+        // Set progress bar "done"
+        val = 0.0;
+        str = "PROGRESSBAR_READY";
+
+#ifdef _WIN32
+
+        // Maybe accessing "parent", which is a Gtk object, can justify to get the Gtk lock...
+        if (!firstProcessingDone && static_cast<RtWindow*> (parent)->getIsFullscreen()) {
+            parent->fullscreen();
+        }
+
+#endif
+        firstProcessingDone = true;
+    }
+
+    isProcessing = inProcessingP;
+
+    setprogressStrUI(val, str, progressLabel);
 }
 
 void EditorPanel::info_toggled ()
