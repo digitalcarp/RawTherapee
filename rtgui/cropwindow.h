@@ -208,10 +208,11 @@ public:
     bool isInside    (int x, int y);
 
 
-    void scroll        (int state, GdkScrollDirection direction, int x, int y, double deltaX=0.0, double deltaY=0.0);
-    void buttonPress   (int button, int num, int state, int x, int y);
-    void buttonRelease (int button, int num, int state, int x, int y);
-    void pointerMoved  (int bstate, int x, int y);
+    void scroll        (Gdk::ModifierType state, Gdk::ScrollDirection direction,
+                        int x, int y, double deltaX=0.0, double deltaY=0.0);
+    void buttonPress   (int button, int num, Gdk::ModifierType state, int x, int y);
+    void buttonRelease (int button, int num, Gdk::ModifierType state, int x, int y);
+    void pointerMoved  (Gdk::ModifierType bstate, int x, int y);
 
     void expose        (Cairo::RefPtr<Cairo::Context> cr);
 

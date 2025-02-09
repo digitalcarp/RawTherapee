@@ -64,12 +64,14 @@ protected:
     PointerMotionListener* pmhlistener;
     ImageAreaToolListener* listener;
 
+    Glib::RefPtr<Gtk::EventControllerMotion> motionController;
+    Glib::RefPtr<Gtk::EventControllerScroll> scrollController;
+    Glib::RefPtr<Gtk::GestureClick> clickController;
+
     CropWindow* getCropWindow (int x, int y);
     Gtk::SizeRequestMode get_request_mode_vfunc () const override;
-    void get_preferred_height_vfunc (int &minimum_height, int &natural_height) const override;
-    void get_preferred_width_vfunc (int &minimum_width, int &natural_width) const override;
-    void get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const override;
-    void get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const override;
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const;
 
     int fullImageWidth, fullImageHeight;
 public:
@@ -81,7 +83,7 @@ public:
     ImageArea* iLinkedImageArea; // used to set a reference to the Before image area, which is set when before/after view is enabled
 
     explicit ImageArea (ImageAreaPanel* p);
-    ~ImageArea () override;
+    ~ImageArea ();
 
     rtengine::StagedImageProcessor* getImProcCoordinator() const;
     void setImProcCoordinator(rtengine::StagedImageProcessor* ipc_);
@@ -105,14 +107,13 @@ public:
 
     // widget base events
     void on_realize () override;
-    bool on_draw                 (const ::Cairo::RefPtr< Cairo::Context> &cr) override;
-    bool on_motion_notify_event  (GdkEventMotion* event) override;
-    bool on_button_press_event   (GdkEventButton* event) override;
-    bool on_button_release_event (GdkEventButton* event) override;
-    bool on_scroll_event         (GdkEventScroll* event) override;
-    bool on_leave_notify_event   (GdkEventCrossing* event) override;
-    void on_resized              (Gtk::Allocation& req);
-    void on_style_updated        () override;
+    void on_draw                 (const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
+    void on_motion_notify_event  (double x, double y);
+    void on_button_press_event   (int n_press, double x, double y);
+    void on_button_release_event (int n_press, double x, double y);
+    bool on_scroll_event         (double dx, double dy);
+    void on_leave_notify_event   ();
+    void on_resized              (int width, int height);
     void syncBeforeAfterViews    ();
 
     void            setCropGUIListener       (CropGUIListener* l);

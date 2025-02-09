@@ -309,7 +309,7 @@ bool CropWindow::isInside (int x, int y)
     return x >= windowPos.x && x < windowPos.x + windowSize.width && y >= windowPos.y && y < windowPos.y + windowSize.height;
 }
 
-void CropWindow::leaveNotify (GdkEventCrossing* event)
+void CropWindow::leaveNotify ()
 {
     EditSubscriber* subscriber = iarea->getCurrSubscriber();
 

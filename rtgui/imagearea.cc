@@ -49,13 +49,29 @@ ImageArea::ImageArea (ImageAreaPanel* p) : parent(p), fullImageWidth(0), fullIma
     previewModePanel =  Gtk::manage (new PreviewModePanel (this));
     previewModePanel->get_style_context()->add_class("narrowbuttonbox");
 
-    add_events(Gdk::LEAVE_NOTIFY_MASK);
-
-    signal_size_allocate().connect( sigc::mem_fun(*this, &ImageArea::on_resized) );
+    set_draw_func(sigc::mem_fun(*this, &ImageArea::on_draw));
+    signal_resize().connect( sigc::mem_fun(*this, &ImageArea::on_resized) );
 
     dirty = false;
     ipc = nullptr;
     iLinkedImageArea = nullptr;
+
+    clickController = Gtk::GestureClick::create();
+    clickController->signal_pressed().connect(
+        sigc::mem_fun(*this, &ImageArea::on_button_press_event));
+    clickController->signal_released().connect(
+        sigc::mem_fun(*this, &ImageArea::on_button_release_event));
+    add_controller(clickController);
+
+    motionController = Gtk::EventControllerMotion::create();
+    motionController->signal_leave().connect(
+        sigc::mem_fun(*this, &ImageArea::on_leave_notify_event));
+    add_controller(motionController);
+
+    scrollController = Gtk::EventControllerScroll::create();
+    scrollController->signal_scroll().connect(
+        sigc::mem_fun(*this, &ImageArea::on_scroll_event), false);
+    add_controller(scrollController);
 }
 
 ImageArea::~ImageArea ()
@@ -76,22 +92,14 @@ void ImageArea::on_realize()
 {
     Gtk::DrawingArea::on_realize();
 
-#if defined (__APPLE__)
-    // Workaround: disabling POINTER_MOTION_HINT_MASK as for gtk 2.24.22 the get_pointer() function is buggy for quartz and modifier mask is not updated correctly.
-    // This workaround should be removed when bug is fixed in GTK2 or when migrating to GTK3
-    add_events(Gdk::EXPOSURE_MASK | Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK | Gdk::SCROLL_MASK);
-#else
-    add_events(Gdk::EXPOSURE_MASK | Gdk::POINTER_MOTION_MASK | Gdk::POINTER_MOTION_HINT_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK | Gdk::SCROLL_MASK | Gdk::SMOOTH_SCROLL_MASK);
-#endif
-
     Cairo::FontOptions cfo;
     cfo.set_antialias (Cairo::ANTIALIAS_SUBPIXEL);
     get_pango_context ()->set_cairo_font_options (cfo);
 }
 
-void ImageArea::on_resized (Gtk::Allocation& req)
+void ImageArea::on_resized (int width, int height)
 {
-    if (ipc && get_width() > 1) { // sometimes on_resize is called in some init state, causing wrong sizes
+    if (ipc && width > 1) { // sometimes on_resize is called in some init state, causing wrong sizes
         if (!mainCropWindow) {
             mainCropWindow = new CropWindow (this, false, false);
             mainCropWindow->setDecorated (false);
@@ -106,10 +114,10 @@ void ImageArea::on_resized (Gtk::Allocation& req)
             mainCropWindow->cropHandler.setDeviceScale(deviceScale);
 
             mainCropWindow->setPosition (0, 0);
-            mainCropWindow->setSize (get_width(), get_height());  // this execute the refresh itself
+            mainCropWindow->setSize (width, height);  // this execute the refresh itself
             mainCropWindow->enable();  // start processing !
         } else {
-            mainCropWindow->setSize (get_width(), get_height());  // this execute the refresh itself
+            mainCropWindow->setSize (width, height);  // this execute the refresh itself
         }
 
         parent->syncBeforeAfterViews();
@@ -146,13 +154,6 @@ void ImageArea::setPreviewHandler (PreviewHandler* ph)
     previewHandler = ph;
 }
 
-void ImageArea::on_style_updated ()
-{
-
-    // TODO: notify all crop windows that the style has been changed
-    queue_draw ();
-}
-
 void ImageArea::setInfoText (Glib::ustring&& text)
 {
     infotext = std::move(text);
@@ -164,10 +165,10 @@ void ImageArea::updateInfoTextBackBuffer()
     backBufferDeviceScale = RTScalable::getScaleForWidget(this);
 
     Glib::RefPtr<Pango::Context> context = get_pango_context () ;
-    Pango::FontDescription fontd(get_style_context()->get_font());
+    Pango::FontDescription fontd = context->get_font_description();
 
     // update font
-    fontd.set_weight (Pango::WEIGHT_BOLD);
+    fontd.set_weight (Pango::Weight::BOLD);
     const int fontSize = 10; // pt
     // Non-absolute size is defined in "Pango units" and shall be multiplied by
     // Pango::SCALE from "pt":
@@ -187,7 +188,7 @@ void ImageArea::updateInfoTextBackBuffer()
     int bufferOffset = 8;
 
     // create BackBuffer
-    iBackBuffer.setDrawRectangle(Cairo::FORMAT_ARGB32, 0, 0, bufferWidth, bufferHeight, true);
+    iBackBuffer.setDrawRectangle(Cairo::Surface::Format::ARGB32, 0, 0, bufferWidth, bufferHeight, true);
     iBackBuffer.setDestPosition(bufferOffset, bufferOffset);
     hidpi::setDeviceScale(iBackBuffer.getSurface(), backBufferDeviceScale);
 
@@ -195,9 +196,9 @@ void ImageArea::updateInfoTextBackBuffer()
 
     // cleaning the back buffer (make it full transparent)
     cr->set_source_rgba (0., 0., 0., 0.);
-    cr->set_operator (Cairo::OPERATOR_CLEAR);
+    cr->set_operator (Cairo::Context::Operator::CLEAR);
     cr->paint ();
-    cr->set_operator (Cairo::OPERATOR_OVER);
+    cr->set_operator (Cairo::Context::Operator::OVER);
 
     // paint transparent black background
     cr->set_source_rgba (0., 0., 0., 0.5);
@@ -248,7 +249,7 @@ void ImageArea::switchPickerVisibility (bool isVisible)
     redraw();
 }
 
-bool ImageArea::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
+void ImageArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height)
 {
     dirty = false;
 
@@ -259,7 +260,7 @@ bool ImageArea::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
             for (const auto& win : cropWins) {
                 win->cropHandler.setDeviceScale(deviceScale);
             }
-            mainCropWindow->setSize(get_width(), get_height());
+            mainCropWindow->setSize(width, height);
         }
 
         mainCropWindow->expose (cr);
@@ -275,19 +276,17 @@ bool ImageArea::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
         }
         iBackBuffer.copySurface(cr);
     }
-
-
-    return true;
 }
 
 
-bool ImageArea::on_motion_notify_event (GdkEventMotion* event)
+void ImageArea::on_motion_notify_event (double x, double y)
 {
+    Gdk::ModifierType state = motionController->get_current_event_state();
 
     if (focusGrabber) {
-        focusGrabber->pointerMoved (event->state, event->x, event->y);
+        focusGrabber->pointerMoved (state, x, y);
     } else {
-        CropWindow* cw = getCropWindow (event->x, event->y);
+        CropWindow* cw = getCropWindow (x, y);
 
         if (cw) {
             if (cw != flawnOverWindow) {
@@ -299,63 +298,66 @@ bool ImageArea::on_motion_notify_event (GdkEventMotion* event)
                 flawnOverWindow = cw;
             }
 
-            cw->pointerMoved (event->state, event->x, event->y);
+            cw->pointerMoved (state, x, y);
         } else if (flawnOverWindow) {
             flawnOverWindow->flawnOver(false);
             flawnOverWindow = nullptr;
         }
     }
-
-    return true;
 }
 
-bool ImageArea::on_button_press_event (GdkEventButton* event)
+void ImageArea::on_button_press_event (int n_press, double x, double y)
 {
+    unsigned int button = clickController->get_button();
+    Gdk::ModifierType state = motionController->get_current_event_state();
 
     if (focusGrabber) {
-        focusGrabber->buttonPress (event->button, event->type, event->state, event->x, event->y);
+        focusGrabber->buttonPress (button, n_press, state, x, y);
     } else {
-        CropWindow* cw = getCropWindow (event->x, event->y);
+        CropWindow* cw = getCropWindow (x, y);
 
         if (cw) {
-            cw->buttonPress (event->button, event->type, event->state, event->x, event->y);
+            cw->buttonPress (button, n_press, state, x, y);
         }
     }
-
-    return true;
 }
 
-bool ImageArea::on_scroll_event (GdkEventScroll* event)
+bool ImageArea::on_scroll_event (double dx, double dy)
 {
+    auto event = motionController->get_current_event();
+    Gdk::ModifierType state = motionController->get_current_event_state();
+    double x = -1;
+    double y = -1;
+    bool success = event->get_position(x, y);
 
 //    printf("ImageArea::on_scroll_event / delta_x=%.5f, delta_y=%.5f, direction=%d, type=%d, send_event=%d\n",
 //            event->delta_x, event->delta_y, (int)event->direction, (int)event->type, event->send_event);
 
-    CropWindow* cw = getCropWindow (event->x, event->y);
+    CropWindow* cw = success ? getCropWindow (x, y) : nullptr;
     if (cw) {
-        cw->scroll (event->state, event->direction, event->x, event->y, event->delta_x, event->delta_y);
+        cw->scroll (state, event->get_direction(), x, y, dx, dy);
     }
 
     return true;
 }
 
-bool ImageArea::on_button_release_event (GdkEventButton* event)
+void ImageArea::on_button_release_event (int n_press, double x, double y)
 {
+    unsigned int button = clickController->get_button();
+    Gdk::ModifierType state = motionController->get_current_event_state();
 
     if (focusGrabber) {
-        focusGrabber->buttonRelease (event->button, event->type, event->state, event->x, event->y);
+        focusGrabber->buttonRelease (button, n_press, state, x, y);
     } else {
-        CropWindow* cw = getCropWindow (event->x, event->y);
+        CropWindow* cw = getCropWindow (x, y);
 
         if (cw) {
-            cw->buttonRelease (event->button, event->type, event->state, event->x, event->y);
+            cw->buttonRelease (button, n_press, state, x, y);
         }
     }
-
-    return true;
 }
 
-bool ImageArea::on_leave_notify_event  (GdkEventCrossing* event)
+void ImageArea::on_leave_notify_event()
 {
     if (flawnOverWindow) {
         flawnOverWindow->flawnOver(false);
@@ -364,17 +366,20 @@ bool ImageArea::on_leave_notify_event  (GdkEventCrossing* event)
 
     if (focusGrabber) {
         focusGrabber->flawnOver(false);
-        focusGrabber->leaveNotify (event);
+        focusGrabber->leaveNotify ();
     } else {
-        CropWindow* cw = getCropWindow (event->x, event->y);
+        auto event = motionController->get_current_event();
+        double x = -1;
+        double y = -1;
+        bool success = event->get_position(x, y);
+
+        CropWindow* cw = success ? getCropWindow (x, y) : nullptr;
 
         if (cw) {
             cw->flawnOver(false);
-            cw->leaveNotify (event);
+            cw->leaveNotify ();
         }
     }
-
-    return true;
 }
 
 void ImageArea::subscribe(EditSubscriber *subscriber)
@@ -814,25 +819,18 @@ Gtk::SizeRequestMode ImageArea::get_request_mode_vfunc () const
     return Gtk::SizeRequestMode::CONSTANT_SIZE;
 }
 
-void ImageArea::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const
+void ImageArea::measure_vfunc(
+    Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+    int& minimum_baseline, int& natural_baseline) const
 {
-    minimum_height = RTScalable::scalePixelSize(50);
-    natural_height = RTScalable::scalePixelSize(300);
-}
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        minimum = RTScalable::scalePixelSize(100);
+        natural = RTScalable::scalePixelSize(400);
+    } else {
+        minimum = RTScalable::scalePixelSize(50);
+        natural = RTScalable::scalePixelSize(300);
+    }
 
-void ImageArea::get_preferred_width_vfunc (int &minimum_width, int &natural_width) const
-{
-    minimum_width = RTScalable::scalePixelSize(100);
-    natural_width = RTScalable::scalePixelSize(400);
+    minimum_baseline = -1;
+    natural_baseline = -1;
 }
-
-void ImageArea::get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const
-{
-    get_preferred_height_vfunc(minimum_height, natural_height);
-}
-
-void ImageArea::get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const
-{
-    get_preferred_width_vfunc (minimum_width, natural_width);
-}
-
