@@ -117,7 +117,7 @@ HistogramPanel::HistogramPanel () :
     gfxGrid = Gtk::manage (new Gtk::Grid ());
     gfxGrid->set_row_spacing(1);
     gfxGrid->set_column_spacing(1);
-    gfxGrid->add(*histogramArea);
+    gfxGrid->attach_next_to(*histogramArea, Gtk::PositionType::BOTTOM);
     gfxGrid->attach_next_to(
         *histogramRGBAreaVert, *histogramArea,
         options.histogramPosition == 1 ? Gtk::PositionType::RIGHT : Gtk::PositionType::LEFT,
@@ -125,33 +125,33 @@ HistogramPanel::HistogramPanel () :
         1
     );
     gfxGrid->attach_next_to(*histogramRGBAreaHori, *histogramArea, Gtk::PositionType::BOTTOM, 1, 1);
-    histogramRGBAreaHori->set_no_show_all();
-    histogramRGBAreaVert->set_no_show_all();
+    histogramRGBAreaHori->hide();
+    histogramRGBAreaVert->hide();
 
-    redImage   = new RTImage ("histogram-red-on-small", Gtk::ICON_SIZE_BUTTON);
-    greenImage = new RTImage ("histogram-green-on-small", Gtk::ICON_SIZE_BUTTON);
-    blueImage  = new RTImage ("histogram-blue-on-small", Gtk::ICON_SIZE_BUTTON);
-    valueImage = new RTImage ("histogram-silver-on-small", Gtk::ICON_SIZE_BUTTON);
-    chroImage  = new RTImage ("histogram-gold-on-small", Gtk::ICON_SIZE_BUTTON);
-    barImage   = new RTImage ("histogram-bar-on-small", Gtk::ICON_SIZE_BUTTON);
+    redImage   = new RtImage ("histogram-red-on-small");
+    greenImage = new RtImage ("histogram-green-on-small");
+    blueImage  = new RtImage ("histogram-blue-on-small");
+    valueImage = new RtImage ("histogram-silver-on-small");
+    chroImage  = new RtImage ("histogram-gold-on-small");
+    barImage   = new RtImage ("histogram-bar-on-small");
 
-    redImage_g   = new RTImage ("histogram-red-off-small", Gtk::ICON_SIZE_BUTTON);
-    greenImage_g = new RTImage ("histogram-green-off-small", Gtk::ICON_SIZE_BUTTON);
-    blueImage_g  = new RTImage ("histogram-blue-off-small", Gtk::ICON_SIZE_BUTTON);
-    valueImage_g = new RTImage ("histogram-silver-off-small", Gtk::ICON_SIZE_BUTTON);
-    chroImage_g  = new RTImage ("histogram-gold-off-small", Gtk::ICON_SIZE_BUTTON);
-    barImage_g   = new RTImage ("histogram-bar-off-small", Gtk::ICON_SIZE_BUTTON);
+    redImage_g   = new RtImage ("histogram-red-off-small");
+    greenImage_g = new RtImage ("histogram-green-off-small");
+    blueImage_g  = new RtImage ("histogram-blue-off-small");
+    valueImage_g = new RtImage ("histogram-silver-off-small");
+    chroImage_g  = new RtImage ("histogram-gold-off-small");
+    barImage_g   = new RtImage ("histogram-bar-off-small");
 
-    mode0Image  = new RTImage ("histogram-mode-linear-small", Gtk::ICON_SIZE_BUTTON);
-    mode1Image  = new RTImage ("histogram-mode-logx-small", Gtk::ICON_SIZE_BUTTON);
-    mode2Image  = new RTImage ("histogram-mode-logxy-small", Gtk::ICON_SIZE_BUTTON);
+    mode0Image  = new RtImage ("histogram-mode-linear-small");
+    mode1Image  = new RtImage ("histogram-mode-logx-small");
+    mode2Image  = new RtImage ("histogram-mode-logxy-small");
 
-    Gtk::Image* histImage = Gtk::manage(new RTImage("histogram-type-histogram-small", Gtk::ICON_SIZE_BUTTON));
-    Gtk::Image* histRawImage = Gtk::manage(new RTImage("histogram-type-histogram-raw-small", Gtk::ICON_SIZE_BUTTON));
-    Gtk::Image* paradeImage = Gtk::manage(new RTImage("histogram-type-parade-small", Gtk::ICON_SIZE_BUTTON));
-    Gtk::Image* waveImage = Gtk::manage(new RTImage("histogram-type-waveform-small", Gtk::ICON_SIZE_BUTTON));
-    Gtk::Image* vectHcImage = Gtk::manage(new RTImage("histogram-type-vectorscope-hc-small", Gtk::ICON_SIZE_BUTTON));
-    Gtk::Image* vectHsImage = Gtk::manage(new RTImage("histogram-type-vectorscope-hs-small", Gtk::ICON_SIZE_BUTTON));
+    Gtk::Image* histImage = Gtk::manage(new RtImage("histogram-type-histogram-small"));
+    Gtk::Image* histRawImage = Gtk::manage(new RtImage("histogram-type-histogram-raw-small"));
+    Gtk::Image* paradeImage = Gtk::manage(new RtImage("histogram-type-parade-small"));
+    Gtk::Image* waveImage = Gtk::manage(new RtImage("histogram-type-waveform-small"));
+    Gtk::Image* vectHcImage = Gtk::manage(new RtImage("histogram-type-vectorscope-hc-small"));
+    Gtk::Image* vectHsImage = Gtk::manage(new RtImage("histogram-type-vectorscope-hs-small"));
 
     showRed   = Gtk::manage (new Gtk::ToggleButton ());
     showGreen = Gtk::manage (new Gtk::ToggleButton ());
@@ -162,19 +162,17 @@ HistogramPanel::HistogramPanel () :
     showBAR   = Gtk::manage (new Gtk::ToggleButton ());
     scopeOptions = Gtk::manage (new Gtk::ToggleButton ());
 
-    Gtk::RadioButtonGroup scopeTypeGroup;
-    scopeHistBtn = Gtk::manage(new Gtk::RadioButton(scopeTypeGroup));
-    scopeHistRawBtn = Gtk::manage(new Gtk::RadioButton(scopeTypeGroup));
-    scopeParadeBtn = Gtk::manage(new Gtk::RadioButton(scopeTypeGroup));
-    scopeWaveBtn = Gtk::manage(new Gtk::RadioButton(scopeTypeGroup));
-    scopeVectHcBtn = Gtk::manage(new Gtk::RadioButton(scopeTypeGroup));
-    scopeVectHsBtn = Gtk::manage(new Gtk::RadioButton(scopeTypeGroup));
-    scopeHistBtn->set_mode(false);
-    scopeHistRawBtn->set_mode(false);
-    scopeParadeBtn->set_mode(false);
-    scopeWaveBtn->set_mode(false);
-    scopeVectHcBtn->set_mode(false);
-    scopeVectHsBtn->set_mode(false);
+    scopeHistBtn = Gtk::manage(new Gtk::ToggleButton());
+    scopeHistRawBtn = Gtk::manage(new Gtk::ToggleButton());
+    scopeParadeBtn = Gtk::manage(new Gtk::ToggleButton());
+    scopeWaveBtn = Gtk::manage(new Gtk::ToggleButton());
+    scopeVectHcBtn = Gtk::manage(new Gtk::ToggleButton());
+    scopeVectHsBtn = Gtk::manage(new Gtk::ToggleButton());
+    scopeHistRawBtn->set_group(*scopeHistBtn);
+    scopeParadeBtn->set_group(*scopeHistBtn);
+    scopeWaveBtn->set_group(*scopeHistBtn);
+    scopeVectHcBtn->set_group(*scopeHistBtn);
+    scopeVectHsBtn->set_group(*scopeHistBtn);
 
     showRed->set_name("histButton");
     showRed->set_can_focus(false);
@@ -205,20 +203,20 @@ HistogramPanel::HistogramPanel () :
     scopeVectHsBtn->set_name("histButton");
     scopeVectHsBtn->set_can_focus(false);
 
-    showRed->set_relief (Gtk::RELIEF_NONE);
-    showGreen->set_relief (Gtk::RELIEF_NONE);
-    showBlue->set_relief (Gtk::RELIEF_NONE);
-    showValue->set_relief (Gtk::RELIEF_NONE);
-    showChro->set_relief (Gtk::RELIEF_NONE);
-    showMode->set_relief (Gtk::RELIEF_NONE);
-    scopeOptions->set_relief (Gtk::RELIEF_NONE);
-    showBAR->set_relief (Gtk::RELIEF_NONE);
-    scopeHistBtn->set_relief (Gtk::RELIEF_NONE);
-    scopeHistRawBtn->set_relief (Gtk::RELIEF_NONE);
-    scopeParadeBtn->set_relief (Gtk::RELIEF_NONE);
-    scopeWaveBtn->set_relief (Gtk::RELIEF_NONE);
-    scopeVectHcBtn->set_relief (Gtk::RELIEF_NONE);
-    scopeVectHsBtn->set_relief (Gtk::RELIEF_NONE);
+    showRed->set_has_frame(false);
+    showGreen->set_has_frame(false);
+    showBlue->set_has_frame(false);
+    showValue->set_has_frame(false);
+    showChro->set_has_frame(false);
+    showMode->set_has_frame(false);
+    scopeOptions->set_has_frame(false);
+    showBAR->set_has_frame(false);
+    scopeHistBtn->set_has_frame(false);
+    scopeHistRawBtn->set_has_frame(false);
+    scopeParadeBtn->set_has_frame(false);
+    scopeWaveBtn->set_has_frame(false);
+    scopeVectHcBtn->set_has_frame(false);
+    scopeVectHsBtn->set_has_frame(false);
 
     showRed->set_tooltip_text   (M("HISTOGRAM_TOOLTIP_R"));
     showGreen->set_tooltip_text (M("HISTOGRAM_TOOLTIP_G"));
@@ -250,23 +248,23 @@ HistogramPanel::HistogramPanel () :
     scopeOptions->set_active(options.histogramShowOptionButtons);
     showBAR->set_active   (options.histogramBar);
 
-    showRed->set_image   (showRed->get_active()   ? *redImage   : *redImage_g);
-    showGreen->set_image (showGreen->get_active() ? *greenImage : *greenImage_g);
-    showBlue->set_image  (showBlue->get_active()  ? *blueImage  : *blueImage_g);
-    showValue->set_image (showValue->get_active() ? *valueImage : *valueImage_g);
-    showChro->set_image  (showChro->get_active()  ? *chroImage  : *chroImage_g);
+    showRed->set_child   (showRed->get_active()   ? *redImage   : *redImage_g);
+    showGreen->set_child (showGreen->get_active() ? *greenImage : *greenImage_g);
+    showBlue->set_child  (showBlue->get_active()  ? *blueImage  : *blueImage_g);
+    showValue->set_child (showValue->get_active() ? *valueImage : *valueImage_g);
+    showChro->set_child  (showChro->get_active()  ? *chroImage  : *chroImage_g);
     if (options.histogramDrawMode == 0)
-        showMode->set_image(*mode0Image);
+        showMode->set_child(*mode0Image);
     else if (options.histogramDrawMode == 1)
-        showMode->set_image(*mode1Image);
+        showMode->set_child(*mode1Image);
     else
-        showMode->set_image(*mode2Image);
-    scopeHistBtn->set_image(*histImage);
-    scopeHistRawBtn->set_image(*histRawImage);
-    scopeParadeBtn->set_image(*paradeImage);
-    scopeWaveBtn->set_image(*waveImage);
-    scopeVectHcBtn->set_image(*vectHcImage);
-    scopeVectHsBtn->set_image(*vectHsImage);
+        showMode->set_child(*mode2Image);
+    scopeHistBtn->set_child(*histImage);
+    scopeHistRawBtn->set_child(*histRawImage);
+    scopeParadeBtn->set_child(*paradeImage);
+    scopeWaveBtn->set_child(*waveImage);
+    scopeVectHcBtn->set_child(*vectHcImage);
+    scopeVectHsBtn->set_child(*vectHsImage);
     switch(options.histogramScopeType) {
         case ScopeType::HISTOGRAM:
             scopeHistBtn->set_active();
@@ -289,8 +287,8 @@ HistogramPanel::HistogramPanel () :
         case ScopeType::NONE:
             break;
     }
-    scopeOptions->set_image(*Gtk::manage(new RTImage("histogram-ellipsis-small")));
-    showBAR->set_image   (showBAR->get_active()   ? *barImage   : *barImage_g);
+    scopeOptions->set_child(*Gtk::manage(new RtImage("histogram-ellipsis-small")));
+    showBAR->set_child   (showBAR->get_active()   ? *barImage   : *barImage_g);
 
     setExpandAlignProperties(showRed, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
     setExpandAlignProperties(showGreen, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
@@ -315,7 +313,7 @@ HistogramPanel::HistogramPanel () :
     showBlue->signal_toggled().connect( sigc::mem_fun(*this, &HistogramPanel::blue_toggled), showBlue );
     showValue->signal_toggled().connect( sigc::mem_fun(*this, &HistogramPanel::value_toggled), showValue );
     showChro->signal_toggled().connect( sigc::mem_fun(*this, &HistogramPanel::chro_toggled), showChro );
-    showMode->signal_released().connect( sigc::mem_fun(*this, &HistogramPanel::mode_released), showMode );
+    showMode->signal_clicked().connect( sigc::mem_fun(*this, &HistogramPanel::mode_released), showMode );
     scopeOptions->signal_toggled().connect(sigc::mem_fun(*this, &HistogramPanel::scopeOptionsToggled));
     showBAR->signal_toggled().connect( sigc::mem_fun(*this, &HistogramPanel::bar_toggled), showBAR );
     scopeHistBtn->signal_toggled().connect(sigc::bind(sigc::mem_fun(*this, &HistogramPanel::type_selected), scopeHistBtn));
@@ -334,43 +332,42 @@ HistogramPanel::HistogramPanel () :
     brightnessWidget->set_tooltip_text(M("HISTOGRAM_TOOLTIP_TRACE_BRIGHTNESS"));
     setExpandAlignProperties(brightnessWidget, true, false, Gtk::Align::CENTER, Gtk::Align::START);
 
-    optionButtons->add(*showRed);
-    optionButtons->add(*showGreen);
-    optionButtons->add(*showBlue);
-    optionButtons->add(*showValue);
-    optionButtons->add(*showChro);
-    optionButtons->add(*showMode);
-    optionButtons->add(*showBAR);
-    optionButtons->add(*brightnessWidget);
+    optionButtons->append(*showRed);
+    optionButtons->append(*showGreen);
+    optionButtons->append(*showBlue);
+    optionButtons->append(*showValue);
+    optionButtons->append(*showChro);
+    optionButtons->append(*showMode);
+    optionButtons->append(*showBAR);
+    optionButtons->append(*brightnessWidget);
 
     Gtk::Separator* separator = Gtk::manage(new Gtk::Separator(Gtk::Orientation::VERTICAL));
     setExpandAlignProperties(separator, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
-    persistentButtons->add(*scopeHistBtn);
-    persistentButtons->add(*scopeHistRawBtn);
-    persistentButtons->add(*scopeParadeBtn);
-    persistentButtons->add(*scopeWaveBtn);
-    persistentButtons->add(*scopeVectHsBtn);
-    persistentButtons->add(*scopeVectHcBtn);
-    persistentButtons->add(*separator);
-    persistentButtons->add(*scopeOptions);
+    persistentButtons->append(*scopeHistBtn);
+    persistentButtons->append(*scopeHistRawBtn);
+    persistentButtons->append(*scopeParadeBtn);
+    persistentButtons->append(*scopeWaveBtn);
+    persistentButtons->append(*scopeVectHsBtn);
+    persistentButtons->append(*scopeVectHcBtn);
+    persistentButtons->append(*separator);
+    persistentButtons->append(*scopeOptions);
 
     // Put the button vbox next to the window's border to be less disturbing
     if (options.histogramPosition == 1) {
-        buttonGrid->add(*persistentButtons);
-        buttonGrid->add(*optionButtons);
+        buttonGrid->attach_next_to(*persistentButtons, Gtk::PositionType::LEFT);
+        buttonGrid->attach_next_to(*optionButtons, Gtk::PositionType::RIGHT);
 
-        add (*buttonGrid);
-        add (*gfxGrid);
+        attach_next_to (*buttonGrid, Gtk::PositionType::LEFT);
+        attach_next_to (*gfxGrid, Gtk::PositionType::RIGHT);
     } else {
-        buttonGrid->add(*optionButtons);
-        buttonGrid->add(*persistentButtons);
+        buttonGrid->attach_next_to(*optionButtons, Gtk::PositionType::LEFT);
+        buttonGrid->attach_next_to(*persistentButtons, Gtk::PositionType::RIGHT);
 
-        add (*gfxGrid);
-        add (*buttonGrid);
+        attach_next_to (*gfxGrid, Gtk::PositionType::LEFT);
+        attach_next_to (*buttonGrid, Gtk::PositionType::RIGHT);
     }
 
-    show_all ();
-    optionButtons->set_no_show_all();
+    optionButtons->hide();
     optionButtons->set_visible(options.histogramShowOptionButtons);
 
     type_changed();
@@ -384,9 +381,13 @@ HistogramPanel::HistogramPanel () :
     }
 
     brightness_changed_connection = histogramArea->getBrighnessChangedSignal().connect(sigc::mem_fun(*this, &HistogramPanel::brightnessUpdated));
-    rconn = signal_size_allocate().connect( sigc::mem_fun(*this, &HistogramPanel::resized) );
 
     histogramArea->setBrightness(options.histogramTraceBrightness);
+
+    signal_unrealize().connect([&]() {
+        // Store current height of the histogram
+        options.histogramHeight = get_height();
+    });
 }
 
 HistogramPanel::~HistogramPanel ()
@@ -419,37 +420,10 @@ void HistogramPanel::showRGBBar()
         histogramRGBArea == histogramRGBAreaVert.get() && showBAR->get_active());
 }
 
-void HistogramPanel::resized (Gtk::Allocation& req)
-{
-    static int old_height = 0;
-    static int old_width = 0;
-
-    bool size_changed =
-        old_height != req.get_height() || old_width != req.get_width();
-
-    // Set HistogramArea invalid
-    if (size_changed) {
-        histogramArea->updatePointer(-1, -1, -1);
-        histogramArea->queue_draw ();
-    }
-
-    // Set HistogramRGBArea invalid
-    if (histogramRGBArea && size_changed) {
-        histogramRGBArea->updatePointer(-1, -1, -1);
-        histogramRGBArea->queue_draw ();
-    }
-
-    // Store current height of the histogram
-    options.histogramHeight = get_height();
-
-    old_height = req.get_height();
-    old_width = req.get_width();
-}
-
 void HistogramPanel::red_toggled ()
 {
     // Update button image
-    showRed->set_image(showRed->get_active() ? *redImage : *redImage_g);
+    showRed->set_child(showRed->get_active() ? *redImage : *redImage_g);
     // Update options value
     options.histogramRed = showRed->get_active() ? true : false;
     // Update drawing areas
@@ -459,7 +433,7 @@ void HistogramPanel::red_toggled ()
 void HistogramPanel::green_toggled ()
 {
     // Update button image
-    showGreen->set_image(showGreen->get_active() ? *greenImage : *greenImage_g);
+    showGreen->set_child(showGreen->get_active() ? *greenImage : *greenImage_g);
     // Update options value
     options.histogramGreen = showGreen->get_active() ? true : false;
     // Update drawing areas
@@ -469,7 +443,7 @@ void HistogramPanel::green_toggled ()
 void HistogramPanel::blue_toggled ()
 {
     // Update button image
-    showBlue->set_image(showBlue->get_active() ? *blueImage : *blueImage_g);
+    showBlue->set_child(showBlue->get_active() ? *blueImage : *blueImage_g);
     // Update options value
     options.histogramBlue = showBlue->get_active() ? true : false;
     // Update drawing areas
@@ -478,7 +452,7 @@ void HistogramPanel::blue_toggled ()
 void HistogramPanel::value_toggled ()
 {
     // Update button image
-    showValue->set_image(showValue->get_active() ? *valueImage : *valueImage_g);
+    showValue->set_child(showValue->get_active() ? *valueImage : *valueImage_g);
     // Update options value
     options.histogramLuma = showValue->get_active() ? true : false;
     // Update drawing areas
@@ -487,7 +461,7 @@ void HistogramPanel::value_toggled ()
 void HistogramPanel::chro_toggled ()
 {
     // Update button image
-    showChro->set_image(showChro->get_active() ? *chroImage : *chroImage_g);
+    showChro->set_child(showChro->get_active() ? *chroImage : *chroImage_g);
     // Update options value
     options.histogramChroma = showChro->get_active() ? true : false;
     // Update drawing areas
@@ -500,11 +474,11 @@ void HistogramPanel::mode_released ()
     options.histogramDrawMode = (options.histogramDrawMode + 1) % 3;
     // Update button image
     if (options.histogramDrawMode == 0) {
-        showMode->set_image(*mode0Image);
+        showMode->set_child(*mode0Image);
     } else if (options.histogramDrawMode == 1) {
-        showMode->set_image(*mode1Image);
+        showMode->set_child(*mode1Image);
     } else {
-        showMode->set_image(*mode2Image);
+        showMode->set_child(*mode2Image);
     }
     // Update drawing areas
     rgbv_toggled();
@@ -531,7 +505,7 @@ void HistogramPanel::scopeOptionsToggled()
     optionButtons->set_visible(scopeOptions->get_active());
 }
 
-void HistogramPanel::type_selected(Gtk::RadioButton* button)
+void HistogramPanel::type_selected(Gtk::ToggleButton* button)
 {
     // Get radio button value
     ScopeType new_type = ScopeType::NONE;
@@ -649,7 +623,7 @@ void HistogramPanel::type_changed()
 void HistogramPanel::bar_toggled ()
 {
     // Update button image
-    showBAR->set_image(showBAR->get_active() ? *barImage : *barImage_g);
+    showBAR->set_child(showBAR->get_active() ? *barImage : *barImage_g);
     // Update options value
     options.histogramBar = showBAR->get_active() ? true : false;
     // Update drawing areas
@@ -692,20 +666,20 @@ void HistogramPanel::reorder (Gtk::PositionType align)
     if (align == Gtk::PositionType::LEFT) {
         gfxGrid->reference();
         removeIfThere(this, gfxGrid, false);
-        add (*gfxGrid);
+        attach_next_to (*gfxGrid, Gtk::PositionType::RIGHT);
         gfxGrid->unreference();
 
         gfxGrid->remove(*histogramRGBAreaVert);
-        gfxGrid->add(*histogramRGBAreaVert);
+        gfxGrid->attach_next_to(*histogramRGBAreaVert, Gtk::PositionType::RIGHT);
 
         optionButtons->reference();
         removeIfThere(buttonGrid, optionButtons, false);
-        buttonGrid->add(*optionButtons);
+        buttonGrid->attach_next_to(*optionButtons, Gtk::PositionType::RIGHT);
         optionButtons->unreference();
     } else {
         buttonGrid->reference();
         removeIfThere(this, buttonGrid, false);
-        add (*buttonGrid);
+        attach_next_to (*buttonGrid, Gtk::PositionType::RIGHT);
         buttonGrid->unreference();
 
         gfxGrid->remove(*histogramRGBAreaVert);
@@ -713,7 +687,7 @@ void HistogramPanel::reorder (Gtk::PositionType align)
 
         persistentButtons->reference();
         removeIfThere(buttonGrid, persistentButtons, false);
-        buttonGrid->add(*persistentButtons);
+        buttonGrid->attach_next_to(*persistentButtons, Gtk::PositionType::RIGHT);
         persistentButtons->unreference();
     }
 }
@@ -722,11 +696,11 @@ void HistogramPanel::reorder (Gtk::PositionType align)
 void HistogramPanel::toggleButtonMode ()
 {
     if (options.histogramDrawMode == 0)
-        showMode->set_image(*mode0Image);
+        showMode->set_child(*mode0Image);
     else if (options.histogramDrawMode == 1)
-        showMode->set_image(*mode1Image);
+        showMode->set_child(*mode1Image);
     else
-        showMode->set_image(*mode2Image);
+        showMode->set_child(*mode2Image);
 }
 
 void HistogramPanel::setPanelListener(HistogramPanelListener* listener)
@@ -763,6 +737,12 @@ HistogramRGBArea::HistogramRGBArea () :
 {
     get_style_context()->add_class("drawingarea");
     set_name("HistogramRGBArea");
+
+    set_draw_func(sigc::mem_fun(*this, &HistogramRGBArea::on_draw));
+    signal_resize().connect([&](int width, int height) {
+        updatePointer(-1, -1, -1);
+        queue_draw();
+    });
 }
 
 HistogramRGBArea::~HistogramRGBArea () {}
@@ -801,7 +781,7 @@ void HistogramRGBArea::getPreferredLengthForThickness(int thickness, int& min_le
     getPreferredLength(min_length, natural_length);
 }
 
-void HistogramRGBArea::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cc)
+void HistogramRGBArea::updateDrawingArea (const Cairo::RefPtr<Cairo::Context> &cc, int width, int height)
 {
     // Do not update drawing area if widget is not realized
     if (!get_realized ()) {
@@ -824,30 +804,26 @@ void HistogramRGBArea::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context>
     // Note: updateDrawingArea is called by the on_draw function so its call does not need to be protected
     // GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
 
-    Glib::RefPtr<Gtk::Window> window = get_window();
-    int winx, winy, winw, winh;
-    window->get_geometry(winx, winy, winw, winh);
-
-    cc->set_operator (Cairo::OPERATOR_OVER);
+    cc->set_operator (Cairo::Context::Operator::OVER);
     cc->set_antialias(Cairo::ANTIALIAS_NONE);
     cc->set_line_width (1.0);
 
     if (needRed) {
         // Red
         cc->set_source_rgb(1.0, 0.0, 0.0);
-        drawBar(cc, r, 255.0, winw, winh);
+        drawBar(cc, r, 255.0, width, height);
     }
 
     if (needGreen) {
         // Green
         cc->set_source_rgb(0.0, 1.0, 0.0);
-        drawBar(cc, g, 255.0, winw, winh);
+        drawBar(cc, g, 255.0, width, height);
     }
 
     if (needBlue) {
         // Blue
         cc->set_source_rgb(0.0, 0.4, 1.0);
-        drawBar(cc, b, 255.0, winw, winh);
+        drawBar(cc, b, 255.0, width, height);
     }
 
     if ((needLuma || needChroma)
@@ -857,14 +833,14 @@ void HistogramRGBArea::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context>
         if (needLuma) {
             // Luma
             cc->set_source_rgb(1.0, 1.0, 1.0);
-            drawBar(cc, lab_L, 32768., winw, winh);
+            drawBar(cc, lab_L, 32768., width, height);
         }
 
         if (needChroma && scopeType == Options::ScopeType::HISTOGRAM) {
             // Chroma
             double chromaval = sqrt(lab_a * lab_a + lab_b * lab_b) / (255. * 188);
             cc->set_source_rgb(0.9, 0.9, 0.0);
-            drawBar(cc, chromaval, 1.0, winw, winh);
+            drawBar(cc, chromaval, 1.0, width, height);
         }
     }
 }
@@ -918,34 +894,16 @@ void HistogramRGBArea::updateFromOptions ()
     showBar = options.histogramBar;
 }
 
-void HistogramRGBArea::on_realize ()
-{
-    Gtk::DrawingArea::on_realize();
-    add_events(Gdk::BUTTON_PRESS_MASK);
-}
-
-bool HistogramRGBArea::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
+void HistogramRGBArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height)
 {
     const Glib::RefPtr<Gtk::StyleContext> style = get_style_context();
-    style->render_background(cr, 0., 0., static_cast<double>(get_width()), static_cast<double>(get_height()));
+    style->render_background(cr, 0., 0., static_cast<double>(width), static_cast<double>(height));
 
     // Draw drawing area
     // Note: As drawing area surface is updated inside on_draw function, hidpi is automatically supported
-    updateDrawingArea(cr);
+    updateDrawingArea(cr, width, height);
 
-    style->render_frame (cr, 0., 0., static_cast<double>(get_width()), static_cast<double>(get_height()));
-
-    return true;
-}
-
-bool HistogramRGBArea::on_button_press_event (GdkEventButton* event)
-{
-
-    if (event->type == GDK_2BUTTON_PRESS && event->button == 1) {
-        // do something?
-    }
-
-    return true;
+    style->render_frame (cr, 0., 0., static_cast<double>(width), static_cast<double>(height));
 }
 
 void HistogramRGBArea::factorChanged (double newFactor)
@@ -957,16 +915,16 @@ void HistogramRGBArea::factorChanged (double newFactor)
     }
 }
 
-void HistogramRGBAreaHori::drawBar(const Cairo::RefPtr<Cairo::Context> &cc, const double value, const double max_value, const int winw, const int winh)
+void HistogramRGBAreaHori::drawBar(const Cairo::RefPtr<Cairo::Context> &cc, const double value, const double max_value, const int width, const int height)
 {
     double pos;
     if (options.histogramDrawMode < 2) {
-        pos = padding + value * (winw - padding * 2.0) / max_value;
+        pos = padding + value * (width - padding * 2.0) / max_value;
     } else {
-        pos = padding + HistogramScaling::log (max_value, value) * (winw - padding * 2.0) / max_value;
+        pos = padding + HistogramScaling::log (max_value, value) * (width - padding * 2.0) / max_value;
     }
     cc->move_to(pos, 0.0);
-    cc->line_to(pos, static_cast<double>(winh));
+    cc->line_to(pos, static_cast<double>(height));
     cc->stroke();
 }
 
@@ -975,36 +933,38 @@ Gtk::SizeRequestMode HistogramRGBAreaHori::get_request_mode_vfunc () const
     return Gtk::SizeRequestMode::HEIGHT_FOR_WIDTH;
 }
 
-void HistogramRGBAreaHori::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const
+void HistogramRGBAreaHori::measure_vfunc(
+    Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+    int& minimum_baseline, int& natural_baseline) const
 {
-    getPreferredThickness(minimum_height, natural_height);
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        if (for_size >= 1) {
+            getPreferredLengthForThickness(for_size, minimum, natural);
+        } else {
+            getPreferredLength(minimum, natural);
+        }
+    } else {
+        if (for_size >= 1) {
+            getPreferredThicknessForLength(for_size, minimum, natural);
+        } else {
+            getPreferredThickness(minimum, natural);
+        }
+    }
+
+    minimum_baseline = -1;
+    natural_baseline = -1;
 }
 
-void HistogramRGBAreaHori::get_preferred_width_vfunc (int &minimum_width, int &natural_width) const
-{
-    getPreferredLength(minimum_width, natural_width);
-}
-
-void HistogramRGBAreaHori::get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const
-{
-    getPreferredThicknessForLength(width, minimum_height, natural_height);
-}
-
-void HistogramRGBAreaHori::get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const
-{
-    getPreferredLengthForThickness(height, minimum_width, natural_width);
-}
-
-void HistogramRGBAreaVert::drawBar(const Cairo::RefPtr<Cairo::Context> &cc, const double value, const double max_value, const int winw, const int winh)
+void HistogramRGBAreaVert::drawBar(const Cairo::RefPtr<Cairo::Context> &cc, const double value, const double max_value, const int width, const int height)
 {
     double pos;
     if (options.histogramDrawMode < 2 || options.histogramScopeType == ScopeType::PARADE || options.histogramScopeType == ScopeType::WAVEFORM) {
-        pos = padding + value * (winh - padding * 2.0 - 1) / max_value + 0.5;
+        pos = padding + value * (height - padding * 2.0 - 1) / max_value + 0.5;
     } else {
-        pos = padding + HistogramScaling::log (max_value, value) * (winh - padding * 2.0) / max_value + 0.5;
+        pos = padding + HistogramScaling::log (max_value, value) * (height - padding * 2.0) / max_value + 0.5;
     }
-    cc->move_to(0.0, winh - pos);
-    cc->line_to(winw, winh - pos);
+    cc->move_to(0.0, height - pos);
+    cc->line_to(width, height - pos);
     cc->stroke();
 }
 
@@ -1013,25 +973,23 @@ Gtk::SizeRequestMode HistogramRGBAreaVert::get_request_mode_vfunc () const
     return Gtk::SizeRequestMode::WIDTH_FOR_HEIGHT;
 }
 
-void HistogramRGBAreaVert::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const
+void HistogramRGBAreaVert::measure_vfunc(
+    Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+    int& minimum_baseline, int& natural_baseline) const
 {
-    getPreferredLength(minimum_height, natural_height);
-}
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        minimum = RTScalable::scalePixelSize(10);
+        natural = minimum;
+    } else {
+        if (for_size >= 1) {
+            getPreferredLengthForThickness(for_size, minimum, natural);
+        } else {
+            getPreferredLength(minimum, natural);
+        }
+    }
 
-void HistogramRGBAreaVert::get_preferred_width_vfunc (int &minimum_width, int &natural_width) const
-{
-    minimum_width = RTScalable::scalePixelSize(10);
-    natural_width = minimum_width;
-}
-
-void HistogramRGBAreaVert::get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const
-{
-    getPreferredLengthForThickness(width, minimum_height, natural_height);
-}
-
-void HistogramRGBAreaVert::get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const
-{
-    get_preferred_width_vfunc(minimum_width, natural_width);
+    minimum_baseline = -1;
+    natural_baseline = -1;
 }
 
 //
@@ -1071,11 +1029,29 @@ HistogramArea::HistogramArea (DrawModeListener *fml) :
 
     get_style_context()->add_class("drawingarea");
     set_name("HistogramArea");
+
+    set_draw_func(sigc::mem_fun(*this, &HistogramArea::on_draw));
+    signal_resize().connect([&](int width, int height) {
+        updatePointer(-1, -1, -1);
+        queue_draw();
+    });
+
+    auto click = Gtk::GestureClick::create();
+    click->set_button(GDK_BUTTON_PRIMARY);
+    click->signal_pressed().connect(
+        sigc::mem_fun(*this, &HistogramArea::on_button_press_event));
+    click->signal_released().connect(
+        sigc::mem_fun(*this, &HistogramArea::on_button_release_event));
+    add_controller(click);
+
+    auto motion = Gtk::EventControllerMotion::create();
+    motion->signal_motion().connect(
+        sigc::mem_fun(*this, &HistogramArea::on_motion_notify_event));
+    add_controller(motion);
 }
 
 HistogramArea::~HistogramArea ()
 {
-    idle_register.destroy();
 }
 
 Gtk::SizeRequestMode HistogramArea::get_request_mode_vfunc () const
@@ -1083,27 +1059,20 @@ Gtk::SizeRequestMode HistogramArea::get_request_mode_vfunc () const
     return Gtk::SizeRequestMode::CONSTANT_SIZE;
 }
 
-void HistogramArea::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const
+void HistogramArea::measure_vfunc(
+    Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+    int& minimum_baseline, int& natural_baseline) const
 {
-    minimum_height = RTScalable::scalePixelSize(100);
-    natural_height = RTScalable::scalePixelSize(200);
-}
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        minimum = RTScalable::scalePixelSize(200);
+        natural = RTScalable::scalePixelSize(400);
+    } else {
+        minimum = RTScalable::scalePixelSize(100);
+        natural = RTScalable::scalePixelSize(200);
+    }
 
-void HistogramArea::get_preferred_width_vfunc (int &minimum_width, int &natural_width) const
-{
-    minimum_width = RTScalable::scalePixelSize(200);
-    natural_width = RTScalable::scalePixelSize(400);
-}
-
-void HistogramArea::get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const
-{
-    minimum_height = 0;
-    natural_height = 0;
-}
-
-void HistogramArea::get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const
-{
-    get_preferred_width_vfunc (minimum_width, natural_width);
+    minimum_baseline = -1;
+    natural_baseline = -1;
 }
 
 void HistogramArea::updateFromOptions ()
@@ -1146,8 +1115,6 @@ void HistogramArea::update(
                 &histGreenRaw, &histBlueRaw, vectorscopeScale, &vectorscopeHC,
                 &vectorscopeHS, waveformScale, &waveformRed, &waveformGreen,
                 &waveformBlue, &waveformLuma]() -> bool {
-        GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
-
         if (histRed) {
             switch (scopeType) {
                 case ScopeType::HISTOGRAM:
@@ -1202,7 +1169,7 @@ void HistogramArea::update(
     );
 }
 
-void HistogramArea::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cr)
+void HistogramArea::updateDrawingArea (const Cairo::RefPtr<Cairo::Context> &cr, int width, int height)
 {
     // Do not update drawing area if widget is not realized
     if (!get_realized ()) {
@@ -1212,24 +1179,20 @@ void HistogramArea::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &c
     // Note: updateDrawingArea is called by the on_draw function so its call does not need to be protected
     // GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
 
-    Glib::RefPtr<Gtk::Window> window = get_window();
-    int winx, winy, winw, winh;
-    window->get_geometry(winx, winy, winw, winh);
-
     // Setup drawing
-    cr->set_operator (Cairo::OPERATOR_OVER);
+    cr->set_operator (Cairo::Context::Operator::OVER);
 
     // Prepare drawing gridlines first
     cr->set_source_rgba (1., 1., 1., 0.25);
     cr->set_line_width (1.0);
     cr->set_antialias(Cairo::ANTIALIAS_NONE);
-    cr->set_line_join(Cairo::LINE_JOIN_MITER);
-    cr->set_line_cap(Cairo::LINE_CAP_BUTT);
+    cr->set_line_join(Cairo::Context::LineJoin::MITER);
+    cr->set_line_cap(Cairo::Context::LineCap::BUTT);
     const std::valarray<double> ch_ds = {4.};
     cr->set_dash (ch_ds, 0);
 
     // determine the number of h-gridlines based on current h
-    int nrOfHGridPartitions = static_cast<int>(rtengine::min (16.0, pow (2.0, floor ((winh - 100) / 250) + 2)));
+    int nrOfHGridPartitions = static_cast<int>(rtengine::min (16.0, pow (2.0, floor ((height - 100) / 250) + 2)));
     int nrOfVGridPartitions = 8; // always show 8 stops (lines at 1,3,7,15,31,63,127)
 
     // draw vertical gridlines
@@ -1237,12 +1200,12 @@ void HistogramArea::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &c
         for (int i = 0; i <= nrOfVGridPartitions; i++) {
             double xpos = padding + 0.5;
             if (drawMode < 2) {
-                xpos += (pow(2.0,i) - 1) * (winw - padding * 2.0) / 255.0;
+                xpos += (pow(2.0,i) - 1) * (width - padding * 2.0) / 255.0;
             } else {
-                xpos += HistogramScaling::log (255, pow(2.0,i) - 1) * (winw - padding * 2.0) / 255.0;
+                xpos += HistogramScaling::log (255, pow(2.0,i) - 1) * (width - padding * 2.0) / 255.0;
             }
             cr->move_to (xpos, 0.);
-            cr->line_to (xpos, winh);
+            cr->line_to (xpos, height);
             cr->stroke ();
         }
     }
@@ -1250,9 +1213,9 @@ void HistogramArea::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &c
     // draw horizontal gridlines
     if (scopeType == Options::ScopeType::PARADE || scopeType == Options::ScopeType::WAVEFORM) {
         for (int i = 0; i <= nrOfVGridPartitions; i++) {
-            const double ypos = winh - padding - (pow(2.0,i) - 1) * (winh - 2 * padding - 1) / 255.0;
+            const double ypos = height - padding - (pow(2.0,i) - 1) * (height - 2 * padding - 1) / 255.0;
             cr->move_to(0, ypos);
-            cr->line_to(winw, ypos);
+            cr->line_to(width, ypos);
             cr->stroke();
         }
     } else if (scopeType == Options::ScopeType::VECTORSCOPE_HC || scopeType == Options::ScopeType::VECTORSCOPE_HS) {
@@ -1260,17 +1223,17 @@ void HistogramArea::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &c
     } else if (drawMode == 0) {
         for (int i = 1; i < nrOfHGridPartitions; i++) {
             cr->move_to (padding,
-                         i * static_cast<double>(winh) / nrOfHGridPartitions + 0.5);
-            cr->line_to (winw - padding,
-                         i * static_cast<double>(winh) / nrOfHGridPartitions + 0.5);
+                         i * static_cast<double>(height) / nrOfHGridPartitions + 0.5);
+            cr->line_to (width - padding,
+                         i * static_cast<double>(height) / nrOfHGridPartitions + 0.5);
             cr->stroke ();
         }
     } else {
         for (int i = 1; i < nrOfHGridPartitions; i++) {
             cr->move_to (padding,
-                         winh - HistogramScaling::log (winh, i * static_cast<double>(winh) / nrOfHGridPartitions) + 0.5);
-            cr->line_to (winw - padding,
-                         winh - HistogramScaling::log (winh, i * static_cast<double>(winh) / nrOfHGridPartitions) + 0.5);
+                         height - HistogramScaling::log (height, i * static_cast<double>(height) / nrOfHGridPartitions) + 0.5);
+            cr->line_to (width - padding,
+                         height - HistogramScaling::log (height, i * static_cast<double>(height) / nrOfHGridPartitions) + 0.5);
             cr->stroke ();
         }
     }
@@ -1342,57 +1305,57 @@ void HistogramArea::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &c
 
         int realhistheight = histheight;
 
-        if (realhistheight < winh - 2) {
-            realhistheight = winh - 2;
+        if (realhistheight < height - 2) {
+            realhistheight = height - 2;
         }
 
         cr->set_antialias (Cairo::ANTIALIAS_SUBPIXEL);
         cr->set_line_width (1.0);
-        cr->set_operator (Cairo::OPERATOR_OVER);
+        cr->set_operator (Cairo::Context::Operator::OVER);
 
         int ui = 0, oi = 0;
 
         if (needLuma && !rawMode) {
-            drawCurve(cr, lhist, realhistheight, winw, winh);
+            drawCurve(cr, lhist, realhistheight, width, height);
             cr->set_source_rgba (0.65, 0.65, 0.65, 0.65);
             cr->fill ();
-            drawMarks(cr, lhist, realhistheight, winw, ui, oi);
+            drawMarks(cr, lhist, realhistheight, width, ui, oi);
         }
 
         if (needChroma && !rawMode) {
-            drawCurve(cr, chist, realhistheight, winw, winh);
+            drawCurve(cr, chist, realhistheight, width, height);
             cr->set_source_rgb (0.9, 0.9, 0.);
             cr->stroke ();
-            drawMarks(cr, chist, realhistheight, winw, ui, oi);
+            drawMarks(cr, chist, realhistheight, width, ui, oi);
         }
 
         if (needRed) {
-            drawCurve(cr, rhchanged, realhistheight, winw, winh);
+            drawCurve(cr, rhchanged, realhistheight, width, height);
             cr->set_source_rgb (1.0, 0.0, 0.0);
             cr->stroke ();
-            drawMarks(cr, rhchanged, realhistheight, winw, ui, oi);
+            drawMarks(cr, rhchanged, realhistheight, width, ui, oi);
         }
 
         if (needGreen) {
-            drawCurve(cr, ghchanged, realhistheight, winw, winh);
+            drawCurve(cr, ghchanged, realhistheight, width, height);
             cr->set_source_rgb (0.0, 1.0, 0.0);
             cr->stroke ();
-            drawMarks(cr, ghchanged, realhistheight, winw, ui, oi);
+            drawMarks(cr, ghchanged, realhistheight, width, ui, oi);
         }
 
         if (needBlue) {
-            drawCurve(cr, bhchanged, realhistheight, winw, winh);
+            drawCurve(cr, bhchanged, realhistheight, width, height);
             cr->set_source_rgb (0.0, 0.4, 1.0);
             cr->stroke ();
-            drawMarks(cr, bhchanged, realhistheight, winw, ui, oi);
+            drawMarks(cr, bhchanged, realhistheight, width, ui, oi);
         }
 
     } else if (scopeType == Options::ScopeType::PARADE && rwave.getWidth() > 0) {
-        drawParade(cr, winw, winh);
+        drawParade(cr, width, height);
     } else if (scopeType == Options::ScopeType::WAVEFORM && rwave.getWidth() > 0) {
-        drawWaveform(cr, winw, winh);
+        drawWaveform(cr, width, height);
     } else if (scopeType == Options::ScopeType::VECTORSCOPE_HC || scopeType == Options::ScopeType::VECTORSCOPE_HS) {
-        drawVectorscope(cr, winw, winh);
+        drawVectorscope(cr, width, height);
     }
     MYREADERLOCK_RELEASE(wave_lock);
 }
@@ -1435,12 +1398,6 @@ bool HistogramArea::updatePointer(const int r, const int g, const int b, const r
     }
 
     return true;
-}
-
-void HistogramArea::on_realize ()
-{
-    Gtk::DrawingArea::on_realize();
-    add_events(Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
 }
 
 void HistogramArea::drawCurve(const Cairo::RefPtr<Cairo::Context> &cr,
@@ -1493,7 +1450,7 @@ void HistogramArea::drawParade(const Cairo::RefPtr<Cairo::Context> &cr, const in
     const int wave_height = rwave.getHeight();
 
     // See Cairo documentation on stride.
-    const int cairo_stride = Cairo::ImageSurface::format_stride_for_width(Cairo::FORMAT_ARGB32, rwave.getWidth());
+    const int cairo_stride = Cairo::ImageSurface::format_stride_for_width(Cairo::Surface::Format::ARGB32, rwave.getWidth());
     const auto buffer_size = static_cast<std::vector<unsigned char>::size_type>(wave_height) * cairo_stride;
 
     if (parade_buffer_r_dirty && needRed) {
@@ -1589,9 +1546,9 @@ void HistogramArea::drawParade(const Cairo::RefPtr<Cairo::Context> &cr, const in
         cr->translate(i * display_wave_width, padding);
         cr->scale(display_wave_width / wave_width, (h - 2 * padding) / wave_height);
         surface = Cairo::ImageSurface::create(
-                      buffers[i], Cairo::FORMAT_ARGB32, wave_width, wave_height, cairo_stride);
+                      buffers[i], Cairo::Surface::Format::ARGB32, wave_width, wave_height, cairo_stride);
         cr->set_source(surface, 0, 0);
-        cr->set_operator(Cairo::OPERATOR_OVER);
+        cr->set_operator(Cairo::Context::Operator::OVER);
         cr->paint();
         surface->finish();
         cr->set_matrix(orig_matrix);
@@ -1612,7 +1569,7 @@ void HistogramArea::drawVectorscope(const Cairo::RefPtr<Cairo::Context> &cr, con
     const int vect_height = vect.getHeight();
 
     // See Cairo documentation on stride.
-    const int cairo_stride = Cairo::ImageSurface::format_stride_for_width(Cairo::FORMAT_ARGB32, vect_width);
+    const int cairo_stride = Cairo::ImageSurface::format_stride_for_width(Cairo::Surface::Format::ARGB32, vect_width);
 
     if (vect_buffer_dirty && vectorscope_scale > 0) {
         // Arbitrary scale factor multiplied by vectorscope area and divided by
@@ -1741,11 +1698,11 @@ void HistogramArea::drawVectorscope(const Cairo::RefPtr<Cairo::Context> &cr, con
     // Vectorscope trace.
     if (vectorscope_scale > 0) {
         Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(
-                    vect_buffer.data(), Cairo::FORMAT_ARGB32, vect_width, vect_height, cairo_stride);
+                    vect_buffer.data(), Cairo::Surface::Format::ARGB32, vect_width, vect_height, cairo_stride);
         cr->translate(o_x, o_y);
         cr->scale(scope_scale, scope_scale);
         cr->set_source(surface, 0, 0);
-        cr->set_operator(Cairo::OPERATOR_OVER);
+        cr->set_operator(Cairo::Context::Operator::OVER);
         cr->paint();
         surface->finish();
         cr->set_matrix(orig_matrix);
@@ -1787,7 +1744,7 @@ void HistogramArea::drawWaveform(const Cairo::RefPtr<Cairo::Context> &cr, const 
     const int wave_height = rwave.getHeight();
 
     // See Cairo documentation on stride.
-    const int cairo_stride = Cairo::ImageSurface::format_stride_for_width(Cairo::FORMAT_ARGB32, rwave.getWidth());
+    const int cairo_stride = Cairo::ImageSurface::format_stride_for_width(Cairo::Surface::Format::ARGB32, rwave.getWidth());
     const auto buffer_size = static_cast<std::vector<unsigned char>::size_type>(wave_height) * cairo_stride;
 
     if (wave_buffer_dirty && (needRed || needGreen || needBlue)) {
@@ -1837,46 +1794,43 @@ void HistogramArea::drawWaveform(const Cairo::RefPtr<Cairo::Context> &cr, const 
     cr->scale(static_cast<double>(w) / wave_width, (h - 2 * padding) / wave_height);
     if (needLuma) {
         surface = Cairo::ImageSurface::create(
-                      wave_buffer_luma.data(), Cairo::FORMAT_ARGB32, wave_width, wave_height, cairo_stride);
+                      wave_buffer_luma.data(), Cairo::Surface::Format::ARGB32, wave_width, wave_height, cairo_stride);
         cr->set_source(surface, 0, 0);
-        cr->set_operator(Cairo::OPERATOR_OVER);
+        cr->set_operator(Cairo::Context::Operator::OVER);
         cr->paint();
         surface->finish();
     }
     if (needRed || needGreen || needBlue) {
         surface = Cairo::ImageSurface::create(
-                      wave_buffer.data(), Cairo::FORMAT_ARGB32, wave_width, wave_height, cairo_stride);
+                      wave_buffer.data(), Cairo::Surface::Format::ARGB32, wave_width, wave_height, cairo_stride);
         cr->set_source(surface, 0, 0);
-        cr->set_operator(Cairo::OPERATOR_OVER);
+        cr->set_operator(Cairo::Context::Operator::OVER);
         cr->paint();
         surface->finish();
     }
     cr->set_matrix(orig_matrix);
 }
 
-bool HistogramArea::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
+void HistogramArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height)
 {
     const Glib::RefPtr<Gtk::StyleContext> style = get_style_context();
-    style->render_background(cr, 0, 0, get_width(), get_height());
+    style->render_background(cr, 0, 0, width, height);
 
     // Draw drawing area
     // Note: As drawing area surface is updated inside on_draw function, hidpi is automatically supported
-    updateDrawingArea(cr);
+    updateDrawingArea(cr, width, height);
 
-    style->render_frame (cr, 0, 0, get_width(), get_height());
-
-    return true;
+    style->render_frame (cr, 0, 0, width, height);
 }
 
-bool HistogramArea::on_button_press_event (GdkEventButton* event)
+void HistogramArea::on_button_press_event (int n_press, double x, double y)
 {
     isPressed = true;
-    movingPosition = event->x;
+    movingPosition = x;
 
-    if (
-        event->type == GDK_2BUTTON_PRESS && event->button == 1
-        && (scopeType == ScopeType::HISTOGRAM || scopeType == ScopeType::HISTOGRAM_RAW)
-    ) {
+    if (n_press == 2 &&
+        (scopeType == ScopeType::HISTOGRAM || scopeType == ScopeType::HISTOGRAM_RAW))
+    {
 
         drawMode = (drawMode + 1) % 3;
         options.histogramDrawMode = (options.histogramDrawMode + 1) % 3;
@@ -1887,31 +1841,28 @@ bool HistogramArea::on_button_press_event (GdkEventButton* event)
 
         queue_draw ();
     }
-
-    return true;
 }
 
-bool HistogramArea::on_button_release_event (GdkEventButton* event)
+void HistogramArea::on_button_release_event (int n_press, double x, double y)
 {
     isPressed = false;
-    return true;
 }
 
-bool HistogramArea::on_motion_notify_event (GdkEventMotion* event)
+void HistogramArea::on_motion_notify_event (double x, double y)
 {
     if (
         drawMode == 0
         && (scopeType == ScopeType::HISTOGRAM || scopeType == ScopeType::HISTOGRAM_RAW)
     ) {
-        return false;
+        return;
     }
 
     if (!isPressed) {
-        return true;
+        return;
     }
 
     if (scopeType == ScopeType::HISTOGRAM || scopeType == ScopeType::HISTOGRAM_RAW) { // Adjust log scale.
-        double mod = 1 + (event->x - movingPosition) / get_width();
+        double mod = 1 + (x - movingPosition) / get_width();
 
         factor /= mod;
         if (factor < 1.0)
@@ -1929,13 +1880,11 @@ bool HistogramArea::on_motion_notify_event (GdkEventMotion* event)
         || scopeType == ScopeType::VECTORSCOPE_HS
     ) { // Adjust brightness.
         constexpr float RANGE = MAX_BRIGHT / MIN_BRIGHT;
-        double dx = (event->x - movingPosition) / get_width();
+        double dx = (x - movingPosition) / get_width();
         float new_brightness = LIM<float>(trace_brightness * pow(RANGE, dx), MIN_BRIGHT, MAX_BRIGHT);
         setBrightness(new_brightness);
-        movingPosition = event->x;
+        movingPosition = x;
     }
-
-    return true;
 }
 
 float HistogramArea::getBrightness(void)

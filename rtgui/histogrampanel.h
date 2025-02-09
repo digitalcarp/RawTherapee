@@ -69,12 +69,10 @@ protected:
     const double padding = 5.0;
 
     // Internal drawing functions
-    void updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cc);
-    virtual void drawBar(const Cairo::RefPtr<Cairo::Context> &cc, const double value, const double max_value, const int winw, const int winh) = 0;
+    void updateDrawingArea (const Cairo::RefPtr<Cairo::Context> &cc, int width, int height);
+    virtual void drawBar(const Cairo::RefPtr<Cairo::Context> &cc, const double value, const double max_value, const int width, const int height) = 0;
 
-    // GtkDrawingArea override functions
-    void on_realize() override;
-    bool on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr) override;
+    void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
 
     // Widget size management functions
     void getPreferredThickness(int& min_thickness, int& natural_length) const;
@@ -91,8 +89,6 @@ public:
     // Update internal parameters from options
     void updateFromOptions ();
 
-    // Event management functions
-    bool on_button_press_event (GdkEventButton* event) override;
     void factorChanged (double newFactor);
 };
 
@@ -100,28 +96,24 @@ class HistogramRGBAreaHori final : public HistogramRGBArea
 {
 private:
     // Internal drawing function
-    void drawBar(const Cairo::RefPtr<Cairo::Context> &cc, const double value, const double max_value, const int winw, const int winh) override;
+    void drawBar(const Cairo::RefPtr<Cairo::Context> &cc, const double value, const double max_value, const int width, const int height) override;
 
     // Widget size management functions
     Gtk::SizeRequestMode get_request_mode_vfunc () const override;
-    void get_preferred_height_vfunc (int& minimum_height, int& natural_height) const override;
-    void get_preferred_width_vfunc (int &minimum_width, int &natural_width) const override;
-    void get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const override;
-    void get_preferred_width_for_height_vfunc (int h, int &minimum_width, int &natural_width) const override;
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
 };
 
 class HistogramRGBAreaVert final : public HistogramRGBArea
 {
 private:
     // Internal drawing function
-    void drawBar(const Cairo::RefPtr<Cairo::Context> &cc, const double value, const double max_value, const int winw, const int winh) override;
+    void drawBar(const Cairo::RefPtr<Cairo::Context> &cc, const double value, const double max_value, const int width, const int height) override;
 
     // Widget size management functions
     Gtk::SizeRequestMode get_request_mode_vfunc () const override;
-    void get_preferred_height_vfunc (int& minimum_height, int& natural_height) const override;
-    void get_preferred_width_vfunc (int &minimum_width, int &natural_width) const override;
-    void get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const override;
-    void get_preferred_width_for_height_vfunc (int h, int &minimum_width, int &natural_width) const override;
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
 };
 
 class DrawModeListener
@@ -134,8 +126,8 @@ public:
 class HistogramArea final : public Gtk::DrawingArea, private HistogramScaling, public rtengine::NonCopyable
 {
 public:
-    typedef sigc::signal<void, double> type_signal_factor_changed;
-    typedef sigc::signal<void, float> SignalBrightnessChanged;
+    typedef sigc::signal<void(double)> type_signal_factor_changed;
+    typedef sigc::signal<void(float)> SignalBrightnessChanged;
 
     static constexpr float MIN_BRIGHT = 0.1;
     static constexpr float MAX_BRIGHT = 3;
@@ -221,9 +213,9 @@ public:
     void updateFromOptions();
 
     // Event management functions
-    bool on_button_press_event (GdkEventButton* event) override;
-    bool on_button_release_event (GdkEventButton* event) override;
-    bool on_motion_notify_event (GdkEventMotion* event) override;
+    void on_button_press_event (int n_press, double x, double y);
+    void on_button_release_event (int n_press, double x, double y);
+    void on_motion_notify_event (double x, double y);
 
     // Brightness management functions (nominal = 1)
     float getBrightness(void);
@@ -234,12 +226,10 @@ public:
     type_signal_factor_changed signal_factor_changed();
 
 private:
-    // GtkDrawingArea override functions
-    void on_realize() override;
-    bool on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr) override;
+    void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
 
     // Internal drawing functions
-    void updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cr);
+    void updateDrawingArea (const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
     void drawCurve(const Cairo::RefPtr<Cairo::Context> &cr, const LUTu & data, const double scale, const int hsize, const int vsize);
     void drawMarks(const Cairo::RefPtr<Cairo::Context> &cr, const LUTu & data, const double scale, const int wsize, int & ui, int & oi);
     void drawParade(const Cairo::RefPtr<Cairo::Context> &cr, const int hsize, const int vsize);
@@ -248,10 +238,8 @@ private:
 
     // Widget size management functions
     Gtk::SizeRequestMode get_request_mode_vfunc () const override;
-    void get_preferred_height_vfunc (int& minimum_height, int& natural_height) const override;
-    void get_preferred_width_vfunc (int &minimum_width, int &natural_width) const override;
-    void get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const override;
-    void get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const override;
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
 };
 
 class HistogramPanelListener
@@ -285,12 +273,12 @@ protected:
     Gtk::ToggleButton* scopeOptions;
     Gtk::Scale* brightnessWidget;
 
-    Gtk::RadioButton* scopeHistBtn;
-    Gtk::RadioButton* scopeHistRawBtn;
-    Gtk::RadioButton* scopeParadeBtn;
-    Gtk::RadioButton* scopeWaveBtn;
-    Gtk::RadioButton* scopeVectHcBtn;
-    Gtk::RadioButton* scopeVectHsBtn;
+    Gtk::ToggleButton* scopeHistBtn;
+    Gtk::ToggleButton* scopeHistRawBtn;
+    Gtk::ToggleButton* scopeParadeBtn;
+    Gtk::ToggleButton* scopeWaveBtn;
+    Gtk::ToggleButton* scopeVectHcBtn;
+    Gtk::ToggleButton* scopeVectHsBtn;
 
     Gtk::Image *redImage;
     Gtk::Image *greenImage;
@@ -313,7 +301,6 @@ protected:
     HistogramPanelListener* panel_listener;
 
     sigc::connection brightness_changed_connection;
-    sigc::connection rconn;
 
     void setHistInvalid ();
     void showRGBBar();
@@ -358,10 +345,10 @@ public:
     void brightnessWidgetValueChanged();
     void brightnessUpdated(float brightness);
     void scopeOptionsToggled();
-    void type_selected(Gtk::RadioButton* button);
+    void type_selected(Gtk::ToggleButton* button);
     void type_changed ();
     void rgbv_toggled ();
-    void resized (Gtk::Allocation& req);
+    void resized (int width, int height);
 
     // drawModeListener interface
     void toggleButtonMode () override;

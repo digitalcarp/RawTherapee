@@ -735,7 +735,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     leftsubpaned = new Gtk::Paned(Gtk::Orientation::VERTICAL);
     leftsubpaned->set_size_request(230, 250);
 
-//     histogramPanel = nullptr;
+    histogramPanel = nullptr;
 
     profilep = Gtk::manage(new ProfilePanel());
     ppframe = Gtk::manage(new Gtk::Frame());
@@ -2324,7 +2324,7 @@ void EditorPanel::setExternalEditorChangedSignal(ExternalEditorChangedSignal *si
 
 void EditorPanel::histogramProfile_toggled()
 {
-//     options.rtSettings.HistogramWorking = toggleHistogramProfile->get_active();
+    options.rtSettings.HistogramWorking = toggleHistogramProfile->get_active();
 //     colorMgmtToolBar->updateHistogram();
 }
 
@@ -2599,107 +2599,107 @@ void EditorPanel::tbBeforeLock_toggled ()
     tbBeforeLock->get_active() ? tbBeforeLock->set_child (*iBeforeLockON) : tbBeforeLock->set_child (*iBeforeLockOFF);
 }
 
-// void EditorPanel::histogramChanged(
-//     const LUTu& histRed,
-//     const LUTu& histGreen,
-//     const LUTu& histBlue,
-//     const LUTu& histLuma,
-//     const LUTu& histToneCurve,
-//     const LUTu& histLCurve,
-//     const LUTu& histCCurve,
-//     const LUTu& histLCAM,
-//     const LUTu& histCCAM,
-//     const LUTu& histRedRaw,
-//     const LUTu& histGreenRaw,
-//     const LUTu& histBlueRaw,
-//     const LUTu& histChroma,
-//     const LUTu& histLRETI,
-//     int vectorscopeScale,
-//     const array2D<int>& vectorscopeHC,
-//     const array2D<int>& vectorscopeHS,
-//     int waveformScale,
-//     const array2D<int>& waveformRed,
-//     const array2D<int>& waveformGreen,
-//     const array2D<int>& waveformBlue,
-//     const array2D<int>& waveformLuma
-// )
-// {
-//     if (histogramPanel) {
-//         histogramPanel->histogramChanged(histRed, histGreen, histBlue, histLuma, histChroma, histRedRaw, histGreenRaw, histBlueRaw, vectorscopeScale, vectorscopeHC, vectorscopeHS, waveformScale, waveformRed, waveformGreen, waveformBlue, waveformLuma);
-//     }
-//
+void EditorPanel::histogramChanged(
+    const LUTu& histRed,
+    const LUTu& histGreen,
+    const LUTu& histBlue,
+    const LUTu& histLuma,
+    const LUTu& histToneCurve,
+    const LUTu& histLCurve,
+    const LUTu& histCCurve,
+    const LUTu& histLCAM,
+    const LUTu& histCCAM,
+    const LUTu& histRedRaw,
+    const LUTu& histGreenRaw,
+    const LUTu& histBlueRaw,
+    const LUTu& histChroma,
+    const LUTu& histLRETI,
+    int vectorscopeScale,
+    const array2D<int>& vectorscopeHC,
+    const array2D<int>& vectorscopeHS,
+    int waveformScale,
+    const array2D<int>& waveformRed,
+    const array2D<int>& waveformGreen,
+    const array2D<int>& waveformBlue,
+    const array2D<int>& waveformLuma
+)
+{
+    if (histogramPanel) {
+        histogramPanel->histogramChanged(histRed, histGreen, histBlue, histLuma, histChroma, histRedRaw, histGreenRaw, histBlueRaw, vectorscopeScale, vectorscopeHC, vectorscopeHS, waveformScale, waveformRed, waveformGreen, waveformBlue, waveformLuma);
+    }
+
 //     tpc->updateCurveBackgroundHistogram(histToneCurve, histLCurve, histCCurve, histLCAM, histCCAM, histRed, histGreen, histBlue, histLuma, histLRETI);
-// }
-//
-// void EditorPanel::setObservable(rtengine::HistogramObservable* observable)
-// {
-//     histogram_observable = observable;
-// }
-//
-// bool EditorPanel::updateHistogram(void) const
-// {
-//     return histogram_scope_type == ScopeType::HISTOGRAM
-//         || histogram_scope_type == ScopeType::NONE;
-// }
-//
-// bool EditorPanel::updateHistogramRaw(void) const
-// {
-//     return histogram_scope_type == ScopeType::HISTOGRAM_RAW
-//         || histogram_scope_type == ScopeType::NONE;
-// }
-//
-// bool EditorPanel::updateVectorscopeHC(void) const
-// {
-//     return
-//         histogram_scope_type == ScopeType::VECTORSCOPE_HC
-//         || histogram_scope_type == ScopeType::NONE;
-// }
-//
-// bool EditorPanel::updateVectorscopeHS(void) const
-// {
-//     return
-//         histogram_scope_type == ScopeType::VECTORSCOPE_HS
-//         || histogram_scope_type == ScopeType::NONE;
-// }
-//
-// bool EditorPanel::updateWaveform(void) const
-// {
-//     return histogram_scope_type == ScopeType::WAVEFORM
-//         || histogram_scope_type == ScopeType::PARADE
-//         || histogram_scope_type == ScopeType::NONE;
-// }
-//
-// void EditorPanel::scopeTypeChanged(ScopeType new_type)
-// {
-//     histogram_scope_type = new_type;
-//
-//     if (!histogram_observable) {
-//         return;
-//     }
-//
-//     // Make sure the new scope is updated since we only actively update the
-//     // current scope.
-//     switch (new_type) {
-//         case ScopeType::HISTOGRAM:
-//             histogram_observable->requestUpdateHistogram();
-//             break;
-//         case ScopeType::HISTOGRAM_RAW:
-//             histogram_observable->requestUpdateHistogramRaw();
-//             break;
-//         case ScopeType::VECTORSCOPE_HC:
-//             histogram_observable->requestUpdateVectorscopeHC();
-//             break;
-//         case ScopeType::VECTORSCOPE_HS:
-//             histogram_observable->requestUpdateVectorscopeHS();
-//             break;
-//         case ScopeType::PARADE:
-//         case ScopeType::WAVEFORM:
-//             histogram_observable->requestUpdateWaveform();
-//             break;
-//         case ScopeType::NONE:
-//             break;
-//     }
-// }
+}
+
+void EditorPanel::setObservable(rtengine::HistogramObservable* observable)
+{
+    histogram_observable = observable;
+}
+
+bool EditorPanel::updateHistogram(void) const
+{
+    return histogram_scope_type == ScopeType::HISTOGRAM
+        || histogram_scope_type == ScopeType::NONE;
+}
+
+bool EditorPanel::updateHistogramRaw(void) const
+{
+    return histogram_scope_type == ScopeType::HISTOGRAM_RAW
+        || histogram_scope_type == ScopeType::NONE;
+}
+
+bool EditorPanel::updateVectorscopeHC(void) const
+{
+    return
+        histogram_scope_type == ScopeType::VECTORSCOPE_HC
+        || histogram_scope_type == ScopeType::NONE;
+}
+
+bool EditorPanel::updateVectorscopeHS(void) const
+{
+    return
+        histogram_scope_type == ScopeType::VECTORSCOPE_HS
+        || histogram_scope_type == ScopeType::NONE;
+}
+
+bool EditorPanel::updateWaveform(void) const
+{
+    return histogram_scope_type == ScopeType::WAVEFORM
+        || histogram_scope_type == ScopeType::PARADE
+        || histogram_scope_type == ScopeType::NONE;
+}
+
+void EditorPanel::scopeTypeChanged(ScopeType new_type)
+{
+    histogram_scope_type = new_type;
+
+    if (!histogram_observable) {
+        return;
+    }
+
+    // Make sure the new scope is updated since we only actively update the
+    // current scope.
+    switch (new_type) {
+        case ScopeType::HISTOGRAM:
+            histogram_observable->requestUpdateHistogram();
+            break;
+        case ScopeType::HISTOGRAM_RAW:
+            histogram_observable->requestUpdateHistogramRaw();
+            break;
+        case ScopeType::VECTORSCOPE_HC:
+            histogram_observable->requestUpdateVectorscopeHC();
+            break;
+        case ScopeType::VECTORSCOPE_HS:
+            histogram_observable->requestUpdateVectorscopeHS();
+            break;
+        case ScopeType::PARADE:
+        case ScopeType::WAVEFORM:
+            histogram_observable->requestUpdateWaveform();
+            break;
+        case ScopeType::NONE:
+            break;
+    }
+}
 
 bool EditorPanel::CheckSidePanelsVisibility()
 {
@@ -2806,66 +2806,66 @@ void EditorPanel::updateTPVScrollbar (bool hide)
 
 void EditorPanel::updateHistogramPosition (int oldPosition, int newPosition)
 {
-//
-//     switch (newPosition) {
-//         case 0:
-//
-//             // No histogram
-//             if (!oldPosition) {
-//                 // An histogram actually exist, we delete it
-//                 delete histogramPanel;
-//                 histogramPanel = nullptr;
-//             }
-//
-//             // else no need to create it
-//             break;
-//
-//         case 1:
-//
-//             // Histogram on the left pane
-//             if (oldPosition == 0) {
-//                 // There was no Histogram before, so we create it
-//                 histogramPanel = Gtk::manage (new HistogramPanel ());
-//                 pack_start(leftbox, *histogramPanel, false, false);
-//             } else if (oldPosition == 2) {
-//                 // The histogram was on the right side, so we move it to the left
-//                 histogramPanel->reference();
-//                 removeIfThere (vboxright, histogramPanel, false);
-//                 pack_start(leftbox, *histogramPanel, false, false);
-//                 histogramPanel->unreference();
-//             }
-//
-//             leftbox->set_position(options.histogramHeight);
-//             histogramPanel->reorder (Gtk::PositionType::LEFT);
-//             break;
-//
-//         case 2:
-//         default:
-//
-//             // Histogram on the right pane
-//             if (oldPosition == 0) {
-//                 // There was no Histogram before, so we create it
-//                 histogramPanel = Gtk::manage (new HistogramPanel ());
-//                 pack_start(vboxright, *histogramPanel, false, false);
-//             } else if (oldPosition == 1) {
-//                 // The histogram was on the left side, so we move it to the right
-//                 histogramPanel->reference();
-//                 removeIfThere (leftbox, histogramPanel, false);
-//                 pack_start(vboxright, *histogramPanel, false, false);
-//                 histogramPanel->unreference();
-//             }
-//
-//             vboxright->set_position(options.histogramHeight);
-//             histogramPanel->reorder (Gtk::PositionType::RIGHT);
-//             break;
-//     }
-//
-//     if (histogramPanel) {
-//         histogramPanel->setPanelListener(this);
-//     }
-//
+
+    switch (newPosition) {
+        case 0:
+
+            // No histogram
+            if (!oldPosition) {
+                // An histogram actually exist, we delete it
+                delete histogramPanel;
+                histogramPanel = nullptr;
+            }
+
+            // else no need to create it
+            break;
+
+        case 1:
+
+            // Histogram on the left pane
+            if (oldPosition == 0) {
+                // There was no Histogram before, so we create it
+                histogramPanel = Gtk::manage (new HistogramPanel ());
+                pack1(leftbox, *histogramPanel, false, false);
+            } else if (oldPosition == 2) {
+                // The histogram was on the right side, so we move it to the left
+                histogramPanel->reference();
+                removeIfThere (vboxright, histogramPanel, false);
+                pack1(leftbox, *histogramPanel, false, false);
+                histogramPanel->unreference();
+            }
+
+            leftbox->set_position(options.histogramHeight);
+            histogramPanel->reorder (Gtk::PositionType::LEFT);
+            break;
+
+        case 2:
+        default:
+
+            // Histogram on the right pane
+            if (oldPosition == 0) {
+                // There was no Histogram before, so we create it
+                histogramPanel = Gtk::manage (new HistogramPanel ());
+                pack1(vboxright, *histogramPanel, false, false);
+            } else if (oldPosition == 1) {
+                // The histogram was on the left side, so we move it to the right
+                histogramPanel->reference();
+                removeIfThere (leftbox, histogramPanel, false);
+                pack1(vboxright, *histogramPanel, false, false);
+                histogramPanel->unreference();
+            }
+
+            vboxright->set_position(options.histogramHeight);
+            histogramPanel->reorder (Gtk::PositionType::RIGHT);
+            break;
+    }
+
+    if (histogramPanel) {
+        histogramPanel->setPanelListener(this);
+    }
+
 //     iareapanel->imageArea->setPointerMotionHListener (histogramPanel);
-//
+
 }
 
 void EditorPanel::updateToolPanelToolLocations(

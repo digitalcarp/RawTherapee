@@ -38,8 +38,8 @@ struct ColorManagementParams;
 class PointerMotionListener
 {
 protected:
-    sigc::signal<void> sig_cycle_rgb;
-    sigc::signal<void> sig_cycle_hsv;
+    sigc::signal<void()> sig_cycle_rgb;
+    sigc::signal<void()> sig_cycle_hsv;
 
 public:
     virtual ~PointerMotionListener() = default;
@@ -48,11 +48,11 @@ public:
     virtual void getHSVText (float h, float s, float v, Glib::ustring &sH, Glib::ustring &sS, Glib::ustring &sV) { sH = "--"; sS = "--"; sV = "--"; }
     virtual void getLABText (float l, float a, float b, Glib::ustring &sL, Glib::ustring &sA, Glib::ustring &sB) { sL = "--"; sA = "--"; sB = "--"; }
 
-    sigc::signal<void> signal_cycle_rgb()
+    sigc::signal<void()>& signal_cycle_rgb()
     {
         return sig_cycle_rgb;
     }
-    sigc::signal<void> signal_cycle_hsv()
+    sigc::signal<void()>& signal_cycle_hsv()
     {
         return sig_cycle_hsv;
     }

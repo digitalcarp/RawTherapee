@@ -82,7 +82,7 @@ set(NONCLISOURCEFILES
     # gradient.cc
     guiutils.cc
     hidpi.cc
-    # histogrampanel.cc
+    histogrampanel.cc
     history.cc
     # hsvequalizer.cc
     iccprofilecreator.cc

@@ -23,7 +23,7 @@
 
 // TODO(gtk4)
 #include "extprog.h"
-// #include "histogrampanel.h"
+#include "histogrampanel.h"
 #include "history.h"
 // #include "imageareapanel.h"
 #include "options.h"
@@ -67,8 +67,8 @@ class EditorPanel final :
     public rtengine::ProgressListener,
     public ThumbnailListener,
 //     public HistoryBeforeLineListener,
-//     public rtengine::HistogramListener,
-//     public HistogramPanelListener,
+    public rtengine::HistogramListener,
+    public HistogramPanelListener,
     public rtengine::NonCopyable
 {
 public:
@@ -126,40 +126,40 @@ public:
     // HistoryBeforeLineListener
 //     void historyBeforeLineChanged (const rtengine::procparams::ProcParams& params) override;
 
-// //     // HistogramListener
-//     void histogramChanged(
-//         const LUTu& histRed,
-//         const LUTu& histGreen,
-//         const LUTu& histBlue,
-//         const LUTu& histLuma,
-//         const LUTu& histToneCurve,
-//         const LUTu& histLCurve,
-//         const LUTu& histCCurve,
-//         const LUTu& histLCAM,
-//         const LUTu& histCCAM,
-//         const LUTu& histRedRaw,
-//         const LUTu& histGreenRaw,
-//         const LUTu& histBlueRaw,
-//         const LUTu& histChroma,
-//         const LUTu& histLRETI,
-//         int vectorscopeScale,
-//         const array2D<int>& vectorscopeHC,
-//         const array2D<int>& vectorscopeHS,
-//         int waveformScale,
-//         const array2D<int>& waveformRed,
-//         const array2D<int>& waveformGreen,
-//         const array2D<int>& waveformBlue,
-//         const array2D<int>& waveformLuma
-//     ) override;
-//     void setObservable(rtengine::HistogramObservable* observable) override;
-//     bool updateHistogram(void) const override;
-//     bool updateHistogramRaw(void) const override;
-//     bool updateVectorscopeHC(void) const override;
-//     bool updateVectorscopeHS(void) const override;
-//     bool updateWaveform(void) const override;
+    // HistogramListener
+    void histogramChanged(
+        const LUTu& histRed,
+        const LUTu& histGreen,
+        const LUTu& histBlue,
+        const LUTu& histLuma,
+        const LUTu& histToneCurve,
+        const LUTu& histLCurve,
+        const LUTu& histCCurve,
+        const LUTu& histLCAM,
+        const LUTu& histCCAM,
+        const LUTu& histRedRaw,
+        const LUTu& histGreenRaw,
+        const LUTu& histBlueRaw,
+        const LUTu& histChroma,
+        const LUTu& histLRETI,
+        int vectorscopeScale,
+        const array2D<int>& vectorscopeHC,
+        const array2D<int>& vectorscopeHS,
+        int waveformScale,
+        const array2D<int>& waveformRed,
+        const array2D<int>& waveformGreen,
+        const array2D<int>& waveformBlue,
+        const array2D<int>& waveformLuma
+    ) override;
+    void setObservable(rtengine::HistogramObservable* observable) override;
+    bool updateHistogram(void) const override;
+    bool updateHistogramRaw(void) const override;
+    bool updateVectorscopeHC(void) const override;
+    bool updateVectorscopeHS(void) const override;
+    bool updateWaveform(void) const override;
 
-//     // HistogramPanelListener
-//     void scopeTypeChanged(Options::ScopeType new_type) override;
+    // HistogramPanelListener
+    void scopeTypeChanged(Options::ScopeType new_type) override;
 
     // event handlers
     void info_toggled ();
@@ -284,7 +284,7 @@ private:
     Gtk::Frame* ppframe;
     ProfilePanel* profilep;
 //     History* history;
-//     HistogramPanel* histogramPanel;
+    HistogramPanel* histogramPanel;
 //     ToolPanelCoordinator* tpc;
     RtWindow* parent;
     Gtk::Window* parentWindow;
@@ -313,6 +313,6 @@ private:
 
     IdleRegister idle_register;
 
-//     rtengine::HistogramObservable* histogram_observable;
-//     Options::ScopeType histogram_scope_type;
+    rtengine::HistogramObservable* histogram_observable;
+    Options::ScopeType histogram_scope_type;
 };
