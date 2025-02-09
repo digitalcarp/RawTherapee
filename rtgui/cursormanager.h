@@ -94,7 +94,7 @@ private:
     Glib::RefPtr<Gtk::Window> window;
 
     void setCursor (CursorShape shape);
-    void setCursor (const Glib::RefPtr<Gtk::Window>& window, CursorShape shape);
+    void setCursor (Gtk::Window* window, CursorShape shape);
 
     Glib::RefPtr<CursorInfo>
     createCursor(const Glib::ustring& name, const Glib::ustring& fallback,
@@ -102,7 +102,7 @@ private:
 
 public:
     void init                         (const Glib::RefPtr<Gtk::Window>& mainWindow);
-    static void setWidgetCursor       (const Glib::RefPtr<Gtk::Window>& window, CursorShape shape);
+    static void setWidgetCursor       (Gtk::Window* window, CursorShape shape);
     static void setCursorOfMainWindow (Gtk::Window* window, CursorShape shape);
 };
 

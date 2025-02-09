@@ -38,8 +38,8 @@ private:
 
     Options::NavigatorUnit currentRGBUnit;
     Options::NavigatorUnit currentHSVUnit;
-    void cycleUnitsRGB (GdkEventButton *event);
-    void cycleUnitsHSV (GdkEventButton *event);
+    void cycleUnitsRGB (int n_press, double x, double y);
+    void cycleUnitsHSV (int n_press, double x, double y);
 
 protected:
     Gtk::Label* dimension;

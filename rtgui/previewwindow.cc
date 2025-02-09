@@ -33,14 +33,22 @@ PreviewWindow::PreviewWindow () : previewHandler(nullptr), mainCropWin(nullptr),
 {
     set_name("PreviewWindow");
     get_style_context()->add_class("drawingarea");
-    rconn = signal_size_allocate().connect( sigc::mem_fun(*this, &PreviewWindow::on_resized) );
-}
 
-void PreviewWindow::on_realize ()
-{
+    auto click = Gtk::GestureClick::create();
+    click->set_button(GDK_BUTTON_PRIMARY);
+    click->signal_pressed().connect(
+        sigc::mem_fun(*this, &PreviewWindow::on_button_press_event));
+    click->signal_released().connect(
+        sigc::mem_fun(*this, &PreviewWindow::on_button_release_event));
+    add_controller(click);
 
-    Gtk::DrawingArea::on_realize ();
-    add_events(Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
+    auto motion = Gtk::EventControllerMotion::create();
+    motion->signal_motion().connect(
+        sigc::mem_fun(*this, &PreviewWindow::on_motion_notify_event));
+    add_controller(motion);
+
+    set_draw_func(sigc::mem_fun(*this, &PreviewWindow::on_draw));
+    signal_resize().connect( sigc::mem_fun(*this, &PreviewWindow::on_resized) );
 }
 
 void PreviewWindow::getObservedFrameArea (int& x, int& y, int& w, int& h)
@@ -59,14 +67,12 @@ void PreviewWindow::getObservedFrameArea (int& x, int& y, int& w, int& h)
 
 void PreviewWindow::updatePreviewImage ()
 {
-    Glib::RefPtr<Gtk::Window> wind = get_window();
-
-    if( ! wind ) {
+    if (!get_realized()) {
         needsUpdate = true;
         return;
     }
 
-    backBuffer.clear();
+    backBuffer = nullptr;
     if (!previewHandler) return;
 
     int scale = RTScalable::getScaleForWidget(this);
@@ -80,17 +86,17 @@ void PreviewWindow::updatePreviewImage ()
     imgH = device.height;
 
     backBuffer = Cairo::RefPtr<BackBuffer> ( new BackBuffer(
-        device.width, device.height, Cairo::FORMAT_ARGB32) );
+        device.width, device.height, Cairo::Surface::Format::ARGB32) );
     Cairo::RefPtr<Cairo::ImageSurface> surface = backBuffer->getSurface();
     hidpi::setDeviceScale(surface, device.device_scale);
 
     Cairo::RefPtr<Cairo::Context> cc = Cairo::Context::create(surface);
     cc->set_source_rgba (0., 0., 0., 0.);
-    cc->set_operator (Cairo::OPERATOR_CLEAR);
+    cc->set_operator (Cairo::Context::Operator::CLEAR);
     cc->paint ();
-    cc->set_operator (Cairo::OPERATOR_OVER);
+    cc->set_operator (Cairo::Context::Operator::OVER);
     cc->set_antialias(Cairo::ANTIALIAS_NONE);
-    cc->set_line_join(Cairo::LINE_JOIN_MITER);
+    cc->set_line_join(Cairo::Context::LineJoin::MITER);
 
     Gdk::Cairo::set_source_pixbuf(cc, result.pixbuf(), 0, 0);
     auto pattern = hidpi::getSourceForSurface(cc);
@@ -124,20 +130,20 @@ void PreviewWindow::setPreviewHandler (PreviewHandler* ph)
     }
 }
 
-void PreviewWindow::on_resized (Gtk::Allocation& req)
+void PreviewWindow::on_resized (int width, int height)
 {
 
     updatePreviewImage ();
     queue_draw ();
 }
 
-bool PreviewWindow::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
+void PreviewWindow::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height)
 {
     const Glib::RefPtr<Gtk::StyleContext> style = get_style_context();
-    style->render_background(cr, 0, 0, get_width(), get_height());
+    style->render_background(cr, 0, 0, width, height);
 
     if (!backBuffer) {
-        return true;
+        return;
     }
 
     int bufferW, bufferH;
@@ -181,7 +187,7 @@ bool PreviewWindow::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
             // draw a black "shadow" line
             cr->set_source_rgba (0.0, 0.0, 0.0, 0.65);
             cr->set_line_width (1 * s);
-            cr->set_line_join(Cairo::LINE_JOIN_MITER);
+            cr->set_line_join(Cairo::Context::LineJoin::MITER);
             cr->rectangle (rectX + 1 * s, rectY + 1 * s, rectW - 2 * s, rectH - 2 * s);
             cr->stroke ();
 
@@ -194,9 +200,7 @@ bool PreviewWindow::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
 
     cr->restore();
 
-    style->render_frame (cr, 0, 0, get_width(), get_height());
-
-    return true;
+    style->render_frame (cr, 0, 0, width, height);
 }
 
 void PreviewWindow::previewImageChanged ()
@@ -236,24 +240,24 @@ void PreviewWindow::initialImageArrived()
 {
 }
 
-bool PreviewWindow::on_motion_notify_event (GdkEventMotion* event)
+void PreviewWindow::on_motion_notify_event (double x, double y)
 {
 
     if (!mainCropWin) {
-        return true;
+        return;
     }
 
-    int x, y, w, h;
-    getObservedFrameArea (x, y, w, h);
-    if (x>0 || y>0 || w < imgW || h < imgH) {
-        bool inside =     event->x > x - 6 && event->x < x + w - 1 + 6 && event->y > y - 6 && event->y < y + h - 1 + 6;
+    int fx, fy, w, h;
+    getObservedFrameArea (fx, fy, w, h);
+    if (fx>0 || fy>0 || w < imgW || h < imgH) {
+        bool inside = x > fx - 6 && x < fx + w - 1 + 6 && y > fy - 6 && y < fy + h - 1 + 6;
 
         CursorShape newType;
 
         if (isMoving) {
-            mainCropWin->remoteMove ((event->x - press_x) / zoom, (event->y - press_y) / zoom);
-            press_x = event->x;
-            press_y = event->y;
+            mainCropWin->remoteMove ((x - press_x) / zoom, (y - press_y) / zoom);
+            press_x = x;
+            press_y = y;
             newType = CSHandClosed;
         } else if (inside) {
             newType = CSHandOpen;
@@ -263,45 +267,41 @@ bool PreviewWindow::on_motion_notify_event (GdkEventMotion* event)
 
         if (newType != cursor_type) {
             cursor_type = newType;
-            CursorManager::setWidgetCursor(get_window(), cursor_type);
+            CursorManager::setWidgetCursor(getToplevelWindow(this), cursor_type);
         }
     }
-
-    return true;
 }
 
-bool PreviewWindow::on_button_press_event (GdkEventButton* event)
+void PreviewWindow::on_button_press_event (int n_press, double x, double y)
 {
 
     if (!mainCropWin) {
-        return true;
+        return;
     }
 
-    int x, y, w, h;
-    getObservedFrameArea (x, y, w, h);
-    if (x>0 || y>0 || w < imgW || h < imgH) {
+    int fx, fy, w, h;
+    getObservedFrameArea (fx, fy, w, h);
+    if (fx>0 || fy>0 || w < imgW || h < imgH) {
 
         if (!isMoving) {
             isMoving = true;
 
-            press_x = event->x;
-            press_y = event->y;
+            press_x = x;
+            press_y = y;
 
             if (cursor_type != CSHandClosed) {
                 cursor_type = CSHandClosed;
-                CursorManager::setWidgetCursor(get_window(), cursor_type);
+                CursorManager::setWidgetCursor(getToplevelWindow(this), cursor_type);
             }
         }
     }
-
-    return true;
 }
 
-bool PreviewWindow::on_button_release_event (GdkEventButton* event)
+void PreviewWindow::on_button_release_event (int n_press, double x, double y)
 {
 
     if (!mainCropWin) {
-        return true;
+        return;
     }
 
     if (isMoving) {
@@ -309,13 +309,11 @@ bool PreviewWindow::on_button_release_event (GdkEventButton* event)
 
         if (cursor_type != CSArrow) {
             cursor_type = CSArrow;
-            CursorManager::setWidgetCursor(get_window(), cursor_type);
+            CursorManager::setWidgetCursor(getToplevelWindow(this), cursor_type);
         }
 
         mainCropWin->remoteMoveReady ();
     }
-
-    return true;
 }
 
 Gtk::SizeRequestMode PreviewWindow::get_request_mode_vfunc () const
@@ -323,24 +321,18 @@ Gtk::SizeRequestMode PreviewWindow::get_request_mode_vfunc () const
     return Gtk::SizeRequestMode::CONSTANT_SIZE;
 }
 
-void PreviewWindow::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const
+void PreviewWindow::measure_vfunc(
+    Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+    int& minimum_baseline, int& natural_baseline) const
 {
-    minimum_height= RTScalable::scalePixelSize(50);
-    natural_height = RTScalable::scalePixelSize(100);
-}
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        minimum = RTScalable::scalePixelSize(80);
+        natural = RTScalable::scalePixelSize(120);
+    } else {
+        minimum = RTScalable::scalePixelSize(50);
+        natural = RTScalable::scalePixelSize(100);
+    }
 
-void PreviewWindow::get_preferred_width_vfunc (int &minimum_width, int &natural_width) const
-{
-    minimum_width = RTScalable::scalePixelSize(80);
-    natural_width = RTScalable::scalePixelSize(120);
-}
-
-void PreviewWindow::get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const
-{
-    get_preferred_height_vfunc(minimum_height, natural_height);
-}
-
-void PreviewWindow::get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const
-{
-    get_preferred_width_vfunc (minimum_width, natural_width);
+    minimum_baseline = -1;
+    natural_baseline = -1;
 }

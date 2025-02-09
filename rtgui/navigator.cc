@@ -92,33 +92,22 @@ Navigator::Navigator() :
     set_name("Navigator");
     Gtk::Box* mbox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
     previewWindow = Gtk::manage (new PreviewWindow ());
-    mbox->pack_start (*previewWindow, Pack::EXPAND_WIDGET, 2);
+    pack_start (mbox, *previewWindow, Pack::EXPAND_WIDGET, 2);
     dimension = Gtk::manage (new Gtk::Label ());
-    mbox->pack_start (*dimension, Pack::SHRINK, 2);
+    pack_start (mbox, *dimension, Pack::SHRINK, 2);
     position = Gtk::manage (new Gtk::Label ());
-    mbox->pack_start (*position, Pack::SHRINK, 2);
+    pack_start (mbox, *position, Pack::SHRINK, 2);
 
     //labels
-    lR = Gtk::manage (new Gtk::Label (M("NAVIGATOR_R")));
-    lG = Gtk::manage (new Gtk::Label (M("NAVIGATOR_G")));
-    lB = Gtk::manage (new Gtk::Label (M("NAVIGATOR_B")));
-    lH = Gtk::manage (new Gtk::Label (M("NAVIGATOR_H")));
-    lS = Gtk::manage (new Gtk::Label (M("NAVIGATOR_S")));
-    lV = Gtk::manage (new Gtk::Label (M("NAVIGATOR_V")));
-    lLAB_A = Gtk::manage (new Gtk::Label (M("NAVIGATOR_LAB_A")));
-    lLAB_B = Gtk::manage (new Gtk::Label (M("NAVIGATOR_LAB_B")));
-    lLAB_L = Gtk::manage (new Gtk::Label (M("NAVIGATOR_LAB_L")));
-
-    // left-align labels
-    lR->set_alignment(Gtk::Align::START);
-    lG->set_alignment(Gtk::Align::START);
-    lB->set_alignment(Gtk::Align::START);
-    lH->set_alignment(Gtk::Align::START);
-    lS->set_alignment(Gtk::Align::START);
-    lV->set_alignment(Gtk::Align::START);
-    lLAB_A->set_alignment(Gtk::Align::START);
-    lLAB_B->set_alignment(Gtk::Align::START);
-    lLAB_L->set_alignment(Gtk::Align::START);
+    lR = Gtk::manage (new Gtk::Label (M("NAVIGATOR_R"), Gtk::Align::START));
+    lG = Gtk::manage (new Gtk::Label (M("NAVIGATOR_G"), Gtk::Align::START));
+    lB = Gtk::manage (new Gtk::Label (M("NAVIGATOR_B"), Gtk::Align::START));
+    lH = Gtk::manage (new Gtk::Label (M("NAVIGATOR_H"), Gtk::Align::START));
+    lS = Gtk::manage (new Gtk::Label (M("NAVIGATOR_S"), Gtk::Align::START));
+    lV = Gtk::manage (new Gtk::Label (M("NAVIGATOR_V"), Gtk::Align::START));
+    lLAB_A = Gtk::manage (new Gtk::Label (M("NAVIGATOR_LAB_A"), Gtk::Align::START));
+    lLAB_B = Gtk::manage (new Gtk::Label (M("NAVIGATOR_LAB_B"), Gtk::Align::START));
+    lLAB_L = Gtk::manage (new Gtk::Label (M("NAVIGATOR_LAB_L"), Gtk::Align::START));
     
     // expand labels
     lR->set_hexpand();
@@ -132,26 +121,15 @@ Navigator::Navigator() :
     lLAB_L->set_hexpand();
 
     //values
-    R = Gtk::manage (new Gtk::Label ());
-    G = Gtk::manage (new Gtk::Label ());
-    B = Gtk::manage (new Gtk::Label ());
-    H = Gtk::manage (new Gtk::Label ());
-    S = Gtk::manage (new Gtk::Label ());
-    V = Gtk::manage (new Gtk::Label ());
-    LAB_A = Gtk::manage (new Gtk::Label ());
-    LAB_B = Gtk::manage (new Gtk::Label ());
-    LAB_L = Gtk::manage (new Gtk::Label ());
-
-    // right-align values
-    R->set_alignment(Gtk::Align::END);
-    G->set_alignment(Gtk::Align::END);
-    B->set_alignment(Gtk::Align::END);
-    H->set_alignment(Gtk::Align::END);
-    S->set_alignment(Gtk::Align::END);
-    V->set_alignment(Gtk::Align::END);
-    LAB_A->set_alignment(Gtk::Align::END);
-    LAB_B->set_alignment(Gtk::Align::END);
-    LAB_L->set_alignment(Gtk::Align::END);
+    R = Gtk::manage (new Gtk::Label ("", Gtk::Align::END));
+    G = Gtk::manage (new Gtk::Label ("", Gtk::Align::END));
+    B = Gtk::manage (new Gtk::Label ("", Gtk::Align::END));
+    H = Gtk::manage (new Gtk::Label ("", Gtk::Align::END));
+    S = Gtk::manage (new Gtk::Label ("", Gtk::Align::END));
+    V = Gtk::manage (new Gtk::Label ("", Gtk::Align::END));
+    LAB_A = Gtk::manage (new Gtk::Label ("", Gtk::Align::END));
+    LAB_B = Gtk::manage (new Gtk::Label ("", Gtk::Align::END));
+    LAB_L = Gtk::manage (new Gtk::Label ("", Gtk::Align::END));
 
     // set font family and size
     /*
@@ -205,7 +183,7 @@ Navigator::Navigator() :
 
 
     // RGB
-    Gtk::EventBox *evBox1 = Gtk::manage (new Gtk::EventBox());
+    Gtk::Box *evBox1 = Gtk::manage (new Gtk::Box());
     Gtk::Box* hbox1 = Gtk::manage (new Gtk::Box ());
     Gtk::Grid* table1 = Gtk::manage (new Gtk::Grid());
     
@@ -216,15 +194,21 @@ Navigator::Navigator() :
     table1->attach(*lB, 0, 2, 1, 1);
     table1->attach(*B, 1, 2, 1, 1);
 
-    evBox1->add (*table1);
-    evBox1->signal_button_release_event().connect_notify( sigc::mem_fun(*this, &Navigator::cycleUnitsRGB));
+    evBox1->append (*table1);
+    {
+        auto click = Gtk::GestureClick::create();
+        click->set_button(GDK_BUTTON_PRIMARY);
+        click->signal_released().connect(
+            sigc::mem_fun(*this, &Navigator::cycleUnitsRGB));
+        evBox1->add_controller(click);
+    }
 
-    hbox1->pack_start (*evBox1, Pack::EXPAND_WIDGET, 4);
-    hbox1->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
+    pack_start (hbox1, *evBox1, Pack::EXPAND_WIDGET, 4);
+    pack_start (hbox1, *Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
     table0->attach(*hbox1, 0, 0, 1, 1);
 
     // HSV
-    Gtk::EventBox *evBox2 = Gtk::manage (new Gtk::EventBox());
+    Gtk::Box *evBox2 = Gtk::manage (new Gtk::Box());
     Gtk::Box* hbox2 = Gtk::manage (new Gtk::Box ());
     Gtk::Grid* table2 = Gtk::manage (new Gtk::Grid());
 
@@ -235,11 +219,17 @@ Navigator::Navigator() :
     table2->attach(*lV, 0, 2, 1, 1);
     table2->attach(*V, 1, 2, 1, 1);
 
-    evBox2->add (*table2);
-    evBox2->signal_button_release_event().connect_notify( sigc::mem_fun(*this, &Navigator::cycleUnitsHSV));
+    evBox2->append (*table2);
+    {
+        auto click = Gtk::GestureClick::create();
+        click->set_button(GDK_BUTTON_PRIMARY);
+        click->signal_released().connect(
+            sigc::mem_fun(*this, &Navigator::cycleUnitsHSV));
+        evBox2->add_controller(click);
+    }
 
-    hbox2->pack_start (*evBox2, Pack::EXPAND_WIDGET, 4);
-    hbox2->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
+    pack_start (hbox2, *evBox2, Pack::EXPAND_WIDGET, 4);
+    pack_start (hbox2, *Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 4);
     table0->attach(*hbox2, 1, 0, 1, 1);
 
     // LAB
@@ -253,17 +243,16 @@ Navigator::Navigator() :
     table3->attach(*lLAB_B, 0, 2, 1, 1);
     table3->attach(*LAB_B, 1, 2, 1, 1);
 
-    hbox3->pack_start (*table3, Pack::EXPAND_WIDGET, 4);
-    hbox3->pack_start (*Gtk::manage (new  Gtk::Box()), Pack::SHRINK, 2);
+    pack_start (hbox3, *table3, Pack::EXPAND_WIDGET, 4);
+    pack_start (hbox3, *Gtk::manage (new  Gtk::Box()), Pack::SHRINK, 2);
     table0->attach(*hbox3, 2, 0, 1, 1);
 
     table0->set_column_homogeneous(true); // all cells will have equal width
 
-    mbox->pack_start (*table0, Pack::SHRINK, 2);
-    add (*mbox);
+    pack_start (mbox, *table0, Pack::SHRINK, 2);
+    set_child (*mbox);
 
     setInvalid ();
-    show_all ();
 }
 
 Navigator::~Navigator()
@@ -350,7 +339,7 @@ void Navigator::pointerMoved (bool validPos, const rtengine::procparams::ColorMa
     pointer_moved_delayed_call(validPos, &cmp, x, y, r, g, b, isRaw);
 }
 
-void Navigator::cycleUnitsRGB (GdkEventButton *event) {
+void Navigator::cycleUnitsRGB (int n_press, double x, double y) {
     uint16_t v = (uint16_t)currentRGBUnit;
     ++v;
     if (v == (uint16_t)Options::NavigatorUnit::_COUNT) {
@@ -379,7 +368,7 @@ void Navigator::cycleUnitsRGB (GdkEventButton *event) {
     sig_cycle_rgb.emit();
 }
 
-void Navigator::cycleUnitsHSV (GdkEventButton *event) {
+void Navigator::cycleUnitsHSV (int n_press, double x, double y) {
     uint16_t v = (uint16_t)currentHSVUnit;
     ++v;
     if (v == (uint16_t)Options::NavigatorUnit::_COUNT) {

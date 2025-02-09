@@ -134,6 +134,10 @@ CropWindow::CropWindow (ImageArea* parent, bool isLowUpdatePriority_, bool isDet
 
     cropHandler.setDisplayHandler(this);
     cropHandler.newImage (parent->getImProcCoordinator(), isDetailWindow);
+
+    auto motion = Gtk::EventControllerMotion::create();
+    motion->signal_leave().connect(sigc::mem_fun(*this, &CropWindow::leaveNotify));
+    add_controller(motion);
 }
 
 CropWindow::~CropWindow ()

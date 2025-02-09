@@ -191,7 +191,7 @@ public:
     void getSize     (int& w, int& h);
     void enable      ();
 
-    void leaveNotify (GdkEventCrossing* event);
+    void leaveNotify ();
     void flawnOver   (bool isFlawnOver);
 
     // zoomlistener interface
