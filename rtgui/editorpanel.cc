@@ -1035,8 +1035,6 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
 
     pack1(hpanedr, *hpanedl, true, false);
     pack2(hpanedr, *vboxright, false, false);
-//     hpanedl->signal_button_release_event().connect_notify ( sigc::mem_fun (*this, &EditorPanel::leftPaneButtonReleased) );
-//     hpanedr->signal_button_release_event().connect_notify ( sigc::mem_fun (*this, &EditorPanel::rightPaneButtonReleased) );
 
     pack_start(this, *hpanedr);
 
@@ -1095,6 +1093,13 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
         tbTopPanel_1->signal_toggled().connect ( sigc::mem_fun (*this, &EditorPanel::tbTopPanel_1_toggled) );
     }
 
+    signal_unrealize().connect([&]() {
+        options.historyPanelWidth = hpanedl->get_position();
+
+        int winW, winH;
+        parentWindow->get_default_size(winW, winH);
+        options.toolPanelWidth = winW - hpanedr->get_position();
+    });
 }
 
 EditorPanel::~EditorPanel ()
@@ -1153,30 +1158,6 @@ EditorPanel::~EditorPanel ()
     delete iShowHideSidePanels_exit;
     delete iShowHideSidePanels;
 }
-
-// void EditorPanel::leftPaneButtonReleased (GdkEventButton *event)
-// {
-//     if (event->button == 1) {
-//         // Button 1 released : it's a resize
-//         options.historyPanelWidth = hpanedl->get_position();
-//     }
-//
-//     /*else if (event->button == 3) {
-//     }*/
-// }
-//
-// void EditorPanel::rightPaneButtonReleased (GdkEventButton *event)
-// {
-//     if (event->button == 1) {
-//         int winW, winH;
-//         parentWindow->get_size (winW, winH);
-//         // Button 1 released : it's a resize
-//         options.toolPanelWidth = winW - hpanedr->get_position();
-//     }
-//
-//     /*else if (event->button == 3) {
-//     }*/
-// }
 
 void EditorPanel::writeOptions()
 {

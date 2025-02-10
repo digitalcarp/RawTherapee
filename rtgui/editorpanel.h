@@ -79,8 +79,6 @@ public:
     void open (Thumbnail* tmb, rtengine::InitialImage* isrc);
     void setAspect ();
     void on_realize () override;
-//     void leftPaneButtonReleased (int n_press, double x, double y);
-//     void rightPaneButtonReleased (int n_press, double x, double y);
 
     void setParent (RtWindow* p)
     {

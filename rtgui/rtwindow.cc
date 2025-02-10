@@ -340,6 +340,7 @@ void RtWindow::on_realize ()
         epanel->setAspect();
     }
 
+// TODO(gtk4)
 //     mainWindowCursorManager.init (get_window());
 
     // Display release notes only if new major version.
@@ -483,7 +484,7 @@ void RtWindow::addEditorPanel (EditorPanel* ep, const std::string &name)
         titleGrid->attach_next_to (*closeb, Gtk::PositionType::RIGHT, 1, 1);
 
         mainNB->append_page (*ep, *titleGrid);
-        //ep->setAspect ();
+        ep->setAspect ();
         mainNB->set_current_page (mainNB->page_num (*ep));
         mainNB->set_tab_reorderable (*ep, true);
 
