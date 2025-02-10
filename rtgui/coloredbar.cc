@@ -75,7 +75,7 @@ void ColoredBar::updateColoredBar(const Cairo::RefPtr< Cairo::Context> &cr)
             // ask the ColorProvider to provide colors :) for each pixels
             if (colorProvider) {
                 // Create surface
-                const auto surface = Cairo::ImageSurface::create(Cairo::FORMAT_RGB24, w, h);
+                const auto surface = Cairo::ImageSurface::create(Cairo::Surface::Format::RGB24, w, h);
                 unsigned char *surfaceData = surface->get_data();
 
                 cr->set_antialias(Cairo::ANTIALIAS_NONE);

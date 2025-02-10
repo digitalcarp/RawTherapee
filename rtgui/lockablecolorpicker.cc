@@ -123,7 +123,7 @@ void LockableColorPicker::updateBackBuffer ()
         newW *= deviceScale;
         newH *= deviceScale;
 
-        setDrawRectangle(Cairo::FORMAT_ARGB32, 0, 0, newW, newH, true);
+        setDrawRectangle(Cairo::Surface::Format::ARGB32, 0, 0, newW, newH, true);
         hidpi::setDeviceScale(getSurface(), deviceScale);
 
         Cairo::RefPtr<Cairo::Context> bbcr = BackBuffer::getContext();
@@ -226,7 +226,7 @@ void LockableColorPicker::updateBackBuffer ()
     } else if (validity == Validity::CROSSING) {
         newH = newW = (int)size + 2 * circlePadding;
 
-        setDrawRectangle(Cairo::FORMAT_ARGB32, 0, 0, newW, newH, true);
+        setDrawRectangle(Cairo::Surface::Format::ARGB32, 0, 0, newW, newH, true);
 
         Cairo::RefPtr<Cairo::Context> bbcr = BackBuffer::getContext();
 

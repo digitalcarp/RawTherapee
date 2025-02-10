@@ -43,14 +43,14 @@ void ObjectMOBuffer::setObjectMode(ObjectMode newType)
         case (OM_255):
             if (objectMode==OM_65535) {
                 objectMap.clear();
-                objectMap = Cairo::ImageSurface::create(Cairo::FORMAT_A8, w, h);
+                objectMap = Cairo::ImageSurface::create(Cairo::Surface::Format::A8, w, h);
             }
             break;
 
         case (OM_65535):
             if (objectMode==OM_255) {
                 objectMap.clear();
-                objectMap = Cairo::ImageSurface::create(Cairo::FORMAT_RGB16_565, w, h);
+                objectMap = Cairo::ImageSurface::create(Cairo::Surface::Format::RGB16_565, w, h);
             }
             break;
         }
@@ -88,7 +88,7 @@ void ObjectMOBuffer::resize(int newWidth, int newHeight)
             }
 
             if (!objectMap && newWidth>0 && newHeight>0) {
-                objectMap = Cairo::ImageSurface::create(objectMode==OM_255?Cairo::FORMAT_A8:Cairo::FORMAT_RGB16_565, newWidth, newHeight);
+                objectMap = Cairo::ImageSurface::create(objectMode==OM_255?Cairo::Surface::Format::A8:Cairo::Surface::Format::RGB16_565, newWidth, newHeight);
             }
 
         } else {
