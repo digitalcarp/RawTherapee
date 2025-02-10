@@ -212,7 +212,7 @@ void EditWindow::addEditorPanel (EditorPanel* ep, const std::string &name)
     hb->set_tooltip_markup (name);
     Gtk::Button* closeb = Gtk::manage (new Gtk::Button ());
     closeb->set_image (*Gtk::manage(new RTImage ("cancel-small", Gtk::ICON_SIZE_BUTTON)));
-    closeb->set_relief (Gtk::RELIEF_NONE);
+    closeb->set_has_frame(false);
     closeb->set_focus_on_click (false);
 
     // make the button as small as possible thanks via css

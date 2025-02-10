@@ -635,7 +635,7 @@ LabGrid::LabGrid(rtengine::ProcEvent evt, const Glib::ustring &msg, bool enable_
     reset->signal_button_release_event().connect(sigc::mem_fun(*this, &LabGrid::resetPressed));
 
     setExpandAlignProperties(reset, false, false, Gtk::Align::CENTER, Gtk::Align::START);
-    reset->set_relief(Gtk::RELIEF_NONE);
+    reset->set_has_frame(false);
     reset->get_style_context()->add_class(GTK_STYLE_CLASS_FLAT);
     reset->set_can_focus(false);
     reset->set_size_request(-1, 20);

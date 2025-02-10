@@ -249,7 +249,7 @@ WhiteBalance::WhiteBalance () : FoldableToolPanel(this, TOOL_NAME, M("TP_WBALANC
 
     resetButton = Gtk::manage (new Gtk::Button()); // No label, keep it short
     setExpandAlignProperties(resetButton, false, false, Gtk::Align::START, Gtk::Align::CENTER);
-    resetButton->set_relief(Gtk::RELIEF_NONE);
+    resetButton->set_has_frame(false);
     resetButton->get_style_context()->add_class(GTK_STYLE_CLASS_FLAT);
     resetButton->set_image (*Gtk::manage (new RTImage ("undo-small", Gtk::ICON_SIZE_BUTTON)));
 

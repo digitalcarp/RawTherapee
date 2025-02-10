@@ -72,7 +72,7 @@ Spot::Spot() :
 
     reset = Gtk::manage (new Gtk::Button ());
     reset->add (*Gtk::manage (new RTImage ("undo-small")));
-    reset->set_relief (Gtk::RELIEF_NONE);
+    reset->set_has_frame(false);
     reset->set_border_width (0);
     reset->signal_clicked().connect ( sigc::mem_fun (*this, &Spot::resetPressed) );
 

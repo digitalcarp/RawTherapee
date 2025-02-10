@@ -31,19 +31,19 @@ IndicateClippedPanel::IndicateClippedPanel (ImageArea* ia) :
     imageArea(ia)
 {
     previewFocusMask = Gtk::manage (new Gtk::ToggleButton ());
-    previewFocusMask->set_relief(Gtk::RELIEF_NONE);
+    previewFocusMask->set_has_frame(false);
     previewFocusMask->set_tooltip_markup (M("MAIN_TOOLTIP_PREVIEWFOCUSMASK"));
     previewFocusMask->set_image(*iF);
 
     previewSharpMask = Gtk::manage (new Gtk::ToggleButton ());
-    previewSharpMask->set_relief(Gtk::RELIEF_NONE);
+    previewSharpMask->set_has_frame(false);
     previewSharpMask->set_tooltip_markup (M("MAIN_TOOLTIP_PREVIEWSHARPMASK"));
     previewSharpMask->set_image(*iS);
 
     Glib::ustring tt;
 
     indClippedH = Gtk::manage (new Gtk::ToggleButton ());
-    indClippedH->set_relief(Gtk::RELIEF_NONE);
+    indClippedH->set_has_frame(false);
     indClippedH->add (*Gtk::manage (new RTImage ("warning-highlights", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
     tt = Glib::ustring::compose("%1\n%2 = %3", M("MAIN_TOOLTIP_INDCLIPPEDH"), M("MAIN_TOOLTIP_THRESHOLD"), options.highlightThreshold);
 
@@ -54,7 +54,7 @@ IndicateClippedPanel::IndicateClippedPanel (ImageArea* ia) :
     }
 
     indClippedS = Gtk::manage (new Gtk::ToggleButton ());
-    indClippedS->set_relief(Gtk::RELIEF_NONE);
+    indClippedS->set_has_frame(false);
     indClippedS->add (*Gtk::manage (new RTImage ("warning-shadows", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
     tt = Glib::ustring::compose("%1\n%2 = %3", M("MAIN_TOOLTIP_INDCLIPPEDS"), M("MAIN_TOOLTIP_THRESHOLD"), options.shadowThreshold);
 

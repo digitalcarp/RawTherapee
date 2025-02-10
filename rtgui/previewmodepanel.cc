@@ -35,49 +35,49 @@ PreviewModePanel::PreviewModePanel (ImageArea* ia) :
 {
     backColor0 = Gtk::manage (new Gtk::ToggleButton ());
     backColor0->get_style_context()->add_class("narrowbutton");
-    backColor0->set_relief(Gtk::RELIEF_NONE);
+    backColor0->set_has_frame(false);
     backColor0->set_tooltip_markup (M("MAIN_TOOLTIP_BACKCOLOR0"));
     backColor0->set_image_from_icon_name(options.bgcolor == 0 ? nBC0 : ngBC0, Gtk::ICON_SIZE_LARGE_TOOLBAR);
 
     backColor1 = Gtk::manage (new Gtk::ToggleButton ());
     backColor1->get_style_context()->add_class("narrowbutton");
-    backColor1->set_relief(Gtk::RELIEF_NONE);
+    backColor1->set_has_frame(false);
     backColor1->set_tooltip_markup (M("MAIN_TOOLTIP_BACKCOLOR1"));
     backColor1->set_image_from_icon_name(options.bgcolor == 1 ? nBC1 : ngBC1, Gtk::ICON_SIZE_LARGE_TOOLBAR);
 
     backColor2 = Gtk::manage (new Gtk::ToggleButton ());
     backColor2->get_style_context()->add_class("narrowbutton");
-    backColor2->set_relief(Gtk::RELIEF_NONE);
+    backColor2->set_has_frame(false);
     backColor2->set_tooltip_markup (M("MAIN_TOOLTIP_BACKCOLOR2"));
     backColor2->set_image_from_icon_name(options.bgcolor == 2 ? nBC2 : ngBC2, Gtk::ICON_SIZE_LARGE_TOOLBAR);
 
     backColor3 = Gtk::manage (new Gtk::ToggleButton ());
     backColor3->get_style_context()->add_class("narrowbutton");
-    backColor3->set_relief(Gtk::RELIEF_NONE);
+    backColor3->set_has_frame(false);
     backColor3->set_tooltip_markup (M("MAIN_TOOLTIP_BACKCOLOR3"));
     backColor3->set_image_from_icon_name(options.bgcolor == 3 ? nBC3 : ngBC3, Gtk::ICON_SIZE_LARGE_TOOLBAR);
 
     previewR = Gtk::manage (new Gtk::ToggleButton ());
     previewR->get_style_context()->add_class("narrowbutton");
-    previewR->set_relief(Gtk::RELIEF_NONE);
+    previewR->set_has_frame(false);
     previewR->set_tooltip_markup (M("MAIN_TOOLTIP_PREVIEWR"));
     previewR->set_image_from_icon_name(ngR, Gtk::ICON_SIZE_LARGE_TOOLBAR);
 
     previewG = Gtk::manage (new Gtk::ToggleButton ());
     previewG->get_style_context()->add_class("narrowbutton");
-    previewG->set_relief(Gtk::RELIEF_NONE);
+    previewG->set_has_frame(false);
     previewG->set_tooltip_markup (M("MAIN_TOOLTIP_PREVIEWG"));
     previewG->set_image_from_icon_name(ngG, Gtk::ICON_SIZE_LARGE_TOOLBAR);
 
     previewB = Gtk::manage (new Gtk::ToggleButton ());
     previewB->get_style_context()->add_class("narrowbutton");
-    previewB->set_relief(Gtk::RELIEF_NONE);
+    previewB->set_has_frame(false);
     previewB->set_tooltip_markup (M("MAIN_TOOLTIP_PREVIEWB"));
     previewB->set_image_from_icon_name(ngB, Gtk::ICON_SIZE_LARGE_TOOLBAR);
 
     previewL = Gtk::manage (new Gtk::ToggleButton ());
     previewL->get_style_context()->add_class("narrowbutton");
-    previewL->set_relief(Gtk::RELIEF_NONE);
+    previewL->set_has_frame(false);
     previewL->set_tooltip_markup (M("MAIN_TOOLTIP_PREVIEWL"));
     previewL->set_image_from_icon_name(ngL, Gtk::ICON_SIZE_LARGE_TOOLBAR);
 

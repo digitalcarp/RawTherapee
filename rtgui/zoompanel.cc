@@ -38,23 +38,23 @@ ZoomPanel::ZoomPanel (ImageArea* iarea) : iarea(iarea)
 
     zoomOut = Gtk::manage (new Gtk::Button());
     zoomOut->add (*imageOut);
-    zoomOut->set_relief(Gtk::RELIEF_NONE);
+    zoomOut->set_has_frame(false);
     setExpandAlignProperties(zoomOut, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
     zoomIn = Gtk::manage (new Gtk::Button());
     zoomIn->add (*imageIn);
-    zoomIn->set_relief(Gtk::RELIEF_NONE);
+    zoomIn->set_has_frame(false);
     setExpandAlignProperties(zoomIn, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
     zoomFit = Gtk::manage (new Gtk::Button());
     zoomFit->add (*imageFit);
-    zoomFit->set_relief(Gtk::RELIEF_NONE);
+    zoomFit->set_has_frame(false);
     setExpandAlignProperties(zoomFit, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
     zoomFitCrop = Gtk::manage (new Gtk::Button());
     zoomFitCrop->add (*imageFitCrop);
-    zoomFitCrop->set_relief(Gtk::RELIEF_NONE);
+    zoomFitCrop->set_has_frame(false);
     setExpandAlignProperties(zoomFitCrop, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
     zoom11 = Gtk::manage (new Gtk::Button());
     zoom11->add (*image11);
-    zoom11->set_relief(Gtk::RELIEF_NONE);
+    zoom11->set_has_frame(false);
     setExpandAlignProperties(zoom11, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
 
     attach_next_to (*zoomOut, Gtk::PositionType::RIGHT, 1, 1);
@@ -71,7 +71,7 @@ ZoomPanel::ZoomPanel (ImageArea* iarea) : iarea(iarea)
     imageCrop->set_padding(0, 0);
     newCrop = Gtk::manage (new Gtk::Button());
     newCrop->add (*imageCrop);
-    newCrop->set_relief(Gtk::RELIEF_NONE);
+    newCrop->set_has_frame(false);
     setExpandAlignProperties(newCrop, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
     attach_next_to (*newCrop, Gtk::PositionType::RIGHT, 1, 1);
 

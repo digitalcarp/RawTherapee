@@ -164,7 +164,7 @@ void CurveEditorGroup::newLine()
             curve_reset = Gtk::manage (new Gtk::Button ());
             setExpandAlignProperties(curve_reset, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
             curve_reset->add (*Gtk::manage (new RTImage ("undo-small", Gtk::ICON_SIZE_BUTTON)));
-            curve_reset->set_relief (Gtk::RELIEF_NONE);
+            curve_reset->set_has_frame(false);
             curve_reset->set_tooltip_text (M("CURVEEDITOR_TOOLTIPLINEAR"));
             curve_reset->signal_clicked().connect( sigc::mem_fun(*this, &CurveEditorGroup::curveResetPressed) );
 
