@@ -21,7 +21,6 @@
 
 #include "editbuffer.h"
 #include "editcallbacks.h"
-#include "rtsurface.h"
 
 const std::vector<double> Geometry::dash = {3., 1.5};
 
@@ -1002,11 +1001,11 @@ void OPIcon::drivenPointToRectangle(const rtengine::Coord &pos,
     bottomRight.y = topLeft.y + H - 1;
 }
 
-OPIcon::OPIcon(const std::shared_ptr<RTSurface> &normal,
-               const std::shared_ptr<RTSurface> &active,
-               const std::shared_ptr<RTSurface> &prelight,
-               const std::shared_ptr<RTSurface> &dragged,
-               const std::shared_ptr<RTSurface>&insensitive,
+OPIcon::OPIcon(const hidpi::ScaledImageSurface &normal,
+               const hidpi::ScaledImageSurface &active,
+               const hidpi::ScaledImageSurface &prelight,
+               const hidpi::ScaledImageSurface &dragged,
+               const hidpi::ScaledImageSurface &insensitive,
                DrivenPoint drivenPoint) :
     drivenPoint(drivenPoint)
 {
@@ -1031,57 +1030,52 @@ OPIcon::OPIcon(const std::shared_ptr<RTSurface> &normal,
     }
 }
 
-OPIcon::OPIcon(Glib::ustring normalImage, Glib::ustring activeImage, Glib::ustring prelightImage,
-               Glib::ustring  draggedImage, Glib::ustring insensitiveImage, DrivenPoint drivenPoint) : drivenPoint(drivenPoint)
+OPIcon::OPIcon(const Glib::ustring& normalImage, const Glib::ustring& activeImage,
+               const Glib::ustring& prelightImage, const Glib::ustring&  draggedImage,
+               const Glib::ustring& insensitiveImage, DrivenPoint drivenPoint)
+    : drivenPoint(drivenPoint)
 {
-    if (!normalImage.empty()) {
-        normalImg = std::shared_ptr<RTSurface>(new RTSurface(normalImage, Gtk::ICON_SIZE_MENU));
-    }
+    auto loadIcon = [](const Glib::ustring& name) -> hidpi::ScaledImageSurface {
+        if (name.empty()) return nullptr;
+        return SvgPaintableWrapper::createFromIcon(name)
+            ->createSurface(SvgPaintableWrapper::IconSize::SMALL, 1);
+    };
 
-    if (!prelightImage.empty()) {
-        prelightImg = std::shared_ptr<RTSurface>(new RTSurface(prelightImage, Gtk::ICON_SIZE_MENU));
-    }
-
-    if (!activeImage.empty()) {
-        activeImg = std::shared_ptr<RTSurface>(new RTSurface(activeImage, Gtk::ICON_SIZE_MENU));
-    }
-
-    if (!draggedImage.empty()) {
-        draggedImg = std::shared_ptr<RTSurface>(new RTSurface(draggedImage, Gtk::ICON_SIZE_MENU));
-    }
-
-    if (!insensitiveImage.empty()) {
-        insensitiveImg = std::shared_ptr<RTSurface>(new RTSurface(insensitiveImage, Gtk::ICON_SIZE_MENU));
-    }
+    normalImg = loadIcon(normalImage);
+        prelightImg = loadIcon(prelightImage);
+        activeImg = loadIcon(activeImage);
+        draggedImg = loadIcon(draggedImage);
+        insensitiveImg = loadIcon(insensitiveImage);
 }
 
-const std::shared_ptr<RTSurface> OPIcon::getNormalImg()
+const hidpi::ScaledImageSurface& OPIcon::getNormalImg()
 {
     return normalImg;
 }
-const std::shared_ptr<RTSurface> OPIcon::getPrelightImg()
+const hidpi::ScaledImageSurface& OPIcon::getPrelightImg()
 {
     return prelightImg;
 }
-const std::shared_ptr<RTSurface> OPIcon::getActiveImg()
+const hidpi::ScaledImageSurface& OPIcon::getActiveImg()
 {
     return activeImg;
 }
-const std::shared_ptr<RTSurface> OPIcon::getDraggedImg()
+const hidpi::ScaledImageSurface& OPIcon::getDraggedImg()
 {
     return draggedImg;
 }
-const std::shared_ptr<RTSurface> OPIcon::getInsensitiveImg()
+const hidpi::ScaledImageSurface& OPIcon::getInsensitiveImg()
 {
     return insensitiveImg;
 }
 
-void OPIcon::drawImage(std::shared_ptr<RTSurface> &img,
+void OPIcon::drawImage(const hidpi::ScaledImageSurface &img,
                        Cairo::RefPtr<Cairo::Context> &cr, ObjectMOBuffer *objectBuffer,
                        EditCoordSystem &coordSystem)
 {
-    int imgW = img->getWidth();
-    int imgH = img->getHeight();
+    hidpi::LogicalSize size = img.getLogicalSize();
+    int imgW = size.width;
+    int imgH = size.height;
 
     rtengine::Coord pos;
 
@@ -1096,19 +1090,20 @@ void OPIcon::drawImage(std::shared_ptr<RTSurface> &img,
     rtengine::Coord tl, br; // Coordinate of the rectangle in the CropBuffer coordinate system
     drivenPointToRectangle(pos, tl, br, imgW, imgH);
 
-    cr->set_source(img->get(), tl.x, tl.y);
+    cr->set_source(img.getBaseSurface(), tl.x, tl.y);
     cr->set_line_width(0.);
     cr->rectangle(tl.x, tl.y, imgW, imgH);
     cr->fill();
 }
 
-void OPIcon::drawMOImage(std::shared_ptr<RTSurface> &img, Cairo::RefPtr<Cairo::Context> &cr,
+void OPIcon::drawMOImage(const hidpi::ScaledImageSurface &img, Cairo::RefPtr<Cairo::Context> &cr,
                          unsigned short id, ObjectMOBuffer *objectBuffer, EditCoordSystem &coordSystem)
 {
     // test of F_HOVERABLE has already been done
 
-    int imgW = img->getWidth();
-    int imgH = img->getHeight();
+    hidpi::LogicalSize size = img.getLogicalSize();
+    int imgW = size.width;
+    int imgH = size.height;
 
     rtengine::Coord pos;
 

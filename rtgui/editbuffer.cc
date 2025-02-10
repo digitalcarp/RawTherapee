@@ -20,6 +20,8 @@
 #include "editbuffer.h"
 #include "editcallbacks.h"
 
+#include <cstdint>
+
 ObjectMOBuffer::ObjectMOBuffer(EditDataProvider *dataProvider) : objectMap(nullptr), objectMode(OM_255), dataProvider(dataProvider) {}
 
 ObjectMOBuffer::~ObjectMOBuffer()
@@ -42,14 +44,14 @@ void ObjectMOBuffer::setObjectMode(ObjectMode newType)
         switch (newType) {
         case (OM_255):
             if (objectMode==OM_65535) {
-                objectMap.clear();
+                objectMap = nullptr;
                 objectMap = Cairo::ImageSurface::create(Cairo::Surface::Format::A8, w, h);
             }
             break;
 
         case (OM_65535):
             if (objectMode==OM_255) {
-                objectMap.clear();
+                objectMap = nullptr;
                 objectMap = Cairo::ImageSurface::create(Cairo::Surface::Format::RGB16_565, w, h);
             }
             break;
@@ -61,7 +63,7 @@ void ObjectMOBuffer::setObjectMode(ObjectMode newType)
 void ObjectMOBuffer::flush()
 {
     if (objectMap ) {
-        objectMap.clear();
+        objectMap = nullptr;
     }
 }
 
@@ -84,7 +86,7 @@ void ObjectMOBuffer::resize(int newWidth, int newHeight)
     if (const auto currSubscriber = dataProvider->getCurrSubscriber ()) {
         if (currSubscriber->getEditingType() == ET_OBJECTS) {
             if (objectMap && (objectMap->get_width() != newWidth || objectMap->get_height() != newHeight)) {
-                objectMap.clear();
+                objectMap = nullptr;
             }
 
             if (!objectMap && newWidth>0 && newHeight>0) {

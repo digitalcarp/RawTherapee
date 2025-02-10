@@ -26,6 +26,7 @@
 #include "imagearea.h"
 #include "multilangmgr.h"
 #include "navigator.h"
+#include "rtscalable.h"
 
 namespace
 {
@@ -53,7 +54,7 @@ void LockableColorPicker::updateBackBuffer ()
         Gtk::DrawingArea *iArea = cropWindow->getImageArea();
 
         Glib::RefPtr<Pango::Context> pangoContext = iArea->get_pango_context ();
-        Pango::FontDescription fontd = iArea->get_style_context()->get_font();
+        Pango::FontDescription fontd = pangoContext->get_font_description();
         // set font family and size
         fontd.set_family(options.CPFontFamily == "default" ? "sans" : options.CPFontFamily);
         const int fontSize = options.CPFontFamily == "default" ? 8 : options.CPFontSize; // pt
@@ -175,7 +176,7 @@ void LockableColorPicker::updateBackBuffer ()
         double txtOffsetX = textPadding;
         double txtOffsetY = (double)size + 2. * circlePadding + textPadding;
         switch (iArea->get_direction()) {
-        case Gtk::TEXT_DIR_RTL:
+        case Gtk::TextDirection::RTL:
             bbcr->move_to (txtOffsetX                         , txtOffsetY);
             layout[0][1]->add_to_cairo_context (bbcr);
             bbcr->fill ();
