@@ -41,8 +41,8 @@ set(NONCLISOURCEFILES
     # coordinateadjuster.cc
     # compressgamut.cc
     # crop.cc
-    # crophandler.cc
-    # cropwindow.cc
+    crophandler.cc
+    cropwindow.cc
     cursormanager.cc
     # curveeditor.cc
     # curveeditorgroup.cc
@@ -55,10 +55,10 @@ set(NONCLISOURCEFILES
     # dirpyrequalizer.cc
     # distortion.cc
     dynamicprofilepanel.cc
-    # editbuffer.cc
+    editbuffer.cc
     editcallbacks.cc
     editorpanel.cc
-    # editwidgets.cc
+    editwidgets.cc
     # editwindow.cc
     # epd.cc
     eventmapper.cc
@@ -87,10 +87,10 @@ set(NONCLISOURCEFILES
     # hsvequalizer.cc
     iccprofilecreator.cc
     # icmpanel.cc
-    # imagearea.cc
-    # imageareapanel.cc
+    imagearea.cc
+    imageareapanel.cc
     # impulsedenoise.cc
-    # indclippedpanel.cc
+    indclippedpanel.cc
     inspector.cc
     # iptcpanel.cc
     # labcurve.cc
@@ -101,7 +101,7 @@ set(NONCLISOURCEFILES
     # locallab.cc
     # locallabtools.cc
     # locallabtools2.cc
-    # lockablecolorpicker.cc
+    lockablecolorpicker.cc
     lwbutton.cc
     lwbuttonset.cc
     main.cc
@@ -110,7 +110,7 @@ set(NONCLISOURCEFILES
     # mycurve.cc
     # mydiagonalcurve.cc
     # myflatcurve.cc
-    # navigator.cc
+    navigator.cc
     options.cc
     paramsedited.cc
     partialpastedlg.cc
@@ -128,8 +128,8 @@ set(NONCLISOURCEFILES
     # preprocesswb.cc
     previewhandler.cc
     previewloader.cc
-    # previewmodepanel.cc
-    # previewwindow.cc
+    previewmodepanel.cc
+    previewwindow.cc
     profilepanel.cc
     profilestorecombobox.cc
     # prsharpening.cc
@@ -181,7 +181,7 @@ set(NONCLISOURCEFILES
     # whitebalance.cc
     # xtransprocess.cc
     # xtransrawexposure.cc
-    # zoompanel.cc
+    zoompanel.cc
 )
 
 if(APPLE)

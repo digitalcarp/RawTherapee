@@ -33,15 +33,16 @@
 #include "guiutils.h"
 // #include "popupbutton.h"
 #include "options.h"
-// #include "navigator.h"
+#include "navigator.h"
 #include "previewhandler.h"
-// #include "previewwindow.h"
+#include "previewwindow.h"
 #include "progressconnector.h"
 #include "procparamchangers.h"
 #include "placesbrowser.h"
 #include "pathutils.h"
 #include "rtappchooserdialog.h"
 #include "rtmessagedialog.h"
+#include "rtscalable.h"
 #include "thumbnail.h"
 // #include "toolpanelcoord.h"
 
@@ -706,8 +707,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
       iBeforeLockON (nullptr), iBeforeLockOFF (nullptr),
       externalEditorChangedSignal (nullptr),
       previewHandler (nullptr), beforePreviewHandler (nullptr),
-//       beforeIarea (nullptr), beforeBox (nullptr), afterBox (nullptr), beforeLabel (nullptr), afterLabel (nullptr),
-      beforeBox (nullptr), afterBox (nullptr), beforeLabel (nullptr), afterLabel (nullptr),
+      beforeIarea (nullptr), beforeBox (nullptr), afterBox (nullptr), beforeLabel (nullptr), afterLabel (nullptr),
       beforeHeaderBox (nullptr), afterHeaderBox (nullptr), parent (nullptr), parentWindow (nullptr), openThm (nullptr),
       selectedFrame(0), isrc (nullptr), ipc (nullptr), beforeIpc (nullptr), err (0), isProcessing (false),
       histogram_observable(nullptr), histogram_scope_type(ScopeType::NONE)
@@ -745,9 +745,9 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     ppframe->set_label(M("PROFILEPANEL_LABEL"));
     //leftsubpaned, *ppframe, Pack::SHRINK, 4);
 
-//     navigator = Gtk::manage(new Navigator());
-//     navigator->previewWindow->set_size_request(-1, RTScalable::scalePixelSize(150));
-//     pack_start(leftsubpaned, *navigator, false, false);
+    navigator = Gtk::manage(new Navigator());
+    navigator->previewWindow->set_size_request(-1, RTScalable::scalePixelSize(150));
+    pack1(leftsubpaned, *navigator, false, false);
 
     history = Gtk::manage(new History());
     pack2(leftsubpaned, *history, true, false);
@@ -824,7 +824,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
 
     Gtk::Separator* vsep3 = Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL));
 
-//     iareapanel = new ImageAreaPanel ();
+    iareapanel = new ImageAreaPanel ();
 //     tpc->setEditProvider (iareapanel->imageArea);
 //     tpc->getToolBar()->setLockablePickerToolListener (iareapanel->imageArea);
 
@@ -840,9 +840,9 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     insertSpacer(toolBarPanel);
 
     pack_start (toolBarPanel, *vsepz4, Pack::SHRINK, 2);
-//     pack_start (toolBarPanel, *iareapanel->imageArea->previewModePanel, Pack::SHRINK, 0);
+    pack_start (toolBarPanel, *iareapanel->imageArea->previewModePanel, Pack::SHRINK, 0);
     pack_start (toolBarPanel, *vsepz, Pack::SHRINK, 2);
-//     pack_start (toolBarPanel, *iareapanel->imageArea->indClippedPanel, Pack::SHRINK, 0);
+    pack_start (toolBarPanel, *iareapanel->imageArea->indClippedPanel, Pack::SHRINK, 0);
 
     pack_start (toolBarPanel, *vsep3, Pack::SHRINK, 2);
     // Histogram profile toggle
@@ -857,7 +857,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     }
 
     afterBox = Gtk::manage (new Gtk::Box (Gtk::Orientation::VERTICAL));
-//     pack_start(afterBox, *iareapanel);
+    pack_start(afterBox, *iareapanel);
 
     beforeAfterBox = Gtk::manage (new Gtk::Box (Gtk::Orientation::HORIZONTAL));
     beforeAfterBox->set_name ("BeforeAfterContainer");
@@ -968,7 +968,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
 
     // Adding widgets from center to the left, on the left side (using Gtk::PositionType::LEFT)
     iops->attach_next_to (*vsep2, Gtk::PositionType::LEFT, 1, 1);
-//     iops->attach_next_to (*progressLabel, Gtk::PositionType::LEFT, 1, 1);
+    iops->attach_next_to (*progressLabel, Gtk::PositionType::LEFT, 1, 1);
     iops->attach_next_to (*vsep1, Gtk::PositionType::LEFT, 1, 1);
 
     if (!gimpPlugin) {
@@ -997,7 +997,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     }
 
     iops->attach_next_to (*vsepz2, Gtk::PositionType::RIGHT, 1, 1);
-//     iops->attach_next_to (*iareapanel->imageArea->zoomPanel, Gtk::PositionType::RIGHT, 1, 1);
+    iops->attach_next_to (*iareapanel->imageArea->zoomPanel, Gtk::PositionType::RIGHT, 1, 1);
     iops->attach_next_to (*vsepz3, Gtk::PositionType::RIGHT, 1, 1);
     iops->attach_next_to (*tbShowHideSidePanels, Gtk::PositionType::RIGHT, 1, 1);
     iops->attach_next_to (*tbRightPanel_1, Gtk::PositionType::RIGHT, 1, 1);
@@ -1059,7 +1059,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
 //     tpc->addPParamsChangeListener (history);
 //     tpc->addPParamsChangeListener (this);
 //     iareapanel->imageArea->setCropGUIListener (tpc->getCropGUIListener());
-//     iareapanel->imageArea->setPointerMotionListener (navigator);
+    iareapanel->imageArea->setPointerMotionListener (navigator);
 //     iareapanel->imageArea->setImageAreaToolListener (tpc);
 
     // initialize components
@@ -1100,17 +1100,17 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
 EditorPanel::~EditorPanel ()
 {
     history->setHistoryBeforeLineListener (nullptr);
-//     // the order is important!
-//     iareapanel->setBeforeAfterViews (nullptr, iareapanel);
-//     delete iareapanel;
-//     iareapanel = nullptr;
+    // the order is important!
+    iareapanel->setBeforeAfterViews (nullptr, iareapanel);
+    delete iareapanel;
+    iareapanel = nullptr;
 
     if (beforeIpc) {
         beforeIpc->stopProcessing ();
     }
 
-//     delete beforeIarea;
-//     beforeIarea = nullptr;
+    delete beforeIarea;
+    beforeIarea = nullptr;
 
     if (beforeIpc) {
         beforeIpc->setPreviewImageListener (nullptr);
@@ -1257,13 +1257,13 @@ void EditorPanel::open (Thumbnail* tmb, rtengine::InitialImage* isrc)
     ipc->setPreviewScale (10);  // Important
 //     tpc->initImage (ipc, tmb->getType() == FT_Raw);
     ipc->setHistogramListener (this);
-//     iareapanel->imageArea->indClippedPanel->silentlyDisableSharpMask();
+    iareapanel->imageArea->indClippedPanel->silentlyDisableSharpMask();
 
-//    iarea->fitZoom ();   // tell to the editorPanel that the next image has to be fitted to the screen
-//     iareapanel->imageArea->setPreviewHandler (previewHandler);
-//     iareapanel->imageArea->setImProcCoordinator (ipc);
-//     navigator->previewWindow->setPreviewHandler (previewHandler);
-//     navigator->previewWindow->setImageArea (iareapanel->imageArea);
+    // iarea->fitZoom ();   // tell to the editorPanel that the next image has to be fitted to the screen
+    iareapanel->imageArea->setPreviewHandler (previewHandler);
+    iareapanel->imageArea->setImProcCoordinator (ipc);
+    navigator->previewWindow->setPreviewHandler (previewHandler);
+    navigator->previewWindow->setImageArea (iareapanel->imageArea);
 
     rtengine::ImageSource* is = isrc->getImageSource();
     is->setProgressListener ( this );
@@ -1279,26 +1279,26 @@ void EditorPanel::open (Thumbnail* tmb, rtengine::InitialImage* isrc)
     openThm->addThumbnailListener (this);
     info_toggled ();
 
-//     if (beforeIarea) {
-//         beforeAfterToggled();
-//         beforeAfterToggled();
-//     }
+    if (beforeIarea) {
+        beforeAfterToggled();
+        beforeAfterToggled();
+    }
 
-//     // If in single tab mode, the main crop window is not constructed the very first time
-//     // since there was no resize event
-//     if (iareapanel->imageArea->mainCropWindow) {
-//         iareapanel->imageArea->mainCropWindow->cropHandler.newImage (ipc, false);
-//     } else {
-//         Gtk::Allocation alloc;
-//         iareapanel->imageArea->on_resized (alloc);
-//
-//         // When passing a photo as an argument to the RawTherapee executable, the user wants
-//         // this auto-loaded photo's thumbnail to be selected and visible in the Filmstrip.
-//         EditorPanel::syncFileBrowser();
-//     }
+    // If in single tab mode, the main crop window is not constructed the very first time
+    // since there was no resize event
+    if (iareapanel->imageArea->mainCropWindow) {
+        iareapanel->imageArea->mainCropWindow->cropHandler.newImage (ipc, false);
+    } else {
+        // TODO(gtk4): Is this needed?
+        iareapanel->imageArea->on_resized(0, 0);
+
+        // When passing a photo as an argument to the RawTherapee executable, the user wants
+        // this auto-loaded photo's thumbnail to be selected and visible in the Filmstrip.
+        EditorPanel::syncFileBrowser();
+    }
 
     history->resetSnapShotNumber();
-//     navigator->setInvalid(ipc->getFullWidth(),ipc->getFullHeight());
+    navigator->setInvalid(ipc->getFullWidth(),ipc->getFullHeight());
 }
 
 void EditorPanel::close ()
@@ -1322,15 +1322,15 @@ void EditorPanel::close ()
         delete previewHandler;
         previewHandler = nullptr;
 
-//         if (iareapanel) {
-//             iareapanel->imageArea->setPreviewHandler (nullptr);
-//             iareapanel->imageArea->setImProcCoordinator (nullptr);
+        if (iareapanel) {
+            iareapanel->imageArea->setPreviewHandler (nullptr);
+            iareapanel->imageArea->setImProcCoordinator (nullptr);
 //             tpc->editModeSwitchedOff();
-//         }
+        }
 
         rtengine::StagedImageProcessor::destroy (ipc);
         ipc = nullptr;
-//         navigator->previewWindow->setPreviewHandler (nullptr);
+        navigator->previewWindow->setPreviewHandler (nullptr);
 
         // If the file was deleted somewhere, the openThm.descreaseRef delete the object, but we don't know here
         if (Glib::file_test (fname, Glib::FileTest::EXISTS)) {
@@ -1614,8 +1614,8 @@ void EditorPanel::info_toggled ()
         infoString = M ("QINFO_NOEXIF");
     }
 
-//     iareapanel->imageArea->setInfoText (std::move(infoString));
-//     iareapanel->imageArea->infoEnabled (info->get_active ());
+    iareapanel->imageArea->setInfoText (std::move(infoString));
+    iareapanel->imageArea->infoEnabled (info->get_active ());
 }
 
 void EditorPanel::hideHistoryActivated ()
@@ -2498,99 +2498,101 @@ void EditorPanel::beforeAfterToggled ()
     removeIfThere (beforeAfterBox,  beforeBox, false);
     removeIfThere (afterBox,  afterHeaderBox, false);
 
-//     if (beforeIarea) {
-//         if (beforeIpc) {
-//             beforeIpc->stopProcessing ();
-//         }
-// 
-//         iareapanel->setBeforeAfterViews (nullptr, iareapanel);
-//         iareapanel->imageArea->iLinkedImageArea = nullptr;
-//         delete beforeIarea;
-//         beforeIarea = nullptr;
-// 
-//         if (beforeIpc) {
-//             beforeIpc->setPreviewImageListener (nullptr);
-//         }
-// 
-//         delete beforePreviewHandler;
-//         beforePreviewHandler = nullptr;
-// 
-//         if (beforeIpc) {
-//             rtengine::StagedImageProcessor::destroy (beforeIpc);
-//         }
-// 
-//         beforeIpc = nullptr;
-//     }
-// 
-//     if (beforeAfter->get_active ()) {
-// 
-//         int errorCode = 0;
-//         rtengine::InitialImage *beforeImg = rtengine::InitialImage::load ( isrc->getImageSource ()->getFileName(),  openThm->getType() == FT_Raw, &errorCode, nullptr);
-// 
-//         if ( !beforeImg || errorCode ) {
-//             return;
-//         }
-// 
-//         beforeIarea = new ImageAreaPanel ();
-//
-//         int HeaderBoxHeight = 17;
-//
-//         beforeLabel = Gtk::manage (new Gtk::Label ());
-//         beforeLabel->set_markup (Glib::ustring ("<b>") + M ("GENERAL_BEFORE") + "</b>");
-//         tbBeforeLock = Gtk::manage (new Gtk::ToggleButton ());
-//         tbBeforeLock->set_has_frame(false);
-//         tbBeforeLock->set_tooltip_markup (M ("MAIN_TOOLTIP_BEFOREAFTERLOCK"));
-//         tbBeforeLock->signal_toggled().connect ( sigc::mem_fun (*this, &EditorPanel::tbBeforeLock_toggled) );
-//         beforeHeaderBox = Gtk::manage (new Gtk::Box (Gtk::Orientation::HORIZONTAL));
-//         beforeHeaderBox->get_style_context()->add_class("smallbuttonbox");
-//         beforeHeaderBox->pack_end (*tbBeforeLock, Pack::SHRINK, 2);
-//         beforeHeaderBox->pack_end (*beforeLabel, Pack::SHRINK, 2);
-//         beforeHeaderBox->set_size_request (0, HeaderBoxHeight);
-//
-//         history->blistenerLock ? tbBeforeLock->set_child (*iBeforeLockON) : tbBeforeLock->set_child (*iBeforeLockOFF);
-//         tbBeforeLock->set_active (history->blistenerLock);
-//
-//         beforeBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
-//         pack_start(beforeBox, *beforeHeaderBox, Pack::SHRINK, 2);
-//         pack_start(beforeBox, *beforeIarea);
-//
-//         afterLabel = Gtk::manage (new Gtk::Label ());
-//         afterLabel->set_markup (Glib::ustring ("<b>") + M ("GENERAL_AFTER") + "</b>");
-//         afterHeaderBox = Gtk::manage (new Gtk::Box (Gtk::Orientation::HORIZONTAL));
-//         afterHeaderBox->set_size_request (0, HeaderBoxHeight);
-//         afterHeaderBox->pack_end (*afterLabel, Pack::SHRINK, 2);
-//         pack_start(afterBox, *afterHeaderBox, Pack::SHRINK, 2);
-//         afterBox->reorder_child (*afterHeaderBox, 0);
-//
-//         pack_start(beforeAfterBox, *beforeBox);
-//         beforeAfterBox->reorder_child (*beforeBox, 0);
-//
-//         beforePreviewHandler = new PreviewHandler ();
-//
-//         beforeIpc = rtengine::StagedImageProcessor::create (beforeImg);
-//         beforeIpc->setPreviewScale (10);
-//         beforeIpc->setPreviewImageListener (beforePreviewHandler);
-//         Glib::ustring monitorProfile;
-//         rtengine::RenderingIntent intent;
-//         ipc->getMonitorProfile(monitorProfile, intent);
-//         beforeIpc->setMonitorProfile(monitorProfile, intent);
-//
-//         beforeIarea->imageArea->setPreviewHandler (beforePreviewHandler);
-//         beforeIarea->imageArea->setImProcCoordinator (beforeIpc);
-//
-//         beforeIarea->imageArea->setPreviewModePanel (iareapanel->imageArea->previewModePanel);
-//         beforeIarea->imageArea->setIndicateClippedPanel (iareapanel->imageArea->indClippedPanel);
-//         iareapanel->imageArea->iLinkedImageArea = beforeIarea->imageArea;
-//
-//         iareapanel->setBeforeAfterViews (beforeIarea, iareapanel);
-//         beforeIarea->setBeforeAfterViews (beforeIarea, iareapanel);
-//
-//         rtengine::procparams::ProcParams params;
-//
-//         if (history->getBeforeLineParams (params)) {
-//             historyBeforeLineChanged (params);
-//         }
-//     }
+    if (beforeIarea) {
+        if (beforeIpc) {
+            beforeIpc->stopProcessing ();
+        }
+
+        iareapanel->setBeforeAfterViews (nullptr, iareapanel);
+        iareapanel->imageArea->iLinkedImageArea = nullptr;
+        delete beforeIarea;
+        beforeIarea = nullptr;
+
+        if (beforeIpc) {
+            beforeIpc->setPreviewImageListener (nullptr);
+        }
+
+        delete beforePreviewHandler;
+        beforePreviewHandler = nullptr;
+
+        if (beforeIpc) {
+            rtengine::StagedImageProcessor::destroy (beforeIpc);
+        }
+
+        beforeIpc = nullptr;
+    }
+
+    if (beforeAfter->get_active ()) {
+
+        int errorCode = 0;
+        rtengine::InitialImage *beforeImg = rtengine::InitialImage::load ( isrc->getImageSource ()->getFileName(),  openThm->getType() == FT_Raw, &errorCode, nullptr);
+
+        if ( !beforeImg || errorCode ) {
+            return;
+        }
+
+        beforeIarea = new ImageAreaPanel ();
+
+        int HeaderBoxHeight = 17;
+
+        beforeLabel = Gtk::manage (new Gtk::Label ());
+        beforeLabel->set_markup (Glib::ustring ("<b>") + M ("GENERAL_BEFORE") + "</b>");
+        tbBeforeLock = Gtk::manage (new Gtk::ToggleButton ());
+        tbBeforeLock->set_has_frame(false);
+        tbBeforeLock->set_tooltip_markup (M ("MAIN_TOOLTIP_BEFOREAFTERLOCK"));
+        tbBeforeLock->signal_toggled().connect ( sigc::mem_fun (*this, &EditorPanel::tbBeforeLock_toggled) );
+        beforeHeaderBox = Gtk::manage (new Gtk::Box (Gtk::Orientation::HORIZONTAL));
+        beforeHeaderBox->get_style_context()->add_class("smallbuttonbox");
+        insertSpacer(beforeHeaderBox);
+        pack_start(beforeHeaderBox, *beforeLabel, Pack::SHRINK, 2);
+        pack_start(beforeHeaderBox, *tbBeforeLock, Pack::SHRINK, 2);
+        beforeHeaderBox->set_size_request (0, HeaderBoxHeight);
+
+        history->blistenerLock ? tbBeforeLock->set_child (*iBeforeLockON) : tbBeforeLock->set_child (*iBeforeLockOFF);
+        tbBeforeLock->set_active (history->blistenerLock);
+
+        beforeBox = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
+        pack_start(beforeBox, *beforeHeaderBox, Pack::SHRINK, 2);
+        pack_start(beforeBox, *beforeIarea);
+
+        afterLabel = Gtk::manage (new Gtk::Label ());
+        afterLabel->set_markup (Glib::ustring ("<b>") + M ("GENERAL_AFTER") + "</b>");
+        afterHeaderBox = Gtk::manage (new Gtk::Box (Gtk::Orientation::HORIZONTAL));
+        afterHeaderBox->set_size_request (0, HeaderBoxHeight);
+        insertSpacer(afterHeaderBox);
+        pack_start(afterHeaderBox, *afterLabel, Pack::SHRINK, 2);
+        pack_start(afterBox, *afterHeaderBox, Pack::SHRINK, 2);
+        afterBox->reorder_child_at_start (*afterHeaderBox);
+
+        pack_start(beforeAfterBox, *beforeBox);
+        beforeAfterBox->reorder_child_at_start (*beforeBox);
+
+        beforePreviewHandler = new PreviewHandler ();
+
+        beforeIpc = rtengine::StagedImageProcessor::create (beforeImg);
+        beforeIpc->setPreviewScale (10);
+        beforeIpc->setPreviewImageListener (beforePreviewHandler);
+        Glib::ustring monitorProfile;
+        rtengine::RenderingIntent intent;
+        ipc->getMonitorProfile(monitorProfile, intent);
+        beforeIpc->setMonitorProfile(monitorProfile, intent);
+
+        beforeIarea->imageArea->setPreviewHandler (beforePreviewHandler);
+        beforeIarea->imageArea->setImProcCoordinator (beforeIpc);
+
+        beforeIarea->imageArea->setPreviewModePanel (iareapanel->imageArea->previewModePanel);
+        beforeIarea->imageArea->setIndicateClippedPanel (iareapanel->imageArea->indClippedPanel);
+        iareapanel->imageArea->iLinkedImageArea = beforeIarea->imageArea;
+
+        iareapanel->setBeforeAfterViews (beforeIarea, iareapanel);
+        beforeIarea->setBeforeAfterViews (beforeIarea, iareapanel);
+
+        rtengine::procparams::ProcParams params;
+
+        if (history->getBeforeLineParams (params)) {
+            historyBeforeLineChanged (params);
+        }
+    }
 }
 
 void EditorPanel::tbBeforeLock_toggled ()
@@ -2864,7 +2866,7 @@ void EditorPanel::updateHistogramPosition (int oldPosition, int newPosition)
         histogramPanel->setPanelListener(this);
     }
 
-//     iareapanel->imageArea->setPointerMotionHListener (histogramPanel);
+    iareapanel->imageArea->setPointerMotionHListener (histogramPanel);
 
 }
 

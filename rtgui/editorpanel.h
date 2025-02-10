@@ -21,11 +21,10 @@
 
 #include <gtkmm.h>
 
-// TODO(gtk4)
 #include "extprog.h"
 #include "histogrampanel.h"
 #include "history.h"
-// #include "imageareapanel.h"
+#include "imageareapanel.h"
 #include "options.h"
 #include "profilepanel.h"
 #include "progressconnector.h"
@@ -61,6 +60,7 @@ struct EditorPanelIdleHelper {
 
 class RtWindow;
 
+// TODO(gtk4)
 class EditorPanel final :
     public Gtk::Box,
     public PParamsChangeListener,
@@ -267,11 +267,11 @@ private:
 //     class ColorManagementToolbar;
 //     std::unique_ptr<ColorManagementToolbar> colorMgmtToolBar;
 
-//     ImageAreaPanel* iareapanel;
+    ImageAreaPanel* iareapanel;
     PreviewHandler* previewHandler;
     PreviewHandler* beforePreviewHandler;   // for the before-after view
-//     Navigator* navigator;
-//     ImageAreaPanel* beforeIarea;    // for the before-after view
+    Navigator* navigator;
+    ImageAreaPanel* beforeIarea;    // for the before-after view
     Gtk::Box* beforeBox;
     Gtk::Box* afterBox;
     Gtk::Label* beforeLabel;

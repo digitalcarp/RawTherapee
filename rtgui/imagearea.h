@@ -67,6 +67,8 @@ protected:
     Glib::RefPtr<Gtk::EventControllerMotion> motionController;
     Glib::RefPtr<Gtk::EventControllerScroll> scrollController;
     Glib::RefPtr<Gtk::GestureClick> clickController;
+    double lastMouseX;
+    double lastMouseY;
 
     CropWindow* getCropWindow (int x, int y);
     Gtk::SizeRequestMode get_request_mode_vfunc () const override;

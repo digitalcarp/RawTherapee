@@ -27,15 +27,11 @@ ImageAreaPanel::ImageAreaPanel () : before(nullptr), after(nullptr)
     Gtk::Box*  hb1   = Gtk::manage (new Gtk::Box ());
     Gtk::Frame* frame = Gtk::manage (new Gtk::Frame ());
 
-    frame->add (*imageArea);
-    frame->set_shadow_type (Gtk::SHADOW_IN );
-    hb1->pack_start (*frame, Pack::EXPAND_WIDGET);
+    frame->set_child (*imageArea);
+    frame->set_vexpand(true);
+    hb1->append (*frame);
 
-    pack_start (*hb1);
-    frame->show ();
-    imageArea->show ();
-    hb1->show ();
-
+    append(*hb1);
 }
 
 ImageAreaPanel::~ImageAreaPanel ()
