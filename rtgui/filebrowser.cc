@@ -2031,11 +2031,10 @@ void FileBrowser::selectImage(const Glib::ustring& fname, bool doScroll)
                 // set new selection
                 fd[i]->selected = true;
                 selected.push_back(fd[i]);
-                redraw();
-
                 MYWRITERLOCK_RELEASE(l);
 
                 // this will require a read access
+                redraw();
                 notifySelectionListener();
 
                 MYWRITERLOCK_ACQUIRE(l);

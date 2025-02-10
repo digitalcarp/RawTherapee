@@ -1177,6 +1177,7 @@ void MyComboBoxText::measure_vfunc(Gtk::Orientation orientation, int for_size,
         minimum_baseline = -1;
         natural_baseline = -1;
     } else {
+        // TODO(gtk4): This doesn't work with how gtkmm wraps code...
         Gtk::ComboBox::measure_vfunc(orientation, for_size, minimum, natural,
                                      minimum_baseline, natural_baseline);
     }
@@ -1235,6 +1236,7 @@ void MyComboBox::measure_vfunc(Gtk::Orientation orientation, int for_size,
         minimum_baseline = -1;
         natural_baseline = -1;
     } else {
+        // TODO(gtk4): This doesn't work with how gtkmm wraps code...
         Gtk::ComboBox::measure_vfunc(orientation, for_size, minimum, natural,
                                      minimum_baseline, natural_baseline);
     }
@@ -1616,6 +1618,7 @@ void MyFileChooserButton::measure_vfunc(Gtk::Orientation orientation, int for_si
         minimum_baseline = -1;
         natural_baseline = -1;
     } else {
+        // TODO(gtk4): This doesn't work with how gtkmm wraps code...
         Gtk::Button::measure_vfunc(orientation, for_size, minimum, natural,
                                    minimum_baseline, natural_baseline);
     }
@@ -1828,6 +1831,7 @@ void MyProgressBar::measure_vfunc(Gtk::Orientation orientation, int for_size,
         minimum_baseline = -1;
         natural_baseline = -1;
     } else {
+        // TODO(gtk4): This doesn't work with how gtkmm wraps code...
         Gtk::ProgressBar::measure_vfunc(orientation, for_size, minimum, natural,
                                         minimum_baseline, natural_baseline);
     }

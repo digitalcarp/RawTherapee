@@ -27,6 +27,7 @@ ImageAreaPanel::ImageAreaPanel () : before(nullptr), after(nullptr)
     Gtk::Box*  hb1   = Gtk::manage (new Gtk::Box ());
     Gtk::Frame* frame = Gtk::manage (new Gtk::Frame ());
 
+    imageArea->set_hexpand(true);
     frame->set_child (*imageArea);
     frame->set_vexpand(true);
     hb1->append (*frame);
