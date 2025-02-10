@@ -69,8 +69,8 @@ FilePanel::FilePanel ()
 //     fileCatalog = Gtk::manage ( new FileCatalog (tpc->coarse, tpc->getToolBar(), this) );
     fileCatalog = Gtk::manage ( new FileCatalog (this) );
     // Holds the location bar and thumbnails
-    ribbonPane = Gtk::manage ( new Gtk::Paned() );
-    ribbonPane->set_start_child(*fileCatalog);
+    ribbonPane = Gtk::manage ( new Gtk::Box() );
+    ribbonPane->append(*fileCatalog);
     ribbonPane->set_size_request(50, 150);
     pack2 (dirpaned, *ribbonPane, true, true);
 

@@ -205,7 +205,7 @@ public:
 
     bool saveImmediately (const Glib::ustring &filename, const SaveFormat &sf);
 
-    Gtk::Paned* catalogPane;
+    Gtk::Box* catalogPane;
 
 private:
     void close ();

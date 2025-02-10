@@ -893,8 +893,12 @@ void RtWindow::MoveFileBrowserToMain()
 {
     if ( fpanel->ribbonPane->get_children().empty()) {
         FileCatalog *fCatalog = fpanel->fileCatalog;
-        epanel->catalogPane->unset_start_child ();  // fCatalog
-        fpanel->ribbonPane->set_end_child (*fCatalog);
+
+        fCatalog->reference();
+        epanel->catalogPane->remove(*fCatalog);
+        fpanel->ribbonPane->append(*fCatalog);
+        fCatalog->unreference();
+
         fCatalog->enableTabMode (false);
         fCatalog->tbLeftPanel_1_visible (true);
         fCatalog->tbRightPanel_1_visible (true);
@@ -905,9 +909,13 @@ void RtWindow::MoveFileBrowserToEditor()
 {
     if (epanel->catalogPane->get_children().empty() ) {
         FileCatalog *fCatalog = fpanel->fileCatalog;
-        fpanel->ribbonPane->unset_end_child ();  // fCatalog
+
+        fCatalog->reference();
+        fpanel->ribbonPane->remove (*fCatalog);
         fCatalog->disableInspector();
-        epanel->catalogPane->set_start_child (*fCatalog);
+        epanel->catalogPane->append(*fCatalog);
+        fCatalog->unreference();
+
         epanel->showTopPanel (options.editorFilmStripOpened);
         fCatalog->enableTabMode (true);
         fCatalog->refreshHeight();

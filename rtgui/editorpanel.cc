@@ -1025,7 +1025,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     fPanel = filePanel;
 
     if (filePanel) {
-        catalogPane = new Gtk::Paned();
+        catalogPane = new Gtk::Box();
         pack1(viewpaned, *catalogPane, false, true);
     }
 

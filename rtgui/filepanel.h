@@ -56,7 +56,7 @@ public:
     FilterPanel* filterPanel;
     ExportPanel* exportPanel;
     FileCatalog* fileCatalog;
-    Gtk::Paned* ribbonPane;
+    Gtk::Box* ribbonPane;
 
     void setParent (RtWindow* p)
     {
