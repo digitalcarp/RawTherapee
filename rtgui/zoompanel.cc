@@ -25,35 +25,30 @@ ZoomPanel::ZoomPanel (ImageArea* iarea) : iarea(iarea)
 {
     set_name ("EditorZoomPanel");
 
-    Gtk::Image* imageOut = Gtk::manage (new RTImage ("magnifier-minus", Gtk::ICON_SIZE_LARGE_TOOLBAR));
-    imageOut->set_padding(0, 0);
-    Gtk::Image* imageIn = Gtk::manage (new RTImage ("magnifier-plus", Gtk::ICON_SIZE_LARGE_TOOLBAR));
-    imageIn->set_padding(0, 0);
-    Gtk::Image* image11 = Gtk::manage ( new RTImage ("magnifier-1to1", Gtk::ICON_SIZE_LARGE_TOOLBAR));
-    image11->set_padding(0, 0);
-    Gtk::Image* imageFit = Gtk::manage (new RTImage ("magnifier-fit", Gtk::ICON_SIZE_LARGE_TOOLBAR));
-    imageFit->set_padding(0, 0);
-    Gtk::Image* imageFitCrop = Gtk::manage (new RTImage ("magnifier-crop", Gtk::ICON_SIZE_LARGE_TOOLBAR));
-    imageFit->set_padding(0, 0);
+    Gtk::Image* imageOut = Gtk::manage (new RtImage ("magnifier-minus"));
+    Gtk::Image* imageIn = Gtk::manage (new RtImage ("magnifier-plus"));
+    Gtk::Image* image11 = Gtk::manage ( new RtImage ("magnifier-1to1"));
+    Gtk::Image* imageFit = Gtk::manage (new RtImage ("magnifier-fit"));
+    Gtk::Image* imageFitCrop = Gtk::manage (new RtImage ("magnifier-crop"));
 
     zoomOut = Gtk::manage (new Gtk::Button());
-    zoomOut->add (*imageOut);
+    zoomOut->set_child (*imageOut);
     zoomOut->set_has_frame(false);
     setExpandAlignProperties(zoomOut, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
     zoomIn = Gtk::manage (new Gtk::Button());
-    zoomIn->add (*imageIn);
+    zoomIn->set_child (*imageIn);
     zoomIn->set_has_frame(false);
     setExpandAlignProperties(zoomIn, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
     zoomFit = Gtk::manage (new Gtk::Button());
-    zoomFit->add (*imageFit);
+    zoomFit->set_child (*imageFit);
     zoomFit->set_has_frame(false);
     setExpandAlignProperties(zoomFit, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
     zoomFitCrop = Gtk::manage (new Gtk::Button());
-    zoomFitCrop->add (*imageFitCrop);
+    zoomFitCrop->set_child (*imageFitCrop);
     zoomFitCrop->set_has_frame(false);
     setExpandAlignProperties(zoomFitCrop, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
     zoom11 = Gtk::manage (new Gtk::Button());
-    zoom11->add (*image11);
+    zoom11->set_child (*image11);
     zoom11->set_has_frame(false);
     setExpandAlignProperties(zoom11, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
 
@@ -67,15 +62,12 @@ ZoomPanel::ZoomPanel (ImageArea* iarea) : iarea(iarea)
     setExpandAlignProperties(zoomLabel, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
     attach_next_to (*zoomLabel, Gtk::PositionType::RIGHT, 1, 1);
 
-    Gtk::Image* imageCrop = Gtk::manage (new RTImage ("window-add", Gtk::ICON_SIZE_LARGE_TOOLBAR));
-    imageCrop->set_padding(0, 0);
+    Gtk::Image* imageCrop = Gtk::manage (new RtImage ("window-add"));
     newCrop = Gtk::manage (new Gtk::Button());
-    newCrop->add (*imageCrop);
+    newCrop->set_child (*imageCrop);
     newCrop->set_has_frame(false);
     setExpandAlignProperties(newCrop, false, false, Gtk::Align::CENTER, Gtk::Align::FILL);
     attach_next_to (*newCrop, Gtk::PositionType::RIGHT, 1, 1);
-
-    show_all_children ();
 
     zoomIn->signal_clicked().connect ( sigc::mem_fun(*this, &ZoomPanel::zoomInClicked) );
     zoomOut->signal_clicked().connect( sigc::mem_fun(*this, &ZoomPanel::zoomOutClicked) );

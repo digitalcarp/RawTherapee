@@ -22,29 +22,27 @@
 #include "rtimage.h"
 
 IndicateClippedPanel::IndicateClippedPanel (ImageArea* ia) :
-    Fon("focusscreen-on"),
-    Foff("focusscreen-off"),
-    Son("contrastmask-on"),
-    Soff("contrastmask-off"),
-    iF(Gtk::manage(new RTImage(Foff, Gtk::ICON_SIZE_LARGE_TOOLBAR))),
-    iS(Gtk::manage(new RTImage(Soff, Gtk::ICON_SIZE_LARGE_TOOLBAR))),
+    Fon(std::make_unique<RtImage>("focusscreen-on")),
+    Foff(std::make_unique<RtImage>("focusscreen-off")),
+    Son(std::make_unique<RtImage>("contrastmask-on")),
+    Soff(std::make_unique<RtImage>("contrastmask-off")),
     imageArea(ia)
 {
     previewFocusMask = Gtk::manage (new Gtk::ToggleButton ());
     previewFocusMask->set_has_frame(false);
     previewFocusMask->set_tooltip_markup (M("MAIN_TOOLTIP_PREVIEWFOCUSMASK"));
-    previewFocusMask->set_image(*iF);
+    previewFocusMask->set_child(*Foff);
 
     previewSharpMask = Gtk::manage (new Gtk::ToggleButton ());
     previewSharpMask->set_has_frame(false);
     previewSharpMask->set_tooltip_markup (M("MAIN_TOOLTIP_PREVIEWSHARPMASK"));
-    previewSharpMask->set_image(*iS);
+    previewSharpMask->set_child(*Soff);
 
     Glib::ustring tt;
 
     indClippedH = Gtk::manage (new Gtk::ToggleButton ());
     indClippedH->set_has_frame(false);
-    indClippedH->add (*Gtk::manage (new RTImage ("warning-highlights", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
+    indClippedH->set_child (*Gtk::manage (new RtImage ("warning-highlights")));
     tt = Glib::ustring::compose("%1\n%2 = %3", M("MAIN_TOOLTIP_INDCLIPPEDH"), M("MAIN_TOOLTIP_THRESHOLD"), options.highlightThreshold);
 
     if (tt.find("&lt;") == Glib::ustring::npos && tt.find("&gt;") == Glib::ustring::npos) {
@@ -55,7 +53,7 @@ IndicateClippedPanel::IndicateClippedPanel (ImageArea* ia) :
 
     indClippedS = Gtk::manage (new Gtk::ToggleButton ());
     indClippedS->set_has_frame(false);
-    indClippedS->add (*Gtk::manage (new RTImage ("warning-shadows", Gtk::ICON_SIZE_LARGE_TOOLBAR)));
+    indClippedS->set_child (*Gtk::manage (new RtImage ("warning-shadows")));
     tt = Glib::ustring::compose("%1\n%2 = %3", M("MAIN_TOOLTIP_INDCLIPPEDS"), M("MAIN_TOOLTIP_THRESHOLD"), options.shadowThreshold);
 
     if (tt.find("&lt;") == Glib::ustring::npos && tt.find("&gt;") == Glib::ustring::npos) {
@@ -69,17 +67,15 @@ IndicateClippedPanel::IndicateClippedPanel (ImageArea* ia) :
     indClippedH->set_active (options.showClippedHighlights);
     indClippedS->set_active (options.showClippedShadows);
 
-    pack_start (*previewFocusMask, Pack::SHRINK, 0);
-    pack_start (*previewSharpMask, Pack::SHRINK, 0);
-    pack_start (*indClippedS, Pack::SHRINK, 0);
-    pack_start (*indClippedH, Pack::SHRINK, 0);
+    append (*previewFocusMask);
+    append (*previewSharpMask);
+    append (*indClippedS);
+    append (*indClippedH);
 
     connSharpMask = previewSharpMask->signal_toggled().connect( sigc::bind(sigc::mem_fun(*this, &IndicateClippedPanel::buttonToggled), previewSharpMask) );
     connFocusMask = previewFocusMask->signal_toggled().connect( sigc::bind(sigc::mem_fun(*this, &IndicateClippedPanel::buttonToggled), previewFocusMask) );
     connClippedS = indClippedS->signal_toggled().connect( sigc::bind(sigc::mem_fun(*this, &IndicateClippedPanel::buttonToggled), indClippedS) );
     connClippedH = indClippedH->signal_toggled().connect( sigc::bind(sigc::mem_fun(*this, &IndicateClippedPanel::buttonToggled), indClippedH) );
-
-    show_all ();
 }
 
 // inverts a toggle programmatically
@@ -101,7 +97,7 @@ void IndicateClippedPanel::silentlyDisableSharpMask ()
 {
     ConnectionBlocker conBlocker(connSharpMask);
     previewSharpMask->set_active(false);
-    iS->set_from_icon_name(Soff);
+    previewSharpMask->set_child(*Soff);
 
 }
 
@@ -140,8 +136,8 @@ void IndicateClippedPanel::buttonToggled (Gtk::ToggleButton* tb)
     }
 
     imageArea->sharpMaskSelected(previewSharpMask->get_active());
-    iF->set_from_icon_name(previewFocusMask->get_active() ? Fon : Foff);
-    iS->set_from_icon_name(previewSharpMask->get_active() ? Son : Soff);
+    previewFocusMask->set_child(previewFocusMask->get_active() ? *Fon : *Foff);
+    previewSharpMask->set_child(previewSharpMask->get_active() ? *Son : *Soff);
 
     connFocusMask.block(false);
     connSharpMask.block(false);
