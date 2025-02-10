@@ -123,7 +123,7 @@ void SHCSelector::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cr)
     Glib::RefPtr<Gtk::StyleContext> style = get_style_context();
 
     // Setup drawing
-    cr->set_operator (Cairo::OPERATOR_OVER);
+    cr->set_operator (Cairo::Context::Operator::OVER);
 
     // Get drawing area size
     const int w = get_width () - leftMargin - rightMargin;
@@ -136,7 +136,7 @@ void SHCSelector::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cr)
     // Set the box's colors
     cr->set_line_width (1.0);
     cr->set_antialias(Cairo::ANTIALIAS_SUBPIXEL);
-    cr->set_line_cap(Cairo::LINE_CAP_BUTT);
+    cr->set_line_cap(Cairo::Context::LineCap::BUTT);
 
     int coloredBarHeight = static_cast<int>(static_cast<double>(h) * 5.5 / 7. + 0.5);
     if (is_sensitive() && coloredBar.canGetColors()) {
@@ -195,8 +195,8 @@ void SHCSelector::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cr)
         cr->set_source_rgb (0., 0., 0.);
 
         cr->set_line_width(3.);
-        cr->set_line_join(Cairo::LINE_JOIN_ROUND);
-        cr->set_line_cap(Cairo::LINE_CAP_ROUND);
+        cr->set_line_join(Cairo::Context::LineJoin::ROUND);
+        cr->set_line_cap(Cairo::Context::LineCap::ROUND);
 
         cr->move_to (static_cast<double>(leftMargin) + static_cast<double>(w) * positions[i] + static_cast<double>(offset), 0.);
         layout->add_to_cairo_context (cr);

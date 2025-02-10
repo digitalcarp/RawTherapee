@@ -130,9 +130,9 @@ void LockableColorPicker::updateBackBuffer ()
 
         // cleaning the back buffer
         bbcr->set_source_rgba (0., 0., 0., 0.);
-        bbcr->set_operator (Cairo::OPERATOR_CLEAR);
+        bbcr->set_operator (Cairo::Context::Operator::CLEAR);
         bbcr->paint ();
-        bbcr->set_operator (Cairo::OPERATOR_OVER);
+        bbcr->set_operator (Cairo::Context::Operator::OVER);
 
         bbcr->set_antialias (Cairo::ANTIALIAS_SUBPIXEL);
         bbcr->set_line_width (0.);
@@ -151,8 +151,8 @@ void LockableColorPicker::updateBackBuffer ()
         bbcr->arc_negative (textWidth, 2. * center + 2. * textPadding, 2. * textPadding, 0., rtengine::RT_PI * 1.5);
         bbcr->line_to (2. * center, 2. * center);
         bbcr->close_path();
-        bbcr->set_line_join (Cairo::LINE_JOIN_BEVEL);
-        bbcr->set_line_cap (Cairo::LINE_CAP_SQUARE);
+        bbcr->set_line_join (Cairo::Context::LineJoin::BEVEL);
+        bbcr->set_line_cap (Cairo::Context::LineCap::SQUARE);
         bbcr->fill ();
 
         // light grey circle around the color mark
@@ -169,8 +169,8 @@ void LockableColorPicker::updateBackBuffer ()
 
         // adding the font
         bbcr->set_line_width (0.);
-        bbcr->set_line_join (Cairo::LINE_JOIN_ROUND);
-        bbcr->set_line_cap (Cairo::LINE_CAP_ROUND);
+        bbcr->set_line_join (Cairo::Context::LineJoin::ROUND);
+        bbcr->set_line_cap (Cairo::Context::LineCap::ROUND);
         bbcr->set_source_rgb (1., 1., 1.);
         double txtOffsetX = textPadding;
         double txtOffsetY = (double)size + 2. * circlePadding + textPadding;
@@ -232,9 +232,9 @@ void LockableColorPicker::updateBackBuffer ()
 
         // cleaning the back buffer
         bbcr->set_source_rgba (0., 0., 0., 0.);
-        bbcr->set_operator (Cairo::OPERATOR_CLEAR);
+        bbcr->set_operator (Cairo::Context::Operator::CLEAR);
         bbcr->paint ();
-        bbcr->set_operator (Cairo::OPERATOR_OVER);
+        bbcr->set_operator (Cairo::Context::Operator::OVER);
 
         bbcr->set_antialias(Cairo::ANTIALIAS_SUBPIXEL);
 

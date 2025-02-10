@@ -106,7 +106,7 @@ void Circle::drawOuterGeometry(Cairo::RefPtr<Cairo::Context> &cr, ObjectMOBuffer
 
         cr->set_source_rgba (color.getR(), color.getG(), color.getB(), OUTERGEOM_OPACITY * rtengine::min(innerLineWidth / 2.f, 1.f));
         cr->set_line_width (lineWidth);
-        cr->set_line_cap(Cairo::LINE_CAP_ROUND);
+        cr->set_line_cap(Cairo::Context::LineCap::ROUND);
 
         rtengine::Coord center_ = center;
         double radius_ = radiusInImageSpace ? coordSystem.scaleValueToCanvas(double(radius)) : double(radius);
@@ -140,7 +140,7 @@ void Circle::drawInnerGeometry(Cairo::RefPtr<Cairo::Context> &cr, ObjectMOBuffer
         }
 
         cr->set_line_width(innerLineWidth);
-        cr->set_line_cap(flags & F_DASHED ? Cairo::LINE_CAP_BUTT : Cairo::LINE_CAP_ROUND);
+        cr->set_line_cap(flags & F_DASHED ? Cairo::Context::LineCap::BUTT : Cairo::Context::LineCap::ROUND);
 
         rtengine::Coord center_ = center;
         double radius_ = radiusInImageSpace ? coordSystem.scaleValueToCanvas(double(radius)) : double(radius);
@@ -180,7 +180,7 @@ void Circle::drawToMOChannel (Cairo::RefPtr<Cairo::Context> &cr, unsigned short 
 {
     if (flags & F_HOVERABLE) {
         cr->set_line_width( getMouseOverLineWidth() );
-        cr->set_line_cap(Cairo::LINE_CAP_ROUND);
+        cr->set_line_cap(Cairo::Context::LineCap::ROUND);
         rtengine::Coord center_ = center;
         double radius_ = radiusInImageSpace ? coordSystem.scaleValueToCanvas(double(radius)) : double(radius);
 
@@ -224,7 +224,7 @@ void Line::drawOuterGeometry(Cairo::RefPtr<Cairo::Context> &cr, ObjectMOBuffer *
 
         cr->set_source_rgba (color.getR(), color.getG(), color.getB(), OUTERGEOM_OPACITY * rtengine::min(innerLineWidth / 2.f, 1.f));
         cr->set_line_width (lineWidth);
-        cr->set_line_cap(Cairo::LINE_CAP_ROUND);
+        cr->set_line_cap(Cairo::Context::LineCap::ROUND);
 
         rtengine::Coord begin_ = begin;
         rtengine::Coord end_ = end;
@@ -262,7 +262,7 @@ void Line::drawInnerGeometry(Cairo::RefPtr<Cairo::Context> &cr, ObjectMOBuffer *
         }
 
         cr->set_line_width(innerLineWidth);
-        cr->set_line_cap(flags & F_DASHED ? Cairo::LINE_CAP_BUTT : Cairo::LINE_CAP_ROUND);
+        cr->set_line_cap(flags & F_DASHED ? Cairo::Context::LineCap::BUTT : Cairo::Context::LineCap::ROUND);
 
         rtengine::Coord begin_ = begin;
         rtengine::Coord end_ = end;
@@ -296,7 +296,7 @@ void Line::drawToMOChannel(Cairo::RefPtr<Cairo::Context> &cr, unsigned short id,
 {
     if (flags & F_HOVERABLE) {
         cr->set_line_width( getMouseOverLineWidth() );
-        cr->set_line_cap(Cairo::LINE_CAP_ROUND);
+        cr->set_line_cap(Cairo::Context::LineCap::ROUND);
         rtengine::Coord begin_ = begin;
         rtengine::Coord end_ = end;
 
@@ -334,8 +334,8 @@ void Polyline::drawOuterGeometry(Cairo::RefPtr<Cairo::Context> &cr, ObjectMOBuff
 
         cr->set_source_rgba (color.getR(), color.getG(), color.getB(), OUTERGEOM_OPACITY * rtengine::min(innerLineWidth / 2.f, 1.f));
         cr->set_line_width (lineWidth);
-        cr->set_line_cap(Cairo::LINE_CAP_ROUND);
-        cr->set_line_join(Cairo::LINE_JOIN_ROUND);
+        cr->set_line_cap(Cairo::Context::LineCap::ROUND);
+        cr->set_line_join(Cairo::Context::LineJoin::ROUND);
 
         rtengine::Coord currPos;
 
@@ -382,8 +382,8 @@ void Polyline::drawInnerGeometry(Cairo::RefPtr<Cairo::Context> &cr, ObjectMOBuff
         }
 
         cr->set_line_width(innerLineWidth);
-        cr->set_line_cap(flags & F_DASHED ? Cairo::LINE_CAP_BUTT : Cairo::LINE_CAP_ROUND);
-        cr->set_line_join(Cairo::LINE_JOIN_ROUND);
+        cr->set_line_cap(flags & F_DASHED ? Cairo::Context::LineCap::BUTT : Cairo::Context::LineCap::ROUND);
+        cr->set_line_join(Cairo::Context::LineJoin::ROUND);
 
         if (flags & F_DASHED) {
             cr->set_dash(dash, 0.);
@@ -454,8 +454,8 @@ void Polyline::drawToMOChannel (Cairo::RefPtr<Cairo::Context> &cr, unsigned shor
         setMOChannelColor(cr, objectBuffer, id);
 
         cr->set_line_width( getMouseOverLineWidth() );
-        cr->set_line_cap(Cairo::LINE_CAP_ROUND);
-        cr->set_line_join(Cairo::LINE_JOIN_ROUND);
+        cr->set_line_cap(Cairo::Context::LineCap::ROUND);
+        cr->set_line_join(Cairo::Context::LineJoin::ROUND);
 
         for (unsigned int i = 0; i < points.size(); ++i) {
             currPos  = points.at(i);
@@ -526,7 +526,7 @@ void EditRectangle::drawOuterGeometry(Cairo::RefPtr<Cairo::Context> &cr, ObjectM
 
         cr->set_source_rgba (color.getR(), color.getG(), color.getB(), OUTERGEOM_OPACITY * rtengine::min(innerLineWidth / 2.f, 1.f));
         cr->set_line_width (lineWidth);
-        cr->set_line_join(Cairo::LINE_JOIN_BEVEL);
+        cr->set_line_join(Cairo::Context::LineJoin::BEVEL);
 
         rtengine::Coord tl, br;
 
@@ -573,7 +573,7 @@ void EditRectangle::drawInnerGeometry(Cairo::RefPtr<Cairo::Context> &cr, ObjectM
         }
 
         cr->set_line_width(innerLineWidth);
-        cr->set_line_join(Cairo::LINE_JOIN_BEVEL);
+        cr->set_line_join(Cairo::Context::LineJoin::BEVEL);
 
         rtengine::Coord tl, br;
 
@@ -621,7 +621,7 @@ void EditRectangle::drawToMOChannel(Cairo::RefPtr<Cairo::Context> &cr, unsigned 
 {
     if (flags & F_HOVERABLE) {
         cr->set_line_width( getMouseOverLineWidth() );
-        cr->set_line_join(Cairo::LINE_JOIN_ROUND);
+        cr->set_line_join(Cairo::Context::LineJoin::ROUND);
 
         rtengine::Coord tl, br;
 

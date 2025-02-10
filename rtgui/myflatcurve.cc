@@ -150,8 +150,8 @@ void MyFlatCurve::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cr)
     Glib::RefPtr<Gtk::StyleContext> style = get_style_context();
 
     // Setup drawing
-    cr->set_line_cap(Cairo::LINE_CAP_SQUARE);
-    cr->set_operator (Cairo::OPERATOR_OVER);
+    cr->set_line_cap(Cairo::Context::LineCap::SQUARE);
+    cr->set_operator (Cairo::Context::Operator::OVER);
 
     // Render background
     style->render_background(cr, graphX, graphY-graphH, graphW, graphH);
@@ -212,7 +212,7 @@ void MyFlatCurve::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cr)
     cr->unset_dash ();
     cr->set_antialias (Cairo::ANTIALIAS_SUBPIXEL);
     cr->set_line_width (1.0);
-    cr->set_line_cap(Cairo::LINE_CAP_BUTT);
+    cr->set_line_cap(Cairo::Context::LineCap::BUTT);
 
     // draw the pipette values
     if (pipetteR > -1.f || pipetteG > -1.f || pipetteB > -1.f) {
@@ -346,7 +346,7 @@ void MyFlatCurve::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cr)
         }
     }
 
-    cr->set_line_cap(Cairo::LINE_CAP_SQUARE);
+    cr->set_line_cap(Cairo::Context::LineCap::SQUARE);
 
     // draw the graph's borders:
     c = style->get_border_color(state);

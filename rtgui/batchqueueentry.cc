@@ -114,7 +114,7 @@ void BatchQueueEntry::drawProgressBar (Glib::RefPtr<Gtk::Window> win, const Gdk:
         cr->move_to (px, py);
         cr->line_to (px + pw, py);
         cr->set_line_width (ph);
-        cr->set_line_cap (Cairo::LINE_CAP_ROUND);
+        cr->set_line_cap (Cairo::Context::LineCap::ROUND);
         cr->set_source_rgb (foregr.get_red(), foregr.get_green(), foregr.get_blue());
         cr->stroke ();
 

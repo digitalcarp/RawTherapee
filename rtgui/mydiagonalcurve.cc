@@ -271,8 +271,8 @@ void MyDiagonalCurve::updateDrawingArea (const int handle, const ::Cairo::RefPtr
     Glib::RefPtr<Gtk::StyleContext> style = get_style_context();
 
     // Setup drawing
-    cr->set_line_cap(Cairo::LINE_CAP_SQUARE);
-    cr->set_operator (Cairo::OPERATOR_OVER);
+    cr->set_line_cap(Cairo::Context::LineCap::SQUARE);
+    cr->set_operator (Cairo::Context::Operator::OVER);
 
     // Render background
     style->render_background(cr, graphX, graphY-graphH, graphW, graphH);

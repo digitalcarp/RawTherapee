@@ -202,8 +202,8 @@ bool LabGridArea::on_draw(const ::Cairo::RefPtr<Cairo::Context> &cr)
     int height = allocation.get_height();
 
     // Setup drawing
-    cr->set_line_cap(Cairo::LINE_CAP_SQUARE);
-    cr->set_operator (Cairo::OPERATOR_OVER);
+    cr->set_line_cap(Cairo::Context::LineCap::SQUARE);
+    cr->set_operator (Cairo::Context::Operator::OVER);
 
     // Render background
     style->render_background(cr,

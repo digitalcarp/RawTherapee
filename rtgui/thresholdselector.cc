@@ -267,7 +267,7 @@ void ThresholdSelector::updateDrawingArea(const Cairo::RefPtr<Cairo::Context>& c
     Gtk::Border padding = getPadding(style);
 
     // Setup drawing
-    cr->set_operator (Cairo::OPERATOR_OVER);
+    cr->set_operator (Cairo::Context::Operator::OVER);
 
     // Get widget size
     const int w = width;
@@ -374,8 +374,8 @@ void ThresholdSelector::updateDrawingArea(const Cairo::RefPtr<Cairo::Context>& c
     }
 
     cr->set_antialias(Cairo::ANTIALIAS_SUBPIXEL);
-    cr->set_line_cap(Cairo::LINE_CAP_BUTT);
-    cr->set_line_join(Cairo::LINE_JOIN_BEVEL);
+    cr->set_line_cap(Cairo::Context::LineCap::BUTT);
+    cr->set_line_join(Cairo::Context::LineJoin::BEVEL);
 
     // Render surrounding curve (black)
     if (is_sensitive()) {
@@ -401,7 +401,7 @@ void ThresholdSelector::updateDrawingArea(const Cairo::RefPtr<Cairo::Context>& c
     Gtk::StateFlags currState = style->get_state();
 
     cr->set_antialias(Cairo::ANTIALIAS_SUBPIXEL);
-    cr->set_line_cap(Cairo::LINE_CAP_ROUND);
+    cr->set_line_cap(Cairo::Context::LineCap::ROUND);
 
     for (int i = 0; i < (doubleThresh ? 4 : 2); ++i) {
         if (!is_sensitive()) {
