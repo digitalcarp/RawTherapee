@@ -281,7 +281,8 @@ void ImageArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
 
 void ImageArea::on_motion_notify_event (double x, double y)
 {
-    Gdk::ModifierType state = motionController->get_current_event_state();
+    Gdk::ModifierType eventState = motionController->get_current_event_state();
+    int state = static_cast<int>(eventState);
 
     if (focusGrabber) {
         focusGrabber->pointerMoved (state, x, y);
@@ -309,7 +310,8 @@ void ImageArea::on_motion_notify_event (double x, double y)
 void ImageArea::on_button_press_event (int n_press, double x, double y)
 {
     unsigned int button = clickController->get_button();
-    Gdk::ModifierType state = motionController->get_current_event_state();
+    Gdk::ModifierType eventState = motionController->get_current_event_state();
+    int state = static_cast<int>(eventState);
 
     if (focusGrabber) {
         focusGrabber->buttonPress (button, n_press, state, x, y);
@@ -325,7 +327,8 @@ void ImageArea::on_button_press_event (int n_press, double x, double y)
 bool ImageArea::on_scroll_event (double dx, double dy)
 {
     auto event = motionController->get_current_event();
-    Gdk::ModifierType state = motionController->get_current_event_state();
+    Gdk::ModifierType eventState = motionController->get_current_event_state();
+    int state = static_cast<int>(eventState);
     double x = -1;
     double y = -1;
     bool success = event->get_position(x, y);
@@ -344,7 +347,8 @@ bool ImageArea::on_scroll_event (double dx, double dy)
 void ImageArea::on_button_release_event (int n_press, double x, double y)
 {
     unsigned int button = clickController->get_button();
-    Gdk::ModifierType state = motionController->get_current_event_state();
+    Gdk::ModifierType eventState = motionController->get_current_event_state();
+    int state = static_cast<int>(eventState);
 
     if (focusGrabber) {
         focusGrabber->buttonRelease (button, n_press, state, x, y);

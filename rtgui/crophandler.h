@@ -20,6 +20,7 @@
 
 #include <atomic>
 #include <memory>
+#include <thread>
 #include <vector>
 
 #include <gtkmm.h>
@@ -133,6 +134,8 @@ private:
     void compDim();
     bool acceptUpdate(const PendingUpdate& update) const;
 
+    std::thread workThread;
+
     // size of the crop's canvas on the screen ; might be bigger than the displayed image, but not smaller
     hidpi::LogicalSize windowSize;
 
@@ -146,7 +149,6 @@ private:
     int cropimg_width, cropimg_height;
     PendingUpdate pendingUpdate;
     int deviceScale;
-    bool isLowUpdatePriority;
 
     rtengine::StagedImageProcessor* ipc;
     rtengine::DetailedCrop* crop;

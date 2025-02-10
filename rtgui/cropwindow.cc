@@ -29,12 +29,12 @@
 #include "lockablecolorpicker.h"
 #include "options.h"
 #include "rtimage.h"
+#include "rtscalable.h"
 #include "threadutils.h"
 #include "editcallbacks.h"
 #include "editbuffer.h"
 #include "editwidgets.h"
 #include "pointermotionlistener.h"
-#include "rtsurface.h"
 
 #include "rtengine/dcrop.h"
 #include "rtengine/imagesource.h"
@@ -88,8 +88,8 @@ CropWindow::CropWindow (ImageArea* parent, bool isLowUpdatePriority_, bool isDet
     initZoomSteps();
 
     Glib::RefPtr<Pango::Context> context = parent->get_pango_context () ;
-    Pango::FontDescription fontd = parent->get_style_context()->get_font();
-    fontd.set_weight (Pango::WEIGHT_BOLD);
+    Pango::FontDescription fontd = context->get_font_description();
+    fontd.set_weight (Pango::Weight::BOLD);
     const int fontSize = 8; // pt
     // Non-absolute size is defined in "Pango units" and shall be multiplied by
     // Pango::SCALE from "pt":
@@ -109,35 +109,36 @@ CropWindow::CropWindow (ImageArea* parent, bool isLowUpdatePriority_, bool isDet
         closett = "Close";
         initialized = true;
     }
-    bZoomOut = new LWButton(std::shared_ptr<RTSurface>(new RTSurface("magnifier-minus-small", Gtk::ICON_SIZE_BUTTON)), 0, nullptr, LWButton::Left, LWButton::Center, &zoomOuttt);
-    bZoomIn  = new LWButton(std::shared_ptr<RTSurface>(new RTSurface("magnifier-plus-small", Gtk::ICON_SIZE_BUTTON)), 1, nullptr, LWButton::Left, LWButton::Center, &zoomIntt);
-    bZoom100 = new LWButton(std::shared_ptr<RTSurface>(new RTSurface("magnifier-1to1-small", Gtk::ICON_SIZE_BUTTON)), 2, nullptr, LWButton::Left, LWButton::Center, &zoom100tt);
-     //bZoomFit = new LWButton (std::shared_ptr<RTSurface>(new RTSurface("magnifier-fit", Gtk::ICON_SIZE_BUTTON)), 3, NULL, LWButton::Left, LWButton::Center, "Zoom Fit");
-    bClose   = new LWButton(std::shared_ptr<RTSurface>(new RTSurface("cancel-small", Gtk::ICON_SIZE_BUTTON)), 4, nullptr, LWButton::Right, LWButton::Center, &closett);
 
-    buttonSet.add (bZoomOut);
-    buttonSet.add (bZoomIn);
-    buttonSet.add (bZoom100);
-    buttonSet.add (bClose);
+    auto loadIconButton = [&](const char* name, int code, Glib::ustring& tooltip) {
+        hidpi::ScaledImageSurface icon = SvgPaintableWrapper::createFromIcon(name)
+            ->createSurface(SvgPaintableWrapper::IconSize::SMALL, 1);
+        auto button = std::make_unique<LWButton>(icon, code, nullptr, LWButton::Left,
+                                                 LWButton::Center, &tooltip);
+        auto ptr = button.get();
+        buttonSet.add(std::move(button));
+        return ptr;
+    };
+
+    bZoomOut = loadIconButton("magnifier-minus-small", 0, zoomOuttt);
+    bZoomIn = loadIconButton("magnifier-plus-small", 1, zoomIntt);
+    bZoom100 = loadIconButton("magnifier-1to1-small", 2, zoom100tt);
+    // bZoomFit = loadFromIcon("magnifier-fit", 3, "Zoom Fit");
+    bClose = loadIconButton("cancel-small", 4, closett);
 
     buttonSet.setColors (Gdk::RGBA("black"), Gdk::RGBA("white"));
     buttonSet.setButtonListener (this);
 
-    int bsw, bsh;
-    buttonSet.getMinimalDimensions (bsw, bsh);
+    hidpi::LogicalSize minSize = buttonSet.getMinimalDimensions();
 
-    if (bsh > titleHeight) {
-        titleHeight = bsh;
+    if (minSize.height > titleHeight) {
+        titleHeight = minSize.height;
     }
 
-    minWidth = bsw + iw + 2 * sideBorderWidth;
+    minWidth = minSize.width + iw + 2 * sideBorderWidth;
 
     cropHandler.setDisplayHandler(this);
     cropHandler.newImage (parent->getImProcCoordinator(), isDetailWindow);
-
-    auto motion = Gtk::EventControllerMotion::create();
-    motion->signal_leave().connect(sigc::mem_fun(*this, &CropWindow::leaveNotify));
-    add_controller(motion);
 }
 
 CropWindow::~CropWindow ()
@@ -329,7 +330,7 @@ void CropWindow::flawnOver (bool isFlawnOver)
     this->isFlawnOver = isFlawnOver;
 }
 
-void CropWindow::scroll (int state, GdkScrollDirection direction, int x, int y, double deltaX, double deltaY)
+void CropWindow::scroll (int state, Gdk::ScrollDirection direction, int x, int y, double deltaX, double deltaY)
 {
     double delta = 0.0;
     if (std::fabs(deltaX) > std::fabs(deltaY)) {
@@ -338,14 +339,14 @@ void CropWindow::scroll (int state, GdkScrollDirection direction, int x, int y, 
         delta = deltaY;
     }
 
-    if (direction == GDK_SCROLL_SMOOTH) {
+    if (direction == Gdk::ScrollDirection::SMOOTH) {
         scrollAccum += delta;
         //Only change zoom level if we've accumulated +/- 1.0 of deltas.  This conditional handles the previous delta=0.0 case
         if (std::fabs(scrollAccum) < 1.0) {
             return;
         }
     }
-    bool isUp = direction == GDK_SCROLL_UP || (direction == GDK_SCROLL_SMOOTH && scrollAccum < 0.0);
+    bool isUp = direction == Gdk::ScrollDirection::UP || (direction == Gdk::ScrollDirection::SMOOTH && scrollAccum < 0.0);
     scrollAccum = 0.0;
     if ((state & GDK_CONTROL_MASK) && onArea(ColorPicker, x, y)) {
         // resizing a color picker
@@ -373,7 +374,7 @@ void CropWindow::scroll (int state, GdkScrollDirection direction, int x, int y, 
     }
 }
 
-void CropWindow::buttonPress (int button, int type, int bstate, int x, int y)
+void CropWindow::buttonPress (int button, int n_press, int bstate, int x, int y)
 {
 
     bool needRedraw = true;  // most common case ; not redrawing are exceptions
@@ -382,7 +383,7 @@ void CropWindow::buttonPress (int button, int type, int bstate, int x, int y)
     iarea->grabFocus (this);
 
     if (button == 1) {
-        if (type == GDK_2BUTTON_PRESS && onArea (CropImage, x, y) && iarea->getToolMode () != TMColorPicker && (state == SNormal || state == SCropImgMove)) {
+        if (n_press == 2 && onArea (CropImage, x, y) && iarea->getToolMode () != TMColorPicker && (state == SNormal || state == SCropImgMove)) {
             if (fitZoomEnabled) {
                 if (fitZoom) {
                     state = SNormal;
@@ -401,7 +402,7 @@ void CropWindow::buttonPress (int button, int type, int bstate, int x, int y)
 
             state = SNormal;
         }
-        else if (type == GDK_BUTTON_PRESS && state == SNormal) {
+        else if (n_press == 1 && state == SNormal) {
             if (onArea (CropToolBar, x, y)) {
                 if (!decorated || !buttonSet.pressNotify (x, y)) {
                     state = SCropWinMove;
@@ -651,7 +652,7 @@ void CropWindow::buttonPress (int button, int type, int bstate, int x, int y)
                 action_y = 0;
             }
         }
-        else if (iarea->getToolMode () == TMColorPicker && type == GDK_BUTTON_PRESS && state == SNormal) {
+        else if (iarea->getToolMode () == TMColorPicker && n_press == 1 && state == SNormal) {
             if (hoveredPicker) {
                 if((bstate & GDK_CONTROL_MASK) && (bstate & GDK_SHIFT_MASK)) {
                     // Deleting all pickers !
@@ -1197,7 +1198,7 @@ bool CropWindow::onArea (CursorArea a, int x, int y)
 
     switch (a) {
     case CropWinButtons:
-        return decorated && buttonSet.inside (x, y);
+        return decorated && buttonSet.inside (hidpi::LogicalCoord(x, y));
 
     case CropToolBar:
         return x > windowPos.x && y > windowPos.y && x < windowPos.x + windowSize.width - 1 && y < windowPos.y + imgAreaPos.y;
@@ -1467,7 +1468,7 @@ void CropWindow::updateCursor (int x, int y)
 
     if (newType != cursor_type) {
         cursor_type = newType;
-        CursorManager::setWidgetCursor(iarea->get_window(), cursor_type);
+        CursorManager::setWidgetCursor(getToplevelWindow(iarea), cursor_type);
     }
 
 }
@@ -2013,8 +2014,8 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
                 // drawing Subscriber's visible geometry
                 const std::vector<Geometry*> visibleGeom = editSubscriber->getVisibleGeometry();
                 cr->set_antialias(Cairo::ANTIALIAS_DEFAULT); // ANTIALIAS_SUBPIXEL ?
-                cr->set_line_cap(Cairo::LINE_CAP_SQUARE);
-                cr->set_line_join(Cairo::LINE_JOIN_ROUND);
+                cr->set_line_cap(Cairo::Context::LineCap::SQUARE);
+                cr->set_line_join(Cairo::Context::LineJoin::ROUND);
 
                 // drawing outer lines
                 for (auto geom : visibleGeom) {
@@ -2041,9 +2042,9 @@ void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
 
                     Cairo::RefPtr<Cairo::Context> crMO = Cairo::Context::create(ObjectMOBuffer::getObjectMap());
                     crMO->set_antialias(Cairo::ANTIALIAS_NONE);
-                    crMO->set_line_cap(Cairo::LINE_CAP_SQUARE);
-                    crMO->set_line_join(Cairo::LINE_JOIN_ROUND);
-                    crMO->set_operator(Cairo::OPERATOR_SOURCE);
+                    crMO->set_line_cap(Cairo::Context::LineCap::SQUARE);
+                    crMO->set_line_join(Cairo::Context::LineJoin::ROUND);
+                    crMO->set_operator(Cairo::Context::Operator::SOURCE);
 
                     // clear the bitmap
                     crMO->set_source_rgba(0., 0., 0., 0.);
@@ -2601,8 +2602,8 @@ void CropWindow::drawDecoration (Cairo::RefPtr<Cairo::Context> cr)
     int x = windowPos.x, y = windowPos.y;
     // prepare label
     Glib::RefPtr<Pango::Context> context = iarea->get_pango_context () ;
-    Pango::FontDescription fontd = iarea->get_style_context()->get_font();
-    fontd.set_weight (Pango::WEIGHT_BOLD);
+    Pango::FontDescription fontd = context->get_font_description();
+    fontd.set_weight (Pango::Weight::BOLD);
     const int fontSize = 8; // pt
     // Non-absolute size is defined in "Pango units" and shall be multiplied by
     // Pango::SCALE from "pt":
@@ -2629,7 +2630,7 @@ void CropWindow::drawDecoration (Cairo::RefPtr<Cairo::Context> cr)
 
     // draw label
     cr->set_source_rgba (1, 1, 1, 0.5);
-    cr->move_to (x + 10 + sideBorderWidth + bZoomIn->getIcon()->getWidth() + bZoomOut->getIcon()->getWidth() + bZoom100->getIcon()->getWidth(), y + 1 + upperBorderWidth + (titleHeight - ih) / 2);
+    cr->move_to (x + 10 + sideBorderWidth + bZoomIn->getSize().width + bZoomOut->getSize().width + bZoom100->getSize().width, y + 1 + upperBorderWidth + (titleHeight - ih) / 2);
     cllayout->add_to_cairo_context (cr);
     cr->fill ();
 
@@ -2668,8 +2669,8 @@ void CropWindow::drawStraightenGuide (Cairo::RefPtr<Cairo::Context> cr)
     }
 
     Glib::RefPtr<Pango::Context> context = iarea->get_pango_context () ;
-    Pango::FontDescription fontd = iarea->get_style_context()->get_font();
-    fontd.set_weight (Pango::WEIGHT_BOLD);
+    Pango::FontDescription fontd = context->get_font_description();
+    fontd.set_weight (Pango::Weight::BOLD);
     const int fontSize = 8; // pt
     // Non-absolute size is defined in "Pango units" and shall be multiplied by
     // Pango::SCALE from "pt":

@@ -17,9 +17,7 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "crophandler.h"
-#undef THREAD_PRIORITY_NORMAL
 
-#include <cstring>
 #include "guiutils.h"
 #include "cropwindow.h"
 #include "imagearea.h"
@@ -49,7 +47,6 @@ CropHandler::CropHandler() :
     cropimg_width(0),
     cropimg_height(0),
     deviceScale(1),
-    isLowUpdatePriority(false),
     ipc(nullptr),
     crop(nullptr),
     displayHandler(nullptr),
@@ -60,13 +57,15 @@ CropHandler::CropHandler() :
 
 CropHandler::~CropHandler ()
 {
-    idle_register.destroy();
-
     if (ipc) {
         ipc->delSizeListener (this);
     }
 
     setEnabled (false);
+
+    if (workThread.joinable()) {
+        workThread.join();
+    }
 
     if (crop) {
         //crop->destroy ();
@@ -96,6 +95,10 @@ void CropHandler::newImage (StagedImageProcessor* ipc_, bool isDetailWindow)
 
     if (cropWin) {
         editDataProvider = cropWin->getImageArea();
+    }
+
+    if (crop && workThread.joinable()) {
+        workThread.join();
     }
 
     crop = ipc->createCrop (editDataProvider, isDetailWindow);
@@ -195,7 +198,7 @@ void CropHandler::setZoom (int z, int centerx, int centery)
 
     if (enabled && (oldZoom != zoom || oldcax != cax || oldcay != cay || oldCropX != cropX || oldCropY != cropY || oldCropW != cropW || oldCropH != cropH)) {
         if (needsFullRefresh && !ipc->getHighQualComputed()) {
-            cropPixbuf.clear ();
+            cropPixbuf = nullptr;
             ipc->startProcessing(M_HIGHQUAL);
             ipc->setHighQualComputed();
         } else {
@@ -353,7 +356,7 @@ void CropHandler::setDetailedCrop(
                     cimg.lock ();
 
                     if (redraw_needed.exchange(false)) {
-                        cropPixbuf.clear ();
+                        cropPixbuf = nullptr;
 
                         if (!enabled) {
                             cropimg.clear();
@@ -380,15 +383,15 @@ void CropHandler::setDetailedCrop(
                                     imh = window.height;
                                 }
 
-                                Glib::RefPtr<Gdk::Pixbuf> tmpPixbuf = Gdk::Pixbuf::create_from_data (cropimg.data(), Gdk::COLORSPACE_RGB, false, 8, cropimg_width, cropimg_height, 3 * cropimg_width);
-                                cropPixbuf = Gdk::Pixbuf::create (Gdk::COLORSPACE_RGB, false, 8, imw, imh);
+                                Glib::RefPtr<Gdk::Pixbuf> tmpPixbuf = Gdk::Pixbuf::create_from_data (cropimg.data(), Gdk::Colorspace::RGB, false, 8, cropimg_width, cropimg_height, 3 * cropimg_width);
+                                cropPixbuf = Gdk::Pixbuf::create (Gdk::Colorspace::RGB, false, 8, imw, imh);
                                 tmpPixbuf->scale (cropPixbuf, 0, 0, imw, imh, 0, 0, czoom, czoom, Gdk::InterpType::TILES);
-                                tmpPixbuf.clear ();
+                                tmpPixbuf = nullptr;
 
-                                Glib::RefPtr<Gdk::Pixbuf> tmpPixbuftrue = Gdk::Pixbuf::create_from_data (cropimgtrue.data(), Gdk::COLORSPACE_RGB, false, 8, cropimg_width, cropimg_height, 3 * cropimg_width);
-                                cropPixbuftrue = Gdk::Pixbuf::create (Gdk::COLORSPACE_RGB, false, 8, imw, imh);
+                                Glib::RefPtr<Gdk::Pixbuf> tmpPixbuftrue = Gdk::Pixbuf::create_from_data (cropimgtrue.data(), Gdk::Colorspace::RGB, false, 8, cropimg_width, cropimg_height, 3 * cropimg_width);
+                                cropPixbuftrue = Gdk::Pixbuf::create (Gdk::Colorspace::RGB, false, 8, imw, imh);
                                 tmpPixbuftrue->scale (cropPixbuftrue, 0, 0, imw, imh, 0, 0, czoom, czoom, Gdk::InterpType::TILES);
-                                tmpPixbuftrue.clear ();
+                                tmpPixbuftrue = nullptr;
                             }
 
                             cropimg.clear();
@@ -443,14 +446,12 @@ void CropHandler::update ()
     if (crop && enabled) {
 //        crop->setWindow (cropX, cropY, cropW, cropH, zoom>=1000 ? 1 : zoom); --> we use the "getWindow" hook instead of setting the size before
         crop->setListener (this);
-        cropPixbuf.clear ();
+        cropPixbuf = nullptr;
 
         // To save threads, try to mark "needUpdate" without a thread first
         if (crop->tryUpdate()) {
-            if (isLowUpdatePriority) {
-                Glib::Thread::create(sigc::mem_fun(*crop, &DetailedCrop::fullUpdate), 0, false, true, Glib::THREAD_PRIORITY_LOW);
-            } else {
-                Glib::Thread::create(sigc::mem_fun(*crop, &DetailedCrop::fullUpdate), false );
+            if (workThread.joinable()) {
+                workThread = std::thread([&]() { crop->fullUpdate(); });
             }
         }
     }
@@ -469,7 +470,7 @@ void CropHandler::setEnabled (bool e)
         cimg.lock();
         cropimg.clear();
         cropimgtrue.clear();
-        cropPixbuf.clear();
+        cropPixbuf = nullptr;
         cimg.unlock();
     } else {
         update ();
