@@ -18,9 +18,10 @@
  */
 #include <iostream>
 
+#include "editcallbacks.h"
 #include "multilangmgr.h"
 #include "toolpanelcoord.h"
-#include "metadatapanel.h"
+// #include "metadatapanel.h"
 #include "options.h"
 #include "rtimage.h"
 
@@ -38,266 +39,266 @@ using Tool = ToolPanelCoordinator::Tool;
 using ToolTree = ToolPanelCoordinator::ToolTree;
 
 const std::vector<ToolTree> EXPOSURE_PANEL_TOOLS = {
-    {
-        .id = Tool::TONE_CURVE,
-        .children = {},
-    },
-    {
-        .id = Tool::SHADOWS_HIGHLIGHTS,
-        .children = {},
-    },
-    {
-        .id = Tool::TONE_EQUALIZER,
-        .children = {},
-    },
-    {
-        .id = Tool::EPD,
-        .children = {},
-    },
-    {
-        .id = Tool::FATTAL,
-        .children = {},
-    },
-    {
-        .id = Tool::PC_VIGNETTE,
-        .children = {},
-    },
-    {
-        .id = Tool::GRADIENT,
-        .children = {},
-    },
-    {
-        .id = Tool::L_CURVE,
-        .children = {},
-    },
+//     {
+//         .id = Tool::TONE_CURVE,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::SHADOWS_HIGHLIGHTS,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::TONE_EQUALIZER,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::EPD,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::FATTAL,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::PC_VIGNETTE,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::GRADIENT,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::L_CURVE,
+//         .children = {},
+//     },
 };
 
 const std::vector<ToolTree> DETAILS_PANEL_TOOLS = {
-    {
-        .id = Tool::SPOT,
-        .children = {},
-    },
-    {
-        .id = Tool::SHARPENING_TOOL,
-        .children = {},
-    },
-    {
-        .id = Tool::LOCAL_CONTRAST,
-        .children = {},
-    },
-    {
-        .id = Tool::SHARPEN_EDGE,
-        .children = {},
-    },
-    {
-        .id = Tool::SHARPEN_MICRO,
-        .children = {},
-    },
-    {
-        .id = Tool::IMPULSE_DENOISE,
-        .children = {},
-    },
-    {
-        .id = Tool::DIR_PYR_DENOISE,
-        .children = {},
-    },
-    {
-        .id = Tool::DEFRINGE_TOOL,
-        .children = {},
-    },
-    {
-        .id = Tool::DIR_PYR_EQUALIZER,
-        .children = {},
-    },
-    {
-        .id = Tool::DEHAZE,
-        .children = {},
-    },
+//     {
+//         .id = Tool::SPOT,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::SHARPENING_TOOL,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::LOCAL_CONTRAST,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::SHARPEN_EDGE,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::SHARPEN_MICRO,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::IMPULSE_DENOISE,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::DIR_PYR_DENOISE,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::DEFRINGE_TOOL,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::DIR_PYR_EQUALIZER,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::DEHAZE,
+//         .children = {},
+//     },
 };
 
 const std::vector<ToolTree> COLOR_PANEL_TOOLS = {
-    {
-        .id = Tool::WHITE_BALANCE,
-        .children = {},
-    },
-    {
-        .id = Tool::COMPRESSGAMUT_TOOL,
-    },
-    {
-        .id = Tool::VIBRANCE,
-        .children = {},
-    },
-    {
-        .id = Tool::CH_MIXER,
-        .children = {},
-    },
-    {
-        .id = Tool::BLACK_WHITE,
-        .children = {},
-    },
-    {
-        .id = Tool::HSV_EQUALIZER,
-        .children = {},
-    },
-    {
-        .id = Tool::FILM_SIMULATION,
-        .children = {},
-    },
-    {
-        .id = Tool::FILM_NEGATIVE,
-        .children = {},
-    },
-    {
-        .id = Tool::SOFT_LIGHT,
-        .children = {},
-    },
-    {
-        .id = Tool::RGB_CURVES,
-        .children = {},
-    },
-    {
-        .id = Tool::COLOR_TONING,
-        .children = {},
-    },
-    {
-        .id = Tool::ICM,
-        .children = {},
-    },
+//     {
+//         .id = Tool::WHITE_BALANCE,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::COMPRESSGAMUT_TOOL,
+//     },
+//     {
+//         .id = Tool::VIBRANCE,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::CH_MIXER,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::BLACK_WHITE,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::HSV_EQUALIZER,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::FILM_SIMULATION,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::FILM_NEGATIVE,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::SOFT_LIGHT,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::RGB_CURVES,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::COLOR_TONING,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::ICM,
+//         .children = {},
+//     },
 };
 
 const std::vector<ToolTree> ADVANCED_PANEL_TOOLS = {
-    {
-        .id = Tool::RETINEX_TOOL,
-        .children = {},
-    },
-    {
-        .id = Tool::COLOR_APPEARANCE,
-        .children = {},
-    },
-    {
-        .id = Tool::WAVELET,
-        .children = {},
-    },
+//     {
+//         .id = Tool::RETINEX_TOOL,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::COLOR_APPEARANCE,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::WAVELET,
+//         .children = {},
+//     },
 };
 
 const std::vector<ToolTree> LOCALLAB_PANEL_TOOLS = {
-    {
-        .id = Tool::LOCALLAB,
-        .children = {},
-    },
+//     {
+//         .id = Tool::LOCALLAB,
+//         .children = {},
+//     },
 };
 
 const std::vector<ToolTree> TRANSFORM_PANEL_TOOLS = {
-    {
-        .id = Tool::CROP_TOOL,
-        .children = {},
-    },
-    {
-        .id = Tool::RESIZE_TOOL,
-        .children = {
-            {
-                .id = Tool::PR_SHARPENING,
-                .children = {},
-            },
-            {
-                .id = Tool::FRAMING,
-            },
-        },
-    },
-    {
-        .id = Tool::LENS_GEOM,
-        .children = {
-            {
-                .id = Tool::ROTATE,
-                .children = {},
-            },
-            {
-                .id = Tool::PERSPECTIVE,
-                .children = {},
-            },
-            {
-                .id = Tool::LENS_PROF,
-                .children = {},
-            },
-            {
-                .id = Tool::DISTORTION,
-                .children = {},
-            },
-            {
-                .id = Tool::CA_CORRECTION,
-                .children = {},
-            },
-            {
-                .id = Tool::VIGNETTING,
-                .children = {},
-            },
-        },
-    },
+//     {
+//         .id = Tool::CROP_TOOL,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::RESIZE_TOOL,
+//         .children = {
+//             {
+//                 .id = Tool::PR_SHARPENING,
+//                 .children = {},
+//             },
+//             {
+//                 .id = Tool::FRAMING,
+//             },
+//         },
+//     },
+//     {
+//         .id = Tool::LENS_GEOM,
+//         .children = {
+//             {
+//                 .id = Tool::ROTATE,
+//                 .children = {},
+//             },
+//             {
+//                 .id = Tool::PERSPECTIVE,
+//                 .children = {},
+//             },
+//             {
+//                 .id = Tool::LENS_PROF,
+//                 .children = {},
+//             },
+//             {
+//                 .id = Tool::DISTORTION,
+//                 .children = {},
+//             },
+//             {
+//                 .id = Tool::CA_CORRECTION,
+//                 .children = {},
+//             },
+//             {
+//                 .id = Tool::VIGNETTING,
+//                 .children = {},
+//             },
+//         },
+//     },
 };
 
 const std::vector<ToolTree> RAW_PANEL_TOOLS = {
-    {
-        .id = Tool::SENSOR_BAYER,
-        .children = {
-            {
-                {
-                    .id = Tool::BAYER_PROCESS,
-                    .children = {},
-                },
-                {
-                    .id = Tool::BAYER_RAW_EXPOSURE,
-                    .children = {},
-                },
-                {
-                    .id = Tool::BAYER_PREPROCESS,
-                    .children = {},
-                },
-                {
-                    .id = Tool::RAW_CA_CORRECTION,
-                    .children = {},
-                },
-            },
-        },
-    },
-    {
-        .id = Tool::SENSOR_XTRANS,
-        .children = {
-            {
-                {
-                    .id = Tool::XTRANS_PROCESS,
-                    .children = {},
-                },
-                {
-                    .id = Tool::XTRANS_RAW_EXPOSURE,
-                    .children = {},
-                },
-            },
-        },
-    },
-    {
-        .id = Tool::RAW_EXPOSURE,
-        .children = {},
-    },
-    {
-        .id = Tool::PREPROCESS_WB,
-        .children = {},
-    },
-    {
-        .id = Tool::PREPROCESS,
-        .children = {},
-    },
-    {
-        .id = Tool::DARKFRAME_TOOL,
-        .children = {},
-    },
-    {
-        .id = Tool::FLATFIELD_TOOL,
-        .children = {},
-    },
-    {
-        .id = Tool::PD_SHARPENING,
-        .children = {},
-    },
+//     {
+//         .id = Tool::SENSOR_BAYER,
+//         .children = {
+//             {
+//                 {
+//                     .id = Tool::BAYER_PROCESS,
+//                     .children = {},
+//                 },
+//                 {
+//                     .id = Tool::BAYER_RAW_EXPOSURE,
+//                     .children = {},
+//                 },
+//                 {
+//                     .id = Tool::BAYER_PREPROCESS,
+//                     .children = {},
+//                 },
+//                 {
+//                     .id = Tool::RAW_CA_CORRECTION,
+//                     .children = {},
+//                 },
+//             },
+//         },
+//     },
+//     {
+//         .id = Tool::SENSOR_XTRANS,
+//         .children = {
+//             {
+//                 {
+//                     .id = Tool::XTRANS_PROCESS,
+//                     .children = {},
+//                 },
+//                 {
+//                     .id = Tool::XTRANS_RAW_EXPOSURE,
+//                     .children = {},
+//                 },
+//             },
+//         },
+//     },
+//     {
+//         .id = Tool::RAW_EXPOSURE,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::PREPROCESS_WB,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::PREPROCESS,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::DARKFRAME_TOOL,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::FLATFIELD_TOOL,
+//         .children = {},
+//     },
+//     {
+//         .id = Tool::PD_SHARPENING,
+//         .children = {},
+//     },
 };
 
 const ToolPanelCoordinator::ToolLayout PANEL_TOOLS = {
@@ -333,7 +334,7 @@ const ToolPanelCoordinator::ToolLayout PANEL_TOOLS = {
 
 std::unordered_map<std::string, Tool> ToolPanelCoordinator::toolNamesReverseMap;
 
-ToolPanelCoordinator::ToolPanelCoordinator (bool batch) : ipc (nullptr), favoritePanelSW(nullptr), hasChanged (false), batch(batch), editDataProvider (nullptr), photoLoadedOnce(false), ornamentSurface(new RTSurface("ornament1.svg"))
+ToolPanelCoordinator::ToolPanelCoordinator (bool batch) : ipc (nullptr), favoritePanelSW(nullptr), hasChanged (false), batch(batch), editDataProvider (nullptr), photoLoadedOnce(false)
 {
 
     favoritePanel   = Gtk::manage (new ToolVBox ());
@@ -345,67 +346,68 @@ ToolPanelCoordinator::ToolPanelCoordinator (bool batch) : ipc (nullptr), favorit
     advancedPanel    = Gtk::manage (new ToolVBox ());
     locallabPanel    = Gtk::manage(new ToolVBox());
 
-    coarse              = Gtk::manage (new CoarsePanel ());
-    toneCurve           = Gtk::manage (new ToneCurve ());
-    shadowshighlights   = Gtk::manage (new ShadowsHighlights ());
-    toneEqualizer       = Gtk::manage (new ToneEqualizer ());
-    impulsedenoise      = Gtk::manage (new ImpulseDenoise ());
-    defringe            = Gtk::manage (new Defringe ());
-    spot                = Gtk::manage (new Spot ());
-    dirpyrdenoise       = Gtk::manage (new DirPyrDenoise ());
-    epd                 = Gtk::manage (new EdgePreservingDecompositionUI ());
-    sharpening          = Gtk::manage (new Sharpening ());
-    localContrast       = Gtk::manage(new LocalContrast());
-    sharpenEdge         = Gtk::manage(new SharpenEdge());
-    sharpenMicro        = Gtk::manage(new SharpenMicro());
-    lcurve              = Gtk::manage(new LCurve());
-    rgbcurves           = Gtk::manage(new RGBCurves());
-    colortoning         = Gtk::manage(new ColorToning());
-    lensgeom            = Gtk::manage(new LensGeometry());
-    lensProf            = Gtk::manage(new LensProfilePanel());
-    distortion          = Gtk::manage(new Distortion());
-    rotate              = Gtk::manage(new Rotate());
-    vibrance            = Gtk::manage(new Vibrance());
-    colorappearance     = Gtk::manage(new ColorAppearance());
-    whitebalance        = Gtk::manage(new WhiteBalance());
-    compressgamut       = Gtk::manage (new Compressgamut ());
-    vignetting          = Gtk::manage(new Vignetting());
-    retinex             = Gtk::manage(new Retinex());
-    gradient            = Gtk::manage(new Gradient());
-    locallab            = Gtk::manage(new Locallab());
-    pcvignette          = Gtk::manage(new PCVignette());
-    perspective         = Gtk::manage(new PerspCorrection());
-    cacorrection        = Gtk::manage(new CACorrection());
-    chmixer             = Gtk::manage(new ChMixer());
-    blackwhite          = Gtk::manage(new BlackWhite());
-    resize              = Gtk::manage(new Resize());
-    prsharpening        = Gtk::manage(new PrSharpening());
-    framing             = Gtk::manage(new Framing());
-    crop                = Gtk::manage(new Crop());
-    icm                 = Gtk::manage(new ICMPanel());
-    metadata            = Gtk::manage(new MetaDataPanel());
-    wavelet             = Gtk::manage(new Wavelet());
-    dirpyrequalizer     = Gtk::manage(new DirPyrEqualizer());
-    hsvequalizer        = Gtk::manage(new HSVEqualizer());
-    filmSimulation      = Gtk::manage(new FilmSimulation());
-    softlight           = Gtk::manage(new SoftLight());
-    dehaze              = Gtk::manage(new Dehaze());
-    sensorbayer         = Gtk::manage(new SensorBayer());
-    sensorxtrans        = Gtk::manage(new SensorXTrans());
-    bayerprocess        = Gtk::manage(new BayerProcess());
-    xtransprocess       = Gtk::manage(new XTransProcess());
-    bayerpreprocess     = Gtk::manage(new BayerPreProcess());
-    preprocess          = Gtk::manage(new PreProcess());
-    darkframe           = Gtk::manage(new DarkFrame());
-    flatfield           = Gtk::manage(new FlatField());
-    rawcacorrection     = Gtk::manage(new RAWCACorr());
-    rawexposure         = Gtk::manage(new RAWExposure());
-    preprocessWB        = Gtk::manage (new PreprocessWB ());
-    bayerrawexposure    = Gtk::manage(new BayerRAWExposure());
-    xtransrawexposure   = Gtk::manage(new XTransRAWExposure());
-    fattal              = Gtk::manage(new FattalToneMapping());
-    filmNegative        = Gtk::manage (new FilmNegative());
-    pdSharpening        = Gtk::manage (new PdSharpening());
+//     coarse              = Gtk::manage (new CoarsePanel ());
+//     toneCurve           = Gtk::manage (new ToneCurve ());
+//     shadowshighlights   = Gtk::manage (new ShadowsHighlights ());
+//     toneEqualizer       = Gtk::manage (new ToneEqualizer ());
+//     impulsedenoise      = Gtk::manage (new ImpulseDenoise ());
+//     defringe            = Gtk::manage (new Defringe ());
+//     spot                = Gtk::manage (new Spot ());
+//     dirpyrdenoise       = Gtk::manage (new DirPyrDenoise ());
+//     epd                 = Gtk::manage (new EdgePreservingDecompositionUI ());
+//     sharpening          = Gtk::manage (new Sharpening ());
+//     localContrast       = Gtk::manage(new LocalContrast());
+//     sharpenEdge         = Gtk::manage(new SharpenEdge());
+//     sharpenMicro        = Gtk::manage(new SharpenMicro());
+//     lcurve              = Gtk::manage(new LCurve());
+//     rgbcurves           = Gtk::manage(new RGBCurves());
+//     colortoning         = Gtk::manage(new ColorToning());
+//     lensgeom            = Gtk::manage(new LensGeometry());
+//     lensProf            = Gtk::manage(new LensProfilePanel());
+//     distortion          = Gtk::manage(new Distortion());
+//     rotate              = Gtk::manage(new Rotate());
+//     vibrance            = Gtk::manage(new Vibrance());
+//     colorappearance     = Gtk::manage(new ColorAppearance());
+//     whitebalance        = Gtk::manage(new WhiteBalance());
+//     compressgamut       = Gtk::manage (new Compressgamut ());
+//     vignetting          = Gtk::manage(new Vignetting());
+//     retinex             = Gtk::manage(new Retinex());
+//     gradient            = Gtk::manage(new Gradient());
+//     locallab            = Gtk::manage(new Locallab());
+//     pcvignette          = Gtk::manage(new PCVignette());
+//     perspective         = Gtk::manage(new PerspCorrection());
+//     cacorrection        = Gtk::manage(new CACorrection());
+//     chmixer             = Gtk::manage(new ChMixer());
+//     blackwhite          = Gtk::manage(new BlackWhite());
+//     resize              = Gtk::manage(new Resize());
+//     prsharpening        = Gtk::manage(new PrSharpening());
+//     framing             = Gtk::manage(new Framing());
+//     crop                = Gtk::manage(new Crop());
+//     icm                 = Gtk::manage(new ICMPanel());
+//     metadata            = Gtk::manage(new MetaDataPanel());
+//     wavelet             = Gtk::manage(new Wavelet());
+//     dirpyrequalizer     = Gtk::manage(new DirPyrEqualizer());
+//     hsvequalizer        = Gtk::manage(new HSVEqualizer());
+//     filmSimulation      = Gtk::manage(new FilmSimulation());
+//     softlight           = Gtk::manage(new SoftLight());
+//     dehaze              = Gtk::manage(new Dehaze());
+//     sensorbayer         = Gtk::manage(new SensorBayer());
+//     sensorxtrans        = Gtk::manage(new SensorXTrans());
+//     bayerprocess        = Gtk::manage(new BayerProcess());
+//     xtransprocess       = Gtk::manage(new XTransProcess());
+//     bayerpreprocess     = Gtk::manage(new BayerPreProcess());
+//     preprocess          = Gtk::manage(new PreProcess());
+//     darkframe           = Gtk::manage(new DarkFrame());
+//     flatfield           = Gtk::manage(new FlatField());
+//     rawcacorrection     = Gtk::manage(new RAWCACorr());
+//     rawexposure         = Gtk::manage(new RAWExposure());
+//     preprocessWB        = Gtk::manage (new PreprocessWB ());
+//     bayerrawexposure    = Gtk::manage(new BayerRAWExposure());
+//     xtransrawexposure   = Gtk::manage(new XTransRAWExposure());
+//     fattal              = Gtk::manage(new FattalToneMapping());
+//     filmNegative        = Gtk::manage (new FilmNegative());
+//     pdSharpening        = Gtk::manage (new PdSharpening());
+
     // So Demosaic, Line noise filter, Green Equilibration, Ca-Correction (garder le nom de section identique!) and Black-Level will be moved in a "Bayer sensor" tool,
     // and a separate Demosaic and Black Level tool will be created in an "X-Trans sensor" tool
 
@@ -437,8 +439,6 @@ ToolPanelCoordinator::ToolPanelCoordinator (bool batch) : ipc (nullptr), favorit
             toolPanels.push_back(tool_panel);
             expanderToToolPanelMap[tool_panel->getExpander()] = tool_panel;
             toolToDefaultToolTreeMap[cur_tool->id] = cur_tool;
-            // Show all now, since they won't be attached to a parent.
-            tool_panel->getExpander()->show_all();
             // Add children to unprocessed.
             for (const auto &child_tool : cur_tool->children) {
                 unprocessed_tools.push_back(&child_tool);
@@ -446,8 +446,8 @@ ToolPanelCoordinator::ToolPanelCoordinator (bool batch) : ipc (nullptr), favorit
         }
     }
 
-    toolPanels.push_back (coarse);
-    toolPanels.push_back(metadata);
+//     toolPanels.push_back (coarse);
+//     toolPanels.push_back(metadata);
 
     toolPanelNotebook = new Gtk::Notebook();
     toolPanelNotebook->set_name("ToolPanelNotebook");
@@ -460,66 +460,66 @@ ToolPanelCoordinator::ToolPanelCoordinator (bool batch) : ipc (nullptr), favorit
     advancedPanelSW    = Gtk::manage (new MyScrolledWindow ());
     locallabPanelSW     = Gtk::manage(new MyScrolledWindow());
 
+    auto svg = SvgPaintableWrapper::createFromImage("ornament1.svg");
+
     // load panel endings
     for (int i = 0; i < 8; i++) {
         vbPanelEnd[i] = Gtk::manage (new Gtk::Box(Gtk::Orientation::VERTICAL));
-        imgPanelEnd[i] = Gtk::manage (new Gtk::Image (ornamentSurface->get()));
-        imgPanelEnd[i]->show();
+        imgPanelEnd[i] = Gtk::manage (new Gtk::Picture());
+        svg->setOnPicture(imgPanelEnd[i]);
         vbPanelEnd[i]->get_style_context()->add_class("PanelEnding");
-        vbPanelEnd[i]->pack_start(*imgPanelEnd[i], Pack::SHRINK);
-        vbPanelEnd[i]->show_all();
+        vbPanelEnd[i]->append(*imgPanelEnd[i]);
     }
     updateVScrollbars(options.hideTPVScrollbar);
 
     Gtk::Box *favoritePanelContainer =
-        Gtk::manage(new Gtk::Box(Gtk::Orientation::ORIENTATION_VERTICAL));
+        Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Box *exposurePanelContainer =
-        Gtk::manage(new Gtk::Box(Gtk::Orientation::ORIENTATION_VERTICAL));
+        Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Box *detailsPanelContainer =
-        Gtk::manage(new Gtk::Box(Gtk::Orientation::ORIENTATION_VERTICAL));
+        Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Box *colorPanelContainer =
-        Gtk::manage(new Gtk::Box(Gtk::Orientation::ORIENTATION_VERTICAL));
+        Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Box *advancedPanelContainer =
-        Gtk::manage(new Gtk::Box(Gtk::Orientation::ORIENTATION_VERTICAL));
+        Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Box *locallabPanelContainer =
-        Gtk::manage(new Gtk::Box(Gtk::Orientation::ORIENTATION_VERTICAL));
+        Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Box *transformPanelContainer =
-        Gtk::manage(new Gtk::Box(Gtk::Orientation::ORIENTATION_VERTICAL));
+        Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
     Gtk::Box *rawPanelContainer =
-        Gtk::manage(new Gtk::Box(Gtk::Orientation::ORIENTATION_VERTICAL));
+        Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL));
 
-    favoritePanelSW->add(*favoritePanelContainer);
-    favoritePanelContainer->pack_start(*favoritePanel, Pack::SHRINK);
-    favoritePanelContainer->pack_start(*vbPanelEnd[0], Pack::SHRINK);
-    favoritePanelSW->show_all();
+    favoritePanelSW->set_child(*favoritePanelContainer);
+    pack_start (favoritePanelContainer, *favoritePanel, Pack::SHRINK);
+    pack_start (favoritePanelContainer, *vbPanelEnd[0], Pack::SHRINK);
 
-    exposurePanelSW->add  (*exposurePanelContainer);
-    exposurePanelContainer->pack_start(*exposurePanel, Pack::SHRINK);
-    exposurePanelContainer->pack_start (*vbPanelEnd[1], Pack::SHRINK);
+    exposurePanelSW->set_child(*exposurePanelContainer);
+    pack_start (exposurePanelContainer, *exposurePanel, Pack::SHRINK);
+    pack_start (exposurePanelContainer, *vbPanelEnd[1], Pack::SHRINK);
 
-    detailsPanelSW->add   (*detailsPanelContainer);
-    detailsPanelContainer->pack_start(*detailsPanel, Pack::SHRINK);
-    detailsPanelContainer->pack_start (*vbPanelEnd[2], Pack::SHRINK);
+    detailsPanelSW->set_child(*detailsPanelContainer);
+    pack_start (detailsPanelContainer, *detailsPanel, Pack::SHRINK);
+    pack_start (detailsPanelContainer, *vbPanelEnd[2], Pack::SHRINK);
 
-    colorPanelSW->add     (*colorPanelContainer);
-    colorPanelContainer->pack_start(*colorPanel, Pack::SHRINK);
-    colorPanelContainer->pack_start (*vbPanelEnd[3], Pack::SHRINK);
+    colorPanelSW->set_child(*colorPanelContainer);
+    pack_start (colorPanelContainer, *colorPanel, Pack::SHRINK);
+    pack_start (colorPanelContainer, *vbPanelEnd[3], Pack::SHRINK);
 
-    advancedPanelSW->add       (*advancedPanelContainer);
-    advancedPanelContainer->pack_start(*advancedPanel, Pack::SHRINK);
-    advancedPanelContainer->pack_start (*vbPanelEnd[6], Pack::SHRINK);
+    advancedPanelSW->set_child(*advancedPanelContainer);
+    pack_start (advancedPanelContainer, *advancedPanel, Pack::SHRINK);
+    pack_start (advancedPanelContainer, *vbPanelEnd[6], Pack::SHRINK);
 
-    locallabPanelSW->add(*locallabPanelContainer);
-    locallabPanelContainer->pack_start(*locallabPanel, Pack::SHRINK);
-    locallabPanelContainer->pack_start(*vbPanelEnd[7], Pack::SHRINK);
+    locallabPanelSW->set_child(*locallabPanelContainer);
+    pack_start (locallabPanelContainer, *locallabPanel, Pack::SHRINK);
+    pack_start (locallabPanelContainer, *vbPanelEnd[7], Pack::SHRINK);
 
-    transformPanelSW->add (*transformPanelContainer);
-    transformPanelContainer->pack_start(*transformPanel, Pack::SHRINK);
-    transformPanelContainer->pack_start (*vbPanelEnd[4], Pack::SHRINK);
+    transformPanelSW->set_child(*transformPanelContainer);
+    pack_start (transformPanelContainer, *transformPanel, Pack::SHRINK);
+    pack_start (transformPanelContainer, *vbPanelEnd[4], Pack::SHRINK);
 
-    rawPanelSW->add       (*rawPanelContainer);
-    rawPanelContainer->pack_start(*rawPanel, Pack::SHRINK);
-    rawPanelContainer->pack_start (*vbPanelEnd[5], Pack::SHRINK);
+    rawPanelSW->set_child(*rawPanelContainer);
+    pack_start (rawPanelContainer, *rawPanel, Pack::SHRINK);
+    pack_start (rawPanelContainer, *vbPanelEnd[5], Pack::SHRINK);
 
     toiF.reset(new TextOrIcon ("star", M ("MAIN_TAB_FAVORITES"), M ("MAIN_TAB_FAVORITES_TOOLTIP")));
     toiE = Gtk::manage (new TextOrIcon ("exposure", M ("MAIN_TAB_EXPOSURE"), M ("MAIN_TAB_EXPOSURE_TOOLTIP")));
@@ -531,7 +531,6 @@ ToolPanelCoordinator::ToolPanelCoordinator (bool batch) : ipc (nullptr), favorit
     toiT = Gtk::manage (new TextOrIcon ("transform", M ("MAIN_TAB_TRANSFORM"), M ("MAIN_TAB_TRANSFORM_TOOLTIP")));
     toiR = Gtk::manage (new TextOrIcon ("bayer", M ("MAIN_TAB_RAW"), M ("MAIN_TAB_RAW_TOOLTIP")));
     toiM = Gtk::manage (new TextOrIcon ("metadata", M ("MAIN_TAB_METADATA"), M ("MAIN_TAB_METADATA_TOOLTIP")));
-    toiF->show_all();
     if (options.favorites.size()) {
         toolPanelNotebook->append_page(*favoritePanelSW, *toiF);
     }
@@ -552,10 +551,9 @@ ToolPanelCoordinator::ToolPanelCoordinator (bool batch) : ipc (nullptr), favorit
 
     toolPanelNotebook->append_page (*transformPanelSW, *toiT);
     toolPanelNotebook->append_page (*rawPanelSW,       *toiR);
-    toolPanelNotebook->append_page (*metadata,    *toiM);
+//     toolPanelNotebook->append_page (*metadata,    *toiM);
 
     toolPanelNotebook->set_scrollable();
-    toolPanelNotebook->show_all();
     updateToolLocations(options.favorites, options.cloneFavoriteTools);
 
     notebookconn = toolPanelNotebook->signal_switch_page().connect(
@@ -570,18 +568,18 @@ ToolPanelCoordinator::ToolPanelCoordinator (bool batch) : ipc (nullptr), favorit
         toolPanel->setListener(this);
     }
 
-    whitebalance->setWBProvider(this);
-    whitebalance->setSpotWBListener(this);
-    darkframe->setDFProvider(this);
-    flatfield->setFFProvider(this);
-    lensgeom->setLensGeomListener(this);
-    rotate->setLensGeomListener(this);
-    perspective->setLensGeomListener(this);
-    perspective->setPerspCorrectionPanelListener(this);
-    distortion->setLensGeomListener(this);
-    crop->setCropPanelListener(this);
-    icm->setICMPanelListener(this);
-    filmNegative->setFilmNegProvider(this);
+//     whitebalance->setWBProvider(this);
+//     whitebalance->setSpotWBListener(this);
+//     darkframe->setDFProvider(this);
+//     flatfield->setFFProvider(this);
+//     lensgeom->setLensGeomListener(this);
+//     rotate->setLensGeomListener(this);
+//     perspective->setLensGeomListener(this);
+//     perspective->setPerspCorrectionPanelListener(this);
+//     distortion->setLensGeomListener(this);
+//     crop->setCropPanelListener(this);
+//     icm->setICMPanelListener(this);
+//     filmNegative->setFilmNegProvider(this);
 
     toolBar = new ToolBar();
     toolBar->setToolBarListener(this);
@@ -627,124 +625,124 @@ Tool ToolPanelCoordinator::getToolFromName(const std::string &name)
 std::string ToolPanelCoordinator::getToolName(Tool tool)
 {
     switch (tool) {
-        case Tool::TONE_CURVE:
-            return ToneCurve::TOOL_NAME;
-        case Tool::SHADOWS_HIGHLIGHTS:
-            return ShadowsHighlights::TOOL_NAME;
-        case Tool::TONE_EQUALIZER:
-            return ToneEqualizer::TOOL_NAME;
-        case Tool::IMPULSE_DENOISE:
-            return ImpulseDenoise::TOOL_NAME;
-        case Tool::DEFRINGE_TOOL:
-            return Defringe::TOOL_NAME;
-        case Tool::COMPRESSGAMUT_TOOL:
-            return Compressgamut::TOOL_NAME;
-        case Tool::SPOT:
-            return Spot::TOOL_NAME;
-        case Tool::DIR_PYR_DENOISE:
-            return DirPyrDenoise::TOOL_NAME;
-        case Tool::EPD:
-            return EdgePreservingDecompositionUI::TOOL_NAME;
-        case Tool::SHARPENING_TOOL:
-            return Sharpening::TOOL_NAME;
-        case Tool::LOCAL_CONTRAST:
-            return LocalContrast::TOOL_NAME;
-        case Tool::SHARPEN_EDGE:
-            return SharpenEdge::TOOL_NAME;
-        case Tool::SHARPEN_MICRO:
-            return SharpenMicro::TOOL_NAME;
-        case Tool::L_CURVE:
-            return LCurve::TOOL_NAME;
-        case Tool::RGB_CURVES:
-            return RGBCurves::TOOL_NAME;
-        case Tool::COLOR_TONING:
-            return ColorToning::TOOL_NAME;
-        case Tool::LENS_GEOM:
-            return LensGeometry::TOOL_NAME;
-        case Tool::LENS_PROF:
-            return LensProfilePanel::TOOL_NAME;
-        case Tool::DISTORTION:
-            return Distortion::TOOL_NAME;
-        case Tool::ROTATE:
-            return Rotate::TOOL_NAME;
-        case Tool::VIBRANCE:
-            return Vibrance::TOOL_NAME;
-        case Tool::COLOR_APPEARANCE:
-            return ColorAppearance::TOOL_NAME;
-        case Tool::WHITE_BALANCE:
-            return WhiteBalance::TOOL_NAME;
-        case Tool::VIGNETTING:
-            return Vignetting::TOOL_NAME;
-        case Tool::RETINEX_TOOL:
-            return Retinex::TOOL_NAME;
-        case Tool::GRADIENT:
-            return Gradient::TOOL_NAME;
-        case Tool::LOCALLAB:
-            return Locallab::TOOL_NAME;
-        case Tool::PC_VIGNETTE:
-            return PCVignette::TOOL_NAME;
-        case Tool::PERSPECTIVE:
-            return PerspCorrection::TOOL_NAME;
-        case Tool::CA_CORRECTION:
-            return CACorrection::TOOL_NAME;
-        case Tool::CH_MIXER:
-            return ChMixer::TOOL_NAME;
-        case Tool::BLACK_WHITE:
-            return BlackWhite::TOOL_NAME;
-        case Tool::RESIZE_TOOL:
-            return Resize::TOOL_NAME;
-        case Tool::PR_SHARPENING:
-            return PrSharpening::TOOL_NAME;
-        case Tool::FRAMING:
-            return Framing::TOOL_NAME;
-        case Tool::CROP_TOOL:
-            return Crop::TOOL_NAME;
-        case Tool::ICM:
-            return ICMPanel::TOOL_NAME;
-        case Tool::WAVELET:
-            return Wavelet::TOOL_NAME;
-        case Tool::DIR_PYR_EQUALIZER:
-            return DirPyrEqualizer::TOOL_NAME;
-        case Tool::HSV_EQUALIZER:
-            return HSVEqualizer::TOOL_NAME;
-        case Tool::FILM_SIMULATION:
-            return FilmSimulation::TOOL_NAME;
-        case Tool::SOFT_LIGHT:
-            return SoftLight::TOOL_NAME;
-        case Tool::DEHAZE:
-            return Dehaze::TOOL_NAME;
-        case Tool::SENSOR_BAYER:
-            return SensorBayer::TOOL_NAME;
-        case Tool::SENSOR_XTRANS:
-            return SensorXTrans::TOOL_NAME;
-        case Tool::BAYER_PROCESS:
-            return BayerProcess::TOOL_NAME;
-        case Tool::XTRANS_PROCESS:
-            return XTransProcess::TOOL_NAME;
-        case Tool::BAYER_PREPROCESS:
-            return BayerPreProcess::TOOL_NAME;
-        case Tool::PREPROCESS:
-            return PreProcess::TOOL_NAME;
-        case Tool::DARKFRAME_TOOL:
-            return DarkFrame::TOOL_NAME;
-        case Tool::FLATFIELD_TOOL:
-            return FlatField::TOOL_NAME;
-        case Tool::RAW_CA_CORRECTION:
-            return RAWCACorr::TOOL_NAME;
-        case Tool::RAW_EXPOSURE:
-            return RAWExposure::TOOL_NAME;
-        case Tool::PREPROCESS_WB:
-            return PreprocessWB::TOOL_NAME;
-        case Tool::BAYER_RAW_EXPOSURE:
-            return BayerRAWExposure::TOOL_NAME;
-        case Tool::XTRANS_RAW_EXPOSURE:
-            return XTransRAWExposure::TOOL_NAME;
-        case Tool::FATTAL:
-            return FattalToneMapping::TOOL_NAME;
-        case Tool::FILM_NEGATIVE:
-            return FilmNegative::TOOL_NAME;
-        case Tool::PD_SHARPENING:
-            return PdSharpening::TOOL_NAME;
+//         case Tool::TONE_CURVE:
+//             return ToneCurve::TOOL_NAME;
+//         case Tool::SHADOWS_HIGHLIGHTS:
+//             return ShadowsHighlights::TOOL_NAME;
+//         case Tool::TONE_EQUALIZER:
+//             return ToneEqualizer::TOOL_NAME;
+//         case Tool::IMPULSE_DENOISE:
+//             return ImpulseDenoise::TOOL_NAME;
+//         case Tool::DEFRINGE_TOOL:
+//             return Defringe::TOOL_NAME;
+//         case Tool::COMPRESSGAMUT_TOOL:
+//             return Compressgamut::TOOL_NAME;
+//         case Tool::SPOT:
+//             return Spot::TOOL_NAME;
+//         case Tool::DIR_PYR_DENOISE:
+//             return DirPyrDenoise::TOOL_NAME;
+//         case Tool::EPD:
+//             return EdgePreservingDecompositionUI::TOOL_NAME;
+//         case Tool::SHARPENING_TOOL:
+//             return Sharpening::TOOL_NAME;
+//         case Tool::LOCAL_CONTRAST:
+//             return LocalContrast::TOOL_NAME;
+//         case Tool::SHARPEN_EDGE:
+//             return SharpenEdge::TOOL_NAME;
+//         case Tool::SHARPEN_MICRO:
+//             return SharpenMicro::TOOL_NAME;
+//         case Tool::L_CURVE:
+//             return LCurve::TOOL_NAME;
+//         case Tool::RGB_CURVES:
+//             return RGBCurves::TOOL_NAME;
+//         case Tool::COLOR_TONING:
+//             return ColorToning::TOOL_NAME;
+//         case Tool::LENS_GEOM:
+//             return LensGeometry::TOOL_NAME;
+//         case Tool::LENS_PROF:
+//             return LensProfilePanel::TOOL_NAME;
+//         case Tool::DISTORTION:
+//             return Distortion::TOOL_NAME;
+//         case Tool::ROTATE:
+//             return Rotate::TOOL_NAME;
+//         case Tool::VIBRANCE:
+//             return Vibrance::TOOL_NAME;
+//         case Tool::COLOR_APPEARANCE:
+//             return ColorAppearance::TOOL_NAME;
+//         case Tool::WHITE_BALANCE:
+//             return WhiteBalance::TOOL_NAME;
+//         case Tool::VIGNETTING:
+//             return Vignetting::TOOL_NAME;
+//         case Tool::RETINEX_TOOL:
+//             return Retinex::TOOL_NAME;
+//         case Tool::GRADIENT:
+//             return Gradient::TOOL_NAME;
+//         case Tool::LOCALLAB:
+//             return Locallab::TOOL_NAME;
+//         case Tool::PC_VIGNETTE:
+//             return PCVignette::TOOL_NAME;
+//         case Tool::PERSPECTIVE:
+//             return PerspCorrection::TOOL_NAME;
+//         case Tool::CA_CORRECTION:
+//             return CACorrection::TOOL_NAME;
+//         case Tool::CH_MIXER:
+//             return ChMixer::TOOL_NAME;
+//         case Tool::BLACK_WHITE:
+//             return BlackWhite::TOOL_NAME;
+//         case Tool::RESIZE_TOOL:
+//             return Resize::TOOL_NAME;
+//         case Tool::PR_SHARPENING:
+//             return PrSharpening::TOOL_NAME;
+//         case Tool::FRAMING:
+//             return Framing::TOOL_NAME;
+//         case Tool::CROP_TOOL:
+//             return Crop::TOOL_NAME;
+//         case Tool::ICM:
+//             return ICMPanel::TOOL_NAME;
+//         case Tool::WAVELET:
+//             return Wavelet::TOOL_NAME;
+//         case Tool::DIR_PYR_EQUALIZER:
+//             return DirPyrEqualizer::TOOL_NAME;
+//         case Tool::HSV_EQUALIZER:
+//             return HSVEqualizer::TOOL_NAME;
+//         case Tool::FILM_SIMULATION:
+//             return FilmSimulation::TOOL_NAME;
+//         case Tool::SOFT_LIGHT:
+//             return SoftLight::TOOL_NAME;
+//         case Tool::DEHAZE:
+//             return Dehaze::TOOL_NAME;
+//         case Tool::SENSOR_BAYER:
+//             return SensorBayer::TOOL_NAME;
+//         case Tool::SENSOR_XTRANS:
+//             return SensorXTrans::TOOL_NAME;
+//         case Tool::BAYER_PROCESS:
+//             return BayerProcess::TOOL_NAME;
+//         case Tool::XTRANS_PROCESS:
+//             return XTransProcess::TOOL_NAME;
+//         case Tool::BAYER_PREPROCESS:
+//             return BayerPreProcess::TOOL_NAME;
+//         case Tool::PREPROCESS:
+//             return PreProcess::TOOL_NAME;
+//         case Tool::DARKFRAME_TOOL:
+//             return DarkFrame::TOOL_NAME;
+//         case Tool::FLATFIELD_TOOL:
+//             return FlatField::TOOL_NAME;
+//         case Tool::RAW_CA_CORRECTION:
+//             return RAWCACorr::TOOL_NAME;
+//         case Tool::RAW_EXPOSURE:
+//             return RAWExposure::TOOL_NAME;
+//         case Tool::PREPROCESS_WB:
+//             return PreprocessWB::TOOL_NAME;
+//         case Tool::BAYER_RAW_EXPOSURE:
+//             return BayerRAWExposure::TOOL_NAME;
+//         case Tool::XTRANS_RAW_EXPOSURE:
+//             return XTransRAWExposure::TOOL_NAME;
+//         case Tool::FATTAL:
+//             return FattalToneMapping::TOOL_NAME;
+//         case Tool::FILM_NEGATIVE:
+//             return FilmNegative::TOOL_NAME;
+//         case Tool::PD_SHARPENING:
+//             return PdSharpening::TOOL_NAME;
     };
     assert(false);
     return "";
@@ -753,8 +751,8 @@ std::string ToolPanelCoordinator::getToolName(Tool tool)
 bool ToolPanelCoordinator::isFavoritable(Tool tool)
 {
     switch (tool) {
-        case Tool::PR_SHARPENING:
-            return false;
+//         case Tool::PR_SHARPENING:
+//             return false;
         default:
             return true;
     }
@@ -769,12 +767,13 @@ void ToolPanelCoordinator::notebookPageChanged(Gtk::Widget* page, guint page_num
     if (photoLoadedOnce) {
         if (page == locallabPanelSW) {
             toolBar->blockEditDeactivation(); // Avoid edit tool deactivation when Locallab page is active (except if pressing other tools button)
-            locallab->subscribe();
+// TODO(gtk4)
+//             locallab->subscribe();
         }
 
         if (prevPage == locallabPanelSW) { // To deactivate Locallab only when switching from Locallab page
             toolBar->blockEditDeactivation(false);
-            locallab->unsubscribe();
+//             locallab->unsubscribe();
         }
 
         prevPage = page;
@@ -890,8 +889,10 @@ ToolPanelCoordinator::updateToolPanel(
     // off and they are not within the favorites panel.
     const auto should_skip_tool =
         [this, skip_favorites, &favorites](const ToolTree &tool_tree) {
-            return (skip_favorites && favorites.count(tool_tree.id)) ||
-                   (batch && tool_tree.id == Tool::LOCALLAB);
+            return (skip_favorites && favorites.count(tool_tree.id));
+// TODO(gtk4)
+//             return (skip_favorites && favorites.count(tool_tree.id)) ||
+//                    (batch && tool_tree.id == Tool::LOCALLAB);
         };
 
     // Keep tools that are already correct.
@@ -933,7 +934,7 @@ ToolPanelCoordinator::updateToolPanel(
         addPanel(panelBox, tool_panel, level);
         if (!reparent) {
             // If attaching for the first time, update the widget sizes.
-            tool_panel->getExpander()->check_resize();
+            tool_panel->getExpander()->queue_resize();
         }
     }
 
@@ -954,13 +955,11 @@ void ToolPanelCoordinator::addPanel(Gtk::Box* where, FoldableToolPanel* panel, i
 
     panel->setParent(where);
     panel->setLevel(level);
-    where->pack_start(*panel->getExpander(), false, false);
+    pack_start (where, *panel->getExpander(), false, false);
 }
 
 ToolPanelCoordinator::~ToolPanelCoordinator ()
 {
-    idle_register.destroy();
-
     closeImage();
 
     // When deleting toolPanelNotebook, pages removal activates notebookPageChanged function
@@ -974,7 +973,7 @@ ToolPanelCoordinator::~ToolPanelCoordinator ()
     std::unique_ptr<Gtk::Box> hidden_tool_panel_parent(new Gtk::Box());
     for (const auto expander : expList) {
         if (!expander->get_parent()) {
-            hidden_tool_panel_parent->add(*expander);
+            hidden_tool_panel_parent->append(*expander);
         }
     }
 
@@ -984,114 +983,114 @@ ToolPanelCoordinator::~ToolPanelCoordinator ()
 
 void ToolPanelCoordinator::imageTypeChanged(bool isRaw, bool isBayer, bool isXtrans, bool isMono, bool isGainMapSupported)
 {
-    if (isRaw) {
-        if (isBayer) {
-            idle_register.add(
-                [this, isGainMapSupported]() -> bool
-                {
-                    rawPanelSW->set_sensitive(true);
-                    sensorxtrans->FoldableToolPanel::hide();
-                    xtransprocess->FoldableToolPanel::hide();
-                    bayerrawexposure->FoldableToolPanel::show();
-                    xtransrawexposure->FoldableToolPanel::hide();
-                    sensorbayer->FoldableToolPanel::show();
-                    bayerprocess->FoldableToolPanel::show();
-                    bayerpreprocess->FoldableToolPanel::show();
-                    rawcacorrection->FoldableToolPanel::show();
-                    preprocessWB->FoldableToolPanel::show();
-                    preprocess->FoldableToolPanel::show();
-                    flatfield->FoldableToolPanel::show();
-                    flatfield->setGainMap(isGainMapSupported);
-                    pdSharpening->FoldableToolPanel::show();
-                    retinex->FoldableToolPanel::setGrayedOut(false);
-                    return false;
-                }
-            );
-        } else if (isXtrans) {
-            idle_register.add(
-                [this, isGainMapSupported]() -> bool
-                {
-                    rawPanelSW->set_sensitive(true);
-                    sensorxtrans->FoldableToolPanel::show();
-                    xtransprocess->FoldableToolPanel::show();
-                    xtransrawexposure->FoldableToolPanel::show();
-                    bayerrawexposure->FoldableToolPanel::hide();
-                    sensorbayer->FoldableToolPanel::hide();
-                    bayerprocess->FoldableToolPanel::hide();
-                    bayerpreprocess->FoldableToolPanel::hide();
-                    rawcacorrection->FoldableToolPanel::hide();
-                    preprocessWB->FoldableToolPanel::show();
-                    preprocess->FoldableToolPanel::show();
-                    flatfield->FoldableToolPanel::show();
-                    flatfield->setGainMap(isGainMapSupported);
-                    pdSharpening->FoldableToolPanel::show();
-                    retinex->FoldableToolPanel::setGrayedOut(false);
-                    return false;
-                }
-            );
-        } else if (isMono) {
-            idle_register.add(
-                [this, isGainMapSupported]() -> bool
-                {
-                    rawPanelSW->set_sensitive(true);
-                    sensorbayer->FoldableToolPanel::hide();
-                    bayerprocess->FoldableToolPanel::hide();
-                    bayerpreprocess->FoldableToolPanel::hide();
-                    rawcacorrection->FoldableToolPanel::hide();
-                    sensorxtrans->FoldableToolPanel::hide();
-                    xtransprocess->FoldableToolPanel::hide();
-                    xtransrawexposure->FoldableToolPanel::hide();
-                    preprocessWB->FoldableToolPanel::hide();
-                    preprocess->FoldableToolPanel::hide();
-                    flatfield->FoldableToolPanel::show();
-                    flatfield->setGainMap(isGainMapSupported);
-                    pdSharpening->FoldableToolPanel::show();
-                    retinex->FoldableToolPanel::setGrayedOut(false);
-                    return false;
-                }
-            );
-        } else {
-            idle_register.add(
-                [this]() -> bool
-                {
-                    rawPanelSW->set_sensitive(true);
-                    sensorbayer->FoldableToolPanel::hide();
-                    bayerprocess->FoldableToolPanel::hide();
-                    bayerpreprocess->FoldableToolPanel::hide();
-                    rawcacorrection->FoldableToolPanel::hide();
-                    sensorxtrans->FoldableToolPanel::hide();
-                    xtransprocess->FoldableToolPanel::hide();
-                    xtransrawexposure->FoldableToolPanel::hide();
-                    preprocessWB->FoldableToolPanel::hide();
-                    preprocess->FoldableToolPanel::hide();
-                    flatfield->FoldableToolPanel::hide();
-                    pdSharpening->FoldableToolPanel::hide();
-                    retinex->FoldableToolPanel::setGrayedOut(false);
-                    return false;
-                }
-            );
-        }
-    } else {
-        idle_register.add(
-            [this]() -> bool
-            {
-                rawPanelSW->set_sensitive(false);
-                sensorbayer->FoldableToolPanel::hide();
-                bayerprocess->FoldableToolPanel::hide();
-                bayerpreprocess->FoldableToolPanel::hide();
-                rawcacorrection->FoldableToolPanel::hide();
-                sensorxtrans->FoldableToolPanel::hide();
-                xtransprocess->FoldableToolPanel::hide();
-                xtransrawexposure->FoldableToolPanel::hide();
-                preprocessWB->FoldableToolPanel::hide();
-                preprocess->FoldableToolPanel::hide();
-                flatfield->FoldableToolPanel::hide();
-                pdSharpening->FoldableToolPanel::hide();
-                retinex->FoldableToolPanel::setGrayedOut(true);
-                return false;
-            }
-        );
-    }
+//     if (isRaw) {
+//         if (isBayer) {
+//             idle_register.add(
+//                 [this, isGainMapSupported]() -> bool
+//                 {
+//                     rawPanelSW->set_sensitive(true);
+//                     sensorxtrans->FoldableToolPanel::hide();
+//                     xtransprocess->FoldableToolPanel::hide();
+//                     bayerrawexposure->FoldableToolPanel::show();
+//                     xtransrawexposure->FoldableToolPanel::hide();
+//                     sensorbayer->FoldableToolPanel::show();
+//                     bayerprocess->FoldableToolPanel::show();
+//                     bayerpreprocess->FoldableToolPanel::show();
+//                     rawcacorrection->FoldableToolPanel::show();
+//                     preprocessWB->FoldableToolPanel::show();
+//                     preprocess->FoldableToolPanel::show();
+//                     flatfield->FoldableToolPanel::show();
+//                     flatfield->setGainMap(isGainMapSupported);
+//                     pdSharpening->FoldableToolPanel::show();
+//                     retinex->FoldableToolPanel::setGrayedOut(false);
+//                     return false;
+//                 }
+//             );
+//         } else if (isXtrans) {
+//             idle_register.add(
+//                 [this, isGainMapSupported]() -> bool
+//                 {
+//                     rawPanelSW->set_sensitive(true);
+//                     sensorxtrans->FoldableToolPanel::show();
+//                     xtransprocess->FoldableToolPanel::show();
+//                     xtransrawexposure->FoldableToolPanel::show();
+//                     bayerrawexposure->FoldableToolPanel::hide();
+//                     sensorbayer->FoldableToolPanel::hide();
+//                     bayerprocess->FoldableToolPanel::hide();
+//                     bayerpreprocess->FoldableToolPanel::hide();
+//                     rawcacorrection->FoldableToolPanel::hide();
+//                     preprocessWB->FoldableToolPanel::show();
+//                     preprocess->FoldableToolPanel::show();
+//                     flatfield->FoldableToolPanel::show();
+//                     flatfield->setGainMap(isGainMapSupported);
+//                     pdSharpening->FoldableToolPanel::show();
+//                     retinex->FoldableToolPanel::setGrayedOut(false);
+//                     return false;
+//                 }
+//             );
+//         } else if (isMono) {
+//             idle_register.add(
+//                 [this, isGainMapSupported]() -> bool
+//                 {
+//                     rawPanelSW->set_sensitive(true);
+//                     sensorbayer->FoldableToolPanel::hide();
+//                     bayerprocess->FoldableToolPanel::hide();
+//                     bayerpreprocess->FoldableToolPanel::hide();
+//                     rawcacorrection->FoldableToolPanel::hide();
+//                     sensorxtrans->FoldableToolPanel::hide();
+//                     xtransprocess->FoldableToolPanel::hide();
+//                     xtransrawexposure->FoldableToolPanel::hide();
+//                     preprocessWB->FoldableToolPanel::hide();
+//                     preprocess->FoldableToolPanel::hide();
+//                     flatfield->FoldableToolPanel::show();
+//                     flatfield->setGainMap(isGainMapSupported);
+//                     pdSharpening->FoldableToolPanel::show();
+//                     retinex->FoldableToolPanel::setGrayedOut(false);
+//                     return false;
+//                 }
+//             );
+//         } else {
+//             idle_register.add(
+//                 [this]() -> bool
+//                 {
+//                     rawPanelSW->set_sensitive(true);
+//                     sensorbayer->FoldableToolPanel::hide();
+//                     bayerprocess->FoldableToolPanel::hide();
+//                     bayerpreprocess->FoldableToolPanel::hide();
+//                     rawcacorrection->FoldableToolPanel::hide();
+//                     sensorxtrans->FoldableToolPanel::hide();
+//                     xtransprocess->FoldableToolPanel::hide();
+//                     xtransrawexposure->FoldableToolPanel::hide();
+//                     preprocessWB->FoldableToolPanel::hide();
+//                     preprocess->FoldableToolPanel::hide();
+//                     flatfield->FoldableToolPanel::hide();
+//                     pdSharpening->FoldableToolPanel::hide();
+//                     retinex->FoldableToolPanel::setGrayedOut(false);
+//                     return false;
+//                 }
+//             );
+//         }
+//     } else {
+//         idle_register.add(
+//             [this]() -> bool
+//             {
+//                 rawPanelSW->set_sensitive(false);
+//                 sensorbayer->FoldableToolPanel::hide();
+//                 bayerprocess->FoldableToolPanel::hide();
+//                 bayerpreprocess->FoldableToolPanel::hide();
+//                 rawcacorrection->FoldableToolPanel::hide();
+//                 sensorxtrans->FoldableToolPanel::hide();
+//                 xtransprocess->FoldableToolPanel::hide();
+//                 xtransrawexposure->FoldableToolPanel::hide();
+//                 preprocessWB->FoldableToolPanel::hide();
+//                 preprocess->FoldableToolPanel::hide();
+//                 flatfield->FoldableToolPanel::hide();
+//                 pdSharpening->FoldableToolPanel::hide();
+//                 retinex->FoldableToolPanel::setGrayedOut(true);
+//                 return false;
+//             }
+// //         );
+//     }
 
 }
 
@@ -1142,7 +1141,7 @@ void ToolPanelCoordinator::panelChanged(const rtengine::ProcEvent& event, const 
         if (fabs(params->rotate.degree) > 0.001) {
             params->rotate.degree *= -1;
             changeFlags |= rtengine::RefreshMapper::getInstance()->getAction(rtengine::EvROTDegree);
-            rotate->read(params);
+//             rotate->read(params);
         }
     }
 
@@ -1161,28 +1160,28 @@ void ToolPanelCoordinator::panelChanged(const rtengine::ProcEvent& event, const 
         // updating the "on preview" geometry
         int fw, fh;
         ipc->getInitialImage()->getImageSource()->getFullSize(fw, fh, tr);
-        gradient->updateGeometry(params->gradient.centerX, params->gradient.centerY, params->gradient.feather, params->gradient.degree, fw, fh);
+//         gradient->updateGeometry(params->gradient.centerX, params->gradient.centerY, params->gradient.feather, params->gradient.degree, fw, fh);
     }
 
     // some transformations make the crop change for convenience
     if (event == rtengine::EvCTHFlip) {
-        crop->hFlipCrop();
-        crop->write(params);
+//         crop->hFlipCrop();
+//         crop->write(params);
     } else if (event == rtengine::EvCTVFlip) {
-        crop->vFlipCrop();
-        crop->write(params);
+//         crop->vFlipCrop();
+//         crop->write(params);
     } else if (event == rtengine::EvCTRotate) {
-        crop->rotateCrop(params->coarse.rotate, params->coarse.hflip, params->coarse.vflip);
-        crop->write(params);
-        resize->update(params->crop.enabled, params->crop.w, params->crop.h, ipc->getFullWidth(), ipc->getFullHeight());
-        resize->write(params);
-        framing->update(ipc->getFullWidth(), ipc->getFullHeight());
-        framing->write(params);
+//         crop->rotateCrop(params->coarse.rotate, params->coarse.hflip, params->coarse.vflip);
+//         crop->write(params);
+//         resize->update(params->crop.enabled, params->crop.w, params->crop.h, ipc->getFullWidth(), ipc->getFullHeight());
+//         resize->write(params);
+//         framing->update(ipc->getFullWidth(), ipc->getFullHeight());
+//         framing->write(params);
     } else if (event == rtengine::EvCrop) {
-        resize->update(params->crop.enabled, params->crop.w, params->crop.h);
-        resize->write(params);
-        framing->update(ipc->getFullWidth(), ipc->getFullHeight());
-        framing->write(params);
+//         resize->update(params->crop.enabled, params->crop.w, params->crop.h);
+//         resize->write(params);
+//         framing->update(ipc->getFullWidth(), ipc->getFullHeight());
+//         framing->write(params);
     }
 
     /*
@@ -1197,15 +1196,15 @@ void ToolPanelCoordinator::panelChanged(const rtengine::ProcEvent& event, const 
      * - Mask preview is also stopped when removing a spot or resetting all mask visibility
      */
     if (event == rtengine::EvlocallabshowmaskMethod) {
-        const Locallab::llMaskVisibility maskStruc = locallab->getMaskVisibility();
-        ipc->setLocallabMaskVisibility(maskStruc.previewDeltaE, maskStruc.colorMask, maskStruc.colorMaskinv, maskStruc.expMask, maskStruc.expMaskinv,
-                maskStruc.SHMask, maskStruc.SHMaskinv, maskStruc.vibMask, maskStruc.softMask,
-                maskStruc.blMask, maskStruc.tmMask, maskStruc.retiMask, maskStruc.sharMask,
-                maskStruc.lcMask, maskStruc.cbMask, maskStruc.logMask, maskStruc.maskMask, maskStruc.cieMask);
+//         const Locallab::llMaskVisibility maskStruc = locallab->getMaskVisibility();
+//         ipc->setLocallabMaskVisibility(maskStruc.previewDeltaE, maskStruc.colorMask, maskStruc.colorMaskinv, maskStruc.expMask, maskStruc.expMaskinv,
+//                 maskStruc.SHMask, maskStruc.SHMaskinv, maskStruc.vibMask, maskStruc.softMask,
+//                 maskStruc.blMask, maskStruc.tmMask, maskStruc.retiMask, maskStruc.sharMask,
+//                 maskStruc.lcMask, maskStruc.cbMask, maskStruc.logMask, maskStruc.maskMask, maskStruc.cieMask);
     } else if (event == rtengine::EvLocallabSpotCreated || event == rtengine::EvLocallabSpotSelectedWithMask ||
             event == rtengine::EvLocallabSpotDeleted /*|| event == rtengine::Evlocallabshowreset*/ ||
             event == rtengine::EvlocallabToolRemovedWithRefresh) {
-        locallab->resetMaskVisibility();
+//         locallab->resetMaskVisibility();
         ipc->setLocallabMaskVisibility(false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
@@ -1217,22 +1216,22 @@ void ToolPanelCoordinator::panelChanged(const rtengine::ProcEvent& event, const 
         paramcListener->procParamsChanged(params, event, descr);
     }
 
-    // Locallab spot curves are set visible if at least one photo has been loaded (to avoid
-    // segfault) and locallab panel is active
-    // When a new photo is loaded, Locallab spot curves need to be set visible again
-const auto func =
-    [this]() -> bool
-    {
-        if (photoLoadedOnce && (toolPanelNotebook->get_nth_page(toolPanelNotebook->get_current_page()) == locallabPanelSW)) {
-            locallab->subscribe();
-       }
-
-        return false;
-    };
-
-if (event == rtengine::EvPhotoLoaded) {
-    idle_register.add(func);
-}
+//     // Locallab spot curves are set visible if at least one photo has been loaded (to avoid
+//     // segfault) and locallab panel is active
+//     // When a new photo is loaded, Locallab spot curves need to be set visible again
+//     const auto func =
+//         [this]() -> bool
+//         {
+//             if (photoLoadedOnce && (toolPanelNotebook->get_nth_page(toolPanelNotebook->get_current_page()) == locallabPanelSW)) {
+//                 locallab->subscribe();
+//            }
+// 
+//             return false;
+//         };
+// 
+//     if (event == rtengine::EvPhotoLoaded) {
+//         idle_register.add(func);
+//     }
 
     photoLoadedOnce = true;
 
@@ -1295,7 +1294,7 @@ void ToolPanelCoordinator::profileChange(
 
     // trimming overflowing cropped area
     ipc->getInitialImage()->getImageSource()->getFullSize(fw, fh, tr);
-    crop->trim(params, fw, fh);
+//     crop->trim(params, fw, fh);
 
     // updating the GUI with updated values
     for (auto toolPanel : toolPanels) {
@@ -1304,18 +1303,18 @@ void ToolPanelCoordinator::profileChange(
         if (event == rtengine::EvPhotoLoaded || event == rtengine::EvProfileChanged) {
             toolPanel->autoOpenCurve();
 
-            // For Locallab, reset tool expanders visibility only when a photo or profile is loaded
-            locallab->openAllTools();
+//             // For Locallab, reset tool expanders visibility only when a photo or profile is loaded
+//             locallab->openAllTools();
         }
     }
 
     if (event == rtengine::EvPhotoLoaded || event == rtengine::EvProfileChanged || event == rtengine::EvHistoryBrowsed || event == rtengine::EvCTRotate) {
-        // updating the "on preview" geometry
-        gradient->updateGeometry(params->gradient.centerX, params->gradient.centerY, params->gradient.feather, params->gradient.degree, fw, fh);
+//         // updating the "on preview" geometry
+//         gradient->updateGeometry(params->gradient.centerX, params->gradient.centerY, params->gradient.feather, params->gradient.degree, fw, fh);
     }
 
-    // Reset Locallab mask visibility
-    locallab->resetMaskVisibility();
+//     // Reset Locallab mask visibility
+//     locallab->resetMaskVisibility();
     ipc->setLocallabMaskVisibility(false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
     // start the IPC processing
@@ -1331,22 +1330,22 @@ void ToolPanelCoordinator::profileChange(
         paramcListener->procParamsChanged(params, event, descr);
     }
 
-    // Locallab spot curves are set visible if at least one photo has been loaded (to avoid
-    // segfault) and locallab panel is active
-    // When a new photo is loaded, Locallab spot curves need to be set visible again
-const auto func =
-    [this]() -> bool
-    {
-        if (photoLoadedOnce && (toolPanelNotebook->get_nth_page(toolPanelNotebook->get_current_page()) == locallabPanelSW)) {
-            locallab->subscribe();
-        }
-
-        return false;
-    };
-
-if (event == rtengine::EvPhotoLoaded) {
-    idle_register.add(func);
-}
+//     // Locallab spot curves are set visible if at least one photo has been loaded (to avoid
+//     // segfault) and locallab panel is active
+//     // When a new photo is loaded, Locallab spot curves need to be set visible again
+//     const auto func =
+//         [this]() -> bool
+//         {
+//             if (photoLoadedOnce && (toolPanelNotebook->get_nth_page(toolPanelNotebook->get_current_page()) == locallabPanelSW)) {
+//                 locallab->subscribe();
+//             }
+// 
+//             return false;
+//         };
+// 
+//     if (event == rtengine::EvPhotoLoaded) {
+//         idle_register.add(func);
+//     }
 
     photoLoadedOnce = true;
 }
@@ -1363,52 +1362,54 @@ void ToolPanelCoordinator::setDefaults(const ProcParams* defparams)
 CropGUIListener* ToolPanelCoordinator::getCropGUIListener()
 {
 
-    return crop;
+    return nullptr;
+// TODO(gtk4)
+//     return crop;
 }
 
 void ToolPanelCoordinator::initImage(rtengine::StagedImageProcessor* ipc_, bool raw)
 {
 
     ipc = ipc_;
-    toneCurve->disableListener();
-    toneCurve->enableAll();
-    toneCurve->enableListener();
+//     toneCurve->disableListener();
+//     toneCurve->enableAll();
+//     toneCurve->enableListener();
 
     if (ipc) {
-        const rtengine::FramesMetaData* pMetaData = ipc->getInitialImage()->getMetaData();
-        metadata->setImageData(pMetaData);
-
-        ipc->setAutoExpListener(toneCurve);
-        ipc->setAutoCamListener(colorappearance);
-        ipc->setAutoBlackListener(bayerrawexposure);
-        ipc->setAutoBlackxListener(xtransrawexposure);
-        ipc->setAutoBWListener(blackwhite);
-        ipc->setFrameCountListener(bayerprocess);
-        ipc->setFlatFieldAutoClipListener (flatfield);
-        ipc->setBayerAutoContrastListener (bayerprocess);
-        ipc->setXtransAutoContrastListener (xtransprocess);
-        ipc->setpdSharpenAutoContrastListener (pdSharpening);
-        ipc->setpdSharpenAutoRadiusListener (pdSharpening);
-        ipc->setAutoWBListener(whitebalance);
-        ipc->setAutoColorTonListener(colortoning);
-        ipc->setAutoprimListener(icm);
-        ipc->setAutoChromaListener(dirpyrdenoise);
-        ipc->setWaveletListener(wavelet);
-        ipc->setRetinexListener(retinex);
-        ipc->setSizeListener(crop);
-        ipc->setSizeListener(resize);
-        ipc->setLocallabListener(locallab);
+//         const rtengine::FramesMetaData* pMetaData = ipc->getInitialImage()->getMetaData();
+//         metadata->setImageData(pMetaData);
+//
+//         ipc->setAutoExpListener(toneCurve);
+//         ipc->setAutoCamListener(colorappearance);
+//         ipc->setAutoBlackListener(bayerrawexposure);
+//         ipc->setAutoBlackxListener(xtransrawexposure);
+//         ipc->setAutoBWListener(blackwhite);
+//         ipc->setFrameCountListener(bayerprocess);
+//         ipc->setFlatFieldAutoClipListener (flatfield);
+//         ipc->setBayerAutoContrastListener (bayerprocess);
+//         ipc->setXtransAutoContrastListener (xtransprocess);
+//         ipc->setpdSharpenAutoContrastListener (pdSharpening);
+//         ipc->setpdSharpenAutoRadiusListener (pdSharpening);
+//         ipc->setAutoWBListener(whitebalance);
+//         ipc->setAutoColorTonListener(colortoning);
+//         ipc->setAutoprimListener(icm);
+//         ipc->setAutoChromaListener(dirpyrdenoise);
+//         ipc->setWaveletListener(wavelet);
+//         ipc->setRetinexListener(retinex);
+//         ipc->setSizeListener(crop);
+//         ipc->setSizeListener(resize);
+//         ipc->setLocallabListener(locallab);
         ipc->setImageTypeListener(this);
-        ipc->setFilmNegListener(filmNegative);
-        flatfield->setShortcutPath(Glib::path_get_dirname(ipc->getInitialImage()->getFileName()));
-
-        icm->setRawMeta(raw, (const rtengine::FramesData*)pMetaData);
-        lensProf->setRawMeta(raw, pMetaData);
-        perspective->setMetadata(pMetaData);
+//         ipc->setFilmNegListener(filmNegative);
+//         flatfield->setShortcutPath(Glib::path_get_dirname(ipc->getInitialImage()->getFileName()));
+//
+//         icm->setRawMeta(raw, (const rtengine::FramesData*)pMetaData);
+//         lensProf->setRawMeta(raw, pMetaData);
+//         perspective->setMetadata(pMetaData);
     }
 
 
-    toneCurve->setRaw(raw);
+//     toneCurve->setRaw(raw);
     hasChanged = true;
 }
 
@@ -1424,65 +1425,65 @@ void ToolPanelCoordinator::closeImage()
 
 void ToolPanelCoordinator::closeAllTools()
 {
-    for (size_t i = 0; i < options.tpOpen.size(); ++i) {
-        if (i < expList.size()) {
-            expList[i]->set_expanded(false);
-        }
-    }
+//     for (size_t i = 0; i < options.tpOpen.size(); ++i) {
+//         if (i < expList.size()) {
+//             expList[i]->set_expanded(false);
+//         }
+//     }
 }
 
 void ToolPanelCoordinator::openAllTools()
 {
-    for (size_t i = 0; i < options.tpOpen.size(); ++i) {
-        if (i < expList.size()) {
-            expList[i]->set_expanded(true);
-        }
-    }
+//     for (size_t i = 0; i < options.tpOpen.size(); ++i) {
+//         if (i < expList.size()) {
+//             expList[i]->set_expanded(true);
+//         }
+//     }
 }
 
 void ToolPanelCoordinator::updateToolState()
 {
-    if (options.tpOpen.empty()) {
-        for (auto expander : expList) {
-            expander->set_expanded(false);
-        }
-
-        wavelet->updateToolState({});
-        retinex->updateToolState({});
-
-        return;
-    }
-
-    for (size_t i = 0; i < options.tpOpen.size(); ++i) {
-        if (i < expList.size()) {
-            expList[i]->set_expanded(options.tpOpen[i]);
-        }
-    }
-
-    if (options.tpOpen.size() > expList.size()) {
-        const size_t sizeWavelet = options.tpOpen.size() - expList.size();
-
-        std::vector<int> temp;
-
-        for (size_t i = 0; i < sizeWavelet; ++i) {
-            temp.push_back(options.tpOpen[i + expList.size()]);
-        }
-
-        wavelet->updateToolState(temp);
-        retinex->updateToolState(temp);
-    }
+//     if (options.tpOpen.empty()) {
+//         for (auto expander : expList) {
+//             expander->set_expanded(false);
+//         }
+// 
+//         wavelet->updateToolState({});
+//         retinex->updateToolState({});
+// 
+//         return;
+//     }
+// 
+//     for (size_t i = 0; i < options.tpOpen.size(); ++i) {
+//         if (i < expList.size()) {
+//             expList[i]->set_expanded(options.tpOpen[i]);
+//         }
+//     }
+// 
+//     if (options.tpOpen.size() > expList.size()) {
+//         const size_t sizeWavelet = options.tpOpen.size() - expList.size();
+// 
+//         std::vector<int> temp;
+// 
+//         for (size_t i = 0; i < sizeWavelet; ++i) {
+//             temp.push_back(options.tpOpen[i + expList.size()]);
+//         }
+// 
+//         wavelet->updateToolState(temp);
+//         retinex->updateToolState(temp);
+//     }
 }
 
 void ToolPanelCoordinator::readOptions()
 {
 
-    crop->readOptions();
+//     crop->readOptions();
 }
 
 void ToolPanelCoordinator::writeOptions()
 {
 
-    crop->writeOptions();
+//     crop->writeOptions();
 
     if (options.autoSaveTpOpen) {
         writeToolExpandedStatus(options.tpOpen);
@@ -1492,41 +1493,41 @@ void ToolPanelCoordinator::writeOptions()
 
 void ToolPanelCoordinator::writeToolExpandedStatus(std::vector<int> &tpOpen)
 {
-    tpOpen.clear();
-
-    for (size_t i = 0; i < expList.size(); i++) {
-        tpOpen.push_back(expList.at(i)->get_expanded());
-    }
-
-    wavelet->writeOptions(tpOpen);
-    retinex->writeOptions(tpOpen);
+//     tpOpen.clear();
+// 
+//     for (size_t i = 0; i < expList.size(); i++) {
+//         tpOpen.push_back(expList.at(i)->get_expanded());
+//     }
+// 
+//     wavelet->writeOptions(tpOpen);
+//     retinex->writeOptions(tpOpen);
 
 }
 
 
 void ToolPanelCoordinator::updateShowtooltipVisibility (bool showtooltip)
 {
-    locallab->updateShowtooltipVisibility(showtooltip);
+//     locallab->updateShowtooltipVisibility(showtooltip);
 }
 
 
 void ToolPanelCoordinator::spotWBselected(int x, int y, Thumbnail* thm)
 {
-    if (!ipc) {
-        return;
-    }
-
-//    toolBar->setTool (TOOL_HAND);
-    int rect = whitebalance->getSize();
-    int ww = ipc->getFullWidth();
-    int hh = ipc->getFullHeight();
-
-    if (x - rect > 0 && y - rect > 0 && x + rect < ww && y + rect < hh) {
-        double temp;
-        double green;
-        ipc->getSpotWB(x, y, rect, temp, green);
-        whitebalance->setWB(temp, green);
-    }
+//     if (!ipc) {
+//         return;
+//     }
+// 
+// //    toolBar->setTool (TOOL_HAND);
+//     int rect = whitebalance->getSize();
+//     int ww = ipc->getFullWidth();
+//     int hh = ipc->getFullHeight();
+// 
+//     if (x - rect > 0 && y - rect > 0 && x + rect < ww && y + rect < hh) {
+//         double temp;
+//         double green;
+//         ipc->getSpotWB(x, y, rect, temp, green);
+//         whitebalance->setWB(temp, green);
+//     }
 }
 
 void ToolPanelCoordinator::sharpMaskSelected(bool sharpMask)
@@ -1541,7 +1542,9 @@ void ToolPanelCoordinator::sharpMaskSelected(bool sharpMask)
 
 int ToolPanelCoordinator::getSpotWBRectSize() const
 {
-    return whitebalance->getSize();
+// TODO(gtk4)
+//     return whitebalance->getSize();
+    return 1;
 }
 
 void ToolPanelCoordinator::cropSelectionReady()
@@ -1555,15 +1558,15 @@ void ToolPanelCoordinator::cropSelectionReady()
 
 void ToolPanelCoordinator::rotateSelectionReady(double rotate_deg, Thumbnail* thm)
 {
-    toolBar->setTool (TMHand);
-
-    if (!ipc) {
-        return;
-    }
-
-    if (rotate_deg != 0.0) {
-        rotate->straighten (rotate_deg);
-    }
+//     toolBar->setTool (TMHand);
+// 
+//     if (!ipc) {
+//         return;
+//     }
+// 
+//     if (rotate_deg != 0.0) {
+//         rotate->straighten (rotate_deg);
+//     }
 }
 
 ToolBar* ToolPanelCoordinator::getToolBar() const
@@ -1573,165 +1576,167 @@ ToolBar* ToolPanelCoordinator::getToolBar() const
 
 CropGUIListener* ToolPanelCoordinator::startCropEditing(Thumbnail* thm)
 {
-    return crop;
-}
-
-void ToolPanelCoordinator::autoCropRequested()
-{
-
-    if (!ipc) {
-        return;
-    }
-
-    int x1, y1, x2, y2, w, h;
-    ipc->getAutoCrop(crop->getRatio(), x1, y1, w, h);
-    x2 = x1 + w - 1;
-    y2 = y1 + h - 1;
-    crop->cropInit(x1, y1, w, h);
-    crop->cropResized(x1, y1, x2, y2);
-    crop->cropManipReady();
-}
-
-const rtengine::RawImage* ToolPanelCoordinator::getDF()
-{
-    if (!ipc) {
-        return nullptr;
-    }
-
-    const rtengine::FramesMetaData *imd = ipc->getInitialImage()->getMetaData();
-
-    if (imd) {
-        int iso = imd->getISOSpeed();
-        double shutter = imd->getShutterSpeed();
-        std::string maker(imd->getMake());
-        std::string model(imd->getModel());
-        time_t timestamp = imd->getDateTimeAsTS();
-
-        return rtengine::DFManager::getInstance().searchDarkFrame(maker, model, iso, shutter, timestamp);
-    }
-
     return nullptr;
+// TODO(gtk4)
+//     return crop;
 }
 
-rtengine::RawImage* ToolPanelCoordinator::getFF()
-{
-    if (!ipc) {
-        return nullptr;
-    }
-
-    const rtengine::FramesMetaData *imd = ipc->getInitialImage()->getMetaData();
-
-    if (imd) {
-        // int iso = imd->getISOSpeed();              temporarily removed because unused
-        // double shutter = imd->getShutterSpeed();   temporarily removed because unused
-        double aperture = imd->getFNumber();
-        double focallength = imd->getFocalLen();
-        std::string maker(imd->getMake());
-        std::string model(imd->getModel());
-        std::string lens(imd->getLens());
-        time_t timestamp = imd->getDateTimeAsTS();
-
-        return rtengine::ffm.searchFlatField(maker, model, lens, focallength, aperture, timestamp);
-    }
-
-    return nullptr;
-}
-
-Glib::ustring ToolPanelCoordinator::GetCurrentImageFilePath()
-{
-    if (!ipc) {
-        return "";
-    }
-
-    return ipc->getInitialImage()->getFileName();
-}
-
-void ToolPanelCoordinator::straightenRequested()
-{
-
-    if (!ipc) {
-        return;
-    }
-
-    toolBar->setTool(TMStraighten);
-}
-
-void ToolPanelCoordinator::autoPerspRequested (bool corr_pitch, bool corr_yaw, double& rot, double& pitch, double& yaw, const std::vector<rtengine::ControlLine> *lines)
-{
-    if (!(ipc && (corr_pitch || corr_yaw))) {
-        return;
-    }
-
-    rtengine::ImageSource *src = dynamic_cast<rtengine::ImageSource *>(ipc->getInitialImage());
-    if (!src) {
-        return;
-    }
-
-    rtengine::procparams::ProcParams params;
-    ipc->getParams(&params);
-
-    // If focal length or crop factor are undetermined, use the defaults.
-    if (params.perspective.camera_focal_length <= 0) {
-        params.perspective.camera_focal_length =
-            PerspectiveParams::DEFAULT_CAMERA_FOCAL_LENGTH;
-    }
-    if (params.perspective.camera_crop_factor <= 0) {
-        params.perspective.camera_crop_factor =
-            PerspectiveParams::DEFAULT_CAMERA_CROP_FACTOR;
-    }
-
-    auto res = rtengine::PerspectiveCorrection::autocompute(src, corr_pitch, corr_yaw, &params, src->getMetaData(), lines);
-    rot = res.angle;
-    pitch = res.pitch;
-    yaw = res.yaw;
-}
-
-double ToolPanelCoordinator::autoDistorRequested()
-{
-    if (!ipc) {
-        return 0.0;
-    }
-
-    return rtengine::ImProcFunctions::getAutoDistor(ipc->getInitialImage()->getFileName(), 400);
-}
-
-void ToolPanelCoordinator::spotWBRequested(int size)
-{
-
-    if (!ipc) {
-        return;
-    }
-
-    toolBar->setTool(TMSpotWB);
-}
-
-void ToolPanelCoordinator::cropSelectRequested()
-{
-
-    if (!ipc) {
-        return;
-    }
-
-    toolBar->setTool(TMCropSelect);
-}
-
-void ToolPanelCoordinator::controlLineEditModeChanged(bool active)
-{
-    if (!ipc) {
-        return;
-    }
-
-    if (active) {
-        toolBar->setTool(TMPerspective);
-    }
-}
-
-void ToolPanelCoordinator::saveInputICCReference(const Glib::ustring& fname, bool apply_wb)
-{
-    if (ipc) {
-        ipc->saveInputICCReference(fname, apply_wb);
-    }
-}
+// void ToolPanelCoordinator::autoCropRequested()
+// {
+//
+//     if (!ipc) {
+//         return;
+//     }
+//
+//     int x1, y1, x2, y2, w, h;
+//     ipc->getAutoCrop(crop->getRatio(), x1, y1, w, h);
+//     x2 = x1 + w - 1;
+//     y2 = y1 + h - 1;
+//     crop->cropInit(x1, y1, w, h);
+//     crop->cropResized(x1, y1, x2, y2);
+//     crop->cropManipReady();
+// }
+//
+// const rtengine::RawImage* ToolPanelCoordinator::getDF()
+// {
+//     if (!ipc) {
+//         return nullptr;
+//     }
+//
+//     const rtengine::FramesMetaData *imd = ipc->getInitialImage()->getMetaData();
+//
+//     if (imd) {
+//         int iso = imd->getISOSpeed();
+//         double shutter = imd->getShutterSpeed();
+//         std::string maker(imd->getMake());
+//         std::string model(imd->getModel());
+//         time_t timestamp = imd->getDateTimeAsTS();
+//
+//         return rtengine::DFManager::getInstance().searchDarkFrame(maker, model, iso, shutter, timestamp);
+//     }
+//
+//     return nullptr;
+// }
+//
+// rtengine::RawImage* ToolPanelCoordinator::getFF()
+// {
+//     if (!ipc) {
+//         return nullptr;
+//     }
+//
+//     const rtengine::FramesMetaData *imd = ipc->getInitialImage()->getMetaData();
+//
+//     if (imd) {
+//         // int iso = imd->getISOSpeed();              temporarily removed because unused
+//         // double shutter = imd->getShutterSpeed();   temporarily removed because unused
+//         double aperture = imd->getFNumber();
+//         double focallength = imd->getFocalLen();
+//         std::string maker(imd->getMake());
+//         std::string model(imd->getModel());
+//         std::string lens(imd->getLens());
+//         time_t timestamp = imd->getDateTimeAsTS();
+//
+//         return rtengine::ffm.searchFlatField(maker, model, lens, focallength, aperture, timestamp);
+//     }
+//
+//     return nullptr;
+// }
+//
+// Glib::ustring ToolPanelCoordinator::GetCurrentImageFilePath()
+// {
+//     if (!ipc) {
+//         return "";
+//     }
+//
+//     return ipc->getInitialImage()->getFileName();
+// }
+//
+// void ToolPanelCoordinator::straightenRequested()
+// {
+//
+//     if (!ipc) {
+//         return;
+//     }
+//
+//     toolBar->setTool(TMStraighten);
+// }
+//
+// void ToolPanelCoordinator::autoPerspRequested (bool corr_pitch, bool corr_yaw, double& rot, double& pitch, double& yaw, const std::vector<rtengine::ControlLine> *lines)
+// {
+//     if (!(ipc && (corr_pitch || corr_yaw))) {
+//         return;
+//     }
+//
+//     rtengine::ImageSource *src = dynamic_cast<rtengine::ImageSource *>(ipc->getInitialImage());
+//     if (!src) {
+//         return;
+//     }
+//
+//     rtengine::procparams::ProcParams params;
+//     ipc->getParams(&params);
+//
+//     // If focal length or crop factor are undetermined, use the defaults.
+//     if (params.perspective.camera_focal_length <= 0) {
+//         params.perspective.camera_focal_length =
+//             PerspectiveParams::DEFAULT_CAMERA_FOCAL_LENGTH;
+//     }
+//     if (params.perspective.camera_crop_factor <= 0) {
+//         params.perspective.camera_crop_factor =
+//             PerspectiveParams::DEFAULT_CAMERA_CROP_FACTOR;
+//     }
+//
+//     auto res = rtengine::PerspectiveCorrection::autocompute(src, corr_pitch, corr_yaw, &params, src->getMetaData(), lines);
+//     rot = res.angle;
+//     pitch = res.pitch;
+//     yaw = res.yaw;
+// }
+//
+// double ToolPanelCoordinator::autoDistorRequested()
+// {
+//     if (!ipc) {
+//         return 0.0;
+//     }
+//
+//     return rtengine::ImProcFunctions::getAutoDistor(ipc->getInitialImage()->getFileName(), 400);
+// }
+//
+// void ToolPanelCoordinator::spotWBRequested(int size)
+// {
+//
+//     if (!ipc) {
+//         return;
+//     }
+//
+//     toolBar->setTool(TMSpotWB);
+// }
+//
+// void ToolPanelCoordinator::cropSelectRequested()
+// {
+//
+//     if (!ipc) {
+//         return;
+//     }
+//
+//     toolBar->setTool(TMCropSelect);
+// }
+//
+// void ToolPanelCoordinator::controlLineEditModeChanged(bool active)
+// {
+//     if (!ipc) {
+//         return;
+//     }
+//
+//     if (active) {
+//         toolBar->setTool(TMPerspective);
+//     }
+// }
+//
+// void ToolPanelCoordinator::saveInputICCReference(const Glib::ustring& fname, bool apply_wb)
+// {
+//     if (ipc) {
+//         ipc->saveInputICCReference(fname, apply_wb);
+//     }
+// }
 
 void ToolPanelCoordinator::updateCurveBackgroundHistogram(
     const LUTu& histToneCurve,
@@ -1746,11 +1751,11 @@ void ToolPanelCoordinator::updateCurveBackgroundHistogram(
     const LUTu& histLRETI
 )
 {
-    colorappearance->updateCurveBackgroundHistogram(histToneCurve, histLCurve, histCCurve, histLCAM,  histCCAM, histRed, histGreen, histBlue, histLuma, histLRETI);
-    toneCurve->updateCurveBackgroundHistogram(histToneCurve, histLCurve, histCCurve,histLCAM,  histCCAM, histRed, histGreen, histBlue, histLuma, histLRETI);
-    lcurve->updateCurveBackgroundHistogram(histToneCurve, histLCurve, histCCurve, histLCAM, histCCAM, histRed, histGreen, histBlue, histLuma, histLRETI);
-    rgbcurves->updateCurveBackgroundHistogram(histToneCurve, histLCurve, histCCurve, histLCAM, histCCAM, histRed, histGreen, histBlue, histLuma, histLRETI);
-    retinex->updateCurveBackgroundHistogram(histToneCurve, histLCurve, histCCurve, histLCAM, histCCAM, histRed, histGreen, histBlue, histLuma, histLRETI);
+//     colorappearance->updateCurveBackgroundHistogram(histToneCurve, histLCurve, histCCurve, histLCAM,  histCCAM, histRed, histGreen, histBlue, histLuma, histLRETI);
+//     toneCurve->updateCurveBackgroundHistogram(histToneCurve, histLCurve, histCCurve,histLCAM,  histCCAM, histRed, histGreen, histBlue, histLuma, histLRETI);
+//     lcurve->updateCurveBackgroundHistogram(histToneCurve, histLCurve, histCCurve, histLCAM, histCCAM, histRed, histGreen, histBlue, histLuma, histLRETI);
+//     rgbcurves->updateCurveBackgroundHistogram(histToneCurve, histLCurve, histCCurve, histLCAM, histCCAM, histRed, histGreen, histBlue, histLuma, histLRETI);
+//     retinex->updateCurveBackgroundHistogram(histToneCurve, histLCurve, histCCurve, histLCAM, histCCAM, histRed, histGreen, histBlue, histLuma, histLRETI);
 }
 
 void ToolPanelCoordinator::foldAllButOne(Gtk::Box* parent, FoldableToolPanel* openedSection)
@@ -1811,74 +1816,74 @@ void ToolPanelCoordinator::updateToolLocations(
     updatePanelTools(cur_page, favorites, cloneFavoriteTools);
 }
 
-bool ToolPanelCoordinator::handleShortcutKey(GdkEventKey* event)
+bool ToolPanelCoordinator::handleShortcutKey(guint keyval, guint keycode, Gdk::ModifierType state)
 {
 
-    //bool ctrl = event->state & GDK_CONTROL_MASK;  temporarily removed because unused
-    //bool shift = event->state & GDK_SHIFT_MASK;   temporarily removed because unused
-    bool alt = event->state & GDK_MOD1_MASK;
-
-    if (alt) {
-        switch (event->keyval) {
-            case GDK_KEY_u:
-                if (toolPanelNotebook->page_num(*favoritePanelSW) >= 0) {
-                    toolPanelNotebook->set_current_page (toolPanelNotebook->page_num (*favoritePanelSW));
-                }
-                return true;
-
-            case GDK_KEY_e:
-                toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*exposurePanelSW));
-                return true;
-
-            case GDK_KEY_d:
-                toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*detailsPanelSW));
-                return true;
-
-            case GDK_KEY_c:
-                toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*colorPanelSW));
-                return true;
-
-            case GDK_KEY_t:
-                toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*transformPanelSW));
-                return true;
-
-            case GDK_KEY_r:
-                toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*rawPanelSW));
-                return true;
-
-            case GDK_KEY_a:
-                toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*advancedPanelSW));
-                return true;
-
-            case GDK_KEY_o:
-                toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*locallabPanelSW));
-                return true;
-
-            case GDK_KEY_m:
-                toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*metadata));
-                return true;
-        }
-    }
+//     //bool ctrl = event->state & GDK_CONTROL_MASK;  temporarily removed because unused
+//     //bool shift = event->state & GDK_SHIFT_MASK;   temporarily removed because unused
+//     bool alt = event->state & GDK_MOD1_MASK;
+//
+//     if (alt) {
+//         switch (event->keyval) {
+//             case GDK_KEY_u:
+//                 if (toolPanelNotebook->page_num(*favoritePanelSW) >= 0) {
+//                     toolPanelNotebook->set_current_page (toolPanelNotebook->page_num (*favoritePanelSW));
+//                 }
+//                 return true;
+//
+//             case GDK_KEY_e:
+//                 toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*exposurePanelSW));
+//                 return true;
+//
+//             case GDK_KEY_d:
+//                 toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*detailsPanelSW));
+//                 return true;
+//
+//             case GDK_KEY_c:
+//                 toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*colorPanelSW));
+//                 return true;
+//
+//             case GDK_KEY_t:
+//                 toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*transformPanelSW));
+//                 return true;
+//
+//             case GDK_KEY_r:
+//                 toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*rawPanelSW));
+//                 return true;
+//
+//             case GDK_KEY_a:
+//                 toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*advancedPanelSW));
+//                 return true;
+//
+//             case GDK_KEY_o:
+//                 toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*locallabPanelSW));
+//                 return true;
+//
+//             case GDK_KEY_m:
+//                 toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(*metadata));
+//                 return true;
+//         }
+//     }
 
     return false;
 }
 
 void ToolPanelCoordinator::updateVScrollbars(bool hide)
 {
-    GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
-    Gtk::PolicyType policy = hide ? Gtk::PolicyType::NEVER : Gtk::PolicyType::AUTOMATIC;
-    favoritePanelSW->set_policy     (Gtk::PolicyType::AUTOMATIC, policy);
-    exposurePanelSW->set_policy     (Gtk::PolicyType::AUTOMATIC, policy);
-    detailsPanelSW->set_policy      (Gtk::PolicyType::AUTOMATIC, policy);
-    colorPanelSW->set_policy        (Gtk::PolicyType::AUTOMATIC, policy);
-    transformPanelSW->set_policy    (Gtk::PolicyType::AUTOMATIC, policy);
-    rawPanelSW->set_policy          (Gtk::PolicyType::AUTOMATIC, policy);
-    advancedPanelSW->set_policy      (Gtk::PolicyType::AUTOMATIC, policy);
-    locallabPanelSW->set_policy(Gtk::PolicyType::AUTOMATIC, policy);
-
-    for (auto currExp : expList) {
-        currExp->updateVScrollbars(hide);
-    }
+//     GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
+//     Gtk::PolicyType policy = hide ? Gtk::PolicyType::NEVER : Gtk::PolicyType::AUTOMATIC;
+//     favoritePanelSW->set_policy     (Gtk::PolicyType::AUTOMATIC, policy);
+//     exposurePanelSW->set_policy     (Gtk::PolicyType::AUTOMATIC, policy);
+//     detailsPanelSW->set_policy      (Gtk::PolicyType::AUTOMATIC, policy);
+//     colorPanelSW->set_policy        (Gtk::PolicyType::AUTOMATIC, policy);
+//     transformPanelSW->set_policy    (Gtk::PolicyType::AUTOMATIC, policy);
+//     rawPanelSW->set_policy          (Gtk::PolicyType::AUTOMATIC, policy);
+//     advancedPanelSW->set_policy      (Gtk::PolicyType::AUTOMATIC, policy);
+//     locallabPanelSW->set_policy(Gtk::PolicyType::AUTOMATIC, policy);
+//
+//     for (auto currExp : expList) {
+//         currExp->updateVScrollbars(hide);
+//     }
 }
 
 void ToolPanelCoordinator::updateTPVScrollbar(bool hide)
@@ -1888,76 +1893,76 @@ void ToolPanelCoordinator::updateTPVScrollbar(bool hide)
 
 void ToolPanelCoordinator::toolDeselected(ToolMode tool)
 {
-    if (tool == TMPerspective) {
-        perspective->requestApplyControlLines();
-    }
+//     if (tool == TMPerspective) {
+//         perspective->requestApplyControlLines();
+//     }
 }
 
 void ToolPanelCoordinator::toolSelected(ToolMode tool)
 {
-    GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
-    notebookconn.block(true); // "signal_switch_page" event is blocked to avoid unsubscribing Locallab (allows a correct behavior when switching to another tool using toolbar)
-
-    auto checkFavorite = [this](FoldableToolPanel* tool) {
-        for (auto fav : favoritesToolPanels) {
-            if (fav == tool) {
-                return true;
-            }
-        }
-        return false;
-    };
-
-    switch (tool) {
-        case TMCropSelect: {
-            toolBar->blockEditDeactivation(false); // To allow deactivating Locallab when switching to another tool using toolbar
-            crop->setExpanded(true);
-            toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(checkFavorite(crop) ? *favoritePanelSW : *transformPanelSW));
-            prevPage = toolPanelNotebook->get_nth_page(toolPanelNotebook->get_current_page()); // Updating prevPage as "signal_switch_page" event
-            break;
-        }
-
-        case TMSpotWB: {
-            toolBar->blockEditDeactivation(false); // To allow deactivating Locallab when switching to another tool using toolbar
-            whitebalance->setExpanded(true);
-            toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(checkFavorite(whitebalance) ? *favoritePanelSW : *colorPanelSW));
-            prevPage = toolPanelNotebook->get_nth_page(toolPanelNotebook->get_current_page()); // Updating prevPage as "signal_switch_page" event
-            break;
-        }
-
-        case TMStraighten: {
-            toolBar->blockEditDeactivation(false); // To allow deactivating Locallab when switching to another tool using toolbar
-            rotate->setExpanded(true);
-            bool isFavorite = checkFavorite(rotate);
-            if (!isFavorite) {
-                isFavorite = checkFavorite(lensgeom);
-                lensgeom->setExpanded(true);
-            }
-            toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(isFavorite ? *favoritePanelSW : *transformPanelSW));
-            prevPage = toolPanelNotebook->get_nth_page(toolPanelNotebook->get_current_page()); // Updating prevPage as "signal_switch_page" event
-            break;
-        }
-
-        case TMPerspective: {
-            toolBar->blockEditDeactivation(false); // To allow deactivating Locallab when switching to another tool using toolbar
-            perspective->setControlLineEditMode(true);
-            perspective->setExpanded(true);
-            bool isFavorite = checkFavorite(perspective);
-            if (!isFavorite) {
-                isFavorite = checkFavorite(lensgeom);
-                lensgeom->setExpanded(true);
-            }
-            toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(isFavorite ? *favoritePanelSW : *transformPanelSW));
-            prevPage = toolPanelNotebook->get_nth_page(toolPanelNotebook->get_current_page()); // Updating prevPage as "signal_switch_page" event
-            break;
-        }
-
-        default:
-            break;
-    }
-
-    updateToolLocations(options.favorites, options.cloneFavoriteTools);
-
-    notebookconn.block(false);
+//     GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
+//     notebookconn.block(true); // "signal_switch_page" event is blocked to avoid unsubscribing Locallab (allows a correct behavior when switching to another tool using toolbar)
+//
+//     auto checkFavorite = [this](FoldableToolPanel* tool) {
+//         for (auto fav : favoritesToolPanels) {
+//             if (fav == tool) {
+//                 return true;
+//             }
+//         }
+//         return false;
+//     };
+//
+//     switch (tool) {
+//         case TMCropSelect: {
+//             toolBar->blockEditDeactivation(false); // To allow deactivating Locallab when switching to another tool using toolbar
+//             crop->setExpanded(true);
+//             toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(checkFavorite(crop) ? *favoritePanelSW : *transformPanelSW));
+//             prevPage = toolPanelNotebook->get_nth_page(toolPanelNotebook->get_current_page()); // Updating prevPage as "signal_switch_page" event
+//             break;
+//         }
+//
+//         case TMSpotWB: {
+//             toolBar->blockEditDeactivation(false); // To allow deactivating Locallab when switching to another tool using toolbar
+//             whitebalance->setExpanded(true);
+//             toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(checkFavorite(whitebalance) ? *favoritePanelSW : *colorPanelSW));
+//             prevPage = toolPanelNotebook->get_nth_page(toolPanelNotebook->get_current_page()); // Updating prevPage as "signal_switch_page" event
+//             break;
+//         }
+//
+//         case TMStraighten: {
+//             toolBar->blockEditDeactivation(false); // To allow deactivating Locallab when switching to another tool using toolbar
+//             rotate->setExpanded(true);
+//             bool isFavorite = checkFavorite(rotate);
+//             if (!isFavorite) {
+//                 isFavorite = checkFavorite(lensgeom);
+//                 lensgeom->setExpanded(true);
+//             }
+//             toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(isFavorite ? *favoritePanelSW : *transformPanelSW));
+//             prevPage = toolPanelNotebook->get_nth_page(toolPanelNotebook->get_current_page()); // Updating prevPage as "signal_switch_page" event
+//             break;
+//         }
+//
+//         case TMPerspective: {
+//             toolBar->blockEditDeactivation(false); // To allow deactivating Locallab when switching to another tool using toolbar
+//             perspective->setControlLineEditMode(true);
+//             perspective->setExpanded(true);
+//             bool isFavorite = checkFavorite(perspective);
+//             if (!isFavorite) {
+//                 isFavorite = checkFavorite(lensgeom);
+//                 lensgeom->setExpanded(true);
+//             }
+//             toolPanelNotebook->set_current_page(toolPanelNotebook->page_num(isFavorite ? *favoritePanelSW : *transformPanelSW));
+//             prevPage = toolPanelNotebook->get_nth_page(toolPanelNotebook->get_current_page()); // Updating prevPage as "signal_switch_page" event
+//             break;
+//         }
+//
+//         default:
+//             break;
+//     }
+//
+//     updateToolLocations(options.favorites, options.cloneFavoriteTools);
+//
+//     notebookconn.block(false);
 }
 
 void ToolPanelCoordinator::editModeSwitchedOff()
@@ -1970,7 +1975,7 @@ void ToolPanelCoordinator::editModeSwitchedOff()
 void ToolPanelCoordinator::dirSelected(const Glib::ustring& dirname, const Glib::ustring& openfile)
 {
 
-    flatfield->setShortcutPath(dirname);
+//     flatfield->setShortcutPath(dirname);
 }
 
 void ToolPanelCoordinator::setEditProvider(EditDataProvider *provider)
@@ -1982,138 +1987,138 @@ void ToolPanelCoordinator::setEditProvider(EditDataProvider *provider)
     }
 }
 
-bool ToolPanelCoordinator::getFilmNegativeSpot(rtengine::Coord spot, int spotSize, RGB &refInput, RGB &refOutput)
-{
-    return ipc && ipc->getFilmNegativeSpot(spot.x, spot.y, spotSize, refInput, refOutput);
-}
+// bool ToolPanelCoordinator::getFilmNegativeSpot(rtengine::Coord spot, int spotSize, RGB &refInput, RGB &refOutput)
+// {
+//     return ipc && ipc->getFilmNegativeSpot(spot.x, spot.y, spotSize, refInput, refOutput);
+// }
 
 
 void ToolPanelCoordinator::setProgressListener(rtengine::ProgressListener *pl)
 {
-    metadata->setProgressListener(pl);
+//     metadata->setProgressListener(pl);
 }
 
 FoldableToolPanel *ToolPanelCoordinator::getFoldableToolPanel(Tool tool) const
 {
     switch (tool) {
-        case Tool::TONE_CURVE:
-            return toneCurve;
-        case Tool::SHADOWS_HIGHLIGHTS:
-            return shadowshighlights;
-        case Tool::TONE_EQUALIZER:
-            return toneEqualizer;
-        case Tool::IMPULSE_DENOISE:
-            return impulsedenoise;
-        case Tool::DEFRINGE_TOOL:
-            return defringe;
-        case Tool::COMPRESSGAMUT_TOOL:
-            return compressgamut;
-        case Tool::SPOT:
-            return spot;
-        case Tool::DIR_PYR_DENOISE:
-            return dirpyrdenoise;
-        case Tool::EPD:
-            return epd;
-        case Tool::SHARPENING_TOOL:
-            return sharpening;
-        case Tool::LOCAL_CONTRAST:
-            return localContrast;
-        case Tool::SHARPEN_EDGE:
-            return sharpenEdge;
-        case Tool::SHARPEN_MICRO:
-            return sharpenMicro;
-        case Tool::L_CURVE:
-            return lcurve;
-        case Tool::RGB_CURVES:
-            return rgbcurves;
-        case Tool::COLOR_TONING:
-            return colortoning;
-        case Tool::LENS_GEOM:
-            return lensgeom;
-        case Tool::LENS_PROF:
-            return lensProf;
-        case Tool::DISTORTION:
-            return distortion;
-        case Tool::ROTATE:
-            return rotate;
-        case Tool::VIBRANCE:
-            return vibrance;
-        case Tool::COLOR_APPEARANCE:
-            return colorappearance;
-        case Tool::WHITE_BALANCE:
-            return whitebalance;
-        case Tool::VIGNETTING:
-            return vignetting;
-        case Tool::RETINEX_TOOL:
-            return retinex;
-        case Tool::GRADIENT:
-            return gradient;
-        case Tool::LOCALLAB:
-            return locallab;
-        case Tool::PC_VIGNETTE:
-            return pcvignette;
-        case Tool::PERSPECTIVE:
-            return perspective;
-        case Tool::CA_CORRECTION:
-            return cacorrection;
-        case Tool::CH_MIXER:
-            return chmixer;
-        case Tool::BLACK_WHITE:
-            return blackwhite;
-        case Tool::RESIZE_TOOL:
-            return resize;
-        case Tool::PR_SHARPENING:
-            return prsharpening;
-        case Tool::FRAMING:
-            return framing;
-        case Tool::CROP_TOOL:
-            return crop;
-        case Tool::ICM:
-            return icm;
-        case Tool::WAVELET:
-            return wavelet;
-        case Tool::DIR_PYR_EQUALIZER:
-            return dirpyrequalizer;
-        case Tool::HSV_EQUALIZER:
-            return hsvequalizer;
-        case Tool::FILM_SIMULATION:
-            return filmSimulation;
-        case Tool::SOFT_LIGHT:
-            return softlight;
-        case Tool::DEHAZE:
-            return dehaze;
-        case Tool::SENSOR_BAYER:
-            return sensorbayer;
-        case Tool::SENSOR_XTRANS:
-            return sensorxtrans;
-        case Tool::BAYER_PROCESS:
-            return bayerprocess;
-        case Tool::XTRANS_PROCESS:
-            return xtransprocess;
-        case Tool::BAYER_PREPROCESS:
-            return bayerpreprocess;
-        case Tool::PREPROCESS:
-            return preprocess;
-        case Tool::DARKFRAME_TOOL:
-            return darkframe;
-        case Tool::FLATFIELD_TOOL:
-            return flatfield;
-        case Tool::RAW_CA_CORRECTION:
-            return rawcacorrection;
-        case Tool::RAW_EXPOSURE:
-            return rawexposure;
-        case Tool::PREPROCESS_WB:
-            return preprocessWB;
-        case Tool::BAYER_RAW_EXPOSURE:
-            return bayerrawexposure;
-        case Tool::XTRANS_RAW_EXPOSURE:
-            return xtransrawexposure;
-        case Tool::FATTAL:
-            return fattal;
-        case Tool::FILM_NEGATIVE:
-            return filmNegative;
-        case Tool::PD_SHARPENING:
-            return pdSharpening;
+//         case Tool::TONE_CURVE:
+//             return toneCurve;
+//         case Tool::SHADOWS_HIGHLIGHTS:
+//             return shadowshighlights;
+//         case Tool::TONE_EQUALIZER:
+//             return toneEqualizer;
+//         case Tool::IMPULSE_DENOISE:
+//             return impulsedenoise;
+//         case Tool::DEFRINGE_TOOL:
+//             return defringe;
+//         case Tool::COMPRESSGAMUT_TOOL:
+//             return compressgamut;
+//         case Tool::SPOT:
+//             return spot;
+//         case Tool::DIR_PYR_DENOISE:
+//             return dirpyrdenoise;
+//         case Tool::EPD:
+//             return epd;
+//         case Tool::SHARPENING_TOOL:
+//             return sharpening;
+//         case Tool::LOCAL_CONTRAST:
+//             return localContrast;
+//         case Tool::SHARPEN_EDGE:
+//             return sharpenEdge;
+//         case Tool::SHARPEN_MICRO:
+//             return sharpenMicro;
+//         case Tool::L_CURVE:
+//             return lcurve;
+//         case Tool::RGB_CURVES:
+//             return rgbcurves;
+//         case Tool::COLOR_TONING:
+//             return colortoning;
+//         case Tool::LENS_GEOM:
+//             return lensgeom;
+//         case Tool::LENS_PROF:
+//             return lensProf;
+//         case Tool::DISTORTION:
+//             return distortion;
+//         case Tool::ROTATE:
+//             return rotate;
+//         case Tool::VIBRANCE:
+//             return vibrance;
+//         case Tool::COLOR_APPEARANCE:
+//             return colorappearance;
+//         case Tool::WHITE_BALANCE:
+//             return whitebalance;
+//         case Tool::VIGNETTING:
+//             return vignetting;
+//         case Tool::RETINEX_TOOL:
+//             return retinex;
+//         case Tool::GRADIENT:
+//             return gradient;
+//         case Tool::LOCALLAB:
+//             return locallab;
+//         case Tool::PC_VIGNETTE:
+//             return pcvignette;
+//         case Tool::PERSPECTIVE:
+//             return perspective;
+//         case Tool::CA_CORRECTION:
+//             return cacorrection;
+//         case Tool::CH_MIXER:
+//             return chmixer;
+//         case Tool::BLACK_WHITE:
+//             return blackwhite;
+//         case Tool::RESIZE_TOOL:
+//             return resize;
+//         case Tool::PR_SHARPENING:
+//             return prsharpening;
+//         case Tool::FRAMING:
+//             return framing;
+//         case Tool::CROP_TOOL:
+//             return crop;
+//         case Tool::ICM:
+//             return icm;
+//         case Tool::WAVELET:
+//             return wavelet;
+//         case Tool::DIR_PYR_EQUALIZER:
+//             return dirpyrequalizer;
+//         case Tool::HSV_EQUALIZER:
+//             return hsvequalizer;
+//         case Tool::FILM_SIMULATION:
+//             return filmSimulation;
+//         case Tool::SOFT_LIGHT:
+//             return softlight;
+//         case Tool::DEHAZE:
+//             return dehaze;
+//         case Tool::SENSOR_BAYER:
+//             return sensorbayer;
+//         case Tool::SENSOR_XTRANS:
+//             return sensorxtrans;
+//         case Tool::BAYER_PROCESS:
+//             return bayerprocess;
+//         case Tool::XTRANS_PROCESS:
+//             return xtransprocess;
+//         case Tool::BAYER_PREPROCESS:
+//             return bayerpreprocess;
+//         case Tool::PREPROCESS:
+//             return preprocess;
+//         case Tool::DARKFRAME_TOOL:
+//             return darkframe;
+//         case Tool::FLATFIELD_TOOL:
+//             return flatfield;
+//         case Tool::RAW_CA_CORRECTION:
+//             return rawcacorrection;
+//         case Tool::RAW_EXPOSURE:
+//             return rawexposure;
+//         case Tool::PREPROCESS_WB:
+//             return preprocessWB;
+//         case Tool::BAYER_RAW_EXPOSURE:
+//             return bayerrawexposure;
+//         case Tool::XTRANS_RAW_EXPOSURE:
+//             return xtransrawexposure;
+//         case Tool::FATTAL:
+//             return fattal;
+//         case Tool::FILM_NEGATIVE:
+//             return filmNegative;
+//         case Tool::PD_SHARPENING:
+//             return pdSharpening;
     };
     assert(false);
     return nullptr;

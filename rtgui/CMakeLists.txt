@@ -174,7 +174,7 @@ set(NONCLISOURCEFILES
     toolbar.cc
     # toollocationpref.cc
     toolpanel.cc
-    # toolpanelcoord.cc
+    toolpanelcoord.cc
     # vibrance.cc
     # vignetting.cc
     # wavelet.cc

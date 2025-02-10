@@ -330,19 +330,19 @@ public:
 };
 
 
-// /**
-//  * @brief subclass of Gtk::ScrolledWindow in order to handle the scrollwheel
-//  */
-// class MyScrolledWindow final : public Gtk::ScrolledWindow
-// {
-//     bool onScroll(double dx, double dy);
-//
-//     void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
-//                        int& minimum_baseline, int& natural_baseline) const override;
-//
-// public:
-//     MyScrolledWindow();
-// };
+/**
+ * @brief subclass of Gtk::ScrolledWindow in order to handle the scrollwheel
+ */
+class MyScrolledWindow final : public Gtk::ScrolledWindow
+{
+    bool onScroll(double dx, double dy);
+
+    void measure_vfunc(Gtk::Orientation orientation, int for_size, int& minimum, int& natural,
+                       int& minimum_baseline, int& natural_baseline) const override;
+
+public:
+    MyScrolledWindow();
+};
 
 /**
  * @brief subclass of Gtk::ScrolledWindow in order to handle the large toolbars (wider than available space)
@@ -543,15 +543,15 @@ typedef enum RTNav {
     NAV_PREVIOUS
 } eRTNav;
 
-// /**
-//  * @brief Handle the switch between text and image to be displayed in the HBox (to be used in a button/toolpanel)
-//  */
-// class TextOrIcon final : public Gtk::Box
-// {
-//
-// public:
-//     TextOrIcon (const Glib::ustring &icon_name, const Glib::ustring &labelTx, const Glib::ustring &tooltipTx);
-// };
+/**
+ * @brief Handle the switch between text and image to be displayed in the HBox (to be used in a button/toolpanel)
+ */
+class TextOrIcon final : public Gtk::Box
+{
+
+public:
+    TextOrIcon (const Glib::ustring &icon_name, const Glib::ustring &labelTx, const Glib::ustring &tooltipTx);
+};
 
 /**
  * Widget with image and label placed horizontally.

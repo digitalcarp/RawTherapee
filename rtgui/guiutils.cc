@@ -995,67 +995,67 @@ void MyExpander::onEnabledChange(int /*n_press*/, double /*x*/, double /*y*/)
     flushEvent = true;
 }
 
-// /*
-//  *
-//  * Derived class of some widgets to properly handle the scroll wheel ;
-//  * the user has to use the Shift key to be able to change the widget's value,
-//  * otherwise the mouse wheel will scroll the editor's tabs content.
-//  *
-//  */
-// MyScrolledWindow::MyScrolledWindow()
-// {
-//     auto controller = Gtk::EventControllerScroll::create();
-//     controller->set_flags(Gtk::EventControllerScroll::Flags::VERTICAL);
-//     controller->signal_scroll().connect(
-//         sigc::mem_fun(*this, &MyScrolledWindow::onScroll), false);
-//     add_controller(controller);
-// }
-//
-// bool MyScrolledWindow::onScroll(double /*dx*/, double dy)
-// {
-//     if (!options.hideTPVScrollbar) {
-//         // Let Gtk::ScrolledWindow handle it
-//         return false;
-//     }
-//
-//     Glib::RefPtr<Gtk::Adjustment> adjust = get_vadjustment();
-//     Gtk::Scrollbar* vscroll = get_vscrollbar();
-//
-//     if (adjust && vscroll) {
-//         const double upperBound = adjust->get_upper();
-//         const double lowerBound = adjust->get_lower();
-//         const double value = adjust->get_value();
-//         const double step = adjust->get_step_increment();
-//
-//         double newValue = value + step * dy;
-//         newValue = std::clamp(newValue, lowerBound, upperBound);
-//
-//         if (newValue != value) {
-//             vscroll->set_value(newValue);
-//         }
-//     }
-//
-//     return true;
-// }
-//
-// void MyScrolledWindow::measure_vfunc(Gtk::Orientation orientation, int /*for_size*/,
-//                                      int& minimum, int& natural,
-//                                      int& minimum_baseline, int& natural_baseline) const
-// {
-//     if (orientation == Gtk::Orientation::HORIZONTAL) {
-//         int width = RTScalable::scalePixelSize(100);
-//         minimum = width;
-//         natural = width;
-//     } else {
-//         int height = RTScalable::scalePixelSize(50);
-//         minimum = height;
-//         natural = height;
-//     }
-//
-//     // Don't use baseline alignment
-//     minimum_baseline = -1;
-//     natural_baseline = -1;
-// }
+/*
+ *
+ * Derived class of some widgets to properly handle the scroll wheel ;
+ * the user has to use the Shift key to be able to change the widget's value,
+ * otherwise the mouse wheel will scroll the editor's tabs content.
+ *
+ */
+MyScrolledWindow::MyScrolledWindow()
+{
+    auto controller = Gtk::EventControllerScroll::create();
+    controller->set_flags(Gtk::EventControllerScroll::Flags::VERTICAL);
+    controller->signal_scroll().connect(
+        sigc::mem_fun(*this, &MyScrolledWindow::onScroll), false);
+    add_controller(controller);
+}
+
+bool MyScrolledWindow::onScroll(double /*dx*/, double dy)
+{
+    if (!options.hideTPVScrollbar) {
+        // Let Gtk::ScrolledWindow handle it
+        return false;
+    }
+
+    Glib::RefPtr<Gtk::Adjustment> adjust = get_vadjustment();
+    Gtk::Scrollbar* vscroll = get_vscrollbar();
+
+    if (adjust && vscroll) {
+        const double upperBound = adjust->get_upper();
+        const double lowerBound = adjust->get_lower();
+        const double value = adjust->get_value();
+        const double step = adjust->get_step_increment();
+
+        double newValue = value + step * dy;
+        newValue = std::clamp(newValue, lowerBound, upperBound);
+
+        if (newValue != value) {
+            vscroll->get_adjustment()->set_value(newValue);
+        }
+    }
+
+    return true;
+}
+
+void MyScrolledWindow::measure_vfunc(Gtk::Orientation orientation, int /*for_size*/,
+                                     int& minimum, int& natural,
+                                     int& minimum_baseline, int& natural_baseline) const
+{
+    if (orientation == Gtk::Orientation::HORIZONTAL) {
+        int width = RTScalable::scalePixelSize(100);
+        minimum = width;
+        natural = width;
+    } else {
+        int height = RTScalable::scalePixelSize(50);
+        minimum = height;
+        natural = height;
+    }
+
+    // Don't use baseline alignment
+    minimum_baseline = -1;
+    natural_baseline = -1;
+}
 
 /*
  *
@@ -1676,17 +1676,15 @@ void MyFileChooserEntry::on_filename_set()
 }
 
 
-// TextOrIcon::TextOrIcon (const Glib::ustring &icon_name, const Glib::ustring &labelTx, const Glib::ustring &tooltipTx)
-// {
-//
-//     RtImage *img = Gtk::manage(new RtImage(icon_name));
-//     pack_start(*img, Pack::SHRINK, 0);
-//     set_tooltip_markup("<span font_size=\"large\" font_weight=\"bold\">" + labelTx  + "</span>\n" + tooltipTx);
-//
-//     set_name("TextOrIcon");
-//     show_all();
-//
-// }
+TextOrIcon::TextOrIcon (const Glib::ustring &icon_name, const Glib::ustring &labelTx, const Glib::ustring &tooltipTx)
+{
+
+    RtImage *img = Gtk::manage(new RtImage(icon_name));
+    append(*img);
+    set_tooltip_markup("<span font_size=\"large\" font_weight=\"bold\">" + labelTx  + "</span>\n" + tooltipTx);
+
+    set_name("TextOrIcon");
+}
 
 class ImageAndLabel::Impl
 {
