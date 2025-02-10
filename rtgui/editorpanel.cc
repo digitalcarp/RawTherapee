@@ -44,7 +44,7 @@
 #include "rtmessagedialog.h"
 #include "rtscalable.h"
 #include "thumbnail.h"
-// #include "toolpanelcoord.h"
+#include "toolpanelcoord.h"
 
 #ifdef _WIN32
 #include "windows.h"
@@ -722,9 +722,9 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     processingStartedTime = 0;
     firstProcessingDone = false;
 
-//     // construct toolpanelcoordinator
-//     tpc = new ToolPanelCoordinator();
-//     tpc->setProgressListener(this);
+    // construct toolpanelcoordinator
+    tpc = new ToolPanelCoordinator();
+    tpc->setProgressListener(this);
 
     // build GUI
 
@@ -825,8 +825,8 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     Gtk::Separator* vsep3 = Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL));
 
     iareapanel = new ImageAreaPanel ();
-//     tpc->setEditProvider (iareapanel->imageArea);
-//     tpc->getToolBar()->setLockablePickerToolListener (iareapanel->imageArea);
+    tpc->setEditProvider (iareapanel->imageArea);
+    tpc->getToolBar()->setLockablePickerToolListener (iareapanel->imageArea);
 
     Gtk::Box* toolBarPanel = Gtk::manage (new Gtk::Box (Gtk::Orientation::HORIZONTAL));
     toolBarPanel->set_name ("EditorTopPanel");
@@ -835,7 +835,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     pack_start(toolBarPanel, *info, Pack::SHRINK, 1);
     pack_start(toolBarPanel, *beforeAfter, Pack::SHRINK, 1);
     pack_start(toolBarPanel, *vsepi, Pack::SHRINK, 2);
-//     pack_start(toolBarPanel, *tpc->getToolBar(), Pack::SHRINK, 1);
+    pack_start(toolBarPanel, *tpc->getToolBar(), Pack::SHRINK, 1);
     pack_start(toolBarPanel, *vsept, Pack::SHRINK, 2);
     insertSpacer(toolBarPanel);
 
@@ -878,8 +878,8 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     vsubboxright->set_size_request (300, 250);
 
     pack_start(vsubboxright, *ppframe, Pack::SHRINK, 2);
-//     // main notebook
-//     pack_start(vsubboxright, *tpc->toolPanelNotebook);
+    // main notebook
+    pack_start(vsubboxright, *tpc->toolPanelNotebook);
     pack2(vboxright, *vsubboxright, true, true);
 
     // Save buttons
@@ -1049,20 +1049,20 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
 
         saveAsDialog->set_default_size (options.saveAsDialogWidth, options.saveAsDialogHeight);
     */
-//     // connect listeners
-//     profilep->setProfileChangeListener (tpc);
-//     history->setProfileChangeListener (tpc);
+    // connect listeners
+    profilep->setProfileChangeListener (tpc);
+    history->setProfileChangeListener (tpc);
     history->setHistoryBeforeLineListener (this);
-//     tpc->addPParamsChangeListener (profilep);
-//     tpc->addPParamsChangeListener (history);
-//     tpc->addPParamsChangeListener (this);
+    tpc->addPParamsChangeListener (profilep);
+    tpc->addPParamsChangeListener (history);
+    tpc->addPParamsChangeListener (this);
 //     iareapanel->imageArea->setCropGUIListener (tpc->getCropGUIListener());
     iareapanel->imageArea->setPointerMotionListener (navigator);
-//     iareapanel->imageArea->setImageAreaToolListener (tpc);
+    iareapanel->imageArea->setImageAreaToolListener (tpc);
 
     // initialize components
     info->set_active (options.showInfo);
-//     tpc->readOptions ();
+    tpc->readOptions ();
 
     // connect event handlers
     info->signal_toggled().connect ( sigc::mem_fun (*this, &EditorPanel::info_toggled) );
@@ -1138,7 +1138,7 @@ EditorPanel::~EditorPanel ()
         delete epih;
     }
 
-//     delete tpc;
+    delete tpc;
 
     delete leftsubpaned;
     delete leftbox;
@@ -1165,24 +1165,24 @@ void EditorPanel::writeOptions()
         profilep->writeOptions();
     }
 
-//     if (tpc) {
-//         tpc->writeOptions();
-//     }
+    if (tpc) {
+        tpc->writeOptions();
+    }
 }
 
 
 void EditorPanel::writeToolExpandedStatus (std::vector<int> &tpOpen)
 {
-//     if (tpc) {
-//         tpc->writeToolExpandedStatus (tpOpen);
-//     }
+    if (tpc) {
+        tpc->writeToolExpandedStatus (tpOpen);
+    }
 }
 
 void EditorPanel::updateShowtooltipVisibility (bool showtooltip)
 {
-//     if (tpc) {
-//         tpc->updateShowtooltipVisibility (showtooltip);
-//     }
+    if (tpc) {
+        tpc->updateShowtooltipVisibility (showtooltip);
+    }
 }
 
 void EditorPanel::showTopPanel (bool show)
@@ -1211,7 +1211,7 @@ void EditorPanel::on_realize ()
     Gtk::Box::on_realize ();
     // This line is needed to avoid autoexpansion of the window :-/
     //vboxright->set_size_request (options.toolPanelWidth, -1);
-//     tpc->updateToolState();
+    tpc->updateToolState();
 }
 
 void EditorPanel::open (Thumbnail* tmb, rtengine::InitialImage* isrc)
@@ -1236,7 +1236,7 @@ void EditorPanel::open (Thumbnail* tmb, rtengine::InitialImage* isrc)
 //     colorMgmtToolBar->updateProcessor();
     ipc->setPreviewImageListener (previewHandler);
     ipc->setPreviewScale (10);  // Important
-//     tpc->initImage (ipc, tmb->getType() == FT_Raw);
+    tpc->initImage (ipc, tmb->getType() == FT_Raw);
     ipc->setHistogramListener (this);
     iareapanel->imageArea->indClippedPanel->silentlyDisableSharpMask();
 
@@ -1287,8 +1287,8 @@ void EditorPanel::close ()
     if (ipc) {
         saveProfile ();
         // close image processor and the current thumbnail
-//         tpc->closeImage ();    // this call stops image processing
-//         tpc->writeOptions ();
+        tpc->closeImage ();    // this call stops image processing
+        tpc->writeOptions ();
         rtengine::ImageSource* is = isrc->getImageSource();
         is->setProgressListener ( nullptr );
 
@@ -1306,7 +1306,7 @@ void EditorPanel::close ()
         if (iareapanel) {
             iareapanel->imageArea->setPreviewHandler (nullptr);
             iareapanel->imageArea->setImProcCoordinator (nullptr);
-//             tpc->editModeSwitchedOff();
+            tpc->editModeSwitchedOff();
         }
 
         rtengine::StagedImageProcessor::destroy (ipc);
@@ -1490,12 +1490,12 @@ void EditorPanel::refreshProcessingState (bool inProcessingP)
         val = 1.0;
         str = "PROGRESSBAR_PROCESSING";
     } else {
-//         // Set proc params of thumbnail. It saves it into the cache and updates the file browser.
-//         if (ipc && openThm && tpc->getChangedState()) {
-//             rtengine::procparams::ProcParams pparams;
-//             ipc->getParams (&pparams);
-//             openThm->setProcParams (pparams, nullptr, EDITOR, false);
-//         }
+        // Set proc params of thumbnail. It saves it into the cache and updates the file browser.
+        if (ipc && openThm && tpc->getChangedState()) {
+            rtengine::procparams::ProcParams pparams;
+            ipc->getParams (&pparams);
+            openThm->setProcParams (pparams, nullptr, EDITOR, false);
+        }
 
         // Ring a sound if it was a long event
         if (processingStartedTime != 0) {
@@ -1971,7 +1971,7 @@ void EditorPanel::procParamsChanged (Thumbnail* thm, int whoChangedIt, bool upgr
         pp.set (true);
         * (pp.pparams) = openThm->getProcParams();
         pp.pedited->locallab.spots.resize(pp.pparams->locallab.spots.size(), LocallabParamsEdited::LocallabSpotEdited(true));
-//         tpc->profileChange (&pp, rtengine::EvProfileChangeNotification, M ("PROGRESSDLG_PROFILECHANGEDINBROWSER"));
+        tpc->profileChange (&pp, rtengine::EvProfileChangeNotification, M ("PROGRESSDLG_PROFILECHANGEDINBROWSER"));
         pp.deleteInstance();
     }
 }
@@ -2611,7 +2611,7 @@ void EditorPanel::histogramChanged(
         histogramPanel->histogramChanged(histRed, histGreen, histBlue, histLuma, histChroma, histRedRaw, histGreenRaw, histBlueRaw, vectorscopeScale, vectorscopeHC, vectorscopeHS, waveformScale, waveformRed, waveformGreen, waveformBlue, waveformLuma);
     }
 
-//     tpc->updateCurveBackgroundHistogram(histToneCurve, histLCurve, histCCurve, histLCAM, histCCAM, histRed, histGreen, histBlue, histLuma, histLRETI);
+    tpc->updateCurveBackgroundHistogram(histToneCurve, histLCurve, histCCurve, histLCAM, histCCAM, histRed, histGreen, histBlue, histLuma, histLRETI);
 }
 
 void EditorPanel::setObservable(rtengine::HistogramObservable* observable)
@@ -2784,7 +2784,7 @@ void EditorPanel::updateProfiles (const Glib::ustring &printerProfile, rtengine:
 
 void EditorPanel::updateTPVScrollbar (bool hide)
 {
-//     tpc->updateTPVScrollbar (hide);
+    tpc->updateTPVScrollbar (hide);
 }
 
 void EditorPanel::updateHistogramPosition (int oldPosition, int newPosition)
@@ -2854,9 +2854,9 @@ void EditorPanel::updateHistogramPosition (int oldPosition, int newPosition)
 void EditorPanel::updateToolPanelToolLocations(
     const std::vector<Glib::ustring> &favorites, bool cloneFavoriteTools)
 {
-//     if (tpc) {
-//         tpc->updateToolLocations(favorites, cloneFavoriteTools);
-//     }
+    if (tpc) {
+        tpc->updateToolLocations(favorites, cloneFavoriteTools);
+    }
 }
 
 void EditorPanel::defaultMonitorProfileChanged (const Glib::ustring &profile_name, bool auto_monitor_profile)

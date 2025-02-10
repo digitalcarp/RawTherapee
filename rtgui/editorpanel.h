@@ -283,7 +283,7 @@ private:
     ProfilePanel* profilep;
     History* history;
     HistogramPanel* histogramPanel;
-//     ToolPanelCoordinator* tpc;
+    ToolPanelCoordinator* tpc;
     RtWindow* parent;
     Gtk::Window* parentWindow;
     FilePanel* fPanel;

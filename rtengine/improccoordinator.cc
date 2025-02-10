@@ -251,7 +251,7 @@ ImProcCoordinator::~ImProcCoordinator()
     destroying = true;
     updaterThreadStart.lock();
 
-    if (updaterRunning && thread.joinable()) {
+    if (thread.joinable()) {
         thread.join();
     }
 
