@@ -182,7 +182,7 @@ void SHCSelector::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cr)
         Pango::FontDescription fontd(get_style_context()->get_font());
 
         // Update font
-        fontd.set_weight (Pango::WEIGHT_NORMAL);
+        fontd.set_weight (Pango::Weight::NORMAL);
         const double fontSize = static_cast<double>(h) * 0.8; // px
         // Absolute size is defined in "Pango units" and shall be multiplied by
         // Pango::SCALE from "px":

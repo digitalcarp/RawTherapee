@@ -60,7 +60,7 @@ void LockableColorPicker::updateBackBuffer ()
         // Non-absolute size is defined in "Pango units" and shall be multiplied by
         // Pango::SCALE from "pt":
         fontd.set_size (fontSize * Pango::SCALE);
-        fontd.set_weight(Pango::WEIGHT_NORMAL);
+        fontd.set_weight(Pango::Weight::NORMAL);
         pangoContext->set_font_description (fontd);
 
         Glib::RefPtr<Pango::Layout> layout[3][2];

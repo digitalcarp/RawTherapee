@@ -323,7 +323,7 @@ void ThresholdAdjuster::refreshLabelStyle ()
 
     /*  Glib::RefPtr<Gtk::StyleContext> style = label->get_style_context ();
         Pango::FontDescription fd = style->get_font ();
-        fd.set_weight (editedState==Edited ? Pango::WEIGHT_BOLD : Pango::WEIGHT_NORMAL);
+        fd.set_weight (editedState==Edited ? Pango::Weight::BOLD : Pango::Weight::NORMAL);
         style->set_font (fd);
         label->set_style (style);
         label->queue_draw ();*/
