@@ -19,67 +19,76 @@
 #include "options.h"
 #include "multilangmgr.h"
 #include "imagearea.h"
+#include "rtimage.h"
 
 PreviewModePanel::PreviewModePanel (ImageArea* ia) :
     imageArea(ia),
     // Note: RTImage custom class only manages squared icon. To reduce toggle button width,
     // toggle button image is managed by icon name
-    nR("square-toggle-red-on-narrow"), ngR("square-toggle-red-off-narrow"),
-    nG("square-toggle-green-on-narrow"), ngG("square-toggle-green-off-narrow"),
-    nB("square-toggle-blue-on-narrow"), ngB("square-toggle-blue-off-narrow"),
-    nL("square-toggle-luminosity-on-narrow"), ngL("square-toggle-luminosity-off-narrow"),
-    nBC0("square-toggle-theme-on-narrow"), ngBC0("square-toggle-theme-off-narrow"),
-    nBC1("square-toggle-black-on-narrow"), ngBC1("square-toggle-black-off-narrow"),
-    nBC2("square-toggle-white-on-narrow"), ngBC2("square-toggle-white-off-narrow"),
-    nBC3("square-toggle-gray-on-narrow"), ngBC3("square-toggle-gray-off-narrow")
+    nR(std::make_unique<RtImage>("square-toggle-red-on-narrow")),
+    ngR(std::make_unique<RtImage>("square-toggle-red-off-narrow")),
+    nG(std::make_unique<RtImage>("square-toggle-green-on-narrow")),
+    ngG(std::make_unique<RtImage>("square-toggle-green-off-narrow")),
+    nB(std::make_unique<RtImage>("square-toggle-blue-on-narrow")),
+    ngB(std::make_unique<RtImage>("square-toggle-blue-off-narrow")),
+    nL(std::make_unique<RtImage>("square-toggle-luminosity-on-narrow")),
+    ngL(std::make_unique<RtImage>("square-toggle-luminosity-off-narrow")),
+    nBC0(std::make_unique<RtImage>("square-toggle-theme-on-narrow")),
+    ngBC0(std::make_unique<RtImage>("square-toggle-theme-off-narrow")),
+    nBC1(std::make_unique<RtImage>("square-toggle-black-on-narrow")),
+    ngBC1(std::make_unique<RtImage>("square-toggle-black-off-narrow")),
+    nBC2(std::make_unique<RtImage>("square-toggle-white-on-narrow")),
+    ngBC2(std::make_unique<RtImage>("square-toggle-white-off-narrow")),
+    nBC3(std::make_unique<RtImage>("square-toggle-gray-on-narrow")),
+    ngBC3(std::make_unique<RtImage>("square-toggle-gray-off-narrow"))
 {
     backColor0 = Gtk::manage (new Gtk::ToggleButton ());
     backColor0->get_style_context()->add_class("narrowbutton");
     backColor0->set_has_frame(false);
     backColor0->set_tooltip_markup (M("MAIN_TOOLTIP_BACKCOLOR0"));
-    backColor0->set_image_from_icon_name(options.bgcolor == 0 ? nBC0 : ngBC0, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+    backColor0->set_child(options.bgcolor == 0 ? *nBC0 : *ngBC0);
 
     backColor1 = Gtk::manage (new Gtk::ToggleButton ());
     backColor1->get_style_context()->add_class("narrowbutton");
     backColor1->set_has_frame(false);
     backColor1->set_tooltip_markup (M("MAIN_TOOLTIP_BACKCOLOR1"));
-    backColor1->set_image_from_icon_name(options.bgcolor == 1 ? nBC1 : ngBC1, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+    backColor1->set_child(options.bgcolor == 1 ? *nBC1 : *ngBC1);
 
     backColor2 = Gtk::manage (new Gtk::ToggleButton ());
     backColor2->get_style_context()->add_class("narrowbutton");
     backColor2->set_has_frame(false);
     backColor2->set_tooltip_markup (M("MAIN_TOOLTIP_BACKCOLOR2"));
-    backColor2->set_image_from_icon_name(options.bgcolor == 2 ? nBC2 : ngBC2, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+    backColor2->set_child(options.bgcolor == 2 ? *nBC2 : *ngBC2);
 
     backColor3 = Gtk::manage (new Gtk::ToggleButton ());
     backColor3->get_style_context()->add_class("narrowbutton");
     backColor3->set_has_frame(false);
     backColor3->set_tooltip_markup (M("MAIN_TOOLTIP_BACKCOLOR3"));
-    backColor3->set_image_from_icon_name(options.bgcolor == 3 ? nBC3 : ngBC3, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+    backColor3->set_child(options.bgcolor == 3 ? *nBC3 : *ngBC3);
 
     previewR = Gtk::manage (new Gtk::ToggleButton ());
     previewR->get_style_context()->add_class("narrowbutton");
     previewR->set_has_frame(false);
     previewR->set_tooltip_markup (M("MAIN_TOOLTIP_PREVIEWR"));
-    previewR->set_image_from_icon_name(ngR, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+    previewR->set_child(*ngR);
 
     previewG = Gtk::manage (new Gtk::ToggleButton ());
     previewG->get_style_context()->add_class("narrowbutton");
     previewG->set_has_frame(false);
     previewG->set_tooltip_markup (M("MAIN_TOOLTIP_PREVIEWG"));
-    previewG->set_image_from_icon_name(ngG, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+    previewG->set_child(*ngG);
 
     previewB = Gtk::manage (new Gtk::ToggleButton ());
     previewB->get_style_context()->add_class("narrowbutton");
     previewB->set_has_frame(false);
     previewB->set_tooltip_markup (M("MAIN_TOOLTIP_PREVIEWB"));
-    previewB->set_image_from_icon_name(ngB, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+    previewB->set_child(*ngB);
 
     previewL = Gtk::manage (new Gtk::ToggleButton ());
     previewL->get_style_context()->add_class("narrowbutton");
     previewL->set_has_frame(false);
     previewL->set_tooltip_markup (M("MAIN_TOOLTIP_PREVIEWL"));
-    previewL->set_image_from_icon_name(ngL, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+    previewL->set_child(*ngL);
 
     previewR->set_active (false);
     previewG->set_active (false);
@@ -91,17 +100,17 @@ PreviewModePanel::PreviewModePanel (ImageArea* ia) :
     backColor2->set_active (options.bgcolor == 2);
     backColor3->set_active (options.bgcolor == 3);
 
-    pack_start (*backColor0, Pack::SHRINK, 0);
-    pack_start (*backColor1, Pack::SHRINK, 0);
-    pack_start (*backColor3, Pack::SHRINK, 0);
-    pack_start (*backColor2, Pack::SHRINK, 0);
+    append(*backColor0);
+    append(*backColor1);
+    append(*backColor3);
+    append(*backColor2);
 
-    pack_start (*Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL)), Pack::SHRINK, 2);
+    append(*Gtk::manage (new Gtk::Separator(Gtk::Orientation::VERTICAL)));
 
-    pack_start (*previewR, Pack::SHRINK, 0);
-    pack_start (*previewG, Pack::SHRINK, 0);
-    pack_start (*previewB, Pack::SHRINK, 0);
-    pack_start (*previewL, Pack::SHRINK, 0);
+    append(*previewR);
+    append(*previewG);
+    append(*previewB);
+    append(*previewL);
 
     connR = previewR->signal_toggled().connect( sigc::bind(sigc::mem_fun(*this, &PreviewModePanel::buttonToggled), previewR) );
     connG = previewG->signal_toggled().connect( sigc::bind(sigc::mem_fun(*this, &PreviewModePanel::buttonToggled), previewG) );
@@ -112,8 +121,6 @@ PreviewModePanel::PreviewModePanel (ImageArea* ia) :
     connbackColor1 = backColor1->signal_toggled().connect( sigc::bind(sigc::mem_fun(*this, &PreviewModePanel::buttonToggled_backColor), backColor1) );
     connbackColor2 = backColor2->signal_toggled().connect( sigc::bind(sigc::mem_fun(*this, &PreviewModePanel::buttonToggled_backColor), backColor2) );
     connbackColor3 = backColor3->signal_toggled().connect( sigc::bind(sigc::mem_fun(*this, &PreviewModePanel::buttonToggled_backColor), backColor3) );
-
-    //show_all ();
 }
 
 PreviewModePanel::~PreviewModePanel () {}
@@ -164,40 +171,40 @@ void PreviewModePanel::buttonToggled (Gtk::ToggleButton* tbpreview)
     // Note: Only refresh previously toggled button
     if (previewR->get_active() && tbpreview != previewR) {
         previewR->set_active(false);
-        previewR->set_image_from_icon_name(ngR, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+        previewR->set_child(*ngR);
     }
 
     if (previewG->get_active() && tbpreview != previewG) {
         previewG->set_active(false);
-        previewG->set_image_from_icon_name(ngG, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+        previewR->set_child(*ngG);
     }
 
     if (previewB->get_active() && tbpreview != previewB) {
         previewB->set_active(false);
-        previewB->set_image_from_icon_name(ngB, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+        previewR->set_child(*ngB);
     }
 
     if (previewL->get_active() && tbpreview != previewL) {
         previewL->set_active(false);
-        previewL->set_image_from_icon_name(ngL, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+        previewR->set_child(*ngL);
     }
 
     // Change image on activated button
     // Note: Only refresh toggled button
     if (tbpreview == previewR) {
-        previewR->set_image_from_icon_name(previewR->get_active() ? nR : ngR, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+        previewR->set_child(previewR->get_active() ? *nR : *ngR);
     }
 
     if (tbpreview == previewG) {
-        previewG->set_image_from_icon_name(previewG->get_active() ? nG : ngG, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+        previewG->set_child(previewG->get_active() ? *nG : *ngG);
     }
 
     if (tbpreview == previewB) {
-        previewB->set_image_from_icon_name(previewB->get_active() ? nB : ngB, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+        previewB->set_child(previewB->get_active() ? *nB : *ngB);
     }
 
     if (tbpreview == previewL) {
-        previewL->set_image_from_icon_name(previewL->get_active() ? nL : ngL, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+        previewL->set_child(previewL->get_active() ? *nL : *ngL);
     }
 
     connR.block(false);
@@ -263,29 +270,29 @@ void PreviewModePanel::buttonToggled_backColor (Gtk::ToggleButton* tbbackColor)
     // Note: Only refresh previously toggled button
     if (backColor0->get_active() && tbbackColor != backColor0) {
         backColor0->set_active(false);
-        backColor0->set_image_from_icon_name(ngBC0, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+        backColor0->set_child(*ngBC0);
     }
 
     if (backColor1->get_active() && tbbackColor != backColor1) {
         backColor1->set_active(false);
-        backColor1->set_image_from_icon_name(ngBC1, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+        backColor1->set_child(*ngBC1);
     }
 
     if (backColor2->get_active() && tbbackColor != backColor2) {
         backColor2->set_active(false);
-        backColor2->set_image_from_icon_name(ngBC2, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+        backColor2->set_child(*ngBC2);
     }
 
     if (backColor3->get_active() && tbbackColor != backColor3) {
         backColor3->set_active(false);
-        backColor3->set_image_from_icon_name(ngBC3, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+        backColor3->set_child(*ngBC3);
     }
 
     // Change image on toggled button
     // Note: Only refresh toggled button if newly active (otherwise keep it active)
     if (tbbackColor == backColor0) {
         if (backColor0->get_active()) {
-            backColor0->set_image_from_icon_name(nBC0, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+            backColor0->set_child(*ngBC0);
         } else {
             backColor0->set_active(true);
         }
@@ -293,7 +300,7 @@ void PreviewModePanel::buttonToggled_backColor (Gtk::ToggleButton* tbbackColor)
 
     if (tbbackColor == backColor1) {
         if (backColor1->get_active()) {
-            backColor1->set_image_from_icon_name(nBC1, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+            backColor1->set_child(*ngBC1);
         } else {
             backColor1->set_active(true);
         }
@@ -301,7 +308,7 @@ void PreviewModePanel::buttonToggled_backColor (Gtk::ToggleButton* tbbackColor)
 
     if (tbbackColor == backColor2) {
         if (backColor2->get_active()) {
-            backColor2->set_image_from_icon_name(nBC2, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+            backColor2->set_child(*ngBC2);
         } else {
             backColor2->set_active(true);
         }
@@ -309,7 +316,7 @@ void PreviewModePanel::buttonToggled_backColor (Gtk::ToggleButton* tbbackColor)
 
     if (tbbackColor == backColor3) {
         if (backColor3->get_active()) {
-            backColor3->set_image_from_icon_name(nBC3, Gtk::ICON_SIZE_LARGE_TOOLBAR);
+            backColor3->set_child(*ngBC3);
         } else {
             backColor3->set_active(true);
         }

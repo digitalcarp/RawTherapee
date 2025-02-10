@@ -20,6 +20,7 @@
 #include <gtkmm.h>
 
 class ImageArea;
+class RtImage;
 
 class PreviewModePanel :
     public Gtk::Box
@@ -36,14 +37,14 @@ protected:
     Gtk::ToggleButton* backColor3;
     ImageArea* imageArea;
 
-    const Glib::ustring nR, ngR;
-    const Glib::ustring nG, ngG;
-    const Glib::ustring nB, ngB;
-    const Glib::ustring nL, ngL;
-    const Glib::ustring nBC0, ngBC0;
-    const Glib::ustring nBC1, ngBC1;
-    const Glib::ustring nBC2, ngBC2;
-    const Glib::ustring nBC3, ngBC3;
+    std::unique_ptr<RtImage> nR, ngR;
+    std::unique_ptr<RtImage> nG, ngG;
+    std::unique_ptr<RtImage> nB, ngB;
+    std::unique_ptr<RtImage> nL, ngL;
+    std::unique_ptr<RtImage> nBC0, ngBC0;
+    std::unique_ptr<RtImage> nBC1, ngBC1;
+    std::unique_ptr<RtImage> nBC2, ngBC2;
+    std::unique_ptr<RtImage> nBC3, ngBC3;
 
 public:
     explicit PreviewModePanel (ImageArea* ia);
