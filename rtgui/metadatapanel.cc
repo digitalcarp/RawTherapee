@@ -19,7 +19,11 @@
  */
 
 #include "metadatapanel.h"
+
+#include "exifpanel.h"
 #include "eventmapper.h"
+#include "iptcpanel.h"
+
 #include "rtengine/procparams.h"
 
 using namespace rtengine;
@@ -31,14 +35,15 @@ MetaDataPanel::MetaDataPanel() : EvMetaDataMode(ProcEventMapper::getInstance()->
     set_orientation(Gtk::Orientation::VERTICAL);
 
     Gtk::Box *box = Gtk::manage(new Gtk::Box());
-    box->pack_start(*Gtk::manage(new Gtk::Label(M("TP_METADATA_MODE") + ": ")), Pack::SHRINK, 4);
+    pack_start (box, *Gtk::manage(new Gtk::Label(M("TP_METADATA_MODE") + ": ")), Pack::SHRINK, 4);
     metadataMode = Gtk::manage(new MyComboBoxText());
     metadataMode->append(M("TP_METADATA_TUNNEL"));
     metadataMode->append(M("TP_METADATA_EDIT"));
     metadataMode->append(M("TP_METADATA_STRIP"));
     metadataMode->set_active(0);
-    box->pack_end(*metadataMode, Pack::EXPAND_WIDGET, 4);
-    pack_start(*box, Pack::SHRINK, 4);
+    insertSpacer(box);
+    pack_start (box, *metadataMode, Pack::EXPAND_WIDGET, 4);
+    pack_start(this, *box, Pack::SHRINK, 4);
 
     metadataMode->signal_changed().connect(sigc::mem_fun(*this, &MetaDataPanel::metaDataModeChanged));
 
@@ -49,7 +54,8 @@ MetaDataPanel::MetaDataPanel() : EvMetaDataMode(ProcEventMapper::getInstance()->
     tagsNotebook->append_page(*exifpanel, M("MAIN_TAB_EXIF"));
     tagsNotebook->append_page(*iptcpanel, M("MAIN_TAB_IPTC"));
 
-    pack_end(*tagsNotebook);
+    insertSpacer(this);
+    append(*tagsNotebook);
 }
 
 

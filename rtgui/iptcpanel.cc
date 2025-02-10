@@ -32,26 +32,26 @@ using namespace rtengine::procparams;
 
 namespace {
 
-const std::string CAPTION("Iptc.Application2.Caption");
-const std::string CAPTION_WRITER("Iptc.Application2.Writer");
-const std::string CATEGORY("Iptc.Application2.Category");
-const std::string CITY("Iptc.Application2.City");
-const std::string COPYRIGHT("Iptc.Application2.Copyright");
-const std::string COUNTRY("Iptc.Application2.CountryName");
-const std::string CREATOR("Iptc.Application2.Byline");
-const std::string CREATOR_JOB_TITLE("Iptc.Application2.BylineTitle");
-const std::string CREDIT("Iptc.Application2.Credit");
-const std::string DATE_CREATED("Iptc.Application2.DateCreated");
-const std::string HEADLINE("Iptc.Application2.Headline");
-const std::string INSTRUCTIONS("Iptc.Application2.SpecialInstructions");
-const std::string KEYWORDS("Iptc.Application2.Keywords");
-const std::string PROVINCE("Iptc.Application2.ProvinceState");
-const std::string SOURCE("Iptc.Application2.Source");
-const std::string SUPPLEMENTAL_CATEGORIES("Iptc.Application2.SuppCategory");
-const std::string TITLE("Iptc.Application2.ObjectName");
-const std::string TRANS_REFERENCE("Iptc.Application2.TransmissionReference");
+const Glib::ustring CAPTION("Iptc.Application2.Caption");
+const Glib::ustring CAPTION_WRITER("Iptc.Application2.Writer");
+const Glib::ustring CATEGORY("Iptc.Application2.Category");
+const Glib::ustring CITY("Iptc.Application2.City");
+const Glib::ustring COPYRIGHT("Iptc.Application2.Copyright");
+const Glib::ustring COUNTRY("Iptc.Application2.CountryName");
+const Glib::ustring CREATOR("Iptc.Application2.Byline");
+const Glib::ustring CREATOR_JOB_TITLE("Iptc.Application2.BylineTitle");
+const Glib::ustring CREDIT("Iptc.Application2.Credit");
+const Glib::ustring DATE_CREATED("Iptc.Application2.DateCreated");
+const Glib::ustring HEADLINE("Iptc.Application2.Headline");
+const Glib::ustring INSTRUCTIONS("Iptc.Application2.SpecialInstructions");
+const Glib::ustring KEYWORDS("Iptc.Application2.Keywords");
+const Glib::ustring PROVINCE("Iptc.Application2.ProvinceState");
+const Glib::ustring SOURCE("Iptc.Application2.Source");
+const Glib::ustring SUPPLEMENTAL_CATEGORIES("Iptc.Application2.SuppCategory");
+const Glib::ustring TITLE("Iptc.Application2.ObjectName");
+const Glib::ustring TRANS_REFERENCE("Iptc.Application2.TransmissionReference");
 
-const std::set<std::string> iptc_keys = {
+const std::set<Glib::ustring> iptc_keys = {
     CAPTION,
     CAPTION_WRITER,
     CATEGORY,
@@ -98,7 +98,7 @@ IPTCPanel::IPTCPanel():
     setExpandAlignProperties(scrolledWindowc, true, false, Gtk::Align::FILL, Gtk::Align::START);
     scrolledWindowc->set_min_content_height(100);
     scrolledWindowc->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
-    scrolledWindowc->add(*captionView);
+    scrolledWindowc->set_child(*captionView);
     capl->set_tooltip_text(M("IPTCPANEL_DESCRIPTIONHINT"));
     captionView->set_tooltip_text(M("IPTCPANEL_DESCRIPTIONHINT"));
     captionView->set_size_request(35, 95);
@@ -157,7 +157,7 @@ IPTCPanel::IPTCPanel():
     setExpandAlignProperties(scrolledWindowkw, true, false, Gtk::Align::FILL, Gtk::Align::START);
     scrolledWindowkw->set_min_content_height(100);
     scrolledWindowkw->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
-    scrolledWindowkw->add(*keywords);
+    scrolledWindowkw->set_child(*keywords);
     keyword  = Gtk::manage(new MyComboBoxText(true));
     setExpandAlignProperties(keyword, true, true, Gtk::Align::FILL, Gtk::Align::FILL);
     keyword->set_size_request(75);
@@ -167,12 +167,12 @@ IPTCPanel::IPTCPanel():
     setExpandAlignProperties(addKW, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
     delKW = Gtk::manage(new Gtk::Button());
     setExpandAlignProperties(delKW, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
-    Gtk::Image* const addKWImg = Gtk::manage(new RTImage("add-small", Gtk::ICON_SIZE_BUTTON));
+    Gtk::Image* const addKWImg = Gtk::manage(new RtImage("add-small"));
     setExpandAlignProperties(addKWImg, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-    Gtk::Image* const delKWImg = Gtk::manage(new RTImage("remove-small", Gtk::ICON_SIZE_BUTTON));
+    Gtk::Image* const delKWImg = Gtk::manage(new RtImage("remove-small"));
     setExpandAlignProperties(delKWImg, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-    addKW->add(*addKWImg);
-    delKW->add(*delKWImg);
+    addKW->set_child(*addKWImg);
+    delKW->set_child(*delKWImg);
     Gtk::Grid* kwgrid = Gtk::manage(new Gtk::Grid());
     setExpandAlignProperties(kwgrid, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     kwgrid->attach(*keyword, 0, 0, 1, 1);
@@ -206,7 +206,7 @@ IPTCPanel::IPTCPanel():
     setExpandAlignProperties(scrolledWindowsc, true, false, Gtk::Align::FILL, Gtk::Align::START);
     scrolledWindowsc->set_min_content_height(100);
     scrolledWindowsc->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
-    scrolledWindowsc->add(*suppCategories);
+    scrolledWindowsc->set_child(*suppCategories);
     suppCategory  = Gtk::manage(new MyComboBoxText(true));
     suppCategory->set_size_request(75);
     setExpandAlignProperties(suppCategory, true, true, Gtk::Align::FILL, Gtk::Align::FILL);
@@ -217,12 +217,12 @@ IPTCPanel::IPTCPanel():
     setExpandAlignProperties(addSC, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
     delSC = Gtk::manage(new Gtk::Button());
     setExpandAlignProperties(delSC, false, true, Gtk::Align::CENTER, Gtk::Align::FILL);
-    Gtk::Image* const addSCImg = Gtk::manage(new RTImage("add-small", Gtk::ICON_SIZE_BUTTON));
+    Gtk::Image* const addSCImg = Gtk::manage(new RtImage("add-small"));
     setExpandAlignProperties(addSCImg, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-    Gtk::Image* const delSCImg = Gtk::manage(new RTImage("remove-small", Gtk::ICON_SIZE_BUTTON));
+    Gtk::Image* const delSCImg = Gtk::manage(new RtImage("remove-small"));
     setExpandAlignProperties(delSCImg, false, false, Gtk::Align::CENTER, Gtk::Align::CENTER);
-    addSC->add(*addSCImg);
-    delSC->add(*delSCImg);
+    addSC->set_child(*addSCImg);
+    delSC->set_child(*delSCImg);
     Gtk::Grid* scgrid = Gtk::manage(new Gtk::Grid());
     setExpandAlignProperties(scgrid, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
     scgrid->attach(*suppCategory, 0, 0, 1, 1);
@@ -371,41 +371,41 @@ IPTCPanel::IPTCPanel():
 
     Gtk::ScrolledWindow* scrolledWindow = Gtk::manage(new Gtk::ScrolledWindow());
     setExpandAlignProperties(scrolledWindow, false, true, Gtk::Align::FILL, Gtk::Align::FILL);
-    scrolledWindow->set_shadow_type(Gtk::SHADOW_NONE);
     scrolledWindow->set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::ALWAYS);
-    scrolledWindow->property_window_placement().set_value(Gtk::CORNER_TOP_RIGHT);
-    scrolledWindow->add(*iptc);
+    scrolledWindow->property_window_placement().set_value(Gtk::CornerType::TOP_RIGHT);
+    scrolledWindow->set_child(*iptc);
 
-    pack_start(*scrolledWindow);
+    append(*scrolledWindow);
 
     Gtk::Grid* bbox = Gtk::manage(new Gtk::Grid());
     setExpandAlignProperties(bbox, true, false, Gtk::Align::FILL, Gtk::Align::CENTER);
 
     reset = Gtk::manage(new Gtk::Button());  // M("IPTCPANEL_RESET")
     reset->get_style_context()->add_class("Left");
-    reset->set_image(*Gtk::manage(new RTImage("undo", Gtk::ICON_SIZE_BUTTON)));
+    reset->set_child(*Gtk::manage(new RtImage("undo")));
     setExpandAlignProperties(reset, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
     bbox->attach_next_to(*reset, Gtk::PositionType::LEFT, 1, 1);
 
     file = Gtk::manage(new Gtk::Button());  // M("IPTCPANEL_EMBEDDED")
     file->get_style_context()->add_class("MiddleH");
-    file->set_image(*Gtk::manage(new RTImage("folder-open", Gtk::ICON_SIZE_BUTTON)));
+    file->set_child(*Gtk::manage(new RtImage("folder-open")));
     setExpandAlignProperties(file, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
     bbox->attach_next_to(*file, Gtk::PositionType::RIGHT, 1, 1);
 
     copy = Gtk::manage(new Gtk::Button());
     copy->get_style_context()->add_class("MiddleH");
-    copy->set_image(*Gtk::manage(new RTImage("copy", Gtk::ICON_SIZE_BUTTON)));
+    copy->set_child(*Gtk::manage(new RtImage("copy")));
     setExpandAlignProperties(copy, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
     bbox->attach_next_to(*copy, Gtk::PositionType::RIGHT, 1, 1);
 
     paste = Gtk::manage(new Gtk::Button());
     paste->get_style_context()->add_class("Right");
-    paste->set_image(*Gtk::manage(new RTImage("paste", Gtk::ICON_SIZE_BUTTON)));
+    paste->set_child(*Gtk::manage(new RtImage("paste")));
     setExpandAlignProperties(paste, true, false, Gtk::Align::FILL, Gtk::Align::FILL);
     bbox->attach_next_to(*paste, Gtk::PositionType::RIGHT, 1, 1);
 
-    pack_end(*bbox, Pack::SHRINK, 2);
+    insertSpacer(this);
+    pack_start(this, *bbox, Pack::SHRINK, 2);
 
     reset->set_tooltip_text(M("IPTCPANEL_RESETHINT"));
     file->set_tooltip_text(M("IPTCPANEL_EMBEDDEDHINT"));
@@ -457,8 +457,6 @@ IPTCPanel::IPTCPanel():
     title->set_max_length(64);
     dateCreated->set_max_length(10);
     transReference->set_max_length(32);
-
-    show_all();
 }
 
 

@@ -18,10 +18,11 @@
  */
 #include <iostream>
 
-#include "editcallbacks.h"
-#include "multilangmgr.h"
 #include "toolpanelcoord.h"
-// #include "metadatapanel.h"
+
+#include "editcallbacks.h"
+#include "metadatapanel.h"
+#include "multilangmgr.h"
 #include "options.h"
 #include "rtimage.h"
 
@@ -384,7 +385,7 @@ ToolPanelCoordinator::ToolPanelCoordinator (bool batch) : ipc (nullptr), favorit
 //     framing             = Gtk::manage(new Framing());
 //     crop                = Gtk::manage(new Crop());
 //     icm                 = Gtk::manage(new ICMPanel());
-//     metadata            = Gtk::manage(new MetaDataPanel());
+    metadata            = Gtk::manage(new MetaDataPanel());
 //     wavelet             = Gtk::manage(new Wavelet());
 //     dirpyrequalizer     = Gtk::manage(new DirPyrEqualizer());
 //     hsvequalizer        = Gtk::manage(new HSVEqualizer());
@@ -447,7 +448,7 @@ ToolPanelCoordinator::ToolPanelCoordinator (bool batch) : ipc (nullptr), favorit
     }
 
 //     toolPanels.push_back (coarse);
-//     toolPanels.push_back(metadata);
+    toolPanels.push_back(metadata);
 
     toolPanelNotebook = new Gtk::Notebook();
     toolPanelNotebook->set_name("ToolPanelNotebook");
@@ -551,7 +552,7 @@ ToolPanelCoordinator::ToolPanelCoordinator (bool batch) : ipc (nullptr), favorit
 
     toolPanelNotebook->append_page (*transformPanelSW, *toiT);
     toolPanelNotebook->append_page (*rawPanelSW,       *toiR);
-//     toolPanelNotebook->append_page (*metadata,    *toiM);
+    toolPanelNotebook->append_page (*metadata,    *toiM);
 
     toolPanelNotebook->set_scrollable();
     updateToolLocations(options.favorites, options.cloneFavoriteTools);
@@ -1376,9 +1377,9 @@ void ToolPanelCoordinator::initImage(rtengine::StagedImageProcessor* ipc_, bool 
 //     toneCurve->enableListener();
 
     if (ipc) {
-//         const rtengine::FramesMetaData* pMetaData = ipc->getInitialImage()->getMetaData();
-//         metadata->setImageData(pMetaData);
-//
+        const rtengine::FramesMetaData* pMetaData = ipc->getInitialImage()->getMetaData();
+        metadata->setImageData(pMetaData);
+
 //         ipc->setAutoExpListener(toneCurve);
 //         ipc->setAutoCamListener(colorappearance);
 //         ipc->setAutoBlackListener(bayerrawexposure);
@@ -1995,7 +1996,7 @@ void ToolPanelCoordinator::setEditProvider(EditDataProvider *provider)
 
 void ToolPanelCoordinator::setProgressListener(rtengine::ProgressListener *pl)
 {
-//     metadata->setProgressListener(pl);
+    metadata->setProgressListener(pl);
 }
 
 FoldableToolPanel *ToolPanelCoordinator::getFoldableToolPanel(Tool tool) const

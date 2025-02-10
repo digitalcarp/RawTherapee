@@ -175,7 +175,7 @@ protected:
     // BayerRAWExposure* bayerrawexposure;
     // XTransRAWExposure* xtransrawexposure;
     // FattalToneMapping *fattal;
-    // MetaDataPanel* metadata;
+    MetaDataPanel* metadata;
     // FilmNegative* filmNegative;
     // PdSharpening* pdSharpening;
     std::vector<PParamsChangeListener*> paramcListeners;

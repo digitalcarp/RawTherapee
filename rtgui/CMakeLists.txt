@@ -63,7 +63,7 @@ set(NONCLISOURCEFILES
     # epd.cc
     eventmapper.cc
     exiffiltersettings.cc
-    # exifpanel.cc
+    exifpanel.cc
     exportpanel.cc
     externaleditorpreferences.cc
     extprog.cc
@@ -92,7 +92,7 @@ set(NONCLISOURCEFILES
     # impulsedenoise.cc
     indclippedpanel.cc
     inspector.cc
-    # iptcpanel.cc
+    iptcpanel.cc
     # labcurve.cc
     # labgrid.cc
     # lensgeom.cc
@@ -105,7 +105,7 @@ set(NONCLISOURCEFILES
     lwbutton.cc
     lwbuttonset.cc
     main.cc
-    # metadatapanel.cc
+    metadatapanel.cc
     multilangmgr.cc
     # mycurve.cc
     # mydiagonalcurve.cc

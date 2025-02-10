@@ -111,17 +111,17 @@ private:
     void activateAllPressed();
     void activateNonePressed();
 
-    void setKeyActive(Gtk::CellRenderer *renderer, const Gtk::TreeModel::iterator &it);
+    void setKeyActive(Gtk::CellRenderer *renderer, const Gtk::TreeModel::const_iterator &it);
     void onKeyActiveToggled(const Glib::ustring &path);
 
     bool all_keys_active() const;
     std::unordered_set<std::string> get_active_keys() const;
 
-    void onExifTreeClick(GdkEventButton *event);
+    void onExifRowActivated(const Gtk::TreeModel::Path &path, Gtk::TreeViewColumn *column);
     void onExifRowExpanded(const Gtk::TreeModel::iterator &it, const Gtk::TreeModel::Path &path);
     void onExifRowCollapsed(const Gtk::TreeModel::iterator &it, const Gtk::TreeModel::Path &path);
 
-    void setExifTagValue(Gtk::CellRenderer *renderer, const Gtk::TreeModel::iterator &it);
+    void setExifTagValue(Gtk::CellRenderer *renderer, const Gtk::TreeModel::const_iterator &it);
     void onEditExifTagValue(const Glib::ustring &path, const Glib::ustring &value);
 
 public:

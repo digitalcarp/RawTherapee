@@ -19,10 +19,12 @@
  */
 #pragma once
 
-#include <gtkmm.h>
 #include "toolpanel.h"
-#include "exifpanel.h"
-#include "iptcpanel.h"
+
+#include <gtkmm.h>
+
+class ExifPanel;
+class IPTCPanel;
 
 class MetaDataPanel: public Gtk::Box, public ToolPanel {
 private:

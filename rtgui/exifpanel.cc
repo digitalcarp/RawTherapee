@@ -52,32 +52,31 @@ ExifPanel::ExifPanel() :
     scrolledWindow = Gtk::manage (new Gtk::ScrolledWindow());
 
     exifTree->set_headers_visible (false);
-    exifTree->set_rules_hint (false);
+    // exifTree->set_rules_hint (false);
     exifTree->set_reorderable (false);
     exifTree->set_enable_search (false);
     exifTree->get_selection()->set_mode(Gtk::SelectionMode::SINGLE);
-    scrolledWindow->set_shadow_type(Gtk::SHADOW_NONE);
     scrolledWindow->set_policy(Gtk::PolicyType::ALWAYS, Gtk::PolicyType::ALWAYS);
-    scrolledWindow->property_window_placement().set_value(Gtk::CORNER_TOP_LEFT);
-    scrolledWindow->add(*exifTree);
+    scrolledWindow->property_window_placement().set_value(Gtk::CornerType::TOP_LEFT);
+    scrolledWindow->set_child(*exifTree);
 
     exifTreeModel = Gtk::TreeStore::create(exifColumns);
     exifTree->set_model(exifTreeModel);
-    exifTree->set_grid_lines(Gtk::TREE_VIEW_GRID_LINES_NONE);
+    exifTree->set_grid_lines(Gtk::TreeView::GridLines::NONE);
     exifTree->set_show_expanders(false);
     exifTree->set_tooltip_column(0);
     exifTree->set_enable_search(false);
 
-    exif_active_renderer_.property_mode() = Gtk::CELL_RENDERER_MODE_ACTIVATABLE;
-    exif_active_renderer_.signal_toggled().connect(sigc::mem_fun(this, &ExifPanel::onKeyActiveToggled));
+    exif_active_renderer_.property_mode() = Gtk::CellRendererMode::ACTIVATABLE;
+    exif_active_renderer_.signal_toggled().connect(sigc::mem_fun(*this, &ExifPanel::onKeyActiveToggled));
     exif_active_column_.pack_start(exif_active_renderer_);
-    exif_active_column_.set_cell_data_func(exif_active_renderer_, sigc::mem_fun(this, &ExifPanel::setKeyActive));
+    exif_active_column_.set_cell_data_func(exif_active_renderer_, sigc::mem_fun(*this, &ExifPanel::setKeyActive));
 
     exifTree->append_column(exif_active_column_);
 
     Gtk::TreeView::Column *viewcol = Gtk::manage (new Gtk::TreeView::Column ("Field Name"));
     Gtk::CellRendererPixbuf* render_pb = Gtk::manage (new Gtk::CellRendererPixbuf());
-    render_pb->property_stock_size() = Gtk::ICON_SIZE_SMALL_TOOLBAR;
+    // render_pb->property_stock_size() = Gtk::ICON_SIZE_SMALL_TOOLBAR;
     Gtk::CellRendererText *render_txt = Gtk::manage (new Gtk::CellRendererText());
     render_txt->property_ellipsize() = Pango::EllipsizeMode::END;
     viewcol->pack_start(*render_pb, false);
@@ -88,7 +87,7 @@ ExifPanel::ExifPanel() :
     viewcol->set_resizable(true);
     viewcol->set_fixed_width(35);
     viewcol->set_min_width(35);
-    viewcol->set_sizing(Gtk::TREE_VIEW_COLUMN_AUTOSIZE);
+    viewcol->set_sizing(Gtk::TreeViewColumn::Sizing::AUTOSIZE);
 
     render_pb->property_ypad() = 0;
     render_txt->property_ypad() = 0;
@@ -107,15 +106,15 @@ ExifPanel::ExifPanel() :
     viewcolv->set_resizable (true);
     viewcol->set_fixed_width (35);
     viewcolv->set_min_width (35);
-    viewcolv->set_sizing (Gtk::TREE_VIEW_COLUMN_AUTOSIZE);
+    viewcolv->set_sizing (Gtk::TreeViewColumn::Sizing::AUTOSIZE);
 
     render_txtv->property_ypad() = 0;
-    viewcolv->set_cell_data_func(*render_txtv, sigc::mem_fun(this, &ExifPanel::setExifTagValue));
-    render_txtv->signal_edited().connect(sigc::mem_fun(this, &ExifPanel::onEditExifTagValue));
+    viewcolv->set_cell_data_func(*render_txtv, sigc::mem_fun(*this, &ExifPanel::setExifTagValue));
+    render_txtv->signal_edited().connect(sigc::mem_fun(*this, &ExifPanel::onEditExifTagValue));
 
     exifTree->append_column(*viewcolv);
 
-    pack_start (*scrolledWindow);
+    pack_start (this, *scrolledWindow);
 
     Gtk::Grid* buttons1 = Gtk::manage (new Gtk::Grid());
     buttons1->set_row_homogeneous (true);
@@ -126,7 +125,7 @@ ExifPanel::ExifPanel() :
         [&](const Glib::ustring &tip, const Glib::ustring &icon) -> Gtk::Button *
         {
             Gtk::Button *b = Gtk::manage(new Gtk::Button());
-            b->set_image(*Gtk::manage(new RTImage(icon, Gtk::ICON_SIZE_BUTTON)));
+            b->set_child(*Gtk::manage(new RtImage(icon)));
             b->set_tooltip_text(M(tip));
             b->get_style_context()->add_class("Right");
             setExpandAlignProperties(b, true, true, Gtk::Align::FILL, Gtk::Align::FILL);
@@ -140,7 +139,8 @@ ExifPanel::ExifPanel() :
     reset = addbtn("EXIFPANEL_RESETHINT", "undo");
     resetAll = addbtn("EXIFPANEL_RESETALLHINT", "undo-all");
 
-    pack_end (*buttons1, Pack::SHRINK);
+    insertSpacer(this);
+    pack_start (this, *buttons1, Pack::SHRINK);
 
     exifTree->get_selection()->signal_changed().connect (sigc::mem_fun (*this, &ExifPanel::exifSelectionChanged));
 
@@ -150,11 +150,9 @@ ExifPanel::ExifPanel() :
     activate_all_->signal_clicked().connect(sigc::mem_fun(*this, &ExifPanel::activateAllPressed));
     activate_none_->signal_clicked().connect(sigc::mem_fun(*this, &ExifPanel::activateNonePressed));
 
-    exifTree->signal_button_press_event().connect_notify(sigc::mem_fun(*this, &ExifPanel::onExifTreeClick));
+    exifTree->signal_row_activated().connect(sigc::mem_fun(*this, &ExifPanel::onExifRowActivated));
     exifTree->signal_row_expanded().connect(sigc::mem_fun(*this, &ExifPanel::onExifRowExpanded));
     exifTree->signal_row_collapsed().connect(sigc::mem_fun(*this, &ExifPanel::onExifRowCollapsed));
-
-    show_all ();
 }
 
 ExifPanel::~ExifPanel ()
@@ -211,7 +209,7 @@ void ExifPanel::addTag(const std::string &key, const std::pair<Glib::ustring, Gl
             for (auto &row : root) {
                 // auto row = *it;
                 std::string key = row[exifColumns.key];
-                if (row[exifColumns.is_group] && key == label.first) {
+                if (row[exifColumns.is_group] && key == label.first.c_str()) {
                     return row./*it->*/children();
                 }
             }
@@ -484,7 +482,7 @@ void ExifPanel::activateAllPressed()
 {
     disableListener();
     auto root = exifTreeModel->children();
-    for (auto &group : root->children()) {
+    for (auto &group : root) {
         group[exifColumns.active] = true;
         for (auto &row : group.children()) {
             row[exifColumns.active] = true;
@@ -499,7 +497,7 @@ void ExifPanel::activateNonePressed()
 {
     disableListener();
     auto root = exifTreeModel->children();
-    for (auto &group : root->children()) {
+    for (auto &group : root) {
         group[exifColumns.active] = false;
         for (auto &row : group.children()) {
             row[exifColumns.active] = false;
@@ -535,7 +533,7 @@ void ExifPanel::onKeyActiveToggled(const Glib::ustring &path)
 }
 
 
-void ExifPanel::setKeyActive(Gtk::CellRenderer *renderer, const Gtk::TreeModel::iterator &it)
+void ExifPanel::setKeyActive(Gtk::CellRenderer *renderer, const Gtk::TreeModel::const_iterator &it)
 {
     auto row = *it;
     Gtk::CellRendererToggle *toggle = static_cast<Gtk::CellRendererToggle *>(renderer);
@@ -572,7 +570,7 @@ std::unordered_set<std::string> ExifPanel::get_active_keys() const
     bool all_active = true;
     std::unordered_set<std::string> ret;
     auto root = exifTreeModel->children();
-    for (auto &group : root->children()) {
+    for (auto &group : root) {
         for (auto &entry : group.children()) {
             std::string key = entry[exifColumns.key];
             if (entry[exifColumns.active]) {
@@ -589,25 +587,20 @@ std::unordered_set<std::string> ExifPanel::get_active_keys() const
     return ret;
 }
 
-void ExifPanel::onExifTreeClick(GdkEventButton *event)
+void ExifPanel::onExifRowActivated(const Gtk::TreeModel::Path &path, Gtk::TreeViewColumn *column)
 {
-    Gtk::TreeModel::Path pth;
-    Gtk::TreeViewColumn *col;
-    int cell_x;
-    int cell_y;
-    if (exifTree->get_path_at_pos(event->x, event->y, pth, col, cell_x, cell_y) && col == exifTree->get_column(1) && cell_x <= 22) {
-        auto it = exifTreeModel->get_iter(pth);
-        auto row = *it;
-        if (row[exifColumns.is_group]) {
-            if (exifTree->row_expanded(pth)) {
-                exifTree->collapse_row(pth);
-            } else {
-                exifTree->expand_row(pth, false);
-            }
+    if (!column || column != exifTree->get_column(1)) return;
+
+    auto it = exifTreeModel->get_iter(path);
+    auto row = *it;
+    if (row[exifColumns.is_group]) {
+        if (exifTree->row_expanded(path)) {
+            exifTree->collapse_row(path);
+        } else {
+            exifTree->expand_row(path, false);
         }
     }
 }
-
 
 void ExifPanel::onExifRowExpanded(const Gtk::TreeModel::iterator &it, const Gtk::TreeModel::Path &path)
 {
@@ -627,7 +620,7 @@ void ExifPanel::onExifRowCollapsed(const Gtk::TreeModel::iterator &it, const Gtk
 }
 
 
-void ExifPanel::setExifTagValue(Gtk::CellRenderer *renderer, const Gtk::TreeModel::iterator &it)
+void ExifPanel::setExifTagValue(Gtk::CellRenderer *renderer, const Gtk::TreeModel::const_iterator &it)
 {
     auto row = *it;
     Gtk::CellRendererText *txt = static_cast<Gtk::CellRendererText *>(renderer);
@@ -653,7 +646,7 @@ typedef Glib::ustring (*validator_func)(const Glib::ustring &);
 Glib::ustring get_fnumber(const Glib::ustring &val)
 {
     Glib::MatchInfo m;
-    auto re = Glib::Regex::create("f? *([0-9.]+) *", Glib::REGEX_CASELESS);
+    auto re = Glib::Regex::create("f? *([0-9.]+) *", Glib::Regex::CompileFlags::CASELESS);
     if (re->match(val, m)) {
         auto s = m.fetch(1);
         return to_fraction(s);
@@ -664,7 +657,7 @@ Glib::ustring get_fnumber(const Glib::ustring &val)
 Glib::ustring get_shutterspeed(const Glib::ustring &val)
 {
     Glib::MatchInfo m;
-    auto re = Glib::Regex::create(" *([0-9/]+) *s? *", Glib::REGEX_CASELESS);
+    auto re = Glib::Regex::create(" *([0-9/]+) *s? *", Glib::Regex::CompileFlags::CASELESS);
     if (re->match(val, m)) {
         auto s = m.fetch(1);
         return s;
@@ -675,7 +668,7 @@ Glib::ustring get_shutterspeed(const Glib::ustring &val)
 Glib::ustring get_focallen(const Glib::ustring &val)
 {
     Glib::MatchInfo m;
-    auto re = Glib::Regex::create(" *([0-9.]+) *(mm)? *", Glib::REGEX_CASELESS);
+    auto re = Glib::Regex::create(" *([0-9.]+) *(mm)? *", Glib::Regex::CompileFlags::CASELESS);
     if (re->match(val, m)) {
         auto s = m.fetch(1);
         return to_fraction(s);
@@ -686,7 +679,7 @@ Glib::ustring get_focallen(const Glib::ustring &val)
 Glib::ustring get_expcomp(const Glib::ustring &val)
 {
     Glib::MatchInfo m;
-    auto re = Glib::Regex::create(" *(-?[0-9.]+) *(EV)? *", Glib::REGEX_CASELESS);
+    auto re = Glib::Regex::create(" *(-?[0-9.]+) *(EV)? *", Glib::Regex::CompileFlags::CASELESS);
     if (re->match(val, m)) {
         auto s = m.fetch(1);
         return to_fraction(s);
