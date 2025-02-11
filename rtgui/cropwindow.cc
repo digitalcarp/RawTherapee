@@ -2837,6 +2837,8 @@ void CropWindow::initialImageArrived ()
     for (auto listener : listeners) {
         listener->initialImageArrived();
     }
+
+    iarea->redraw();
 }
 
 void CropWindow::setDisplayPosition (hidpi::LogicalCoord pos) {

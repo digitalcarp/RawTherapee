@@ -44,7 +44,7 @@ CursorManager::CursorInfo::generateTexture(int cursor_size, double scale,
     return texture;
 }
 
-void CursorManager::init (const Glib::RefPtr<Gtk::Window>& mainWindow)
+void CursorManager::init (Gtk::Window* mainWindow)
 {
 
     display = Gdk::Display::get_default ();
@@ -226,6 +226,5 @@ void CursorManager::setCursorOfMainWindow (Gtk::Window* window, CursorShape shap
 /* Set the cursor of the main window */
 void CursorManager::setCursor (CursorShape shape)
 {
-    setCursor (window.get(), shape);
+    setCursor (window, shape);
 }
-

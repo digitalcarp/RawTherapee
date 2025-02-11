@@ -20,6 +20,8 @@
 #include "rtwindow.h"
 
 #include "cachemanager.h"
+#include "cursormanager.h"
+#include "editorpanel.h"
 #include "filepanel.h"
 #include "guiutils.h"
 #include "iccprofilecreator.h"
@@ -32,19 +34,17 @@
 #include "rtmessagedialog.h"
 #include "rtscalable.h"
 #include "splash.h"
+#include "thumbnail.h"
 
 #include "rtengine/procparams.h"
 
 #include <gtkmm.h>
 
-// #include "cursormanager.h"
 // #include "editwindow.h"
-// #include "thumbnail.h"
 // #include "whitebalance.h"
 // #include "rtengine/settings.h"
 // #include "batchqueuepanel.h"
 // #include "batchqueueentry.h"
-#include "editorpanel.h"
 // #include "filmsimulation.h"
 
 Glib::RefPtr<Gtk::CssProvider> cssForced;
@@ -340,8 +340,7 @@ void RtWindow::on_realize ()
         epanel->setAspect();
     }
 
-// TODO(gtk4)
-//     mainWindowCursorManager.init (get_window());
+    cursorManagerScope = mainWindowCursorManager.initScope(this);
 
     // Display release notes only if new major version.
     bool waitForSplash = false;
@@ -942,75 +941,75 @@ void RtWindow::updateExternalEditorWidget(int selectedIndex, const std::vector<E
 
 void RtWindow::updateProfiles (const Glib::ustring &printerProfile, rtengine::RenderingIntent printerIntent, bool printerBPC)
 {
-//     if (epanel) {
-//         epanel->updateProfiles (printerProfile, printerIntent, printerBPC);
-//     }
-//
-//     for (auto panel : epanels) {
-//         panel.second->updateProfiles (printerProfile, printerIntent, printerBPC);
-//     }
+    if (epanel) {
+        epanel->updateProfiles (printerProfile, printerIntent, printerBPC);
+    }
+
+    for (auto panel : epanels) {
+        panel.second->updateProfiles (printerProfile, printerIntent, printerBPC);
+    }
 }
 
 void RtWindow::updateTPVScrollbar (bool hide)
 {
-//     fpanel->updateTPVScrollbar (hide);
-//
-//     if (epanel) {
-//         epanel->updateTPVScrollbar (hide);
-//     }
-//
-//     for (auto panel : epanels) {
-//         panel.second->updateTPVScrollbar (hide);
-//     }
+    fpanel->updateTPVScrollbar (hide);
+
+    if (epanel) {
+        epanel->updateTPVScrollbar (hide);
+    }
+
+    for (auto panel : epanels) {
+        panel.second->updateTPVScrollbar (hide);
+    }
 }
 
 void RtWindow::updateFBQueryTB (bool singleRow)
 {
-//     fpanel->fileCatalog->updateFBQueryTB (singleRow);
+    fpanel->fileCatalog->updateFBQueryTB (singleRow);
 }
 
 void RtWindow::updateFBToolBarVisibility (bool showFilmStripToolBar)
 {
-//     fpanel->fileCatalog->updateFBToolBarVisibility (showFilmStripToolBar);
+    fpanel->fileCatalog->updateFBToolBarVisibility (showFilmStripToolBar);
 }
 
 void RtWindow::updateShowtooltipVisibility (bool showtooltip)
 {
-//     if (epanel) {
-//         epanel->updateShowtooltipVisibility (showtooltip);
-//     }
-//
-//     for (auto panel : epanels) {
-//         panel.second->updateShowtooltipVisibility (showtooltip);
-//     }
+    if (epanel) {
+        epanel->updateShowtooltipVisibility (showtooltip);
+    }
+
+    for (auto panel : epanels) {
+        panel.second->updateShowtooltipVisibility (showtooltip);
+    }
 }
 
 void RtWindow::updateHistogramPosition (int oldPosition, int newPosition)
 {
-//     if (epanel) {
-//         epanel->updateHistogramPosition (oldPosition, newPosition);
-//     }
-//
-//     for (auto panel : epanels) {
-//         panel.second->updateHistogramPosition (oldPosition, newPosition);
-//     }
+    if (epanel) {
+        epanel->updateHistogramPosition (oldPosition, newPosition);
+    }
+
+    for (auto panel : epanels) {
+        panel.second->updateHistogramPosition (oldPosition, newPosition);
+    }
 }
 
 void RtWindow::updateToolPanelToolLocations(
     const std::vector<Glib::ustring> &favorites, bool cloneFavoriteTools)
 {
-//     if (fpanel) {
-//         fpanel->updateToolPanelToolLocations(favorites, cloneFavoriteTools);
-//     }
-//
-//     if (epanel) {
-//         epanel->updateToolPanelToolLocations(favorites, cloneFavoriteTools);
-//     }
-//
-//     for (const auto &panel : epanels) {
-//         panel.second->updateToolPanelToolLocations(favorites, cloneFavoriteTools);
-//     }
-//
+    if (fpanel) {
+        fpanel->updateToolPanelToolLocations(favorites, cloneFavoriteTools);
+    }
+
+    if (epanel) {
+        epanel->updateToolPanelToolLocations(favorites, cloneFavoriteTools);
+    }
+
+    for (const auto &panel : epanels) {
+        panel.second->updateToolPanelToolLocations(favorites, cloneFavoriteTools);
+    }
+
 //     if (options.multiDisplayMode > 0) {
 //         EditWindow::getInstance(this)
 //             ->updateToolPanelToolLocations(favorites, cloneFavoriteTools);
@@ -1062,6 +1061,7 @@ void RtWindow::closeOpenEditors()
 
 bool RtWindow::isEditorPanel (Widget* panel)
 {
+// TODO(gtk4)
 //     return (panel != bpanel) && (panel != fpanel);
     return (panel != fpanel);
 }

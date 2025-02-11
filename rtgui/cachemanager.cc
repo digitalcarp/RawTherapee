@@ -408,7 +408,7 @@ void CacheManager::applyCacheSizeLimitation () const
         files.end(),
         [](const FNameMTime& lhs, const FNameMTime& rhs) -> bool
         {
-            return lhs.second.to_unix_usec() < rhs.second.to_unix_usec();
+            return lhs.second.compare(rhs.second);
         }
     );
 

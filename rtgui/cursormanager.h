@@ -22,6 +22,8 @@
 
 #include <gtkmm.h>
 
+class CursorManagerScope;
+
 enum CursorShape {
     CSAddColPicker,
     CSArrow,
@@ -54,6 +56,8 @@ enum CursorShape {
 class CursorManager
 {
 private:
+    friend class CursorManagerScope;
+
     struct CursorInfo {
         Glib::RefPtr<Gdk::Cursor> cursor;
         Glib::RefPtr<SvgPaintableWrapper> svg;
@@ -91,7 +95,7 @@ private:
     Glib::RefPtr<CursorInfo> cWait;
 
     Glib::RefPtr<Gdk::Display> display;
-    Glib::RefPtr<Gtk::Window> window;
+    Gtk::Window* window;
 
     void setCursor (CursorShape shape);
     void setCursor (Gtk::Window* window, CursorShape shape);
@@ -100,10 +104,28 @@ private:
     createCursor(const Glib::ustring& name, const Glib::ustring& fallback,
                  double hotspot_x = 0.0, double hotspot_y = 0.0);
 
+    void init(Gtk::Window* mainWindow);
+    void cleanup() { window = nullptr; }
+
 public:
-    void init                         (const Glib::RefPtr<Gtk::Window>& mainWindow);
+    CursorManager() : window(nullptr) {}
+
+    auto initScope(Gtk::Window* window) {
+        return std::make_unique<CursorManagerScope>(this, window);
+    }
+
     static void setWidgetCursor       (Gtk::Window* window, CursorShape shape);
     static void setCursorOfMainWindow (Gtk::Window* window, CursorShape shape);
+};
+
+class CursorManagerScope {
+public:
+    CursorManagerScope(CursorManager* manager, Gtk::Window* window) : m_manager(manager) { 
+        m_manager->init(window);
+    }
+    ~CursorManagerScope() { m_manager->cleanup(); }
+private:
+    CursorManager* m_manager;
 };
 
 extern CursorManager mainWindowCursorManager;

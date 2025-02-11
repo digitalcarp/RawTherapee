@@ -28,6 +28,7 @@
 
 class BatchQueueEntry;
 class BatchQueuePanel;
+class CursorManagerScope;
 class EditorPanel;
 struct ExternalEditor;
 class FilePanel;
@@ -59,6 +60,8 @@ private:
     Gtk::Button* btn_fullscreen;
 
     Gtk::Image *iFullscreen, *iFullscreen_exit;
+
+    std::unique_ptr<CursorManagerScope> cursorManagerScope;
 
     bool isSingleTabMode() const;
 

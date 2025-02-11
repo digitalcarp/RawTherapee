@@ -145,7 +145,8 @@ void Exiv2Metadata::load() const
     if (!src_.empty() && !image_.get() && Glib::file_test(src_.c_str(), Glib::FileTest::EXISTS)) {
         CacheVal val;
         auto finfo = Gio::File::create_for_path(src_)->query_info(G_FILE_ATTRIBUTE_TIME_MODIFIED);
-        Glib::DateTime xmp_mtime(0, 0);
+        Glib::DateTime file_mtime = finfo->get_modification_date_time();
+        Glib::DateTime xmp_mtime;
         if (merge_xmp_) {
             auto xmpname = xmpSidecarPath(src_);
             if (Glib::file_test(xmpname.c_str(), Glib::FileTest::EXISTS)) {
@@ -153,10 +154,19 @@ void Exiv2Metadata::load() const
             }
         }
 
-        if (cache_ && cache_->get(src_, val) &&
-                val.image_mtime.to_unix_usec() >= finfo->get_modification_date_time().to_unix_usec() &&
-                val.use_xmp == merge_xmp_ &&
-                val.xmp_mtime.to_unix_usec() >= xmp_mtime.to_unix_usec()) {
+        bool should_use_cache = [&]() {
+            if (!cache_ || !cache_->get(src_, val)) return false;
+            if (val.use_xmp != merge_xmp_) return false;
+            // Check if the cache is outdated
+            if (file_mtime.difference(val.image_mtime) > 0) return false;
+            if (merge_xmp_ && (!xmp_mtime || xmp_mtime.difference(val.xmp_mtime) > 0)) {
+                return false;
+            }
+
+            return true;
+        }();
+
+        if (should_use_cache) {
             image_ = val.image;
         } else {
             auto img = open_exiv2(src_, true);
@@ -166,7 +176,7 @@ void Exiv2Metadata::load() const
             }
             if (cache_) {
                 val.image = image_;
-                val.image_mtime = finfo->get_modification_date_time();
+                val.image_mtime = file_mtime;
                 val.xmp_mtime = xmp_mtime;
                 val.use_xmp = merge_xmp_;
                 cache_->set(src_, val);

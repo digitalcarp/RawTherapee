@@ -64,6 +64,8 @@ ImageArea::ImageArea (ImageAreaPanel* p) : parent(p), fullImageWidth(0), fullIma
     add_controller(clickController);
 
     motionController = Gtk::EventControllerMotion::create();
+    motionController->signal_motion().connect(
+        sigc::mem_fun(*this, &ImageArea::on_motion_notify_event));
     motionController->signal_leave().connect(
         sigc::mem_fun(*this, &ImageArea::on_leave_notify_event));
     add_controller(motionController);
@@ -578,6 +580,8 @@ void ImageArea::addCropWindow ()
         ipc->startProcessing(M_HIGHQUAL);
         ipc->setHighQualComputed();
     }
+
+    redraw();
 }
 
 
@@ -670,18 +674,19 @@ void ImageArea::setScrollPosition (int x, int y)
 
 void ImageArea::cropPositionChanged (CropWindow* cw)
 {
-
+    redraw();
     syncBeforeAfterViews ();
 }
 
 void ImageArea::cropWindowSizeChanged (CropWindow* cw)
 {
-
+    redraw();
     syncBeforeAfterViews ();
 }
 
 void ImageArea::cropZoomChanged (CropWindow* cw)
 {
+    redraw();
 
     if (cw == mainCropWindow) {
         parent->zoomChanged ();
@@ -727,6 +732,7 @@ void ImageArea::initialImageArrived ()
         }
         fullImageWidth = size.width;
         fullImageHeight = size.height;
+        redraw();
     }
 }
 
