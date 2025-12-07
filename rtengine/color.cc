@@ -44,11 +44,13 @@ typedef Vec3f A3;
 void XYZ_D50_to_D65(float &X, float &Y, float &Z)
 {
     // Bradford adaptation matrix from http://www.brucelindbloom.com/index.html?Eqn_ChromAdapt.html
+    // clang-format off
     constexpr float M[3][3] = {
         {  0.9555766f, -0.0230393f,  0.0631636f },
         { -0.0282895f,  1.0099416f,  0.0210077f },
-        {  0.0122982f, -0.0204830f,  1.3299098f }
+        {  0.0122982f, -0.0204830f,  1.3299098f },
     };
+    // clang-format on
     A3 res = dot_product(M, A3(X, Y, Z));
     X = res[0];
     Y = res[1];
@@ -59,11 +61,13 @@ void XYZ_D50_to_D65(float &X, float &Y, float &Z)
 void XYZ_D65_to_D50(float &X, float &Y, float &Z)
 {
     // Bradford adaptation matrix from http://www.brucelindbloom.com/index.html?Eqn_ChromAdapt.html
+    // clang-format off
     constexpr float M[3][3] = {
         {  1.0478112f,  0.0228866f, -0.0501270f },
         {  0.0295424f,  0.9904844f, -0.0170491f },
-        { -0.0092345f,  0.0150436f,  0.7521316f }
+        { -0.0092345f,  0.0150436f,  0.7521316f },
     };
+    // clang-format on
     A3 res = dot_product(M, A3(X, Y, Z));
     X = res[0];
     Y = res[1];
@@ -562,7 +566,7 @@ void Color::rgb2lab01 (const Glib::ustring &profile, const Glib::ustring &profil
 
     const float xyz_rgb[3][3] = { {static_cast<float>(wprof[0][0]), static_cast<float>(wprof[0][1]), static_cast<float>(wprof[0][2])},
                                   {static_cast<float>(wprof[1][0]), static_cast<float>(wprof[1][1]), static_cast<float>(wprof[1][2])},
-                                  {static_cast<float>(wprof[2][0]), static_cast<float>(wprof[2][1]), static_cast<float>(wprof[2][2])}
+                                  {static_cast<float>(wprof[2][0]), static_cast<float>(wprof[2][1]), static_cast<float>(wprof[2][2])},
                                 };
 
     const float var_X = (xyz_rgb[0][0] * r + xyz_rgb[0][1] * g + xyz_rgb[0][2] * b) / Color::D50x;
@@ -1835,7 +1839,7 @@ void Color::Lab2RGBLimit(float *L, float *a, float *b, float *R, float *G, float
     const vfloat wpv[3][3] = {
                               {F2V(wp[0][0]), F2V(wp[0][1]), F2V(wp[0][2])},
                               {F2V(wp[1][0]), F2V(wp[1][1]), F2V(wp[1][2])},
-                              {F2V(wp[2][0]), F2V(wp[2][1]), F2V(wp[2][2])}
+                              {F2V(wp[2][0]), F2V(wp[2][1]), F2V(wp[2][2])},
                              };
     const vfloat limitv = F2V(limit);
     const vfloat afactorv = F2V(afactor);
@@ -1984,7 +1988,7 @@ void Color::xyz2oklab(float X, float Y, float Z, float &L, float &a, float &b)
     constexpr float M1[3][3] = {
         {0.8189330101f, 0.3618667424f, -0.1288597137f},
         {0.0329845436f, 0.9293118715f, 0.0361456387f},
-        {0.0482003018f, 0.2643662691f, 0.6338517070f}        
+        {0.0482003018f, 0.2643662691f, 0.6338517070f},
     };
     
     A3 lms = dot_product(M1, A3(X, Y, Z));
@@ -1995,7 +1999,7 @@ void Color::xyz2oklab(float X, float Y, float Z, float &L, float &a, float &b)
     constexpr float M2[3][3] = {
         {0.2104542553f, 0.7936177850f, -0.0040720468f},
         {1.9779984951f, -2.4285922050f, 0.4505937099f},
-        {0.0259040371f, 0.7827717662f, -0.8086757660f}
+        {0.0259040371f, 0.7827717662f, -0.8086757660f},
     };
 
     lms = dot_product(M2, lms);
@@ -2011,7 +2015,7 @@ void Color::oklab2xyz(float L, float a, float b, float &X, float &Y, float &Z)
     constexpr float M2_inv[3][3] = {
         {1.f, 0.39633779f, 0.21580376f},
         {1.00000001f, -0.10556134f, -0.06385417f},
-        {1.00000005f, -0.08948418f, -1.29148554f}
+        {1.00000005f, -0.08948418f, -1.29148554f},
     };
 
     A3 lms = dot_product(M2_inv, A3(L, a, b));
@@ -2022,7 +2026,7 @@ void Color::oklab2xyz(float L, float a, float b, float &X, float &Y, float &Z)
     constexpr float M1_inv[3][3] = {
         {1.22701385f, -0.55779998f, 0.28125615f},
         {-0.04058018f, 1.11225687f, -0.07167668f},
-        {-0.07638128f, -0.42148198f, 1.58616322}
+        {-0.07638128f, -0.42148198f, 1.58616322},
     };
 
     lms = dot_product(M1_inv, lms);

@@ -292,7 +292,7 @@ int DCraw::parseCR3(
         "soun",
         "vide",
         "hint",
-        "meta"
+        "meta",
     };
 
     int err = 0;

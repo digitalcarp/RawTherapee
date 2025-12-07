@@ -1803,7 +1803,7 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                 double wp[3][3] = {
                     {wprof[0][0], wprof[0][1], wprof[0][2]},
                     {wprof[1][0], wprof[1][1], wprof[1][2]},
-                    {wprof[2][0], wprof[2][1], wprof[2][2]}
+                    {wprof[2][0], wprof[2][1], wprof[2][2]},
                 };
                 params->colorToning.getCurves(ctColorCurve, ctOpacityCurve, wp, opautili);
                 CurveFactory::diagonalCurve2Lut(params->colorToning.clcurve, clToningcurve, scale == 1 ? 1 : 16);

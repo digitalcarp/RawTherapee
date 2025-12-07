@@ -75,6 +75,7 @@ void RawImageSource::vng4_demosaic (const array2D<float> &rawData, array2D<float
         }
     }
 
+    // clang-format off
     BENCHFUN
     const signed short int *cp, terms[] = {
         -2, -2, +0, -1, 0, 0x01, -2, -2, +0, +0, 1, 0x01, -2, -1, -1, +0, 0, 0x01,
@@ -101,6 +102,7 @@ void RawImageSource::vng4_demosaic (const array2D<float> &rawData, array2D<float
         +1, +0, +2, +1, 0, 0x10
     },
     chood[] = { -1, -1, -1, 0, -1, +1, 0, +1, +1, +1, +1, 0, +1, -1, 0, -1 };
+    // clang-format on
 
     double progress = 0.0;
     const bool plistenerActive = plistener;

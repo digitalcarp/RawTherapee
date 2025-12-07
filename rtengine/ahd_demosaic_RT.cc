@@ -55,7 +55,7 @@ void RawImageSource::ahd_demosaic()
     constexpr float xyz_rgb[3][3] = {        /* XYZ from RGB */
         { 0.412453f, 0.357580f, 0.180423f },
         { 0.212671f, 0.715160f, 0.072169f },
-        { 0.019334f, 0.119193f, 0.950227f }
+        { 0.019334f, 0.119193f, 0.950227f },
     };
 
     constexpr float d65_white[3] = { 0.950456f, 1.f, 1.088754f };

@@ -2129,7 +2129,7 @@ void RawImageSource::retinexPrepareBuffers(const ColorManagementParams& cmp, con
         const float wp[3][3] = {
             {static_cast<float>(wprof[0][0]), static_cast<float>(wprof[0][1]), static_cast<float>(wprof[0][2])},
             {static_cast<float>(wprof[1][0]), static_cast<float>(wprof[1][1]), static_cast<float>(wprof[1][2])},
-            {static_cast<float>(wprof[2][0]), static_cast<float>(wprof[2][1]), static_cast<float>(wprof[2][2])}
+            {static_cast<float>(wprof[2][0]), static_cast<float>(wprof[2][1]), static_cast<float>(wprof[2][2])},
         };
 
         // Conversion rgb -> lab is hard to vectorize because it uses a lut (that's not the main problem)
@@ -2405,7 +2405,7 @@ void RawImageSource::retinex(const ColorManagementParams& cmp, const RetinexPara
         double wip[3][3] = {
             {wiprof[0][0], wiprof[0][1], wiprof[0][2]},
             {wiprof[1][0], wiprof[1][1], wiprof[1][2]},
-            {wiprof[2][0], wiprof[2][1], wiprof[2][2]}
+            {wiprof[2][0], wiprof[2][1], wiprof[2][2]},
         };
         // gamut control only in Lab mode
         const bool highlight = Tc.hrenabled;
@@ -3245,7 +3245,7 @@ void RawImageSource::colorSpaceConversion_(Imagefloat* im, const ColorManagement
         const DCPProfile::Matrix cam_matrix = {{
                 {camMatrix[0][0], camMatrix[0][1], camMatrix[0][2]},
                 {camMatrix[1][0], camMatrix[1][1], camMatrix[1][2]},
-                {camMatrix[2][0], camMatrix[2][1], camMatrix[2][2]}
+                {camMatrix[2][0], camMatrix[2][1], camMatrix[2][2]},
             }
         };
         dcpProf->apply(im, cmp.dcpIlluminant, cmp.workingProfile, wb, pre_mul_row, cam_matrix, cmp.applyHueSatMap);
@@ -5628,7 +5628,7 @@ void RawImageSource::ItcWB(bool extra, double &tempref, double &greenref, double
             {3.400, 1.f},
             {3.600, 1.f},
             {3.800, 1.f},
-            {4.000, 1.f}
+            {4.000, 1.f},
         };
         const int N_g = sizeof(gree) / sizeof(gree[0]);   //number of green
 
@@ -5880,7 +5880,7 @@ void RawImageSource::ItcWB(bool extra, double &tempref, double &greenref, double
             {14251., 0.965827, 1.705950},
             {14501., 0.966363, 1.715637},
             {14751., 0.966886, 1.724998},
-            {15001., 0.967397, 1.734047}
+            {15001., 0.967397, 1.734047},
         };
         //compatibility 5.9
         constexpr WbTxyz Txyzs[118] = {//temperature Xwb Zwb 118 values - same table as in Rawimagesource.cc  x wb and y wb are calculated after
@@ -6001,7 +6001,7 @@ void RawImageSource::ItcWB(bool extra, double &tempref, double &greenref, double
             {9901., 0.954537, 1.464134},
             {10501., 0.956321, 1.508623},
             {11001., 0.957747, 1.541281},
-            {12001., 0.960440, 1.601019}
+            {12001., 0.960440, 1.601019},
         };
         bool purp = true;//if inpaint-opposed or something else enable purp
 

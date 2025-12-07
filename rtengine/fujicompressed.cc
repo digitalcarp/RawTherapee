@@ -997,7 +997,7 @@ void CLASS fuji_decode_strip (fuji_compressed_params* params, int cur_block, INT
         int a, b;
     };
 
-    const i_pair mtable[6] = { {_R0, _R3}, {_R1, _R4}, {_G0, _G6}, {_G1, _G7}, {_B0, _B3}, {_B1, _B4}},
+    const i_pair mtable[6] = { {_R0, _R3}, {_R1, _R4}, {_G0, _G6}, {_G1, _G7}, {_B0, _B3}, {_B1, _B4}, },
     ztable[3] = {{_R2, 3}, {_G2, 6}, {_B2, 3}};
 
     for  (cur_line = 0; cur_line < fuji_total_lines; cur_line++) {

@@ -72,27 +72,27 @@ void ImProcFunctions::softLight(LabImage *lab, const rtengine::procparams::SoftL
     const float wp[3][3] = {
         {static_cast<float>(wprof[0][0]), static_cast<float>(wprof[0][1]), static_cast<float>(wprof[0][2])},
         {static_cast<float>(wprof[1][0]), static_cast<float>(wprof[1][1]), static_cast<float>(wprof[1][2])},
-        {static_cast<float>(wprof[2][0]), static_cast<float>(wprof[2][1]), static_cast<float>(wprof[2][2])}
+        {static_cast<float>(wprof[2][0]), static_cast<float>(wprof[2][1]), static_cast<float>(wprof[2][2])},
     };
 
     const TMatrix wiprof = ICCStore::getInstance()->workingSpaceInverseMatrix(params->icm.workingProfile);
     const float wip[3][3] = {
         {static_cast<float>(wiprof[0][0]), static_cast<float>(wiprof[0][1]), static_cast<float>(wiprof[0][2])},
         {static_cast<float>(wiprof[1][0]), static_cast<float>(wiprof[1][1]), static_cast<float>(wiprof[1][2])},
-        {static_cast<float>(wiprof[2][0]), static_cast<float>(wiprof[2][1]), static_cast<float>(wiprof[2][2])}
+        {static_cast<float>(wiprof[2][0]), static_cast<float>(wiprof[2][1]), static_cast<float>(wiprof[2][2])},
     };
 
 #ifdef __SSE2__
     const vfloat wpv[3][3] = {
         {F2V(wprof[0][0]), F2V(wprof[0][1]), F2V(wprof[0][2])},
         {F2V(wprof[1][0]), F2V(wprof[1][1]), F2V(wprof[1][2])},
-        {F2V(wprof[2][0]), F2V(wprof[2][1]), F2V(wprof[2][2])}
+        {F2V(wprof[2][0]), F2V(wprof[2][1]), F2V(wprof[2][2])},
     };
 
     const vfloat wipv[3][3] = {
         {F2V(wiprof[0][0]), F2V(wiprof[0][1]), F2V(wiprof[0][2])},
         {F2V(wiprof[1][0]), F2V(wiprof[1][1]), F2V(wiprof[1][2])},
-        {F2V(wiprof[2][0]), F2V(wiprof[2][1]), F2V(wiprof[2][2])}
+        {F2V(wiprof[2][0]), F2V(wiprof[2][1]), F2V(wiprof[2][2])},
     };
 #endif
 

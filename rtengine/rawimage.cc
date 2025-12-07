@@ -47,6 +47,7 @@ struct MakeModel
  * Map from make and model to other make and models that are essentially
  * identical.
  */
+// clang-format off
 const std::map<MakeModel, std::vector<MakeModel>> CAMERA_ALIASES = {
     {{MAKE_PENTAX, "*istDL2"},
         {{MAKE_SAMSUNG, "GX-1L"}}},
@@ -57,6 +58,7 @@ const std::map<MakeModel, std::vector<MakeModel>> CAMERA_ALIASES = {
     {{MAKE_PENTAX, "K20D"},
         {{MAKE_SAMSUNG, "GX20"}, {MAKE_SAMSUNG, "GX-20"}}},
 };
+// clang-format on
 
 /**
  * Transforms a map of make and model to like make and models into a map of make
@@ -1580,6 +1582,7 @@ bool
 DCraw::dcraw_coeff_overrides(const char make[], const char model[], const int iso_speed, short trans[12], int *black_level, int *white_level)
 {
     static const int dcraw_arw2_scaling_bugfix_shift = 2;
+    // clang-format off
     static const struct {
         const char *prefix;
         int black_level, white_level; // set to -1 for no change
@@ -1703,6 +1706,7 @@ DCraw::dcraw_coeff_overrides(const char make[], const char model[], const int is
             { 5126, -830, -261, -4788, 12196, 2934, -948, 1602, 7068 }
         },
     };
+    // clang-format on
 
     *black_level = -1;
     *white_level = -1;

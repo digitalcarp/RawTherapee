@@ -387,14 +387,14 @@ void SobelCannyLuma(float **sobelL, float **luma, int bfw, int bfh, float radius
     constexpr float GX[3][3] = {
         {1.f, 0.f, -1.f},
         {2.f, 0.f, -2.f},
-        {1.f, 0.f, -1.f}
+        {1.f, 0.f, -1.f},
     };
 
     //Sobel Vertical
     constexpr float GY[3][3] = {
         {1.f, 2.f, 1.f},
         {0.f, 0.f, 0.f},
-        {-1.f, -2.f, -1.f}
+        {-1.f, -2.f, -1.f},
     };
 
     if (radius > 0.f) {
@@ -3217,7 +3217,7 @@ void ImProcFunctions::ciecamloc_02float(struct local_params& lp, int sp, LabImag
     const double wip[3][3] = {//improve precision with double
         {wiprof[0][0], wiprof[0][1], wiprof[0][2]},
         {wiprof[1][0], wiprof[1][1], wiprof[1][2]},
-        {wiprof[2][0], wiprof[2][1], wiprof[2][2]}
+        {wiprof[2][0], wiprof[2][1], wiprof[2][2]},
     };
     float plum = (float) params->locallab.spots.at(sp).pqremapcam16;
 
@@ -12855,7 +12855,7 @@ void ImProcFunctions::DeNoise(int sp, int call, int aut,  bool noiscfactiv, cons
                 const float wip[3][3] = {
                     {(float) wprof[0][0], (float) wprof[0][1], (float) wprof[0][2]},
                     {(float) wprof[1][0], (float) wprof[1][1], (float) wprof[1][2]},
-                    {(float) wprof[2][0], (float) wprof[2][1], (float) wprof[2][2]}
+                    {(float) wprof[2][0], (float) wprof[2][1], (float) wprof[2][2]},
                 };
 
                 const std::unique_ptr<Imagefloat> tmpImage(new Imagefloat(original->W, original->H));//all image
@@ -13749,7 +13749,7 @@ void ImProcFunctions::DeNoise(int sp, int call, int aut,  bool noiscfactiv, cons
                         const float wip[3][3] = {
                             {(float) wprof[0][0], (float) wprof[0][1], (float) wprof[0][2]},
                             {(float) wprof[1][0], (float) wprof[1][1], (float) wprof[1][2]},
-                            {(float) wprof[2][0], (float) wprof[2][1], (float) wprof[2][2]}
+                            {(float) wprof[2][0], (float) wprof[2][1], (float) wprof[2][2]},
                         };
 
                         const std::unique_ptr<Imagefloat> tmpImage(new Imagefloat(bfw, bfh));//all image
@@ -14103,14 +14103,14 @@ void ImProcFunctions::avoidcolshi(const struct local_params& lp, int sp, LabImag
         const double wip[3][3] = {//improve precision with double
             {wiprof[0][0], wiprof[0][1], wiprof[0][2]},
             {wiprof[1][0], wiprof[1][1], wiprof[1][2]},
-            {wiprof[2][0], wiprof[2][1], wiprof[2][2]}
+            {wiprof[2][0], wiprof[2][1], wiprof[2][2]},
         };
 
         TMatrix wprof = ICCStore::getInstance()->workingSpaceMatrix(params->icm.workingProfile);
         const double wp[3][3] = {//improve precision with double
             {wprof[0][0], wprof[0][1], wprof[0][2]},
             {wprof[1][0], wprof[1][1], wprof[1][2]},
-            {wprof[2][0], wprof[2][1], wprof[2][2]}
+            {wprof[2][0], wprof[2][1], wprof[2][2]},
         };
 
         const float softr = params->locallab.spots.at(sp).avoidrad;//max softr = 30
@@ -22291,7 +22291,7 @@ void ImProcFunctions::Lab_Local(
                         static_cast<float>(wprof[2][0] / static_cast<double>(Color::D50z)),
                         static_cast<float>(wprof[2][1] / static_cast<double>(Color::D50z)),
                         static_cast<float>(wprof[2][2] / static_cast<double>(Color::D50z))
-                        }
+                        },
                     };
 
                     float maxFactorToxyz = max(toxyz[1][0], toxyz[1][1], toxyz[1][2]);
@@ -22302,12 +22302,12 @@ void ImProcFunctions::Lab_Local(
                     double wip[3][3] = {
                         {wiprof[0][0], wiprof[0][1], wiprof[0][2]},
                         {wiprof[1][0], wiprof[1][1], wiprof[1][2]},
-                        {wiprof[2][0], wiprof[2][1], wiprof[2][2]}
+                        {wiprof[2][0], wiprof[2][1], wiprof[2][2]},
                     };
                     double wp[3][3] = {
                         {wprof[0][0], wprof[0][1], wprof[0][2]},
                         {wprof[1][0], wprof[1][1], wprof[1][2]},
-                        {wprof[2][0], wprof[2][1], wprof[2][2]}
+                        {wprof[2][0], wprof[2][1], wprof[2][2]},
                     };
                     Imagefloat *tmpImage = nullptr;
                     tmpImage = new Imagefloat(bfw, bfh);

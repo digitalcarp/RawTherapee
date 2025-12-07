@@ -128,11 +128,13 @@ DCPProfile::Matrix mapWhiteMatrix(const DCPProfile::Triple& white1, const DCPPro
 
     // Use the linearized Bradford adaptation matrix
     const DCPProfile::Matrix mb = {
+        // clang-format off
         {
-            { 0.8951,  0.2664, -0.1614 },
-            { -0.7502, 1.7135,  0.0367 },
-            { 0.0389, -0.0685,  1.0296 }
+            {  0.8951,  0.2664, -0.1614 },
+            { -0.7502,  1.7135,  0.0367 },
+            {  0.0389, -0.0685,  1.0296 },
         }
+        // clang-format on
     };
 
     DCPProfile::Triple w1 = multiply3x3_v3(mb, white1);
@@ -291,6 +293,7 @@ double xyCoordToTemperature(const std::array<double, 2>& white_xy)
         double t;
     };
 
+    // clang-format off
     static const Ruvt temp_table[] = {
         {   0, 0.18006, 0.26352, -0.24341 },
         {  10, 0.18066, 0.26589, -0.25479 },
@@ -322,8 +325,9 @@ double xyCoordToTemperature(const std::array<double, 2>& white_xy)
         { 525, 0.31320, 0.35968, -15.628 },
         { 550, 0.32129, 0.36011, -23.325 },
         { 575, 0.32931, 0.36038, -40.770 },
-        { 600, 0.33724, 0.36051, -116.45 }
+        { 600, 0.33724, 0.36051, -116.45 },
     };
+    // clang-format on
 
     double res = 0;
 
@@ -1761,7 +1765,7 @@ DCPProfile::Matrix DCPProfile::makeXyzCam(const ColorTemp& white_balance, const 
             {
                 {xyz_sRGB[0][0], xyz_sRGB[0][1], xyz_sRGB[0][2]},
                 {xyz_sRGB[1][0], xyz_sRGB[1][1], xyz_sRGB[1][2]},
-                {xyz_sRGB[2][0], xyz_sRGB[2][1], xyz_sRGB[2][2]}
+                {xyz_sRGB[2][0], xyz_sRGB[2][1], xyz_sRGB[2][2]},
             }
         };
         const Matrix cam_rgb = multiply3x3(invert3x3(cam_wb_matrix), xyz_srgb);
@@ -1882,7 +1886,7 @@ DCPProfile::Matrix DCPProfile::makeXyzCam(const ColorTemp& white_balance, const 
             {
                 {camera_white[0], 0, 0},
                 {0, camera_white[1], 0},
-                {0, 0, camera_white[2]}
+                {0, 0, camera_white[2]},
             }
         };
 

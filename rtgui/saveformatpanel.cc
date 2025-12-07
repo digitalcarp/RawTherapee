@@ -33,7 +33,7 @@ const std::array<std::pair<const char*, SaveFormat>, 7> sf_templates = {{
      {"TIFF (16-bit float)", SaveFormat("tif", 8, 16, true)},
      {"TIFF (32-bit float)", SaveFormat("tif", 8, 32, true)},
      {"PNG (8-bit)", SaveFormat("png", 8, 8, false)},
-     {"PNG (16-bit)", SaveFormat("png", 16, 8, false)}
+     {"PNG (16-bit)", SaveFormat("png", 16, 8, false)},
 }};
 
 }

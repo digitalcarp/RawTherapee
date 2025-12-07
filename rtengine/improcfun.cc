@@ -1029,7 +1029,7 @@ void ImProcFunctions::ciecam_02float(CieImage* ncie, float adap, int pW, int pwb
         const float wip[3][3] = {
             { (float)wiprof[0][0], (float)wiprof[0][1], (float)wiprof[0][2]},
             { (float)wiprof[1][0], (float)wiprof[1][1], (float)wiprof[1][2]},
-            { (float)wiprof[2][0], (float)wiprof[2][1], (float)wiprof[2][2]}
+            { (float)wiprof[2][0], (float)wiprof[2][1], (float)wiprof[2][2]},
         };
 
 #ifdef __SSE2__
@@ -1480,7 +1480,7 @@ void ImProcFunctions::ciecam_02float(CieImage* ncie, float adap, int pW, int pwb
                             const double wpc[3][3] = {//improve precision with double
                                 {wprofc[0][0], wprofc[0][1], wprofc[0][2]},
                                 {wprofc[1][0], wprofc[1][1], wprofc[1][2]},
-                                {wprofc[2][0], wprofc[2][1], wprofc[2][2]}
+                                {wprofc[2][0], wprofc[2][1], wprofc[2][2]},
                             };
 
                             Ciecam02::jch2xyz_ciecam02float(xx, yy, zz,
@@ -2011,15 +2011,15 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
         {
             static_cast<float>(wprof[0][0] / static_cast<double>(Color::D50x)),
             static_cast<float>(wprof[0][1] / static_cast<double>(Color::D50x)),
-            static_cast<float>(wprof[0][2] / static_cast<double>(Color::D50x))
+            static_cast<float>(wprof[0][2] / static_cast<double>(Color::D50x)),
         }, {
             static_cast<float>(wprof[1][0]),
             static_cast<float>(wprof[1][1]),
-            static_cast<float>(wprof[1][2])
+            static_cast<float>(wprof[1][2]),
         }, {
             static_cast<float>(wprof[2][0] / static_cast<double>(Color::D50z)),
             static_cast<float>(wprof[2][1] / static_cast<double>(Color::D50z)),
-            static_cast<float>(wprof[2][2] / static_cast<double>(Color::D50z))
+            static_cast<float>(wprof[2][2] / static_cast<double>(Color::D50z)),
         }
     };
     float maxFactorToxyz = max(toxyz[1][0], toxyz[1][1], toxyz[1][2]);
@@ -2031,13 +2031,13 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
     double wip[3][3] = {
         {wiprof[0][0], wiprof[0][1], wiprof[0][2]},
         {wiprof[1][0], wiprof[1][1], wiprof[1][2]},
-        {wiprof[2][0], wiprof[2][1], wiprof[2][2]}
+        {wiprof[2][0], wiprof[2][1], wiprof[2][2]},
     };
 
     double wp[3][3] = {
         {wprof[0][0], wprof[0][1], wprof[0][2]},
         {wprof[1][0], wprof[1][1], wprof[1][2]},
-        {wprof[2][0], wprof[2][1], wprof[2][2]}
+        {wprof[2][0], wprof[2][1], wprof[2][2]},
     };
 
     bool mixchannels = params->chmixer.enabled &&
@@ -4320,14 +4320,14 @@ void ImProcFunctions::chromiLuminanceCurve(PipetteBuffer *pipetteBuffer, int pW,
     const double wip[3][3] = {
         {wiprof[0][0], wiprof[0][1], wiprof[0][2]},
         {wiprof[1][0], wiprof[1][1], wiprof[1][2]},
-        {wiprof[2][0], wiprof[2][1], wiprof[2][2]}
+        {wiprof[2][0], wiprof[2][1], wiprof[2][2]},
     };
 
     TMatrix wprof = ICCStore::getInstance()->workingSpaceMatrix(params->icm.workingProfile);
     const double wp[3][3] = {
         {wprof[0][0], wprof[0][1], wprof[0][2]},
         {wprof[1][0], wprof[1][1], wprof[1][2]},
-        {wprof[2][0], wprof[2][1], wprof[2][2]}
+        {wprof[2][0], wprof[2][1], wprof[2][2]},
     };
 
 #ifdef _OPENMP
@@ -5713,7 +5713,7 @@ void ImProcFunctions::rgb2lab(const Imagefloat &src, LabImage &dst, const Glib::
     const float wp[3][3] = {
         {static_cast<float>(wprof[0][0]), static_cast<float>(wprof[0][1]), static_cast<float>(wprof[0][2])},
         {static_cast<float>(wprof[1][0]), static_cast<float>(wprof[1][1]), static_cast<float>(wprof[1][2])},
-        {static_cast<float>(wprof[2][0]), static_cast<float>(wprof[2][1]), static_cast<float>(wprof[2][2])}
+        {static_cast<float>(wprof[2][0]), static_cast<float>(wprof[2][1]), static_cast<float>(wprof[2][2])},
     };
 
     const int W = src.getWidth();
@@ -5825,7 +5825,7 @@ void ImProcFunctions::rgb2lab(const Image8 &src, int x, int y, int w, int h, flo
         const float wp[3][3] = {
             {static_cast<float>(wprof[0][0]), static_cast<float>(wprof[0][1]), static_cast<float>(wprof[0][2])},
             {static_cast<float>(wprof[1][0]), static_cast<float>(wprof[1][1]), static_cast<float>(wprof[1][2])},
-            {static_cast<float>(wprof[2][0]), static_cast<float>(wprof[2][1]), static_cast<float>(wprof[2][2])}
+            {static_cast<float>(wprof[2][0]), static_cast<float>(wprof[2][1]), static_cast<float>(wprof[2][2])},
         };
 
         const int x2 = x + w;
@@ -5872,7 +5872,7 @@ void ImProcFunctions::lab2rgb(const LabImage &src, Imagefloat &dst, const Glib::
     const float wip[3][3] = {
         {static_cast<float>(wiprof[0][0]), static_cast<float>(wiprof[0][1]), static_cast<float>(wiprof[0][2])},
         {static_cast<float>(wiprof[1][0]), static_cast<float>(wiprof[1][1]), static_cast<float>(wiprof[1][2])},
-        {static_cast<float>(wiprof[2][0]), static_cast<float>(wiprof[2][1]), static_cast<float>(wiprof[2][2])}
+        {static_cast<float>(wiprof[2][0]), static_cast<float>(wiprof[2][1]), static_cast<float>(wiprof[2][2])},
     };
 
     const int W = dst.getWidth();

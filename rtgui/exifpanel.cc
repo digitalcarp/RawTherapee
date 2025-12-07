@@ -349,7 +349,7 @@ void ExifPanel::refreshTags()
                 order_{
                     {"Exif.GPSInfo", 0},
                     {"Exif.Photo", 1},
-                    {"Exif.Image", 2}
+                    {"Exif.Image", 2},
                 }
             {}
             bool operator()(const std::string &a, const std::string &b) const
@@ -698,7 +698,7 @@ std::unordered_map<std::string, validator_func> validators = {
     {"Exif.Photo.FNumber", get_fnumber},
     {"Exif.Photo.ExposureTime", get_shutterspeed},
     {"Exif.Photo.FocalLength", get_focallen},
-    {"Exif.Photo.ExposureBiasValue", get_expcomp}
+    {"Exif.Photo.ExposureBiasValue", get_expcomp},
 };
 
 } // namespace

@@ -326,12 +326,12 @@ void RawImageSource::HLRecovery_inpaint(float** red, float** green, float** blue
     constexpr float trans[3][3] = {
         {1.f, 1.f, 1.f},
         {1.7320508f, -1.7320508f, 0.f},
-        {-1.f, -1.f, 2.f}
+        {-1.f, -1.f, 2.f},
     };
     constexpr float itrans[3][3] = {
         {1.f, 0.8660254f, -0.5f},
         {1.f, -0.8660254f, -0.5f},
-        {1.f, 0.f, 1.f}
+        {1.f, 0.f, 1.f},
     };
 
     if (settings->verbose) {
@@ -1173,7 +1173,7 @@ void RawImageSource::HLRecovery_inpaint(float** red, float** green, float** blue
                                   //    {3.5f, 0.5f, 0.2f},
                                       {3.0f, 1.0f, 0.1f},
                                       {3.0f, 2.0f, 0.01f},
-                                      {2.0f, 3.0f, 0.001f}
+                                      {2.0f, 3.0f, 0.001f},
                                      };
 
         const float radius1 = vals[blur][0];

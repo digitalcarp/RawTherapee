@@ -613,7 +613,7 @@ bool CameraConst::get_Levels(camera_const_levels & lvl, int bw, int iso, float f
                 { 2.8f, 3.2f, 3.5f },
                 { 4.f, 4.5f, 5.f },
                 { 5.6f, 6.3f, 7.1f },
-                { 8.f, 9.f, 10.f }
+                { 8.f, 9.f, 10.f },
             };
 
             for (int avh = 0; avh < 8; avh++) {

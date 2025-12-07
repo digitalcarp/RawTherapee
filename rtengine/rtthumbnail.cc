@@ -1397,7 +1397,7 @@ IImage8* Thumbnail::processImage (const procparams::ProcParams& params, eSensorT
         double wp[3][3] = {
             {wprof[0][0], wprof[0][1], wprof[0][2]},
             {wprof[1][0], wprof[1][1], wprof[1][2]},
-            {wprof[2][0], wprof[2][1], wprof[2][2]}
+            {wprof[2][0], wprof[2][1], wprof[2][2]},
         };
         params.colorToning.getCurves (ctColorCurve, ctOpacityCurve, wp, opautili);
 

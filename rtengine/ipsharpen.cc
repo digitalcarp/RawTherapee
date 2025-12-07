@@ -740,7 +740,7 @@ void ImProcFunctions::doCapture_Sharpening_SE(Imagefloat *rgb, int bfw, int bfh,
     const float wip[3][3] = {
         {(float) wprof[0][0], (float) wprof[0][1], (float) wprof[0][2]},
         {(float) wprof[1][0], (float) wprof[1][1], (float) wprof[1][2]},
-        {(float) wprof[2][0], (float) wprof[2][1], (float) wprof[2][2]}
+        {(float) wprof[2][0], (float) wprof[2][1], (float) wprof[2][2]},
     };
         //tempory variables for gamma
         array2D<float> redgam (bfw, bfh);

@@ -768,9 +768,12 @@ BENCHFUN
         for(int i = winy + 1; i < winh - 1; ++i) {
             float *nonGreenDest0 = psRed[i];
             float *nonGreenDest1 = psBlue[i];
-            float ngbright[2][4] = {{redBrightness[0], redBrightness[1], redBrightness[2], redBrightness[3]},
-                                    {blueBrightness[0], blueBrightness[1], blueBrightness[2], blueBrightness[3]}
-                                   };
+            // clang-format off
+            float ngbright[2][4] = {
+                {redBrightness[0],   redBrightness[1],  redBrightness[2],  redBrightness[3]},
+                {blueBrightness[0], blueBrightness[1], blueBrightness[2], blueBrightness[3]},
+            };
+            // clang-format on
             int ng = 0;
             int j = winx + 1;
             int c = fc(cfarray, i, j);
@@ -1004,9 +1007,13 @@ BENCHFUN
         }
     } else {
         // motion detection off => combine the 4 raw frames
-        float ngbright[2][4] = {{redBrightness[0], redBrightness[1], redBrightness[2], redBrightness[3]},
-                                {blueBrightness[0], blueBrightness[1], blueBrightness[2], blueBrightness[3]}
+
+        // clang-format off
+        float ngbright[2][4] = {
+            {redBrightness[0],   redBrightness[1],  redBrightness[2],  redBrightness[3]},
+            {blueBrightness[0], blueBrightness[1], blueBrightness[2], blueBrightness[3]},
         };
+        // clang-format on
 #ifdef _OPENMP
         #pragma omp parallel for schedule(dynamic,16)
 #endif

@@ -605,7 +605,7 @@ BENCHFUN
     constexpr float xyz_rgb[3][3] = {          // XYZ from RGB
                                     { 0.412453, 0.357580, 0.180423 },
                                     { 0.212671, 0.715160, 0.072169 },
-                                    { 0.019334, 0.119193, 0.950227 }
+                                    { 0.019334, 0.119193, 0.950227 },
                                 };
 
     float contrast = conrastThreshold / 100.0;
@@ -831,7 +831,7 @@ BENCHFUN
     if (getSensorType() == ST_BAYER) {
         const float whites[2][2] = {
                                     {(ri->get_white(FC(0,0)) - c_black[FC(0,0)]) * scale_mul[FC(0,0)] * clipLimit, (ri->get_white(FC(0,1)) - c_black[FC(0,1)]) * scale_mul[FC(0,1)] * clipLimit},
-                                    {(ri->get_white(FC(1,0)) - c_black[FC(1,0)]) * scale_mul[FC(1,0)] * clipLimit, (ri->get_white(FC(1,1)) - c_black[FC(1,1)]) * scale_mul[FC(1,1)] * clipLimit}
+                                    {(ri->get_white(FC(1,0)) - c_black[FC(1,0)]) * scale_mul[FC(1,0)] * clipLimit, (ri->get_white(FC(1,1)) - c_black[FC(1,1)]) * scale_mul[FC(1,1)] * clipLimit},
                                    };
         buildClipMaskBayer(rawData, W, H, clipMask, whites);
         const unsigned int fc[2] = {FC(0,0), FC(1,0)};

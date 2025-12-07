@@ -847,16 +847,16 @@ void ImProcFunctions::workingtrc(int sp, Imagefloat* src, Imagefloat* dst, int c
         {
             static_cast<float>(wprof[0][0] / ((normalizeIn ? 65535.0 : 1.0))), //I have suppressed / Color::D50x
             static_cast<float>(wprof[0][1] / ((normalizeIn ? 65535.0 : 1.0))),
-            static_cast<float>(wprof[0][2] / ((normalizeIn ? 65535.0 : 1.0)))
+            static_cast<float>(wprof[0][2] / ((normalizeIn ? 65535.0 : 1.0))),
         }, {
             static_cast<float>(wprof[1][0] / (normalizeIn ? 65535.0 : 1.0)),
             static_cast<float>(wprof[1][1] / (normalizeIn ? 65535.0 : 1.0)),
-            static_cast<float>(wprof[1][2] / (normalizeIn ? 65535.0 : 1.0))
+            static_cast<float>(wprof[1][2] / (normalizeIn ? 65535.0 : 1.0)),
         }, {
             static_cast<float>(wprof[2][0] / ((normalizeIn ? 65535.0 : 1.0))), //I have suppressed / Color::D50z
             static_cast<float>(wprof[2][1] / ((normalizeIn ? 65535.0 : 1.0))),
-            static_cast<float>(wprof[2][2] / ((normalizeIn ? 65535.0 : 1.0)))
-        }
+            static_cast<float>(wprof[2][2] / ((normalizeIn ? 65535.0 : 1.0))),
+        },
     };
 
     if (profile == "sRGB" || profile == "Adobe RGB" || profile == "ProPhoto" || profile == "WideGamut"  || profile == "BruceRGB" || profile == "Beta RGB" || profile == "BestRGB" || profile == "Rec2020" || profile == "ACESp0" || profile == "ACESp1" || profile == "JDCmax" || profile == "JDCmax stdA") {
@@ -1755,9 +1755,9 @@ void ImProcFunctions::workingtrc(int sp, Imagefloat* src, Imagefloat* dst, int c
         cmsHPROFILE oprofdef = nullptr;
 
         const cmsCIExyYTRIPLE Primaries = {
-            {p[0], p[1], 1.0}, // red
-            {p[2], p[3], 1.0}, // green
-            {p[4], p[5], 1.0}  // blue
+            {p[0], p[1], 1.0},  // red
+            {p[2], p[3], 1.0},  // green
+            {p[4], p[5], 1.0},  // blue
         };
         oprofdef = cmsCreateRGBProfile(&xyD, &Primaries, GammaTRC);
         cmsWriteTag(oprofdef, cmsSigRedTRCTag, GammaTRC[0]);

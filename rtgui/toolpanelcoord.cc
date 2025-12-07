@@ -37,6 +37,7 @@ using namespace rtengine::procparams;
 using Tool = ToolPanelCoordinator::Tool;
 using ToolTree = ToolPanelCoordinator::ToolTree;
 
+// clang-format off
 const std::vector<ToolTree> EXPOSURE_PANEL_TOOLS = {
     {
         .id = Tool::TONE_CURVE,
@@ -332,6 +333,7 @@ const ToolPanelCoordinator::ToolLayout PANEL_TOOLS = {
         RAW_PANEL_TOOLS
     },
 };
+// clang-format on
 
 std::unordered_map<std::string, Tool> ToolPanelCoordinator::toolNamesReverseMap;
 

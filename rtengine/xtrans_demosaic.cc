@@ -34,7 +34,7 @@ namespace rtengine
 const float xyz_rgb[3][3] = {          // XYZ from RGB
     { 0.412453, 0.357580, 0.180423 },
     { 0.212671, 0.715160, 0.072169 },
-    { 0.019334, 0.119193, 0.950227 }
+    { 0.019334, 0.119193, 0.950227 },
 };
 const float d65_white[3] = { 0.950456, 1, 1.088754 };
 
@@ -128,7 +128,7 @@ void RawImageSource::xtransborder_interpolate (int border, array2D<float> &red, 
     const float weight[3][3] = {
                                 {0.25f, 0.5f, 0.25f},
                                 {0.5f,  0.f,  0.5f},
-                                {0.25f, 0.5f, 0.25f}
+                                {0.25f, 0.5f, 0.25f},
                                };
 
     for (int row = 0; row < height; row++)
@@ -204,7 +204,7 @@ void RawImageSource::xtrans_interpolate (const int passes, const bool useCieLab,
 
     constexpr short  orth[12] = { 1, 0, 0, 1, -1, 0, 0, -1, 1, 0, 0, 1 },
     patt[2][16] = { { 0, 1, 0, -1, 2, 0, -1, 0, 1, 1, 1, -1, 0, 0, 0, 0 },
-        { 0, 1, 0, -2, 1, 0, -2, 0, 1, 1, -2, -2, 1, -1, -1, 1 }
+        { 0, 1, 0, -2, 1, 0, -2, 0, 1, 1, -2, -2, 1, -1, -1, 1 },
     },
     dir[4] = { 1, ts, ts + 1, ts - 1 };
 
@@ -981,7 +981,7 @@ void RawImageSource::fast_xtrans_interpolate (const array2D<float> &rawData, arr
     const float weight[3][3] = {
                                 {0.25f, 0.5f, 0.25f},
                                 {0.5f,  0.f,  0.5f},
-                                {0.25f, 0.5f, 0.25f}
+                                {0.25f, 0.5f, 0.25f},
                                };
 #ifdef _OPENMP
     #pragma omp parallel for schedule(dynamic, 16)
@@ -1042,7 +1042,7 @@ void RawImageSource::fast_xtrans_interpolate_blend (const float* const * blend, 
     const float weight[3][3] = {
                                 {0.25f, 0.5f, 0.25f},
                                 {0.5f,  0.f,  0.5f},
-                                {0.25f, 0.5f, 0.25f}
+                                {0.25f, 0.5f, 0.25f},
                                };
 #ifdef _OPENMP
     #pragma omp parallel for schedule(dynamic, 16)

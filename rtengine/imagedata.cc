@@ -295,7 +295,7 @@ const std::map<int, std::string> defaultColors = {
     {2, "Yellow"},
     {3, "Green"},
     {4, "Blue"},
-    {5, "Purple"}
+    {5, "Purple"},
 };
 
 auto defaultColorMapper = ColorMapper(defaultColors);
