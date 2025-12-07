@@ -671,6 +671,7 @@ bool ToneCurveParams::isPanningRelatedChange(const ToneCurveParams& other) const
 
 bool ToneCurveParams::operator ==(const ToneCurveParams& other) const
 {
+    // clang-format off
     return
         autoexp == other.autoexp
         && clip == other.clip
@@ -693,6 +694,7 @@ bool ToneCurveParams::operator ==(const ToneCurveParams& other) const
         && histmatching == other.histmatching
         && fromHistMatching == other.fromHistMatching
         && clampOOG == other.clampOOG;
+    // clang-format on
 }
 
 bool ToneCurveParams::operator !=(const ToneCurveParams& other) const
@@ -778,6 +780,7 @@ RetinexParams::RetinexParams() :
 
 bool RetinexParams::operator ==(const RetinexParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && cdcurve == other.cdcurve
@@ -811,6 +814,7 @@ bool RetinexParams::operator ==(const RetinexParams& other) const
         && highl == other.highl
         && skal == other.skal
         && medianmap == other.medianmap;
+    // clang-format on
 }
 
 bool RetinexParams::operator !=(const RetinexParams& other) const
@@ -865,6 +869,7 @@ LCurveParams::LCurveParams() :
 
 bool LCurveParams::operator ==(const LCurveParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && lcurve == other.lcurve
@@ -882,6 +887,7 @@ bool LCurveParams::operator ==(const LCurveParams& other) const
         && gamutmunselmethod == other.gamutmunselmethod
         && rstprotection == other.rstprotection
         && lcredsk == other.lcredsk;
+    // clang-format on
 }
 
 bool LCurveParams::operator !=(const LCurveParams& other) const
@@ -906,12 +912,14 @@ RGBCurvesParams::RGBCurvesParams() :
 
 bool RGBCurvesParams::operator ==(const RGBCurvesParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && lumamode == other.lumamode
         && rcurve == other.rcurve
         && gcurve == other.gcurve
         && bcurve == other.bcurve;
+    // clang-format on
 }
 
 bool RGBCurvesParams::operator !=(const RGBCurvesParams& other) const
@@ -1094,6 +1102,7 @@ ColorToningParams::ColorToningParams() :
 
 bool ColorToningParams::operator ==(const ColorToningParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && autosat == other.autosat
@@ -1127,6 +1136,7 @@ bool ColorToningParams::operator ==(const ColorToningParams& other) const
         && labgridBHigh == other.labgridBHigh
         && labregions == other.labregions
         && labregionsShowMask == other.labregionsShowMask;
+    // clang-format on
 }
 
 bool ColorToningParams::operator !=(const ColorToningParams& other) const
@@ -1437,6 +1447,7 @@ SharpeningParams::SharpeningParams() :
 
 bool SharpeningParams::operator ==(const SharpeningParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && contrast == other.contrast
@@ -1456,6 +1467,7 @@ bool SharpeningParams::operator ==(const SharpeningParams& other) const
         && deconvradius == other.deconvradius
         && deconviter == other.deconviter
         && deconvdamping == other.deconvdamping;
+    // clang-format on
 }
 
 bool SharpeningParams::operator !=(const SharpeningParams& other) const
@@ -1482,6 +1494,7 @@ CaptureSharpeningParams::CaptureSharpeningParams() :
 
 bool CaptureSharpeningParams::operator ==(const CaptureSharpeningParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && contrast == other.contrast
@@ -1495,6 +1508,7 @@ bool CaptureSharpeningParams::operator ==(const CaptureSharpeningParams& other) 
         && noisecapafter == other.noisecapafter
         && deconvradiusOffset == other.deconvradiusOffset
         && deconviter == other.deconviter;
+    // clang-format on
 }
 
 bool CaptureSharpeningParams::operator !=(const CaptureSharpeningParams& other) const
@@ -1512,11 +1526,13 @@ SharpenEdgeParams::SharpenEdgeParams() :
 
 bool SharpenEdgeParams::operator ==(const SharpenEdgeParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && passes == other.passes
         && amount == other.amount
         && threechannels == other.threechannels;
+    // clang-format on
 }
 
 bool SharpenEdgeParams::operator !=(const SharpenEdgeParams& other) const
@@ -1535,12 +1551,14 @@ SharpenMicroParams::SharpenMicroParams() :
 
 bool SharpenMicroParams::operator ==(const SharpenMicroParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && matrix == other.matrix
         && amount == other.amount
         && contrast == other.contrast
         && uniformity == other.uniformity;
+    // clang-format on
 }
 
 bool SharpenMicroParams::operator !=(const SharpenMicroParams& other) const
@@ -1564,6 +1582,7 @@ VibranceParams::VibranceParams() :
 
 bool VibranceParams::operator ==(const VibranceParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && pastels == other.pastels
@@ -1573,6 +1592,7 @@ bool VibranceParams::operator ==(const VibranceParams& other) const
         && avoidcolorshift == other.avoidcolorshift
         && pastsattog == other.pastsattog
         && skintonescurve == other.skintonescurve;
+    // clang-format on
 }
 
 bool VibranceParams::operator !=(const VibranceParams& other) const
@@ -1628,6 +1648,7 @@ bool WBParams::isPanningRelatedChange(const WBParams& other) const
 
 bool WBParams::operator ==(const WBParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && method == other.method
@@ -1642,6 +1663,7 @@ bool WBParams::operator ==(const WBParams& other) const
         && itcwb_alg == other.itcwb_alg
         && itcwb_prim == other.itcwb_prim
         && itcwb_sampling == other.itcwb_sampling
+    // clang-format on
         && compat_version == other.compat_version;
 
 }
@@ -1749,6 +1771,7 @@ ColorAppearanceParams::ColorAppearanceParams() :
 
 bool ColorAppearanceParams::operator ==(const ColorAppearanceParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && degree == other.degree
@@ -1794,6 +1817,7 @@ bool ColorAppearanceParams::operator ==(const ColorAppearanceParams& other) cons
         && greenout == other.greenout
         && tempsc == other.tempsc
         && greensc == other.greensc;
+    // clang-format on
 }
 
 bool ColorAppearanceParams::operator !=(const ColorAppearanceParams& other) const
@@ -1837,11 +1861,13 @@ DefringeParams::DefringeParams() :
 
 bool DefringeParams::operator ==(const DefringeParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && radius == other.radius
         && threshold == other.threshold
         && huecurve == other.huecurve;
+    // clang-format on
 }
 
 bool DefringeParams::operator !=(const DefringeParams& other) const
@@ -1857,9 +1883,11 @@ ImpulseDenoiseParams::ImpulseDenoiseParams() :
 
 bool ImpulseDenoiseParams::operator ==(const ImpulseDenoiseParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && thresh == other.thresh;
+    // clang-format on
 }
 
 bool ImpulseDenoiseParams::operator !=(const ImpulseDenoiseParams& other) const
@@ -1915,6 +1943,7 @@ DirPyrDenoiseParams::DirPyrDenoiseParams() :
 
 bool DirPyrDenoiseParams::operator ==(const DirPyrDenoiseParams& other) const
 {
+    // clang-format off
     return
         lcurve == other.lcurve
         && cccurve == other.cccurve
@@ -1938,6 +1967,7 @@ bool DirPyrDenoiseParams::operator ==(const DirPyrDenoiseParams& other) const
         && methodmed == other.methodmed
         && rgbmethod == other.rgbmethod
         && passes == other.passes;
+    // clang-format on
 }
 
 bool DirPyrDenoiseParams::operator !=(const DirPyrDenoiseParams& other) const
@@ -1963,6 +1993,7 @@ EPDParams::EPDParams() :
 
 bool EPDParams::operator ==(const EPDParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && strength == other.strength
@@ -1970,6 +2001,7 @@ bool EPDParams::operator ==(const EPDParams& other) const
         && edgeStopping == other.edgeStopping
         && scale == other.scale
         && reweightingIterates == other.reweightingIterates;
+    // clang-format on
 }
 
 bool EPDParams::operator !=(const EPDParams& other) const
@@ -1991,8 +2023,10 @@ float SpotEntry::getFeatherRadius() const
 
 bool SpotEntry::operator ==(const SpotEntry& other) const
 {
+    // clang-format off
     return other.sourcePos == sourcePos && other.targetPos == targetPos &&
            other.radius == radius && other.feather == feather && other.opacity == opacity;
+    // clang-format on
 }
 
 bool SpotEntry::operator !=(const SpotEntry& other) const
@@ -2028,11 +2062,13 @@ FattalToneMappingParams::FattalToneMappingParams() :
 
 bool FattalToneMappingParams::operator ==(const FattalToneMappingParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && threshold == other.threshold
         && amount == other.amount
         && anchor == other.anchor;
+    // clang-format on
 }
 
 bool FattalToneMappingParams::operator !=(const FattalToneMappingParams& other) const
@@ -2053,6 +2089,7 @@ SHParams::SHParams() :
 
 bool SHParams::operator ==(const SHParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && highlights == other.highlights
@@ -2061,6 +2098,7 @@ bool SHParams::operator ==(const SHParams& other) const
         && stonalwidth == other.stonalwidth
         && radius == other.radius
         && lab == other.lab;
+    // clang-format on
 }
 
 bool SHParams::operator !=(const SHParams& other) const
@@ -2090,6 +2128,7 @@ CGParams::CGParams() :
 
 bool CGParams::operator ==(const CGParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && th_c == other.th_c
@@ -2104,6 +2143,7 @@ bool CGParams::operator ==(const CGParams& other) const
         && pwr == other.pwr
         && colorspace == other.colorspace
         && rolloff == other.rolloff;
+    // clang-format on
 }
 
 bool CGParams::operator !=(const CGParams& other) const
@@ -2125,12 +2165,14 @@ ToneEqualizerParams::ToneEqualizerParams() :
 
 bool ToneEqualizerParams::operator ==(const ToneEqualizerParams &other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && bands == other.bands
         && regularization == other.regularization
         && show_colormap == other.show_colormap
         && pivot == other.pivot;
+    // clang-format on
 }
 
 bool ToneEqualizerParams::operator !=(const ToneEqualizerParams &other) const
@@ -2153,6 +2195,7 @@ CropParams::CropParams() :
 
 bool CropParams::operator ==(const CropParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && x == other.x
@@ -2163,6 +2206,7 @@ bool CropParams::operator ==(const CropParams& other) const
         && ratio == other.ratio
         && orientation == other.orientation
         && guide == other.guide;
+    // clang-format on
 }
 
 bool CropParams::operator !=(const CropParams& other) const
@@ -2221,7 +2265,13 @@ double CommonTransformParams::getScaleVertically() const
 
 bool CommonTransformParams::operator ==(const CommonTransformParams& other) const
 {
-    return method == other.method && autofill == other.autofill && std::abs(scale - other.scale) < 1e-6 && std::abs(scale_horizontally - other.scale_horizontally) < 1e-6 && std::abs(scale_vertically - other.scale_vertically) < 1e-6;
+    // clang-format off
+    return method == other.method
+        && autofill == other.autofill
+        && std::abs(scale - other.scale) < 1e-6
+        && std::abs(scale_horizontally - other.scale_horizontally) < 1e-6
+        && std::abs(scale_vertically - other.scale_vertically) < 1e-6;
+    // clang-format on
 }
 
 bool CommonTransformParams::operator !=(const CommonTransformParams& other) const
@@ -2266,6 +2316,7 @@ LensProfParams::LensProfParams() :
 
 bool LensProfParams::operator ==(const LensProfParams& other) const
 {
+    // clang-format off
     return
         lcMode == other.lcMode
         && lcpFile == other.lcpFile
@@ -2275,6 +2326,7 @@ bool LensProfParams::operator ==(const LensProfParams& other) const
         && lfLens == other.lfLens
         && useDist == other.useDist
         && useVign == other.useVign;
+    // clang-format on
 }
 
 bool LensProfParams::operator !=(const LensProfParams& other) const
@@ -2357,6 +2409,7 @@ PerspectiveParams::PerspectiveParams() :
 
 bool PerspectiveParams::operator ==(const PerspectiveParams& other) const
 {
+    // clang-format off
     return
         method == other.method
         && render == other.render
@@ -2379,6 +2432,7 @@ bool PerspectiveParams::operator ==(const PerspectiveParams& other) const
         // more code which introduces clutter.
         && control_line_values == other.control_line_values
         && control_line_types == other.control_line_types;
+    // clang-format on
 }
 
 bool PerspectiveParams::operator !=(const PerspectiveParams& other) const
@@ -2398,6 +2452,7 @@ GradientParams::GradientParams() :
 
 bool GradientParams::operator ==(const GradientParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && degree == other.degree
@@ -2405,6 +2460,7 @@ bool GradientParams::operator ==(const GradientParams& other) const
         && strength == other.strength
         && centerX == other.centerX
         && centerY == other.centerY;
+    // clang-format on
 }
 
 bool GradientParams::operator !=(const GradientParams& other) const
@@ -2422,11 +2478,13 @@ PCVignetteParams::PCVignetteParams() :
 
 bool PCVignetteParams::operator ==(const PCVignetteParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && strength == other.strength
         && feather == other.feather
         && roundness == other.roundness;
+    // clang-format on
 }
 
 bool PCVignetteParams::operator !=(const PCVignetteParams& other) const
@@ -2445,12 +2503,14 @@ VignettingParams::VignettingParams() :
 
 bool VignettingParams::operator ==(const VignettingParams& other) const
 {
+    // clang-format off
     return
         amount == other.amount
         && radius == other.radius
         && strength == other.strength
         && centerX == other.centerX
         && centerY == other.centerY;
+    // clang-format on
 }
 
 bool VignettingParams::operator !=(const VignettingParams& other) const
@@ -2537,6 +2597,7 @@ BlackWhiteParams::BlackWhiteParams() :
 
 bool BlackWhiteParams::operator ==(const BlackWhiteParams& other) const
 {
+    // clang-format off
     return
         beforeCurve == other.beforeCurve
         && beforeCurveMode == other.beforeCurveMode
@@ -2561,6 +2622,7 @@ bool BlackWhiteParams::operator ==(const BlackWhiteParams& other) const
         && gammaRed == other.gammaRed
         && gammaGreen == other.gammaGreen
         && gammaBlue == other.gammaBlue;
+    // clang-format on
 }
 
 bool BlackWhiteParams::operator !=(const BlackWhiteParams& other) const
@@ -2602,6 +2664,7 @@ ResizeParams::ResizeParams() :
 
 bool ResizeParams::operator ==(const ResizeParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && scale == other.scale
@@ -2613,6 +2676,7 @@ bool ResizeParams::operator ==(const ResizeParams& other) const
         && longedge == other.longedge
         && shortedge == other.shortedge
         && allowUpscaling == other.allowUpscaling;
+    // clang-format on
 }
 
 bool ResizeParams::operator !=(const ResizeParams& other) const
@@ -2644,6 +2708,7 @@ FramingParams::FramingParams() :
 
 bool FramingParams::operator ==(const FramingParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && framingMethod == other.framingMethod
@@ -2663,6 +2728,7 @@ bool FramingParams::operator ==(const FramingParams& other) const
         && borderRed == other.borderRed
         && borderGreen == other.borderGreen
         && borderBlue == other.borderBlue;
+    // clang-format on
 }
 
 bool FramingParams::operator !=(const FramingParams& other) const
@@ -2744,6 +2810,7 @@ ColorManagementParams::ColorManagementParams() :
 
 bool ColorManagementParams::operator ==(const ColorManagementParams& other) const
 {
+    // clang-format off
     return
         inputProfile == other.inputProfile
         && toneCurve == other.toneCurve
@@ -2795,6 +2862,7 @@ bool ColorManagementParams::operator ==(const ColorManagementParams& other) cons
         && outputProfile == other.outputProfile
         && outputIntent == other.outputIntent
         && outputBPC == other.outputBPC;
+    // clang-format on
 }
 
 void ColorManagementParams::getCurves(
@@ -3134,6 +3202,7 @@ WaveletParams::WaveletParams() :
 
 bool WaveletParams::operator ==(const WaveletParams& other) const
 {
+    // clang-format off
     return
         ccwcurve == other.ccwcurve
         && wavdenoise == other.wavdenoise
@@ -3279,6 +3348,7 @@ bool WaveletParams::operator ==(const WaveletParams& other) const
         && level3noise == other.level3noise
         && leveldenoise == other.leveldenoise
         && levelsigm == other.levelsigm;
+    // clang-format on
 }
 
 bool WaveletParams::operator !=(const WaveletParams& other) const
@@ -5287,6 +5357,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
 
 bool LocallabParams::LocallabSpot::operator ==(const LocallabSpot& other) const
 {
+    // clang-format off
     return
         // Control spot settings
         name == other.name
@@ -6144,7 +6215,7 @@ bool LocallabParams::LocallabSpot::operator ==(const LocallabSpot& other) const
         && fftcieMask == other.fftcieMask
         && LLmaskciecurvewav == other.LLmaskciecurvewav
         && csthresholdcie == other.csthresholdcie;
-
+    // clang-format on
 }
 
 bool LocallabParams::LocallabSpot::operator !=(const LocallabSpot& other) const
@@ -6165,10 +6236,12 @@ LocallabParams::LocallabParams() :
 
 bool LocallabParams::operator ==(const LocallabParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && selspot == other.selspot
         && spots == other.spots;
+    // clang-format on
 }
 
 bool LocallabParams::operator !=(const LocallabParams& other) const
@@ -6196,6 +6269,7 @@ DirPyrEqualizerParams::DirPyrEqualizerParams() :
 
 bool DirPyrEqualizerParams::operator ==(const DirPyrEqualizerParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && gamutlab == other.gamutlab
@@ -6212,6 +6286,7 @@ bool DirPyrEqualizerParams::operator ==(const DirPyrEqualizerParams& other) cons
         && skinprotect == other.skinprotect
         && hueskin == other.hueskin
         && cbdlMethod == other.cbdlMethod;
+    // clang-format on
 }
 
 bool DirPyrEqualizerParams::operator !=(const DirPyrEqualizerParams& other) const
@@ -6236,10 +6311,12 @@ HSVEqualizerParams::HSVEqualizerParams() :
 bool HSVEqualizerParams::operator ==(const HSVEqualizerParams& other) const
 {
     return
+    // clang-format off
         enabled == other.enabled
         && hcurve == other.hcurve
         && scurve == other.scurve
         && vcurve == other.vcurve;
+    // clang-format on
 }
 
 bool HSVEqualizerParams::operator !=(const HSVEqualizerParams& other) const
@@ -6255,10 +6332,12 @@ FilmSimulationParams::FilmSimulationParams() :
 
 bool FilmSimulationParams::operator ==(const FilmSimulationParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && clutFilename == other.clutFilename
         && strength == other.strength;
+    // clang-format on
 }
 
 bool FilmSimulationParams::operator !=(const FilmSimulationParams& other) const
@@ -6297,12 +6376,14 @@ DehazeParams::DehazeParams() :
 
 bool DehazeParams::operator ==(const DehazeParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && strength == other.strength
         && showDepthMap == other.showDepthMap
         && depth == other.depth
         && saturation == other.saturation;
+    // clang-format on
 }
 
 bool DehazeParams::operator !=(const DehazeParams& other) const
@@ -6351,6 +6432,7 @@ RAWParams::BayerSensor::BayerSensor() :
 
 bool RAWParams::BayerSensor::operator ==(const BayerSensor& other) const
 {
+    // clang-format off
     return
         method == other.method
         && border == other.border
@@ -6386,6 +6468,7 @@ bool RAWParams::BayerSensor::operator ==(const BayerSensor& other) const
         && pixelShiftDemosaicMethod == other.pixelShiftDemosaicMethod
         && dcb_enhance == other.dcb_enhance
         && pdafLinesFilter == other.pdafLinesFilter;
+    // clang-format on
 }
 
 bool RAWParams::BayerSensor::operator !=(const BayerSensor& other) const
@@ -6473,6 +6556,7 @@ RAWParams::XTransSensor::XTransSensor() :
 
 bool RAWParams::XTransSensor::operator ==(const XTransSensor& other) const
 {
+    // clang-format off
     return
         method == other.method
         && dualDemosaicAutoContrast == other.dualDemosaicAutoContrast
@@ -6483,6 +6567,7 @@ bool RAWParams::XTransSensor::operator ==(const XTransSensor& other) const
         && blackgreen == other.blackgreen
         && blackblue == other.blackblue
         && Dehablackx == other.Dehablackx;
+    // clang-format on
 }
 
 bool RAWParams::XTransSensor::operator !=(const XTransSensor& other) const
@@ -6548,6 +6633,7 @@ RAWParams::RAWParams() :
 
 bool RAWParams::operator ==(const RAWParams& other) const
 {
+    // clang-format off
     return
         bayersensor == other.bayersensor
         && xtranssensor == other.xtranssensor
@@ -6570,6 +6656,7 @@ bool RAWParams::operator ==(const RAWParams& other) const
         && hotPixelFilter == other.hotPixelFilter
         && deadPixelFilter == other.deadPixelFilter
         && hotdeadpix_thresh == other.hotdeadpix_thresh;
+    // clang-format on
 }
 
 bool RAWParams::operator !=(const RAWParams& other) const
@@ -6630,6 +6717,7 @@ FilmNegativeParams::RGB FilmNegativeParams::RGB::operator *(const FilmNegativePa
 
 bool FilmNegativeParams::operator ==(const FilmNegativeParams& other) const
 {
+    // clang-format off
     return
         enabled == other.enabled
         && redRatio == other.redRatio
@@ -6639,6 +6727,7 @@ bool FilmNegativeParams::operator ==(const FilmNegativeParams& other) const
         && refOutput == other.refOutput
         && colorSpace == other.colorSpace
         && backCompat == other.backCompat;
+    // clang-format on
 }
 
 bool FilmNegativeParams::operator !=(const FilmNegativeParams& other) const
@@ -12192,6 +12281,7 @@ void ProcParams::destroy(ProcParams* pp)
 
 bool ProcParams::operator ==(const ProcParams& other) const
 {
+    // clang-format off
     return
         toneCurve == other.toneCurve
         && retinex == other.retinex
@@ -12240,6 +12330,7 @@ bool ProcParams::operator ==(const ProcParams& other) const
         && metadata == other.metadata
         && dehaze == other.dehaze
         && filmNegative == other.filmNegative;
+    // clang-format on
 }
 
 bool ProcParams::operator !=(const ProcParams& other) const
