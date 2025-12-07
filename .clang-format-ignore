@@ -8,13 +8,3 @@ rtengine/klt/*
 rtengine/libraw/*
 rtengine/libraw/**/*
 rtengine/libraw/**/**/*
-
-# Blacklist all while transitioning to clang-format
-rtengine/*
-rtgui/*
-rtgui/widgets/*
-rtgui/widgets/basic/*
-rtgui/widgets/curves/*
-rtgui/windows/*
-rtgui/tools/*
-tools/gimp-plugin/*
