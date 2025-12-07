@@ -497,7 +497,7 @@ void loadFramingParams(
     const std::map<std::string, FramingMethod> framingMethodMapping = {
         {FRAMING_METHOD_STANDARD, FramingMethod::STANDARD},
         {FRAMING_METHOD_BBOX, FramingMethod::BBOX},
-        {FRAMING_METHOD_FIXED_SIZE, FramingMethod::FIXED_SIZE}
+        {FRAMING_METHOD_FIXED_SIZE, FramingMethod::FIXED_SIZE},
     };
     assignFromKeyfile(keyFile, group, FRAMING_METHOD, framingMethodMapping, params.framingMethod, edited.framingMethod);
     assignFromKeyfile(keyFile, group, ASPECT_RATIO, params.aspectRatio, edited.aspectRatio);
@@ -516,7 +516,7 @@ void loadFramingParams(
     const std::map<std::string, BorderSizing> borderSizingMapping = {
         {BORDER_SIZING_PERCENTAGE, BorderSizing::PERCENTAGE},
         {BORDER_SIZING_UNIFORM_PERCENTAGE, BorderSizing::UNIFORM_PERCENTAGE},
-        {BORDER_SIZING_FIXED_SIZE, BorderSizing::FIXED_SIZE}
+        {BORDER_SIZING_FIXED_SIZE, BorderSizing::FIXED_SIZE},
     };
     assignFromKeyfile(keyFile, group, BORDER_SIZING_METHOD, borderSizingMapping, params.borderSizingMethod, edited.borderSizingMethod);
     using Basis = FramingParams::Basis;
@@ -525,7 +525,7 @@ void loadFramingParams(
         {BASIS_WIDTH, Basis::WIDTH},
         {BASIS_HEIGHT, Basis::HEIGHT},
         {BASIS_LONG, Basis::LONG},
-        {BASIS_SHORT, Basis::SHORT}
+        {BASIS_SHORT, Basis::SHORT},
     };
     assignFromKeyfile(keyFile, group, BASIS, basisMapping, params.basis, edited.basis);
     assignFromKeyfile(keyFile, group, RELATIVE_BORDER_SIZE, params.relativeBorderSize, edited.relativeBorderSize);
@@ -560,7 +560,7 @@ void saveFramingParams(
     const std::map<FramingMethod, const char*> framingMethodMapping = {
         {FramingMethod::STANDARD, FRAMING_METHOD_STANDARD},
         {FramingMethod::BBOX, FRAMING_METHOD_BBOX},
-        {FramingMethod::FIXED_SIZE, FRAMING_METHOD_FIXED_SIZE}
+        {FramingMethod::FIXED_SIZE, FRAMING_METHOD_FIXED_SIZE},
     };
     saveToKeyfile(!pedited || edited.framingMethod, group, FRAMING_METHOD, framingMethodMapping, params.framingMethod, keyFile);
     saveToKeyfile(!pedited || edited.aspectRatio, group, ASPECT_RATIO, params.aspectRatio, keyFile);
@@ -579,7 +579,7 @@ void saveFramingParams(
     const std::map<BorderSizing, const char*> borderSizingMapping = {
         {BorderSizing::PERCENTAGE, BORDER_SIZING_PERCENTAGE},
         {BorderSizing::UNIFORM_PERCENTAGE, BORDER_SIZING_UNIFORM_PERCENTAGE},
-        {BorderSizing::FIXED_SIZE, BORDER_SIZING_FIXED_SIZE}
+        {BorderSizing::FIXED_SIZE, BORDER_SIZING_FIXED_SIZE},
     };
     saveToKeyfile(!pedited || edited.borderSizingMethod, group, BORDER_SIZING_METHOD, borderSizingMapping, params.borderSizingMethod, keyFile);
     using Basis = FramingParams::Basis;
@@ -588,7 +588,7 @@ void saveFramingParams(
         {Basis::WIDTH, BASIS_WIDTH},
         {Basis::HEIGHT, BASIS_HEIGHT},
         {Basis::LONG, BASIS_LONG},
-        {Basis::SHORT, BASIS_SHORT}
+        {Basis::SHORT, BASIS_SHORT},
     };
     saveToKeyfile(!pedited || edited.basis, group, BASIS, basisMapping, params.basis, keyFile);
     saveToKeyfile(!pedited || edited.relativeBorderSize, group, RELATIVE_BORDER_SIZE, params.relativeBorderSize, keyFile);
@@ -726,7 +726,7 @@ RetinexParams::RetinexParams() :
         1.00,
         0.50,
         0.35,
-        0.35
+        0.35,
     },
     gaintransmissionCurve{
         FCT_MinMaxCPoints,
@@ -745,7 +745,7 @@ RetinexParams::RetinexParams() :
         1.00,
         0.1,
         0.00,
-        0.00
+        0.00,
     },
     mapcurve{
         DCT_Linear
@@ -970,7 +970,7 @@ ColorToningParams::LabCorrectionRegion::LabCorrectionRegion():
         0.8287775246,
         1.,
         0.35,
-        0.35
+        0.35,
     },
     chromaticityMask{
         FCT_MinMaxCPoints,
@@ -981,7 +981,7 @@ ColorToningParams::LabCorrectionRegion::LabCorrectionRegion():
         1.,
         1.,
         0.35,
-        0.35
+        0.35,
     },
     lightnessMask{
         FCT_MinMaxCPoints,
@@ -992,7 +992,7 @@ ColorToningParams::LabCorrectionRegion::LabCorrectionRegion():
         1.,
         1.,
         0.35,
-        0.35
+        0.35,
     },
     maskBlur(0),
     channel(ColorToningParams::LabCorrectionRegion::CHAN_ALL)
@@ -1040,7 +1040,7 @@ ColorToningParams::ColorToningParams() :
         1.00,
         0.3,
         0.00,
-        0.00
+        0.00,
     },
     colorCurve{
         FCT_MinMaxCPoints,
@@ -1051,7 +1051,7 @@ ColorToningParams::ColorToningParams() :
         0.585,
         0.11,
         0.25,
-        0.25
+        0.25,
     },
     satProtectionThreshold(30),
     saturatedOpacity(80),
@@ -1066,7 +1066,7 @@ ColorToningParams::ColorToningParams() :
         0.35,
         0.65,
         1.00,
-        1.00
+        1.00,
     },
     cl2curve{
         DCT_NURBS,
@@ -1075,7 +1075,7 @@ ColorToningParams::ColorToningParams() :
         0.35,
         0.65,
         1.00,
-        1.00
+        1.00,
     },
     method("LabRegions"),
     twocolor("Std"),
@@ -1675,6 +1675,7 @@ bool WBParams::operator !=(const WBParams& other) const
 
 const std::vector<WBEntry>& WBParams::getWbEntries()
 {
+    // clang-format off
     static const std::vector<WBEntry> wb_entries = {
         {"Camera",               WBEntry::Type::CAMERA,      M("TP_WBALANCE_CAMERA"),         0, 1.f,   1.f,   0.f},
         {"autitcgreen",       	 WBEntry::Type::AUTO,        M("TP_WBALANCE_AUTOITCGREEN"),   0, 1.f,    1.f,    0.f},
@@ -1712,6 +1713,7 @@ const std::vector<WBEntry>& WBParams::getWbEntries()
         // Should remain the last one
         {"Custom",               WBEntry::Type::CUSTOM,      M("TP_WBALANCE_CUSTOM"),        0, 1.f,   1.f,   0.f}
     };
+    // clang-format on
     return wb_entries;
 }
 
@@ -1905,7 +1907,7 @@ DirPyrDenoiseParams::DirPyrDenoiseParams() :
         0.55,
         0.04,
         0.35,
-        0.35
+        0.35,
     },
     cccurve{
         FCT_MinMaxCPoints,
@@ -1916,7 +1918,7 @@ DirPyrDenoiseParams::DirPyrDenoiseParams() :
         0.35,
         0.05,
         0.35,
-        0.35
+        0.35,
     },
     enabled(false),
     enhance(false),
@@ -2773,7 +2775,7 @@ ColorManagementParams::ColorManagementParams() :
         1.00,
         0.50,
         0.35,
-        0.35
+        0.35,
     },
     wsmoothcie(false),
     wsmoothciesli(0.),
@@ -2895,7 +2897,7 @@ WaveletParams::WaveletParams() :
         0.90,
         0.0,
         0.35,
-        0.35
+        0.35,
     },
     wavdenoise{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -2910,7 +2912,7 @@ WaveletParams::WaveletParams() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     wavdenoiseh{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -2925,7 +2927,7 @@ WaveletParams::WaveletParams() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     blcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -2940,7 +2942,7 @@ WaveletParams::WaveletParams() :
         1.0,
         0.0,
         0.35,
-        0.35
+        0.35,
 /*
         0.0,
         0.35,
@@ -2960,7 +2962,7 @@ WaveletParams::WaveletParams() :
         1.00,
         0.50,
         0.35,
-        0.35
+        0.35,
     },
     //opacityCurveSH{
     //    static_cast<double>(FCT_MinMaxCPoints),
@@ -3027,7 +3029,7 @@ WaveletParams::WaveletParams() :
         1.00,
         0.50,
         0.35,
-        0.35
+        0.35,
     },
     opacityCurveW{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -3046,7 +3048,7 @@ WaveletParams::WaveletParams() :
         1.00,
         0.35,
         0.00,
-        0.00
+        0.00,
     },
     opacityCurveWL{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -3057,7 +3059,7 @@ WaveletParams::WaveletParams() :
         1.00,
         0.50,
         0.35,
-        0.35
+        0.35,
     },
     hhcurve{
         FCT_Linear
@@ -3469,35 +3471,35 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     lccurve{
         static_cast<double>(DCT_NURBS),
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     cccurve{
         static_cast<double>(DCT_NURBS),
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     clcurve{
         static_cast<double>(DCT_NURBS),
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     rgbcurve{
         static_cast<double>(DCT_NURBS),
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     LHcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -3524,7 +3526,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.833,
         0.50,
         0.35,
-        0.35
+        0.35,
     },
     HHcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -3551,7 +3553,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.833,
         0.50,
         0.35,
-        0.35
+        0.35,
     },
     CHcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -3578,7 +3580,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.833,
         0.50,
         0.35,
-        0.35
+        0.35,
     },
     invers(false),
     special(false),
@@ -3598,7 +3600,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.00,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     LLmaskcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -3613,7 +3615,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.00,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     HHmaskcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -3628,7 +3630,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.00,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     HHhmaskcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -3643,7 +3645,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.00,
         0.5,
         0.35,
-        0.35
+        0.35,
     },
     softradiuscol(0.0),
     opacol(60.0),
@@ -3655,7 +3657,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     LLmaskcolcurvewav{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -3666,7 +3668,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.,
         0.5,
         0.35,
-        0.35
+        0.35,
     },
     csthresholdcol(0, 0, 6, 5, false),
     recothresc(1.),
@@ -3696,7 +3698,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     norm(true),
     inversex(false),
@@ -3714,7 +3716,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     LLmaskexpcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -3729,7 +3731,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     HHmaskexpcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -3744,7 +3746,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     blendmaskexp(0),
     radmaskexp(0.0),
@@ -3760,7 +3762,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     expMethod("std"),
     exnoiseMethod("none"),
@@ -3823,7 +3825,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     LLmaskSHcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -3838,7 +3840,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     HHmaskSHcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -3853,7 +3855,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     blendmaskSH(0),
     radmaskSH(0.0),
@@ -3874,7 +3876,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     fatamountSH(1.0),
     fatanchorSH(50.0),
@@ -3913,7 +3915,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     LLmaskvibcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -3928,7 +3930,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     HHmaskvibcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -3943,7 +3945,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     enavibMask(false),
     blendmaskvib(0),
@@ -3965,7 +3967,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     recothresv(1.),
     lowthresv(12.),
@@ -4015,7 +4017,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
     lnoiselow(1.),
     levelthrlow(12.),
     activlum(true),
-    madlsav{100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f},  
+    madlsav{100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f},
     noiselumf(0.),
     noiselumf0(0.),
     noiselumf2(0.),
@@ -4050,7 +4052,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         0.03,
         0.35,
-        0.35
+        0.35,
     },
     locwavcurvehue{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4077,7 +4079,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.833,
         0.50,
         0.35,
-        0.35
+        0.35,
     },
     locwavcurvehuecont{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4104,7 +4106,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.833,
         0.50,
         0.35,
-        0.35
+        0.35,
     },
     showmaskblMethodtyp("nois"),
     CCmaskblcurve{
@@ -4120,7 +4122,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     LLmaskblcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4135,7 +4137,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     HHmaskblcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4150,7 +4152,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     enablMask(false),
     fftwbl(false),
@@ -4170,7 +4172,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     LLmaskblcurvewav{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4181,7 +4183,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.,
         0.5,
         0.35,
-        0.35
+        0.35,
     },
     csthresholdblur(0, 0, 6, 5, false),
     denocontrast(10.),
@@ -4220,7 +4222,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     LLmasktmcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4235,7 +4237,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     HHmasktmcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4250,7 +4252,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     enatmMask(false),
     enatmMaskaft(false),
@@ -4265,7 +4267,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     recothrest(1.),
     lowthrest(12.),
@@ -4297,7 +4299,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.00,
         0.12,
         0.35,
-        0.35
+        0.35,
     },
     localTtranscurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4312,7 +4314,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.00,
         0.50,
         0.35,
-        0.35
+        0.35,
     },
     inversret(false),
     equilret(false),
@@ -4333,7 +4335,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     LLmaskreticurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4348,7 +4350,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     HHmaskreticurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4363,7 +4365,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     enaretiMask(false),
     enaretiMasktmap(true),
@@ -4384,7 +4386,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     recothresr(1.),
     lowthresr(12.),
@@ -4489,7 +4491,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.,
         0.5,
         0.35,
-        0.35
+        0.35,
     },
     csthreshold(0, 0, 7, 5, false),
     loclevwavcurve{
@@ -4505,7 +4507,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         0.0,
         0.35,
-        0.35
+        0.35,
     },
     locconwavcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4516,7 +4518,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.,
         0.5,
         0.35,
-        0.35
+        0.35,
     },
     loccompwavcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4535,7 +4537,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.00,
         0.35,
         0.00,
-        0.00
+        0.00,
     },
     loccomprewavcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4546,7 +4548,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.,
         0.75,
         0.35,
-        0.35
+        0.35,
     },
     locedgwavcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4561,7 +4563,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.90,
         0.0,
         0.35,
-        0.35
+        0.35,
     },
     CCmasklccurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4576,7 +4578,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     LLmasklccurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4591,7 +4593,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     HHmasklccurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4606,7 +4608,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     enalcMask(false),
     blendmasklc(0),
@@ -4617,7 +4619,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     recothresw(1.),
     lowthresw(12.),
@@ -4648,7 +4650,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     LLmaskcbcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4663,7 +4665,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     HHmaskcbcurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4678,7 +4680,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     blendmaskcb(0),
     radmaskcb(0.0),
@@ -4691,7 +4693,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     recothrescb(1.),
     lowthrescb(12.),
@@ -4720,7 +4722,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     Autogray(true),
     fullimage(true),
@@ -4754,7 +4756,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.00,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     LLmaskcurveL{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4769,7 +4771,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.00,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     HHmaskcurveL{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4784,7 +4786,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.00,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     enaLMask(false),
     blendmaskL(0),
@@ -4795,7 +4797,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     recothresl(1.),
     lowthresl(12.),
@@ -4826,7 +4828,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.00,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     LLmask_curve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4841,7 +4843,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.00,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     HHmask_curve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4856,7 +4858,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.00,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     strumaskmask(0.),
     toolmask(false),
@@ -4882,14 +4884,14 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.00,
         0.5,
         0.35,
-        0.35
+        0.35,
     },
     Lmask_curve{
         static_cast<double>(DCT_NURBS),
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     LLmask_curvewav{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -4900,7 +4902,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.,
         0.5,
         0.35,
-        0.35
+        0.35,
     },
     csthresholdmask(0, 0, 6, 5, false),
     // ciecam
@@ -4956,7 +4958,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     toneMethodcie2("onec"),
     ciecurve2{
@@ -4964,7 +4966,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     chromjzcie(0.),
     saturjzcie(0.),
@@ -4977,21 +4979,21 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     czcurve{
         static_cast<double>(DCT_NURBS),
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     czjzcurve{
         static_cast<double>(DCT_NURBS),
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     HHcurvejz{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -5018,7 +5020,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.833,
         0.50,
         0.35,
-        0.35
+        0.35,
     },
     CHcurvejz{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -5045,7 +5047,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.833,
         0.50,
         0.35,
-        0.35
+        0.35,
     },
     LHcurvejz{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -5072,7 +5074,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.833,
         0.50,
         0.35,
-        0.35
+        0.35,
     },
     lightlcie(0.),
     lightjzcie(0.),
@@ -5103,7 +5105,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.,
         0.5,
         0.35,
-        0.35
+        0.35,
     },
     csthresholdjz(0, 0, 7, 4, false),
     contthrescie(0.),
@@ -5142,7 +5144,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         1.0,
         1.0,
-        0.0
+        0.0,
     },
     midtciemet("one"),
     midtcie(0),
@@ -5193,7 +5195,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     LLmaskciecurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -5208,7 +5210,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     HHmaskciecurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -5223,7 +5225,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.0,
         1.0,
         0.35,
-        0.35
+        0.35,
     },
     HHhmaskciecurve{
         static_cast<double>(FCT_MinMaxCPoints),
@@ -5238,7 +5240,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.00,
         0.5,
         0.35,
-        0.35
+        0.35,
     },
 
     blendmaskcie(0),
@@ -5252,7 +5254,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         0.0,
         0.0,
         1.0,
-        1.0
+        1.0,
     },
     recothrescie(1.),
     lowthrescie(12.),
@@ -5274,7 +5276,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
         1.,
         0.5,
         0.35,
-        0.35
+        0.35,
     },
     csthresholdcie(0, 0, 6, 5, false)
    
@@ -6258,7 +6260,7 @@ DirPyrEqualizerParams::DirPyrEqualizerParams() :
         1.0,
         1.0,
         1.0,
-        1.0
+        1.0,
     },
     threshold(0.2),
     skinprotect(0.0),
@@ -6754,7 +6756,7 @@ const std::map<std::string, std::string> exif_keys = {
     {"Lens", "Exif.Photo.LensModel"},
     {"DateTime", "Exif.Photo.DateTimeOriginal"},
     {"XResolution", "Exif.Image.XResolution"},
-    {"YResolution", "Exif.Image.YResolution"}
+    {"YResolution", "Exif.Image.YResolution"},
 };
 
 const std::map<std::string, std::string> iptc_keys = {
@@ -6775,7 +6777,7 @@ const std::map<std::string, std::string> iptc_keys = {
     {"Source", "Iptc.Application2.Source"},
     {"Copyright", "Iptc.Application2.Copyright"},
     {"Caption", "Iptc.Application2.Caption"},
-    {"CaptionWriter", "Iptc.Application2.Writer"}
+    {"CaptionWriter", "Iptc.Application2.Writer"},
 };
 
 } // namespace
@@ -6797,7 +6799,7 @@ std::vector<std::string> MetaDataParams::basicExifKeys = {
     "Exif.Photo.Flash",
     "Exif.Photo.DateTimeOriginal",
     "Exif.Image.XResolution",
-    "Exif.Image.YResolution"
+    "Exif.Image.YResolution",
 };
 
 
@@ -6997,7 +6999,7 @@ int ProcParams::save(const Glib::ustring& fname, const Glib::ustring& fname2, bo
             {ToneCurveMode::SATANDVALBLENDING, "SatAndValueBlending"},
             {ToneCurveMode::WEIGHTEDSTD, "WeightedStd"},
             {ToneCurveMode::LUMINANCE, "Luminance"},
-            {ToneCurveMode::PERCEPTUAL, "Perceptual"}
+            {ToneCurveMode::PERCEPTUAL, "Perceptual"},
         };
 
         saveToKeyfile(!pedited || pedited->toneCurve.curveMode, "Exposure", "CurveMode", tc_mapping, toneCurve.curveMode, keyFile);
@@ -7088,14 +7090,13 @@ int ProcParams::save(const Glib::ustring& fname, const Glib::ustring& fname2, bo
         saveToKeyfile(!pedited || pedited->blackwhite.algo, "Black & White", "Algorithm", blackwhite.algo, keyFile);
         saveToKeyfile(!pedited || pedited->blackwhite.luminanceCurve, "Black & White", "LuminanceCurve", blackwhite.luminanceCurve, keyFile);
         saveToKeyfile(
-            !pedited || pedited->blackwhite.beforeCurveMode,
-            "Black & White",
+            !pedited || pedited->blackwhite.beforeCurveMode, "Black & White",
             "BeforeCurveMode",
             {
                 {BlackWhiteParams::TcMode::STD_BW, "Standard"},
                 {BlackWhiteParams::TcMode::FILMLIKE_BW, "FilmLike"},
                 {BlackWhiteParams::TcMode::SATANDVALBLENDING_BW, "SatAndValueBlending"},
-                {BlackWhiteParams::TcMode::WEIGHTEDSTD_BW, "WeightedStd"}
+                {BlackWhiteParams::TcMode::WEIGHTEDSTD_BW, "WeightedStd"},
 
             },
             blackwhite.beforeCurveMode,
@@ -7107,8 +7108,7 @@ int ProcParams::save(const Glib::ustring& fname, const Glib::ustring& fname2, bo
             "AfterCurveMode",
             {
                 {BlackWhiteParams::TcMode::STD_BW, "Standard"},
-                {BlackWhiteParams::TcMode::WEIGHTEDSTD_BW, "WeightedStd"}
-
+                {BlackWhiteParams::TcMode::WEIGHTEDSTD_BW, "WeightedStd"},
             },
             blackwhite.afterCurveMode,
             keyFile
@@ -7233,7 +7233,7 @@ int ProcParams::save(const Glib::ustring& fname, const Glib::ustring& fname2, bo
 
         const std::map<ColorAppearanceParams::TcMode, const char*> ca_mapping = {
             {ColorAppearanceParams::TcMode::LIGHT, "Lightness"},
-            {ColorAppearanceParams::TcMode::BRIGHT, "Brightness"}
+            {ColorAppearanceParams::TcMode::BRIGHT, "Brightness"},
         };
 
         saveToKeyfile(!pedited || pedited->colorappearance.curveMode, "Color appearance", "CurveMode", ca_mapping, colorappearance.curveMode, keyFile);
@@ -7245,7 +7245,7 @@ int ProcParams::save(const Glib::ustring& fname, const Glib::ustring& fname2, bo
             {
                 {ColorAppearanceParams::CtcMode::CHROMA, "Chroma"},
                 {ColorAppearanceParams::CtcMode::SATUR, "Saturation"},
-                {ColorAppearanceParams::CtcMode::COLORF, "Colorfullness"}
+                {ColorAppearanceParams::CtcMode::COLORF, "Colorfullness"},
             },
             colorappearance.curveMode3,
             keyFile
@@ -8395,7 +8395,7 @@ int ProcParams::save(const Glib::ustring& fname, const Glib::ustring& fname2, bo
                 {ColorManagementParams::WorkingTrc::SRGB, "srgb"},
                 {ColorManagementParams::WorkingTrc::GAMMA_2_2, "22"},
                 {ColorManagementParams::WorkingTrc::GAMMA_1_8, "18"},
-                {ColorManagementParams::WorkingTrc::LINEAR, "lin"}
+                {ColorManagementParams::WorkingTrc::LINEAR, "lin"},
             },
             icm.workingTRC,
             keyFile
@@ -8416,7 +8416,7 @@ int ProcParams::save(const Glib::ustring& fname, const Glib::ustring& fname2, bo
                 {ColorManagementParams::Illuminant::STDA, "stda"},
                 {ColorManagementParams::Illuminant::TUNGSTEN_2000K, "2000"},
                 {ColorManagementParams::Illuminant::TUNGSTEN_1500K, "1500"},
-                {ColorManagementParams::Illuminant::E, "E"}
+                {ColorManagementParams::Illuminant::E, "E"},
             },
             icm.will,
             keyFile
@@ -8440,7 +8440,7 @@ int ProcParams::save(const Glib::ustring& fname, const Glib::ustring& fname2, bo
                 {ColorManagementParams::Primaries::BETA_RGB, "bet"},
                 {ColorManagementParams::Primaries::BEST_RGB, "bst"},
                 {ColorManagementParams::Primaries::CUSTOM, "cus"},
-                {ColorManagementParams::Primaries::CUSTOM_GRID, "cusgr"}
+                {ColorManagementParams::Primaries::CUSTOM_GRID, "cusgr"},
             },
             icm.wprim,
             keyFile
@@ -8454,7 +8454,7 @@ int ProcParams::save(const Glib::ustring& fname, const Glib::ustring& fname2, bo
                 {ColorManagementParams::Cat::CAT16, "cat16"},
                 {ColorManagementParams::Cat::CAT02, "cat02"},
                 {ColorManagementParams::Cat::CAT_VK, "cat_vk"},
-                {ColorManagementParams::Cat::CAT_XYZ, "cat_xyz"}
+                {ColorManagementParams::Cat::CAT_XYZ, "cat_xyz"},
             },
             icm.wcat,
             keyFile
@@ -8505,7 +8505,7 @@ int ProcParams::save(const Glib::ustring& fname, const Glib::ustring& fname2, bo
                 {RI_PERCEPTUAL, "Perceptual"},
                 {RI_RELATIVE, "Relative"},
                 {RI_SATURATION, "Saturation"},
-                {RI_ABSOLUTE, "Absolute"}
+                {RI_ABSOLUTE, "Absolute"},
             },
             icm.aRendIntent,
             keyFile
@@ -8519,7 +8519,7 @@ int ProcParams::save(const Glib::ustring& fname, const Glib::ustring& fname2, bo
                 {RI_PERCEPTUAL, "Perceptual"},
                 {RI_RELATIVE, "Relative"},
                 {RI_SATURATION, "Saturation"},
-                {RI_ABSOLUTE, "Absolute"}
+                {RI_ABSOLUTE, "Absolute"},
             },
             icm.outputIntent,
             keyFile
@@ -9001,7 +9001,7 @@ int ProcParams::load(const Glib::ustring& fname, ParamsEdited* pedited)
                 {"SatAndValueBlending", ToneCurveMode::SATANDVALBLENDING},
                 {"WeightedStd", ToneCurveMode::WEIGHTEDSTD},
                 {"Luminance", ToneCurveMode::LUMINANCE},
-                {"Perceptual", ToneCurveMode::PERCEPTUAL}
+                {"Perceptual", ToneCurveMode::PERCEPTUAL},
             };
 
             assignFromKeyfile(keyFile, "Exposure", "CurveMode", tc_mapping, toneCurve.curveMode, pedited->toneCurve.curveMode);
@@ -9099,7 +9099,7 @@ int ProcParams::load(const Glib::ustring& fname, ParamsEdited* pedited)
                     {"Standard", BlackWhiteParams::TcMode::STD_BW},
                     {"FilmLike", BlackWhiteParams::TcMode::FILMLIKE_BW},
                     {"SatAndValueBlending", BlackWhiteParams::TcMode::SATANDVALBLENDING_BW},
-                    {"WeightedStd", BlackWhiteParams::TcMode::WEIGHTEDSTD_BW}
+                    {"WeightedStd", BlackWhiteParams::TcMode::WEIGHTEDSTD_BW},
                 },
                 blackwhite.beforeCurveMode,
                 pedited->blackwhite.beforeCurveMode
@@ -9112,7 +9112,7 @@ int ProcParams::load(const Glib::ustring& fname, ParamsEdited* pedited)
                 "AfterCurveMode",
                 {
                     {"Standard", BlackWhiteParams::TcMode::STD_BW},
-                    {"WeightedStd", BlackWhiteParams::TcMode::WEIGHTEDSTD_BW}
+                    {"WeightedStd", BlackWhiteParams::TcMode::WEIGHTEDSTD_BW},
                 },
                 blackwhite.afterCurveMode,
                 pedited->blackwhite.afterCurveMode
@@ -9498,7 +9498,7 @@ int ProcParams::load(const Glib::ustring& fname, ParamsEdited* pedited)
 
             const std::map<std::string, ColorAppearanceParams::TcMode> tc_mapping = {
                 {"Lightness", ColorAppearanceParams::TcMode::LIGHT},
-                {"Brightness", ColorAppearanceParams::TcMode::BRIGHT}
+                {"Brightness", ColorAppearanceParams::TcMode::BRIGHT},
             };
             assignFromKeyfile(keyFile, "Color appearance", "CurveMode", tc_mapping, colorappearance.curveMode, pedited->colorappearance.curveMode);
             assignFromKeyfile(keyFile, "Color appearance", "CurveMode2", tc_mapping, colorappearance.curveMode2, pedited->colorappearance.curveMode2);
@@ -9510,7 +9510,7 @@ int ProcParams::load(const Glib::ustring& fname, ParamsEdited* pedited)
                 {
                     {"Chroma", ColorAppearanceParams::CtcMode::CHROMA},
                     {"Saturation", ColorAppearanceParams::CtcMode::SATUR},
-                    {"Colorfullness", ColorAppearanceParams::CtcMode::COLORF}
+                    {"Colorfullness", ColorAppearanceParams::CtcMode::COLORF},
                 },
                 colorappearance.curveMode3,
                 pedited->colorappearance.curveMode3
@@ -9694,7 +9694,7 @@ int ProcParams::load(const Glib::ustring& fname, ParamsEdited* pedited)
                     {"Golden Triangle 1", CropParams::Guide::GOLDEN_TRIANGLE_1},
                     {"Golden Triangle 2", CropParams::Guide::GOLDEN_TRIANGLE_2},
                     {"ePassport", CropParams::Guide::EPASSPORT},
-                    {"Centered square", CropParams::Guide::CENTERED_SQUARE}
+                    {"Centered square", CropParams::Guide::CENTERED_SQUARE},
                 },
                 crop.guide,
                 pedited->crop.guide
@@ -11152,7 +11152,7 @@ int ProcParams::load(const Glib::ustring& fname, ParamsEdited* pedited)
                         {"srgb", ColorManagementParams::WorkingTrc::SRGB},
                         {"22", ColorManagementParams::WorkingTrc::GAMMA_2_2},
                         {"18", ColorManagementParams::WorkingTrc::GAMMA_1_8},
-                        {"lin", ColorManagementParams::WorkingTrc::LINEAR}
+                        {"lin", ColorManagementParams::WorkingTrc::LINEAR},
                     },
                     icm.workingTRC,
                     pedited->icm.workingTRC
@@ -11180,7 +11180,7 @@ int ProcParams::load(const Glib::ustring& fname, ParamsEdited* pedited)
                         {"stda", ColorManagementParams::Illuminant::STDA},
                         {"2000", ColorManagementParams::Illuminant::TUNGSTEN_2000K},
                         {"1500", ColorManagementParams::Illuminant::TUNGSTEN_1500K},
-                        {"E", ColorManagementParams::Illuminant::E}
+                        {"E", ColorManagementParams::Illuminant::E},
                     },
                     icm.will,
                     pedited->icm.will
@@ -11211,7 +11211,7 @@ int ProcParams::load(const Glib::ustring& fname, ParamsEdited* pedited)
                         {"bet", ColorManagementParams::Primaries::BETA_RGB},
                         {"bst", ColorManagementParams::Primaries::BEST_RGB},
                         {"cus", ColorManagementParams::Primaries::CUSTOM},
-                        {"cusgr", ColorManagementParams::Primaries::CUSTOM_GRID}
+                        {"cusgr", ColorManagementParams::Primaries::CUSTOM_GRID},
                     },
                     icm.wprim,
                     pedited->icm.wprim
@@ -11232,7 +11232,7 @@ int ProcParams::load(const Glib::ustring& fname, ParamsEdited* pedited)
                         {"cat16", ColorManagementParams::Cat::CAT16},
                         {"cat02", ColorManagementParams::Cat::CAT02},
                         {"cat_vk", ColorManagementParams::Cat::CAT_VK},
-                        {"cat_xyz", ColorManagementParams::Cat::CAT_XYZ}
+                        {"cat_xyz", ColorManagementParams::Cat::CAT_XYZ},
                     },
                     icm.wcat,
                     pedited->icm.wcat
