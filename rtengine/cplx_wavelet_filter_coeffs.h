@@ -19,6 +19,8 @@
  */
 #pragma once
 
+#include "opthelper.h"
+
 namespace rtengine
 {
 

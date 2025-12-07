@@ -18,6 +18,7 @@
 #pragma once
 
 #include <cstdio>       /* needed to define "FILE", "NULL" */
+
 #include "jpeglib.h"
 
 

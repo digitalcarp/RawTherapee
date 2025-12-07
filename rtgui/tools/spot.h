@@ -20,6 +20,7 @@
 #ifndef _SPOT_H_
 #define _SPOT_H_
 
+#include "editcallbacks.h"
 #include "editwidgets.h"
 #include "toolpanel.h"
 #include "widgets/basic/adjuster.h"
