@@ -26,18 +26,12 @@
 class Circle;
 class Line;
 class OPIcon;
-class EditRectangle; 
+class EditRectangle;
 class RTSurface;
 
-
-struct ControlLine {
-    enum ObjectIndex {
-        LINE,
-        ICON,
-        BEGIN,
-        END,
-        OBJECT_COUNT
-    };
+struct ControlLine
+{
+    enum ObjectIndex { LINE, ICON, BEGIN, END, OBJECT_COUNT };
 
     std::unique_ptr<Line> line;
     std::shared_ptr<OPIcon> icon;
@@ -48,7 +42,7 @@ struct ControlLine {
     ~ControlLine();
 };
 
-class ControlLineManager: EditSubscriber
+class ControlLineManager : EditSubscriber
 {
 
 protected:
@@ -66,7 +60,8 @@ protected:
     int prev_obj;
     int selected_object;
 
-    void addLine(rtengine::Coord begin, rtengine::Coord end,
+    void addLine(rtengine::Coord begin,
+                 rtengine::Coord end,
                  rtengine::ControlLine::Type type = rtengine::ControlLine::VERTICAL);
     /**
      * Set the line type of the line containing the object according to the

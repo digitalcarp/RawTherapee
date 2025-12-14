@@ -49,15 +49,16 @@ enum EditUniqueID : int {
 /// @brief Editing mechanisms
 //  TODO: Look out if it has to be a bitfield to allow both mechanisms at a time
 enum EditType {
-    ET_PIPETTE,  /// Will trigger dedicated methods; can have a geometry list to be displayed, but without "mouse over" capabilities
+    ET_PIPETTE,  /// Will trigger dedicated methods; can have a geometry list to be
+                 /// displayed, but without "mouse over" capabilities
     ET_OBJECTS   /// The objects are geometrical widgets with "mouse over" capabilities
 };
 
 /// @brief Buffer type for ET_PIPETTE type editing
 enum BufferType {
-    BT_IMAGEFLOAT,          /// Imagefloat buffer type (3 channels of float values)
-    BT_LABIMAGE,            /// LabImage buffer type (3 channels of float values)
-    BT_SINGLEPLANE_FLOAT    /// All purpose, 1 channel buffer of float values
+    BT_IMAGEFLOAT,        /// Imagefloat buffer type (3 channels of float values)
+    BT_LABIMAGE,          /// LabImage buffer type (3 channels of float values)
+    BT_SINGLEPLANE_FLOAT  /// All purpose, 1 channel buffer of float values
 };
 
 /// @brief Number of object to be handled (for optimization purpose)

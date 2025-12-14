@@ -30,11 +30,12 @@ class Settings;
 
 namespace procparams {
 class ColorManagementParams;
-} // namespace procparams
+}  // namespace procparams
 
-} // namespace rtengine
+}  // namespace rtengine
 
-class App {
+class App
+{
 public:
     static const Glib::ustring VERSION;
     static const Glib::ustring PARAM_FILE_EXTENSION;

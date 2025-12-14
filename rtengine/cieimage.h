@@ -20,18 +20,16 @@
 
 #include "noncopyable.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
-class CieImage final :
-    public NonCopyable
+class CieImage final : public NonCopyable
 {
 private:
     bool fromImage;
 
 public:
     int W, H;
-    float * data[6];
+    float* data[6];
     float** J_p;
     float** Q_p;
     float** M_p;
@@ -39,11 +37,11 @@ public:
     float** sh_p;
     float** h_p;
 
-    CieImage (int w, int h);
-    ~CieImage ();
+    CieImage(int w, int h);
+    ~CieImage();
 
-    //Copies image data in Img into this instance.
-    void CopyFrom(CieImage *Img);
+    // Copies image data in Img into this instance.
+    void CopyFrom(CieImage* Img);
 };
 
-}
+}  // namespace rtengine

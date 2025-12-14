@@ -18,21 +18,20 @@
  */
 #pragma once
 
-namespace rtengine
-{
+namespace rtengine {
 
 class Coord2D
 {
 
 public:
     double x, y;
-    Coord2D (double x_, double y_) : x(x_), y(y_) {}
-    Coord2D () : x(0), y(0) {}
-    void set (double x_, double y_)
+    Coord2D(double x_, double y_) : x(x_), y(y_) {}
+    Coord2D() : x(0), y(0) {}
+    void set(double x_, double y_)
     {
         x = x_;
         y = y_;
     }
 };
 
-}
+}  // namespace rtengine

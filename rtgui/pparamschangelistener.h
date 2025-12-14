@@ -20,37 +20,31 @@
 
 struct ParamsEdited;
 
-namespace Glib
-{
+namespace Glib {
 
 class ustring;
 
 }
-namespace rtengine
-{
+namespace rtengine {
 
 class ProcEvent;
 
-namespace procparams
-{
+namespace procparams {
 
 class ProcParams;
 
-
 }
 
-}
+}  // namespace rtengine
 
 class PParamsChangeListener
 {
 public:
     virtual ~PParamsChangeListener() = default;
-    virtual void procParamsChanged(
-        const rtengine::procparams::ProcParams* params,
-        const rtengine::ProcEvent& ev,
-        const Glib::ustring& descr,
-        const ParamsEdited* paramsEdited = nullptr
-    ) = 0;
+    virtual void procParamsChanged(const rtengine::procparams::ProcParams* params,
+                                   const rtengine::ProcEvent& ev,
+                                   const Glib::ustring& descr,
+                                   const ParamsEdited* paramsEdited = nullptr) = 0;
     virtual void clearParamChanges() = 0;
 };
 

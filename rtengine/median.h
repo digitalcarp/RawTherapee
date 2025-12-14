@@ -23,58 +23,53 @@
  *  https://github.com/hoytech/Algorithm-Networksort-Chooser
  *
  *  Instead of using the PIX_SORT and PIX_SWAP macros we use std::min() and std::max()
- *  because it turned out that it generates much faster (branch free) code on machines which support SSE
+ *  because it turned out that it generates much faster (branch free) code on machines
+ * which support SSE
  *
  */
 
 #pragma once
 
-#include <array>
 #include <algorithm>
+#include <array>
 
 #include "opthelper.h"
 
-#if defined __GNUC__ && __GNUC__>=6 && defined __SSE2__
-    #pragma GCC diagnostic ignored "-Wignored-attributes"
+#if defined __GNUC__ && __GNUC__ >= 6 && defined __SSE2__
+#pragma GCC diagnostic ignored "-Wignored-attributes"
 #endif
 
-template<typename T, std::size_t N>
-inline T median(std::array<T, N> array)
+template <typename T, std::size_t N> inline T median(std::array<T, N> array)
 {
     const typename std::array<T, N>::iterator middle = array.begin() + N / 2;
     std::nth_element(array.begin(), middle, array.end());
 
-    return
-        (N % 2)
-            ? *middle
-            : ((*middle + *std::max_element(array.begin(), middle)) / static_cast<T>(2));
+    return (N % 2) ? *middle
+                   : ((*middle + *std::max_element(array.begin(), middle))
+                      / static_cast<T>(2));
 }
 
-template<typename T>
-inline T median(std::array<T, 3> array)
+template <typename T> inline T median(std::array<T, 3> array)
 {
-    return std::max(std::min(array[0], array[1]), std::min(array[2], std::max(array[0], array[1])));
+    return std::max(std::min(array[0], array[1]),
+                    std::min(array[2], std::max(array[0], array[1])));
 }
 
 #ifdef __SSE2__
-template<>
-inline vfloat median(std::array<vfloat, 3> array)
+template <> inline vfloat median(std::array<vfloat, 3> array)
 {
     return vmaxf(vminf(array[0], array[1]), vminf(array[2], vmaxf(array[0], array[1])));
 }
 #endif
 
-
-template<typename T>
-inline T median(std::array<T, 4> array)
+template <typename T> inline T median(std::array<T, 4> array)
 {
     float val1 = std::max(std::min(array[0], array[1]), std::min(array[2], array[3]));
     float val2 = std::min(std::max(array[0], array[1]), std::max(array[2], array[3]));
     return (val1 + val2) / 2.f;
 }
 
-template<typename T>
-inline T median(std::array<T, 5> array)
+template <typename T> inline T median(std::array<T, 5> array)
 {
     T tmp = std::min(array[0], array[1]);
     array[1] = std::max(array[0], array[1]);
@@ -91,8 +86,7 @@ inline T median(std::array<T, 5> array)
 }
 
 #ifdef __SSE2__
-template<>
-inline vfloat median(std::array<vfloat, 5> array)
+template <> inline vfloat median(std::array<vfloat, 5> array)
 {
     vfloat tmp = vminf(array[0], array[1]);
     array[1] = vmaxf(array[0], array[1]);
@@ -109,8 +103,7 @@ inline vfloat median(std::array<vfloat, 5> array)
 }
 #endif
 
-template<typename T>
-inline T median(std::array<T, 7> array)
+template <typename T> inline T median(std::array<T, 7> array)
 {
     T tmp = std::min(array[0], array[5]);
     array[5] = std::max(array[0], array[5]);
@@ -140,8 +133,7 @@ inline T median(std::array<T, 7> array)
 }
 
 #ifdef __SSE2__
-template<>
-inline vfloat median(std::array<vfloat, 7> array)
+template <> inline vfloat median(std::array<vfloat, 7> array)
 {
     vfloat tmp = vminf(array[0], array[5]);
     array[5] = vmaxf(array[0], array[5]);
@@ -171,8 +163,7 @@ inline vfloat median(std::array<vfloat, 7> array)
 }
 #endif
 
-template<typename T>
-inline T median(std::array<T, 9> array)
+template <typename T> inline T median(std::array<T, 9> array)
 {
     T tmp = std::min(array[1], array[2]);
     array[2] = std::max(array[1], array[2]);
@@ -215,8 +206,7 @@ inline T median(std::array<T, 9> array)
 }
 
 #ifdef __SSE2__
-template<>
-inline vfloat median(std::array<vfloat, 9> array)
+template <> inline vfloat median(std::array<vfloat, 9> array)
 {
     vfloat tmp = vminf(array[1], array[2]);
     array[2] = vmaxf(array[1], array[2]);
@@ -259,8 +249,7 @@ inline vfloat median(std::array<vfloat, 9> array)
 }
 #endif
 
-template<typename T>
-inline T median(std::array<T, 13> array)
+template <typename T> inline T median(std::array<T, 13> array)
 {
     T tmp = std::min(array[1], array[7]);
     array[7] = std::max(array[1], array[7]);
@@ -356,8 +345,7 @@ inline T median(std::array<T, 13> array)
 }
 
 #ifdef __SSE2__
-template<>
-inline vfloat median(std::array<vfloat, 13> array)
+template <> inline vfloat median(std::array<vfloat, 13> array)
 {
     vfloat tmp = vminf(array[1], array[7]);
     array[7] = vmaxf(array[1], array[7]);
@@ -453,8 +441,7 @@ inline vfloat median(std::array<vfloat, 13> array)
 }
 #endif
 
-template<typename T>
-inline T median(std::array<T, 25> array)
+template <typename T> inline T median(std::array<T, 25> array)
 {
     T tmp = std::min(array[0], array[1]);
     array[1] = std::max(array[0], array[1]);
@@ -667,8 +654,7 @@ inline T median(std::array<T, 25> array)
 }
 
 #ifdef __SSE2__
-template<>
-inline vfloat median(std::array<vfloat, 25> array)
+template <> inline vfloat median(std::array<vfloat, 25> array)
 {
     vfloat tmp = vminf(array[0], array[1]);
     array[1] = vmaxf(array[0], array[1]);
@@ -881,8 +867,7 @@ inline vfloat median(std::array<vfloat, 25> array)
 }
 #endif
 
-template<typename T>
-inline T median(std::array<T, 49> array)
+template <typename T> inline T median(std::array<T, 49> array)
 {
     T tmp = std::min(array[0], array[32]);
     array[32] = std::max(array[0], array[32]);
@@ -1730,8 +1715,7 @@ inline T median(std::array<T, 49> array)
 }
 
 #ifdef __SSE2__
-template<>
-inline vfloat median(std::array<vfloat, 49> array)
+template <> inline vfloat median(std::array<vfloat, 49> array)
 {
     vfloat tmp = vminf(array[0], array[32]);
     array[32] = vmaxf(array[0], array[32]);
@@ -2579,8 +2563,7 @@ inline vfloat median(std::array<vfloat, 49> array)
 }
 #endif
 
-template<typename T>
-inline T median(std::array<T, 81> array)
+template <typename T> inline T median(std::array<T, 81> array)
 {
     T tmp = std::min(array[0], array[64]);
     array[64] = std::max(array[0], array[64]);
@@ -4408,8 +4391,7 @@ inline T median(std::array<T, 81> array)
 }
 
 #ifdef __SSE2__
-template<>
-inline vfloat median(std::array<vfloat, 81> array)
+template <> inline vfloat median(std::array<vfloat, 81> array)
 {
     vfloat tmp = vminf(array[0], array[64]);
     array[64] = vmaxf(array[0], array[64]);
@@ -6237,14 +6219,13 @@ inline vfloat median(std::array<vfloat, 81> array)
 }
 #endif
 
-template<typename T, typename... ARGS>
-inline T median(T arg, ARGS... args)
+template <typename T, typename... ARGS> inline T median(T arg, ARGS... args)
 {
-    return median(std::array<T, sizeof...(args) + 1>{std::move(arg), std::move(args)...});
+    return median(
+        std::array<T, sizeof...(args) + 1>{ std::move(arg), std::move(args)... });
 }
 
-template<typename T>
-inline std::array<T, 4> middle4of6(const std::array<T, 6>& array)
+template <typename T> inline std::array<T, 4> middle4of6(const std::array<T, 6>& array)
 {
     std::array<T, 4> res;
 
@@ -6268,8 +6249,7 @@ inline std::array<T, 4> middle4of6(const std::array<T, 6>& array)
 }
 
 #ifdef __SSE2__
-template<>
-inline std::array<vfloat, 4> middle4of6(const std::array<vfloat, 6>& array)
+template <> inline std::array<vfloat, 4> middle4of6(const std::array<vfloat, 6>& array)
 {
     std::array<vfloat, 4> res;
 
@@ -6293,8 +6273,10 @@ inline std::array<vfloat, 4> middle4of6(const std::array<vfloat, 6>& array)
 }
 #endif
 
-template<typename T>
+template <typename T>
 inline std::array<T, 4> middle4of6(T arg0, T arg1, T arg2, T arg3, T arg4, T arg5)
 {
-    return middle4of6(std::array<T, 6>{std::move(arg0), std::move(arg1), std::move(arg2), std::move(arg3), std::move(arg4), std::move(arg5)});
+    return middle4of6(std::array<T, 6>{ std::move(arg0), std::move(arg1), std::move(arg2),
+                                        std::move(arg3), std::move(arg4),
+                                        std::move(arg5) });
 }

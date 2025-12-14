@@ -20,13 +20,12 @@
 
 #include "cplx_wavelet_dec.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
 wavelet_decomposition::~wavelet_decomposition()
 {
-    for(int i = 0; i <= lvltot; i++) {
-        if(wavelet_decomp[i] != nullptr) {
+    for (int i = 0; i <= lvltot; i++) {
+        if (wavelet_decomp[i] != nullptr) {
             delete wavelet_decomp[i];
         }
     }
@@ -34,10 +33,9 @@ wavelet_decomposition::~wavelet_decomposition()
     delete[] wavfilt_anal;
     delete[] wavfilt_synth;
 
-    if(coeff0) {
-        delete [] coeff0;
+    if (coeff0) {
+        delete[] coeff0;
     }
 }
 
-}
-
+}  // namespace rtengine

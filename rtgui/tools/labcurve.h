@@ -40,7 +40,7 @@ class LCurve final :
 
 protected:
     CurveEditorGroup* curveEditorG;
-//    CurveEditorGroup* curveEditorGD;
+    //    CurveEditorGroup* curveEditorGD;
     Adjuster* brightness;
     Adjuster* contrast;
     Adjuster* chromaticity;
@@ -49,9 +49,9 @@ protected:
     DiagonalCurveEditor* bshape;
     DiagonalCurveEditor* ccshape;
     DiagonalCurveEditor* lcshape;
-    FlatCurveEditor*   chshape;
-    FlatCurveEditor*   lhshape;
-    FlatCurveEditor*   hhshape;
+    FlatCurveEditor* chshape;
+    FlatCurveEditor* lhshape;
+    FlatCurveEditor* hhshape;
     Gtk::Label* labmdh;
     Gtk::Box* dhbox;
 
@@ -62,11 +62,11 @@ protected:
     Gtk::CheckButton* lcredsk;
 
     MyComboBoxText* gamutmunselmethod;
-    sigc::connection   gamutmunselmethodconn;
+    sigc::connection gamutmunselmethodconn;
     rtengine::ProcEvent Evgamutmunsell;
 
     Adjuster* rstprotection;
-    sigc::connection  bwtconn, lcconn;
+    sigc::connection bwtconn, lcconn;
     bool lastACVal, lastLCVal;
 
     //%%%%%%%%%%%%%%%%
@@ -74,37 +74,42 @@ protected:
 public:
     static const Glib::ustring TOOL_NAME;
 
-    LCurve ();
-    ~LCurve () override;
+    LCurve();
+    ~LCurve() override;
 
-    void read           (const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited = nullptr) override;
-    void write          (rtengine::procparams::ProcParams* pp, ParamsEdited* pedited = nullptr) override;
-    void setDefaults    (const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited = nullptr) override;
-    void setBatchMode   (bool batchMode) override;
-    void autoOpenCurve  () override;
-    void setEditProvider     (EditDataProvider *provider) override;
-    void setAdjusterBehavior (bool bradd, bool contradd, bool satadd);
-    void trimValues          (rtengine::procparams::ProcParams* pp) override;
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
+    void setBatchMode(bool batchMode) override;
+    void autoOpenCurve() override;
+    void setEditProvider(EditDataProvider* provider) override;
+    void setAdjusterBehavior(bool bradd, bool contradd, bool satadd);
+    void trimValues(rtengine::procparams::ProcParams* pp) override;
 
-    void curveChanged (CurveEditor* ce) override;
-    void adjusterChanged (Adjuster* a, double newval) override;
+    void curveChanged(CurveEditor* ce) override;
+    void adjusterChanged(Adjuster* a, double newval) override;
     void lcredsk_toggled();
     void gamutmunselChanged();
 
-    void updateCurveBackgroundHistogram(
-        const LUTu& histToneCurve,
-        const LUTu& histLCurve,
-        const LUTu& histCCurve,
-        const LUTu& histLCAM,
-        const LUTu& histCCAM,
-        const LUTu& histRed,
-        const LUTu& histGreen,
-        const LUTu& histBlue,
-        const LUTu& histLuma,
-        const LUTu& histLRETI
-    );
+    void updateCurveBackgroundHistogram(const LUTu& histToneCurve,
+                                        const LUTu& histLCurve,
+                                        const LUTu& histCCurve,
+                                        const LUTu& histLCAM,
+                                        const LUTu& histCCAM,
+                                        const LUTu& histRed,
+                                        const LUTu& histGreen,
+                                        const LUTu& histBlue,
+                                        const LUTu& histLuma,
+                                        const LUTu& histLRETI);
 
-    void colorForValue (double valX, double valY, enum ColorCaller::ElemType elemType, int callerId, ColorCaller* caller) override;
+    void colorForValue(double valX,
+                       double valY,
+                       enum ColorCaller::ElemType elemType,
+                       int callerId,
+                       ColorCaller* caller) override;
 
     void enabledChanged() override;
 };

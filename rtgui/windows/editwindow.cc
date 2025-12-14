@@ -1,30 +1,30 @@
 /*
-*  This file is part of RawTherapee.
-*
-*  RawTherapee is free software: you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation, either version 3 of the License, or
-*  (at your option) any later version.
-*
-*  RawTherapee is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ *  This file is part of RawTherapee.
+ *
+ *  RawTherapee is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  RawTherapee is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include "editwindow.h"
+#include "cursormanager.h"
 #include "editorpanel.h"
 #include "filepanel.h"
-#include "rtengine/procparams.h"
 #include "options.h"
 #include "preferences.h"
-#include "cursormanager.h"
+#include "rtengine/procparams.h"
 #include "rtwindow.h"
-#include <gtk/gtk.h>
 #include "threadutils.h"
+#include <gtk/gtk.h>
 
 // Check if the system has more than one display and option is set
 bool EditWindow::isMultiDisplayEnabled()
@@ -32,9 +32,10 @@ bool EditWindow::isMultiDisplayEnabled()
     const auto screen = Gdk::Screen::get_default();
 
     if (screen) {
-        return App::get().options().multiDisplayMode > 0 && screen->get_display()->get_n_monitors() > 1;
+        return App::get().options().multiDisplayMode > 0
+               && screen->get_display()->get_n_monitors() > 1;
     } else {
-        return false; // There is no default screen
+        return false;  // There is no default screen
     }
 }
 
@@ -45,20 +46,15 @@ EditWindow* EditWindow::getInstance(RTWindow* p)
     {
         EditWindow editWnd;
 
-        explicit EditWindowInstance(RTWindow* p) : editWnd(p)
-        {
-        }
+        explicit EditWindowInstance(RTWindow* p) : editWnd(p) {}
     };
 
     static EditWindowInstance instance_(p);
     return &instance_.editWnd;
 }
 
-EditWindow::EditWindow (RTWindow* p)
-    : parent(p)
-    , isFullscreen(false)
-    , isClosed(true)
-    , isMinimized(false)
+EditWindow::EditWindow(RTWindow* p)
+    : parent(p), isFullscreen(false), isClosed(true), isMinimized(false)
 {
     // For UNIX system, set app icon
 #ifndef _WIN32
@@ -73,35 +69,39 @@ EditWindow::EditWindow (RTWindow* p)
 
     property_destroy_with_parent().set_value(false);
 
-    mainNB = Gtk::manage(new Gtk::Notebook ());
+    mainNB = Gtk::manage(new Gtk::Notebook());
     mainNB->set_scrollable(true);
-    mainNB->signal_switch_page().connect_notify(sigc::mem_fun(*this, &EditWindow::on_mainNB_switch_page));
+    mainNB->signal_switch_page().connect_notify(
+        sigc::mem_fun(*this, &EditWindow::on_mainNB_switch_page));
 
     signal_key_press_event().connect(sigc::mem_fun(*this, &EditWindow::keyPressed));
-    signal_window_state_event().connect(sigc::mem_fun(*this, &EditWindow::on_window_state_event));
-    onConfEventConn = signal_configure_event().connect(sigc::mem_fun(*this, &EditWindow::on_configure_event));
+    signal_window_state_event().connect(
+        sigc::mem_fun(*this, &EditWindow::on_window_state_event));
+    onConfEventConn = signal_configure_event().connect(
+        sigc::mem_fun(*this, &EditWindow::on_configure_event));
 
     Gtk::Box* mainBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
     mainBox->pack_start(*mainNB);
 
     add(*mainBox);
-
 }
 
 void EditWindow::restoreWindow()
 {
     if (isClosed) {
-        onConfEventConn.block(true); // Avoid getting size and position while window is being moved, maximized, ...
+        onConfEventConn.block(true);  // Avoid getting size and position while window is
+                                      // being moved, maximized, ...
 
-        int meowMonitor = 0; // By default, set to main monitor
+        int meowMonitor = 0;  // By default, set to main monitor
         const auto display = get_screen()->get_display();
         const auto& options = App::get().options();
 
         if (isMultiDisplayEnabled()) {
-            if (options.meowMonitor >= 0) { // Use display from last session if available
-                meowMonitor = std::max(0, std::min(options.meowMonitor, display->get_n_monitors() - 1));
-            } else { // Determine the main RT window display
-                const Glib::RefPtr<Gdk::Window> &wnd = parent->get_window();
+            if (options.meowMonitor >= 0) {  // Use display from last session if available
+                meowMonitor = std::max(
+                    0, std::min(options.meowMonitor, display->get_n_monitors() - 1));
+            } else {  // Determine the main RT window display
+                const Glib::RefPtr<Gdk::Window>& wnd = parent->get_window();
 
                 // Retrieve window monitor ID
                 const int monitor_nb = display->get_n_monitors();
@@ -121,14 +121,17 @@ void EditWindow::restoreWindow()
 #ifdef __APPLE__
         // Get macOS menu bar height
         Gdk::Rectangle lWorkAreaRect;
-        display->get_monitor(std::min(meowMonitor, display->get_n_monitors() - 1))->get_workarea(lWorkAreaRect);
+        display->get_monitor(std::min(meowMonitor, display->get_n_monitors() - 1))
+            ->get_workarea(lWorkAreaRect);
         const int macMenuBarHeight = lWorkAreaRect.get_y();
 
         // Place RT window to saved one in options file
         if (options.meowX <= lMonitorRect.get_x() + lMonitorRect.get_width()
-                && options.meowX >= 0
-                && options.meowY <= lMonitorRect.get_y() + lMonitorRect.get_height() - macMenuBarHeight
-                && options.meowY >= 0) {
+            && options.meowX >= 0
+            && options.meowY
+                   <= lMonitorRect.get_y() + lMonitorRect.get_height() - macMenuBarHeight
+            && options.meowY >= 0)
+        {
             move(options.meowX, options.meowY + macMenuBarHeight);
         } else {
             move(lMonitorRect.get_x(), lMonitorRect.get_y() + macMenuBarHeight);
@@ -136,9 +139,10 @@ void EditWindow::restoreWindow()
 #else
         // Place RT window to saved one in options file
         if (options.meowX <= lMonitorRect.get_x() + lMonitorRect.get_width()
-                && options.meowX >= 0
-                && options.meowY <= lMonitorRect.get_y() + lMonitorRect.get_height()
-                && options.meowY >= 0) {
+            && options.meowX >= 0
+            && options.meowY <= lMonitorRect.get_y() + lMonitorRect.get_height()
+            && options.meowY >= 0)
+        {
             move(options.meowX, options.meowY);
         } else {
             move(lMonitorRect.get_x(), lMonitorRect.get_y());
@@ -159,11 +163,11 @@ void EditWindow::restoreWindow()
     }
 }
 
-void EditWindow::on_realize ()
+void EditWindow::on_realize()
 {
-    Gtk::Window::on_realize ();
+    Gtk::Window::on_realize();
 
-    editWindowCursorManager.init (get_window());
+    editWindowCursorManager.init(get_window());
 }
 
 bool EditWindow::on_configure_event(GdkEventConfigure* event)
@@ -190,8 +194,8 @@ bool EditWindow::on_window_state_event(GdkEventWindowState* event)
 
 void EditWindow::on_mainNB_switch_page(Gtk::Widget* widget, guint page_num)
 {
-    //if (page_num > 1) {
-    EditorPanel *ep = static_cast<EditorPanel*>(widget);
+    // if (page_num > 1) {
+    EditorPanel* ep = static_cast<EditorPanel*>(widget);
 
     if (mainNB->get_n_pages() > 1 && page_num <= (filesEdited.size() - 1)) {
         set_title_decorated(ep->getFileName());
@@ -201,58 +205,60 @@ void EditWindow::on_mainNB_switch_page(Gtk::Widget* widget, guint page_num)
     //}
 }
 
-void EditWindow::addEditorPanel (EditorPanel* ep, const std::string &name)
+void EditWindow::addEditorPanel(EditorPanel* ep, const std::string& name)
 {
-    ep->setParent (parent);
+    ep->setParent(parent);
     ep->setParentWindow(this);
     ep->setExternalEditorChangedSignal(&externalEditorChangedSignal);
 
     // construct closeable tab for the image
-    Gtk::Box* hb = Gtk::manage (new Gtk::Box ());
-    hb->pack_start (*Gtk::manage (new RTImage ("aperture")));
-    hb->pack_start (*Gtk::manage (new Gtk::Label (Glib::path_get_basename (name))));
-    hb->set_tooltip_markup (name);
-    Gtk::Button* closeb = Gtk::manage (new Gtk::Button ());
-    closeb->set_image (*Gtk::manage(new RTImage ("cancel-small", Gtk::ICON_SIZE_BUTTON)));
-    closeb->set_relief (Gtk::RELIEF_NONE);
-    closeb->set_focus_on_click (false);
+    Gtk::Box* hb = Gtk::manage(new Gtk::Box());
+    hb->pack_start(*Gtk::manage(new RTImage("aperture")));
+    hb->pack_start(*Gtk::manage(new Gtk::Label(Glib::path_get_basename(name))));
+    hb->set_tooltip_markup(name);
+    Gtk::Button* closeb = Gtk::manage(new Gtk::Button());
+    closeb->set_image(*Gtk::manage(new RTImage("cancel-small", Gtk::ICON_SIZE_BUTTON)));
+    closeb->set_relief(Gtk::RELIEF_NONE);
+    closeb->set_focus_on_click(false);
 
     // make the button as small as possible thanks via css
     closeb->set_name("notebook_close_button");
 
-    closeb->signal_clicked().connect( sigc::bind (sigc::mem_fun(*this, &EditWindow::remEditorPanel) , ep));
-    hb->pack_end (*closeb);
-    hb->set_spacing (2);
-    hb->show_all ();
+    closeb->signal_clicked().connect(
+        sigc::bind(sigc::mem_fun(*this, &EditWindow::remEditorPanel), ep));
+    hb->pack_end(*closeb);
+    hb->set_spacing(2);
+    hb->show_all();
 
-    mainNB->append_page (*ep, *hb);
-    mainNB->set_current_page (mainNB->page_num (*ep));
-    mainNB->set_tab_reorderable (*ep, true);
+    mainNB->append_page(*ep, *hb);
+    mainNB->set_current_page(mainNB->page_num(*ep));
+    mainNB->set_tab_reorderable(*ep, true);
 
     set_title_decorated(name);
 
-    epanels[ name ] = ep;
-    filesEdited.insert ( name );
-    parent->fpanel->refreshEditedState (filesEdited);
+    epanels[name] = ep;
+    filesEdited.insert(name);
+    parent->fpanel->refreshEditedState(filesEdited);
 
     show_all();
 }
 
-void EditWindow::remEditorPanel (EditorPanel* ep)
+void EditWindow::remEditorPanel(EditorPanel* ep)
 {
     if (ep->getIsProcessing()) {
-        return;    // Will crash if destroyed while loading
+        return;  // Will crash if destroyed while loading
     }
 
     ep->setExternalEditorChangedSignal(nullptr);
-    epanels.erase (ep->getFileName());
-    filesEdited.erase (ep->getFileName ());
-    parent->fpanel->refreshEditedState (filesEdited);
+    epanels.erase(ep->getFileName());
+    filesEdited.erase(ep->getFileName());
+    parent->fpanel->refreshEditedState(filesEdited);
 
-    mainNB->remove_page (*ep);
+    mainNB->remove_page(*ep);
 
     if (mainNB->get_n_pages() > 0) {
-        EditorPanel* ep1 = static_cast<EditorPanel*>(mainNB->get_nth_page (mainNB->get_current_page()));
+        EditorPanel* ep1 =
+            static_cast<EditorPanel*>(mainNB->get_nth_page(mainNB->get_current_page()));
         set_title_decorated(ep1->getFileName());
     } else {
         set_title_decorated("");
@@ -261,12 +267,12 @@ void EditWindow::remEditorPanel (EditorPanel* ep)
     // TODO: save options if wanted
 }
 
-bool EditWindow::selectEditorPanel(const std::string &name)
+bool EditWindow::selectEditorPanel(const std::string& name)
 {
     std::map<Glib::ustring, EditorPanel*>::iterator iep = epanels.find(name);
 
     if (iep != epanels.end()) {
-        mainNB->set_current_page (mainNB->page_num (*iep->second));
+        mainNB->set_current_page(mainNB->page_num(*iep->second));
         set_title_decorated(name);
         return true;
     }
@@ -274,40 +280,42 @@ bool EditWindow::selectEditorPanel(const std::string &name)
     return false;
 }
 
-void EditWindow::toFront ()
+void EditWindow::toFront()
 {
-    // When using the secondary window on the same monitor as the primary window we need to present the secondary window.
-    // If we don't, it will stay in background when opening 2nd, 3rd... editor, which is annoying
-    // It will also deiconify the window
-    // To avoid unexpected behavior while window is being updated, present() function is called after at idle
-    idle_register.add(
-        [this]()-> bool
-        {
-            onConfEventConn.block(true); // Avoid getting size and position while window is being moved, maximized, ...
-            present();
-            onConfEventConn.block(false);
+    // When using the secondary window on the same monitor as the primary window we need
+    // to present the secondary window. If we don't, it will stay in background when
+    // opening 2nd, 3rd... editor, which is annoying It will also deiconify the window To
+    // avoid unexpected behavior while window is being updated, present() function is
+    // called after at idle
+    idle_register.add([this]() -> bool {
+        onConfEventConn.block(true);  // Avoid getting size and position while window is
+                                      // being moved, maximized, ...
+        present();
+        onConfEventConn.block(false);
 
-            return false;
-        }
-    );
+        return false;
+    });
 }
 
-bool EditWindow::keyPressed (GdkEventKey* event)
+bool EditWindow::keyPressed(GdkEventKey* event)
 {
     bool ctrl = event->state & GDK_CONTROL_MASK;
 
-    if(event->keyval == GDK_KEY_F11) {
+    if (event->keyval == GDK_KEY_F11) {
         toggleFullscreen();
         return true;
     } else {
-        if(mainNB->get_n_pages () > 0) { //pass the handling for the editor panels, if there are any
-            if (event->keyval == GDK_KEY_w && ctrl) { //remove editor panel
-                EditorPanel* ep = static_cast<EditorPanel*>(mainNB->get_nth_page (mainNB->get_current_page()));
-                remEditorPanel (ep);
+        if (mainNB->get_n_pages() > 0)
+        {  // pass the handling for the editor panels, if there are any
+            if (event->keyval == GDK_KEY_w && ctrl) {  // remove editor panel
+                EditorPanel* ep = static_cast<EditorPanel*>(
+                    mainNB->get_nth_page(mainNB->get_current_page()));
+                remEditorPanel(ep);
                 return true;
-            } else if(mainNB->get_n_pages () > 0) {
-                EditorPanel* ep = static_cast<EditorPanel*>(mainNB->get_nth_page (mainNB->get_current_page()));
-                return ep->handleShortcutKey (event);
+            } else if (mainNB->get_n_pages() > 0) {
+                EditorPanel* ep = static_cast<EditorPanel*>(
+                    mainNB->get_nth_page(mainNB->get_current_page()));
+                return ep->handleShortcutKey(event);
             }
         }
 
@@ -317,7 +325,8 @@ bool EditWindow::keyPressed (GdkEventKey* event)
 
 void EditWindow::toggleFullscreen()
 {
-    onConfEventConn.block(true); // Avoid getting size and position while window is getting fullscreen
+    onConfEventConn.block(
+        true);  // Avoid getting size and position while window is getting fullscreen
 
     isFullscreen ? unfullscreen() : fullscreen();
 
@@ -357,7 +366,9 @@ void EditWindow::writeOptions()
             const int monitor_nb = display->get_n_monitors();
 
             for (int id = 0; id < monitor_nb; id++) {
-                if (display->get_monitor_at_window(get_window()) == display->get_monitor(id)) {
+                if (display->get_monitor_at_window(get_window())
+                    == display->get_monitor(id))
+                {
                     options.windowMonitor = id;
                     break;
                 }
@@ -385,9 +396,11 @@ bool EditWindow::on_delete_event(GdkEventAny* event)
     return false;
 }
 
-bool EditWindow::isProcessing ()
+bool EditWindow::isProcessing()
 {
-    for ( std::set <Glib::ustring>::iterator iter = filesEdited.begin(); iter != filesEdited.end(); ++iter ) {
+    for (std::set<Glib::ustring>::iterator iter = filesEdited.begin();
+         iter != filesEdited.end(); ++iter)
+    {
         if (epanels[*iter]->getIsProcessing()) {
             return true;
         }
@@ -398,17 +411,20 @@ bool EditWindow::isProcessing ()
 
 bool EditWindow::closeOpenEditors()
 {
-    // Check if any editor is still processing, and do NOT quit if so. Otherwise crashes and inconsistent caches
+    // Check if any editor is still processing, and do NOT quit if so. Otherwise crashes
+    // and inconsistent caches
     if (isProcessing()) {
         return false;
     }
 
     if (epanels.size()) {
         int page = mainNB->get_current_page();
-        Gtk::Widget *w = mainNB->get_nth_page(page);
+        Gtk::Widget* w = mainNB->get_nth_page(page);
         bool optionsWritten = false;
 
-        for (std::map<Glib::ustring, EditorPanel*>::iterator i = epanels.begin(); i != epanels.end(); ++i) {
+        for (std::map<Glib::ustring, EditorPanel*>::iterator i = epanels.begin();
+             i != epanels.end(); ++i)
+        {
             if (i->second == w) {
                 i->second->writeOptions();
                 optionsWritten = true;
@@ -422,13 +438,15 @@ bool EditWindow::closeOpenEditors()
         }
     }
 
-    for ( std::set <Glib::ustring>::iterator iter = filesEdited.begin(); iter != filesEdited.end(); ++iter ) {
-        mainNB->remove_page (*epanels[*iter]);
+    for (std::set<Glib::ustring>::iterator iter = filesEdited.begin();
+         iter != filesEdited.end(); ++iter)
+    {
+        mainNB->remove_page(*epanels[*iter]);
     }
 
     epanels.clear();
     filesEdited.clear();
-    parent->fpanel->refreshEditedState (filesEdited);
+    parent->fpanel->refreshEditedState(filesEdited);
 
     return true;
 }
@@ -444,15 +462,16 @@ void EditWindow::set_title_decorated(Glib::ustring fname)
     set_title("RawTherapee " + M("EDITWINDOW_TITLE") + subtitle);
 }
 
-void EditWindow::updateExternalEditorWidget(int selectedIndex, const std::vector<ExternalEditor> &editors)
+void EditWindow::updateExternalEditorWidget(int selectedIndex,
+                                            const std::vector<ExternalEditor>& editors)
 {
     for (const auto& panel : epanels) {
         panel.second->updateExternalEditorWidget(selectedIndex, editors);
     }
 }
 
-void EditWindow::updateToolPanelToolLocations(
-        const std::vector<Glib::ustring> &favorites, bool cloneFavoriteTools)
+void EditWindow::updateToolPanelToolLocations(const std::vector<Glib::ustring>& favorites,
+                                              bool cloneFavoriteTools)
 {
     for (const auto& panel : epanels) {
         panel.second->updateToolPanelToolLocations(favorites, cloneFavoriteTools);

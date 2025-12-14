@@ -36,10 +36,10 @@ App& App::get()
 }
 
 App::App()
-    : m_options(new Options())
-    , m_simple_editor(false)
-    , m_gimp_plugin(false)
-    , m_remote(false)
+    : m_options(new Options()),
+      m_simple_editor(false),
+      m_gimp_plugin(false),
+      m_remote(false)
 {
 }
 

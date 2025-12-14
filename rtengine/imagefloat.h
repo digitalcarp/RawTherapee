@@ -23,8 +23,7 @@
 
 #include "imageio.h"
 
-namespace rtengine
-{
+namespace rtengine {
 using namespace procparams;
 
 class Image8;
@@ -38,63 +37,56 @@ class Imagefloat final : public IImagefloat, public ImageIO
 {
 
 public:
+    Imagefloat();
+    Imagefloat(int width, int height);
+    ~Imagefloat() override;
 
-    Imagefloat ();
-    Imagefloat (int width, int height);
-    ~Imagefloat () override;
+    Imagefloat* copy() const;
+    Imagefloat* copySubRegion(int x, int y, int width, int height);
 
-    Imagefloat* copy () const;
-    Imagefloat*          copySubRegion (int x, int y, int width, int height);
+    void getStdImage(const ColorTemp& ctemp,
+                     int tran,
+                     Imagefloat* image,
+                     const PreviewProps& pp) const override;
 
-    void getStdImage (const ColorTemp &ctemp, int tran, Imagefloat* image, const PreviewProps &pp) const override;
+    const char* getType() const override { return sImagefloat; }
 
-    const char* getType () const override
-    {
-        return sImagefloat;
-    }
+    int getBPS() const override { return 8 * sizeof(float); }
 
-    int getBPS () const override
-    {
-        return 8 * sizeof(float);
-    }
-
-    void getScanline (int row, unsigned char* buffer, int bps, bool isFloat = false) const override;
-    void setScanline (int row, const unsigned char* buffer, int bps, unsigned int numSamples) override;
+    void getScanline(int row,
+                     unsigned char* buffer,
+                     int bps,
+                     bool isFloat = false) const override;
+    void setScanline(int row,
+                     const unsigned char* buffer,
+                     int bps,
+                     unsigned int numSamples) override;
 
     // functions inherited from IImagefloat:
-    MyMutex& getMutex () override
+    MyMutex& getMutex() override { return mutex(); }
+    cmsHPROFILE getProfile() const override { return getEmbeddedProfile(); }
+    int saveToFile(const Glib::ustring& fname) const override { return save(fname); }
+    int saveAsPNG(const Glib::ustring& fname, int bps = -1) const override
     {
-        return mutex ();
+        return savePNG(fname, bps);
     }
-    cmsHPROFILE getProfile () const override
+    int saveAsJPEG(const Glib::ustring& fname,
+                   int quality = 100,
+                   int subSamp = 3) const override
     {
-        return getEmbeddedProfile ();
+        return saveJPEG(fname, quality, subSamp);
     }
-    int saveToFile (const Glib::ustring &fname) const override
+    int saveAsTIFF(const Glib::ustring& fname,
+                   int bps = -1,
+                   bool isFloat = false,
+                   bool uncompressed = false,
+                   bool big = false) const override
     {
-        return save (fname);
+        return saveTIFF(fname, bps, isFloat, uncompressed, big);
     }
-    int saveAsPNG  (const Glib::ustring &fname, int bps = -1) const override
+    void setSaveProgressListener(ProgressListener* pl) override
     {
-        return savePNG (fname, bps);
-    }
-    int saveAsJPEG (const Glib::ustring &fname, int quality = 100, int subSamp = 3) const override
-    {
-        return saveJPEG (fname, quality, subSamp);
-    }
-    int saveAsTIFF (
-        const Glib::ustring &fname,
-        int bps = -1,
-        bool isFloat = false,
-        bool uncompressed = false,
-        bool big = false
-    ) const override
-    {
-        return saveTIFF (fname, bps, isFloat, uncompressed, big);
-    }
-    void setSaveProgressListener (ProgressListener* pl) override
-    {
-        setProgressListener (pl);
+        setProgressListener(pl);
     }
 
     inline uint16_t DNG_FloatToHalf(float f) const
@@ -113,8 +105,7 @@ public:
                 return (uint16_t)lsign;
             }
             mantissa = (mantissa | 0x00800000) >> (1 - exponent);
-            if (mantissa &  0x00001000)
-                mantissa += 0x00002000;
+            if (mantissa & 0x00001000) mantissa += 0x00002000;
             return (uint16_t)(lsign | (mantissa >> 13));
         } else if (exponent == 0xff - (127 - 15)) {
             if (mantissa == 0) {
@@ -126,18 +117,18 @@ public:
         if (mantissa & 0x00001000) {
             mantissa += 0x00002000;
             if (mantissa & 0x00800000) {
-                mantissa = 0;           // overflow in significand,
-                exponent += 1;          // adjust exponent
+                mantissa = 0;   // overflow in significand,
+                exponent += 1;  // adjust exponent
             }
         }
         if (exponent > 30) {
-            return (uint16_t)(lsign | 0x7c00); // infinity with the same sign as f.
+            return (uint16_t)(lsign | 0x7c00);  // infinity with the same sign as f.
         }
         return (uint16_t)(lsign | (exponent << 10) | (mantissa >> 13));
     }
 
     // From DNG SDK dng_utils.h
-    inline float         DNG_HalfToFloat(uint16_t halfValue)
+    inline float DNG_HalfToFloat(uint16_t halfValue)
     {
         union {
             float f;
@@ -150,13 +141,13 @@ public:
         if (exponent == 0) {
             if (mantissa == 0) {
                 // Plus or minus zero
-                tmp.i = (uint32_t) (lsign << 31);
+                tmp.i = (uint32_t)(lsign << 31);
                 return tmp.f;
             } else {
                 // Denormalized number -- renormalize it
                 while (!(mantissa & 0x00000400)) {
                     mantissa <<= 1;
-                    exponent -=  1;
+                    exponent -= 1;
                 }
                 exponent += 1;
                 mantissa &= ~0x00000400;
@@ -164,7 +155,8 @@ public:
         } else if (exponent == 31) {
             if (mantissa == 0) {
                 // Positive or negative infinity, convert to maximum (16 bit) values.
-                tmp.i = (uint32_t)((lsign << 31) | ((0x1eL + 127 - 15) << 23) | (0x3ffL << 13));
+                tmp.i = (uint32_t)((lsign << 31) | ((0x1eL + 127 - 15) << 23)
+                                   | (0x3ffL << 13));
                 return tmp.f;
             } else {
                 // Nan -- Just set to zero.
@@ -175,24 +167,24 @@ public:
         exponent += (127 - 15);
         mantissa <<= 13;
         // Assemble sign, exponent and mantissa.
-        tmp.i = (uint32_t) ((lsign << 31) | (exponent << 23) | mantissa);
+        tmp.i = (uint32_t)((lsign << 31) | (exponent << 23) | mantissa);
         return tmp.f;
     }
 
-    inline uint32_t      DNG_FP24ToFloat(const uint8_t * input)
+    inline uint32_t DNG_FP24ToFloat(const uint8_t* input)
     {
         const int32_t lsign = (input[0] >> 7) & 0x01;
         int32_t exponent = input[0] & 0x7F;
-        int32_t mantissa = (((int32_t) input[1]) << 8) | input[2];
+        int32_t mantissa = (((int32_t)input[1]) << 8) | input[2];
         if (exponent == 0) {
             if (mantissa == 0) {
                 // Plus or minus zero
-                return (uint32_t) (lsign << 31);
+                return (uint32_t)(lsign << 31);
             } else {
                 // Denormalized number -- renormalize it
                 while (!(mantissa & 0x00010000)) {
                     mantissa <<= 1;
-                    exponent -=  1;
+                    exponent -= 1;
                 }
                 exponent += 1;
                 mantissa &= ~0x00010000;
@@ -200,7 +192,8 @@ public:
         } else if (exponent == 127) {
             if (mantissa == 0) {
                 // Positive or negative infinity, convert to maximum (24 bit) values.
-                return (uint32_t) ((lsign << 31) | ((0x7eL + 128 - 64) << 23) |  (0xffffL << 7));
+                return (uint32_t)((lsign << 31) | ((0x7eL + 128 - 64) << 23)
+                                  | (0xffffL << 7));
             } else {
                 // Nan -- Just set to zero.
                 return 0;
@@ -210,15 +203,16 @@ public:
         exponent += (128 - 64);
         mantissa <<= 7;
         // Assemble sign, exponent and mantissa.
-        return (uint32_t) ((lsign << 31) | (exponent << 23) | mantissa);
+        return (uint32_t)((lsign << 31) | (exponent << 23) | mantissa);
     }
 
     void multiply(float factor, bool multithread);
-    void                 normalizeFloat(float srcMinVal, float srcMaxVal) override;
-    void                 normalizeFloatTo1(bool multithread=true);
-    void                 normalizeFloatTo65535(bool multithread=true);
-    void                 ExecCMSTransform(cmsHTRANSFORM hTransform);
-    void                 ExecCMSTransform(cmsHTRANSFORM hTransform, const LabImage &labImage, int cx, int cy);
+    void normalizeFloat(float srcMinVal, float srcMaxVal) override;
+    void normalizeFloatTo1(bool multithread = true);
+    void normalizeFloatTo65535(bool multithread = true);
+    void ExecCMSTransform(cmsHTRANSFORM hTransform);
+    void
+    ExecCMSTransform(cmsHTRANSFORM hTransform, const LabImage& labImage, int cx, int cy);
 };
 
-}
+}  // namespace rtengine

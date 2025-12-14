@@ -23,78 +23,69 @@
 
 #include "imageio.h"
 
-namespace rtengine
-{
+namespace rtengine {
 class Imagefloat;
 
 class Image8 final : public IImage8, public ImageIO
 {
 
 public:
+    Image8();
+    Image8(int width, int height);
+    ~Image8() override;
 
-    Image8 ();
-    Image8 (int width, int height);
-    ~Image8 () override;
+    Image8* copy() const;
 
-    Image8* copy () const;
+    void getStdImage(const ColorTemp& ctemp,
+                     int tran,
+                     Imagefloat* image,
+                     const PreviewProps& pp) const override;
 
-    void getStdImage (const ColorTemp &ctemp, int tran, Imagefloat* image, const PreviewProps &pp) const override;
+    const char* getType() const override { return sImage8; }
 
-    const char* getType () const override
-    {
-        return sImage8;
-    }
+    int getBPS() const override { return 8 * sizeof(unsigned char); }
 
-    int getBPS () const override
-    {
-        return 8 * sizeof(unsigned char);
-    }
-
-    void getScanline (int row, unsigned char* buffer, int bps, bool isFloat = false) const override;
-    void setScanline (int row, const unsigned char* buffer, int bps, unsigned int numSamples) override;
+    void getScanline(int row,
+                     unsigned char* buffer,
+                     int bps,
+                     bool isFloat = false) const override;
+    void setScanline(int row,
+                     const unsigned char* buffer,
+                     int bps,
+                     unsigned int numSamples) override;
 
     // functions inherited from IImage*:
-    MyMutex& getMutex () override
+    MyMutex& getMutex() override { return mutex(); }
+
+    cmsHPROFILE getProfile() const override { return getEmbeddedProfile(); }
+
+    int saveToFile(const Glib::ustring& fname) const override { return save(fname); }
+
+    int saveAsPNG(const Glib::ustring& fname, int bps = -1) const override
     {
-        return mutex ();
+        return savePNG(fname, bps);
     }
 
-    cmsHPROFILE getProfile () const override
+    int saveAsJPEG(const Glib::ustring& fname,
+                   int quality = 100,
+                   int subSamp = 3) const override
     {
-        return getEmbeddedProfile ();
+        return saveJPEG(fname, quality, subSamp);
     }
 
-    int saveToFile (const Glib::ustring &fname) const override
+    int saveAsTIFF(const Glib::ustring& fname,
+                   int bps = -1,
+                   bool isFloat = false,
+                   bool uncompressed = false,
+                   bool big = false) const override
     {
-        return save (fname);
+        return saveTIFF(fname, bps, isFloat, uncompressed, big);
     }
 
-    int saveAsPNG (const Glib::ustring &fname, int bps = -1) const override
+    void setSaveProgressListener(ProgressListener* pl) override
     {
-        return savePNG (fname, bps);
+        setProgressListener(pl);
     }
-
-    int saveAsJPEG (const Glib::ustring &fname, int quality = 100, int subSamp = 3) const override
-    {
-        return saveJPEG (fname, quality, subSamp);
-    }
-
-    int saveAsTIFF (
-        const Glib::ustring &fname,
-        int bps = -1,
-        bool isFloat = false,
-        bool uncompressed = false,
-        bool big = false
-    ) const override
-    {
-        return saveTIFF (fname, bps, isFloat, uncompressed, big);
-    }
-
-    void setSaveProgressListener (ProgressListener* pl) override
-    {
-        setProgressListener (pl);
-    }
-
 };
 
-}
+}  // namespace rtengine

@@ -35,20 +35,19 @@ class BayerProcess final :
 {
 
 protected:
-
     MyComboBoxText* method;
     Gtk::Box* borderbox;
-    Gtk::Box *imageNumberBox;
+    Gtk::Box* imageNumberBox;
     Adjuster* border;
     MyComboBoxText* imageNumber;
     Adjuster* ccSteps;
-    Gtk::Box *dcbOptions;
+    Gtk::Box* dcbOptions;
     Adjuster* dcbIterations;
     CheckBox* dcbEnhance;
-    Gtk::Box *lmmseOptions;
+    Gtk::Box* lmmseOptions;
     Adjuster* lmmseIterations;
-    Gtk::Frame *pixelShiftFrame;
-    Gtk::Box *pixelShiftOptions;
+    Gtk::Frame* pixelShiftFrame;
+    Gtk::Box* pixelShiftOptions;
     MyComboBoxText* pixelShiftMotionMethod;
     MyComboBoxText* pixelShiftDemosaicMethod;
     CheckBox* pixelShiftShowMotion;
@@ -64,7 +63,7 @@ protected:
     Adjuster* pixelShiftSmooth;
     Adjuster* pixelShiftEperIso;
     Adjuster* pixelShiftSigma;
-    Gtk::Box *dualDemosaicOptions;
+    Gtk::Box* dualDemosaicOptions;
     Adjuster* dualDemosaicContrast;
     int oldMethod;
     bool lastAutoContrast;
@@ -75,26 +74,35 @@ protected:
     rtengine::ProcEvent EvDemosaicContrast;
     rtengine::ProcEvent EvDemosaicPixelshiftDemosaicMethod;
     rtengine::ProcEvent EvPixelshiftAverage;
+
 public:
     static const Glib::ustring TOOL_NAME;
 
-    BayerProcess ();
-    ~BayerProcess () override;
+    BayerProcess();
+    ~BayerProcess() override;
 
-    void read(const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited = nullptr) override;
-    void write(rtengine::procparams::ProcParams* pp, ParamsEdited* pedited = nullptr) override;
-    void setAdjusterBehavior(bool falsecoloradd, bool iteradd, bool dualdemozecontrastadd, bool pssigmaadd, bool pssmoothadd, bool pseperisoadd);
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
+    void setAdjusterBehavior(bool falsecoloradd,
+                             bool iteradd,
+                             bool dualdemozecontrastadd,
+                             bool pssigmaadd,
+                             bool pssmoothadd,
+                             bool pseperisoadd);
     void trimValues(rtengine::procparams::ProcParams* pp) override;
     void setBatchMode(bool batchMode) override;
-    void setDefaults(const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited = nullptr) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
 
     void methodChanged();
     void imageNumberChanged();
     void adjusterChanged(Adjuster* a, double newval) override;
-    void adjusterAutoToggled (Adjuster* a, bool newval) override;
+    void adjusterAutoToggled(Adjuster* a, bool newval) override;
     void checkBoxToggled(CheckBox* c, CheckValue newval) override;
     void pixelShiftMotionMethodChanged();
     void pixelShiftDemosaicMethodChanged();
-    void autoContrastChanged (double autoContrast) override;
+    void autoContrastChanged(double autoContrast) override;
     void FrameCountChanged(int n, int frameNum) override;
 };

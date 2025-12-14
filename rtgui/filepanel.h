@@ -42,8 +42,8 @@ class FilePanel final :
     public rtengine::NonCopyable
 {
 public:
-    FilePanel ();
-    ~FilePanel () override;
+    FilePanel();
+    ~FilePanel() override;
 
     Gtk::Paned* placespaned;
     Gtk::Paned* dirpaned;
@@ -54,37 +54,34 @@ public:
     FilterPanel* filterPanel;
     ExportPanel* exportPanel;
     FileCatalog* fileCatalog;
-    Gtk::Paned *ribbonPane;
+    Gtk::Paned* ribbonPane;
 
-    void setParent (RTWindow* p)
-    {
-        parent = p;
-    }
-    void init (); // don't call it directly, the constructor calls it as idle source
-    void on_realize () override;
+    void setParent(RTWindow* p) { parent = p; }
+    void init();  // don't call it directly, the constructor calls it as idle source
+    void on_realize() override;
     void setAspect();
-    void open (const Glib::ustring& d); // open a file or a directory
-    void refreshEditedState (const std::set<Glib::ustring>& efiles)
+    void open(const Glib::ustring& d);  // open a file or a directory
+    void refreshEditedState(const std::set<Glib::ustring>& efiles)
     {
-        fileCatalog->refreshEditedState (efiles);
+        fileCatalog->refreshEditedState(efiles);
     }
     void loadingThumbs(Glib::ustring str, double rate);
 
     // call this before closing RT: it saves file browser's related things into options
-    void saveOptions ();
+    void saveOptions();
 
     // interface fileselectionlistener
     bool fileSelected(Thumbnail* thm) override;
     bool addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries) override;
 
-    void optionsChanged         ();
-    bool imageLoaded( Thumbnail* thm, ProgressConnector<rtengine::InitialImage*> * );
+    void optionsChanged();
+    bool imageLoaded(Thumbnail* thm, ProgressConnector<rtengine::InitialImage*>*);
 
-    bool handleShortcutKey (GdkEventKey* event);
-    bool handleShortcutKeyRelease(GdkEventKey *event);
-    void updateTPVScrollbar (bool hide);
-    void updateToolPanelToolLocations(
-        const std::vector<Glib::ustring> &favorites, bool cloneFavoriteTools);
+    bool handleShortcutKey(GdkEventKey* event);
+    bool handleShortcutKeyRelease(GdkEventKey* event);
+    void updateTPVScrollbar(bool hide);
+    void updateToolPanelToolLocations(const std::vector<Glib::ustring>& favorites,
+                                      bool cloneFavoriteTools);
 
 private:
     void on_NB_switch_page(Gtk::Widget* page, guint page_num);
@@ -100,10 +97,11 @@ private:
     Gtk::Notebook* rightNotebook;
     sigc::connection rightNotebookSwitchConn;
 
-    struct pendingLoad {
+    struct pendingLoad
+    {
         bool complete;
-        ProgressConnector<rtengine::InitialImage*> *pc;
-        Thumbnail *thm;
+        ProgressConnector<rtengine::InitialImage*>* pc;
+        Thumbnail* thm;
     };
     MyMutex pendingLoadMutex;
     std::vector<struct pendingLoad*> pendingLoads;

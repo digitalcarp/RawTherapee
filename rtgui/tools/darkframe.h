@@ -25,8 +25,7 @@
 #include "guiutils.h"
 #include "toolpanel.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
 class RawImage;
 
@@ -41,22 +40,19 @@ public:
     // add other info here
 };
 
-class DarkFrame final:
-    public ToolParamBlock,
-    public FoldableToolPanel
+class DarkFrame final : public ToolParamBlock, public FoldableToolPanel
 {
 
 protected:
-
-    MyFileChooserButton *darkFrameFile;
-    Gtk::Box *hbdf;
-    Gtk::Button *btnReset;
-    Gtk::Label *dfLabel;
-    Gtk::Label *dfInfo;
+    MyFileChooserButton* darkFrameFile;
+    Gtk::Box* hbdf;
+    Gtk::Button* btnReset;
+    Gtk::Label* dfLabel;
+    Gtk::Label* dfInfo;
     Gtk::CheckButton* dfAuto;
     bool dfChanged;
     bool lastDFauto;
-    DFProvider *dfp;
+    DFProvider* dfp;
     sigc::connection dfautoconn, dfFile;
     bool b_filter_asCurrent;
     bool israw;
@@ -64,16 +60,15 @@ protected:
 public:
     static const Glib::ustring TOOL_NAME;
 
-    DarkFrame ();
+    DarkFrame();
 
-    void read           (const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited = nullptr) override;
-    void write          (rtengine::procparams::ProcParams* pp, ParamsEdited* pedited = nullptr) override;
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
 
-    void darkFrameChanged ();
-    void darkFrameReset   ();
-    void dfAutoChanged    ();
-    void setDFProvider    (DFProvider* p)
-    {
-        dfp = p;
-    };
+    void darkFrameChanged();
+    void darkFrameReset();
+    void dfAutoChanged();
+    void setDFProvider(DFProvider* p) { dfp = p; };
 };

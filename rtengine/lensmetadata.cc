@@ -21,16 +21,16 @@
 
 #include "lensmetadata.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
-namespace
-{
+namespace {
 
 /* interpolateLinearSpline does a simple linear spline interpolation. Values
  * outside the external knots will return the value of the nearest knot without
  * any additional interpolation. */
-double interpolateLinearSpline(const std::vector<double> &xi, const std::vector<double> &yi, double x)
+double interpolateLinearSpline(const std::vector<double>& xi,
+                               const std::vector<double>& yi,
+                               double x)
 {
     if (x < xi[0]) {
         return yi[0];
@@ -47,16 +47,21 @@ double interpolateLinearSpline(const std::vector<double> &xi, const std::vector<
     return yi[yi.size() - 1];
 }
 
-} // namespace
+}  // namespace
 
-CenterRadiusMetadataLensCorrection::CenterRadiusMetadataLensCorrection(const FramesMetaData *meta) :
-    swap_xy(false)
+CenterRadiusMetadataLensCorrection::CenterRadiusMetadataLensCorrection(
+    const FramesMetaData* meta)
+    : swap_xy(false)
 {
     metadata = Exiv2Metadata(meta->getFileName());
     metadata.load();
 }
 
-void CenterRadiusMetadataLensCorrection::initCorrections(int width, int height, const procparams::CoarseTransformParams &coarse, int rawRotationDeg)
+void CenterRadiusMetadataLensCorrection::initCorrections(
+    int width,
+    int height,
+    const procparams::CoarseTransformParams& coarse,
+    int rawRotationDeg)
 {
     if (rawRotationDeg >= 0) {
         int rot = (coarse.rotate + rawRotationDeg) % 360;
@@ -71,7 +76,13 @@ void CenterRadiusMetadataLensCorrection::initCorrections(int width, int height, 
     rf = 1 / std::sqrt(SQR(w2) + SQR(h2));
 }
 
-void CenterRadiusMetadataLensCorrection::process(double &x, double &y, int cx, int cy, int channel, bool dist, bool ca) const
+void CenterRadiusMetadataLensCorrection::process(double& x,
+                                                 double& y,
+                                                 int cx,
+                                                 int cy,
+                                                 int channel,
+                                                 bool dist,
+                                                 bool ca) const
 {
     double xx = x + cx;
     double yy = y + cy;
@@ -102,7 +113,11 @@ void CenterRadiusMetadataLensCorrection::process(double &x, double &y, int cx, i
     y -= cy;
 }
 
-void CenterRadiusMetadataLensCorrection::correctDistortionAndCA(double &x, double &y, int cx, int cy, int channel) const
+void CenterRadiusMetadataLensCorrection::correctDistortionAndCA(double& x,
+                                                                double& y,
+                                                                int cx,
+                                                                int cy,
+                                                                int channel) const
 {
     if (!hasDistortionCorrection() || !hasCACorrection()) {
         return;
@@ -111,7 +126,10 @@ void CenterRadiusMetadataLensCorrection::correctDistortionAndCA(double &x, doubl
     process(x, y, cx, cy, channel, true, true);
 }
 
-void CenterRadiusMetadataLensCorrection::correctDistortion(double &x, double &y, int cx, int cy) const
+void CenterRadiusMetadataLensCorrection::correctDistortion(double& x,
+                                                           double& y,
+                                                           int cx,
+                                                           int cy) const
 {
     if (!hasDistortionCorrection()) {
         return;
@@ -120,7 +138,11 @@ void CenterRadiusMetadataLensCorrection::correctDistortion(double &x, double &y,
     process(x, y, cx, cy, 1, true, false);
 }
 
-void CenterRadiusMetadataLensCorrection::correctCA(double &x, double &y, int cx, int cy, int channel) const
+void CenterRadiusMetadataLensCorrection::correctCA(double& x,
+                                                   double& y,
+                                                   int cx,
+                                                   int cy,
+                                                   int channel) const
 {
     if (!hasCACorrection()) {
         return;
@@ -129,7 +151,10 @@ void CenterRadiusMetadataLensCorrection::correctCA(double &x, double &y, int cx,
     process(x, y, cx, cy, channel, false, true);
 }
 
-void CenterRadiusMetadataLensCorrection::processVignetteNChannels(int width, int height, float **rawData, int channels) const
+void CenterRadiusMetadataLensCorrection::processVignetteNChannels(int width,
+                                                                  int height,
+                                                                  float** rawData,
+                                                                  int channels) const
 {
     if (!hasVignettingCorrection()) {
         return;
@@ -147,12 +172,16 @@ void CenterRadiusMetadataLensCorrection::processVignetteNChannels(int width, int
     }
 }
 
-void CenterRadiusMetadataLensCorrection::processVignette(int width, int height, float **rawData) const
+void CenterRadiusMetadataLensCorrection::processVignette(int width,
+                                                         int height,
+                                                         float** rawData) const
 {
     return processVignetteNChannels(width, height, rawData, 1);
 }
 
-void CenterRadiusMetadataLensCorrection::processVignette3Channels(int width, int height, float **rawData) const
+void CenterRadiusMetadataLensCorrection::processVignette3Channels(int width,
+                                                                  int height,
+                                                                  float** rawData) const
 {
     return processVignetteNChannels(width, height, rawData, 3);
 }
@@ -182,8 +211,8 @@ void CenterRadiusMetadataLensCorrection::processVignette3Channels(int width, int
 class SonyMetadataLensCorrection : public CenterRadiusMetadataLensCorrection
 {
 public:
-    SonyMetadataLensCorrection(const FramesMetaData *meta) :
-        CenterRadiusMetadataLensCorrection(meta)
+    SonyMetadataLensCorrection(const FramesMetaData* meta)
+        : CenterRadiusMetadataLensCorrection(meta)
     {
         parse();
         setup();
@@ -204,13 +233,16 @@ private:
     void parse()
     {
         if (Exiv2::versionNumber() < EXIV2_MAKE_VERSION(0, 27, 4)) {
-            throw std::runtime_error("cannot get Sony correction data, too old exiv2 version " + Exiv2::versionString());
+            throw std::runtime_error(
+                "cannot get Sony correction data, too old exiv2 version "
+                + Exiv2::versionString());
         }
 
-        auto &exif = metadata.exifData();
+        auto& exif = metadata.exifData();
 
         auto posd = exif.findKey(Exiv2::ExifKey("Exif.SubImage1.DistortionCorrParams"));
-        auto posc = exif.findKey(Exiv2::ExifKey("Exif.SubImage1.ChromaticAberrationCorrParams"));
+        auto posc =
+            exif.findKey(Exiv2::ExifKey("Exif.SubImage1.ChromaticAberrationCorrParams"));
         auto posv = exif.findKey(Exiv2::ExifKey("Exif.SubImage1.VignettingCorrParams"));
 
         /* Sony metadata corrections parameters define some splines with N knots */
@@ -282,8 +314,8 @@ private:
 class FujiMetadataLensCorrection : public CenterRadiusMetadataLensCorrection
 {
 public:
-    FujiMetadataLensCorrection(const FramesMetaData *meta) :
-        CenterRadiusMetadataLensCorrection(meta)
+    FujiMetadataLensCorrection(const FramesMetaData* meta)
+        : CenterRadiusMetadataLensCorrection(meta)
     {
         parse();
         setup();
@@ -310,19 +342,24 @@ private:
     void parse()
     {
         if (Exiv2::versionNumber() < EXIV2_MAKE_VERSION(0, 27, 4)) {
-            throw std::runtime_error("cannot get Fuji correction data, too old exiv2 version " + Exiv2::versionString());
+            throw std::runtime_error(
+                "cannot get Fuji correction data, too old exiv2 version "
+                + Exiv2::versionString());
         }
 
-        auto &exif = metadata.exifData();
+        auto& exif = metadata.exifData();
 
         /* FujiFilm metadata corrections parameters define some splines with N knots */
-        auto posd = exif.findKey(Exiv2::ExifKey("Exif.Fujifilm.GeometricDistortionParams"));
-        auto posc = exif.findKey(Exiv2::ExifKey("Exif.Fujifilm.ChromaticAberrationParams"));
+        auto posd =
+            exif.findKey(Exiv2::ExifKey("Exif.Fujifilm.GeometricDistortionParams"));
+        auto posc =
+            exif.findKey(Exiv2::ExifKey("Exif.Fujifilm.ChromaticAberrationParams"));
         auto posv = exif.findKey(Exiv2::ExifKey("Exif.Fujifilm.VignettingParams"));
 
         // X-Trans IV/V
-        if (posd != exif.end() && posc != exif.end() && posv != exif.end() &&
-            posd->count() == 19 && posc->count() == 29 && posv->count() == 19) {
+        if (posd != exif.end() && posc != exif.end() && posv != exif.end()
+            && posd->count() == 19 && posc->count() == 29 && posv->count() == 19)
+        {
             const int nc = 9;
             this->nc = nc;
 
@@ -331,9 +368,11 @@ private:
                 const float kc = posc->toFloat(i + 1);
                 const float kv = posv->toFloat(i + 1);
 
-                // Check that the knots position is the same for distortion, ca and vignetting,
+                // Check that the knots position is the same for distortion, ca and
+                // vignetting,
                 if (kd != kc || kd != kv) {
-                    throw std::runtime_error("cannot get Fuji correction data: unexpected data");
+                    throw std::runtime_error(
+                        "cannot get Fuji correction data: unexpected data");
                 }
 
                 fuji_knots[i] = kd;
@@ -353,8 +392,9 @@ private:
             }
         }
         // X-Trans I/II/III
-        else if (posd != exif.end() && posc != exif.end() && posv != exif.end() &&
-                 posd->count() == 23 && posc->count() == 31 && posv->count() == 23) {
+        else if (posd != exif.end() && posc != exif.end() && posv != exif.end()
+                 && posd->count() == 23 && posc->count() == 31 && posv->count() == 23)
+        {
             const int nc = 11;
             this->nc = nc;
 
@@ -364,9 +404,11 @@ private:
                 // ca data doesn't provide first knot (0)
                 if (i != 0) kc = posc->toFloat(i);
                 const float kv = posv->toFloat(i + 1);
-                // check that the knots position is the same for distortion, ca and vignetting,
+                // check that the knots position is the same for distortion, ca and
+                // vignetting,
                 if (kd != kc || kd != kv) {
-                    throw std::runtime_error("cannot get Fuji correction data: unexpected data");
+                    throw std::runtime_error(
+                        "cannot get Fuji correction data: unexpected data");
                 }
 
                 fuji_knots[i] = kd;
@@ -486,8 +528,8 @@ private:
 class OlympusMetadataLensCorrection : public CenterRadiusMetadataLensCorrection
 {
 public:
-    OlympusMetadataLensCorrection(const FramesMetaData *meta) :
-        CenterRadiusMetadataLensCorrection(meta), has_dist(false), has_ca(false)
+    OlympusMetadataLensCorrection(const FramesMetaData* meta)
+        : CenterRadiusMetadataLensCorrection(meta), has_dist(false), has_ca(false)
     {
         parse();
     }
@@ -510,10 +552,12 @@ private:
     void parse()
     {
         if (Exiv2::versionNumber() < EXIV2_MAKE_VERSION(0, 27, 4)) {
-            throw std::runtime_error("cannot get Olympus correction data, too old exiv2 version " + Exiv2::versionString());
+            throw std::runtime_error(
+                "cannot get Olympus correction data, too old exiv2 version "
+                + Exiv2::versionString());
         }
 
-        auto &exif = metadata.exifData();
+        auto& exif = metadata.exifData();
 
         std::array<double, 4> distortion;
         std::array<double, 6> cacorr;
@@ -561,7 +605,8 @@ private:
         // (undistorted) image, where the corner is defined as Rout=1, to a
         // radius in the input (distorted) image, where the corner is defined
         // as Rin=1.
-        // Rin = Rout*drs * (1 + dk2 * (Rout*drs)^2 + dk4 * (Rout*drs)^4 + dk6 * (Rout*drs)^6)
+        // Rin = Rout*drs * (1 + dk2 * (Rout*drs)^2 + dk4 * (Rout*drs)^4 + dk6 *
+        // (Rout*drs)^6)
         //
         // cf is Rin / Rout.
 
@@ -596,10 +641,7 @@ private:
         return distortionCorrectionFactor(rout) * caCorrectionFactor(rout, channel);
     }
 
-    double vignettingCorrectionFactor(double r) const override
-    {
-        return 1;
-    }
+    double vignettingCorrectionFactor(double r) const override { return 1; }
 
     bool hasDistortionCorrection() const override { return has_dist; }
     // Olympus cameras have a shading correction option that fixes vignetting
@@ -611,7 +653,8 @@ private:
 };
 
 /* Panasonic metadata lens correction
- * Currently disabled since the algorithm is not stable and works well with only some lenses.
+ * Currently disabled since the algorithm is not stable and works well with only some
+ * lenses.
  *
  * Data extraction and distortion correction formula from:
  * https://web.archive.org/web/20120701131817/https://syscall.eu/#pana
@@ -626,11 +669,13 @@ private:
 class PanasonicMetadataLensCorrection : public CenterRadiusMetadataLensCorrection
 {
 public:
-    PanasonicMetadataLensCorrection(const FramesMetaData *meta) :
-        CenterRadiusMetadataLensCorrection(meta), has_dist(false), a(0), b(0), c(0)
+    PanasonicMetadataLensCorrection(const FramesMetaData* meta)
+        : CenterRadiusMetadataLensCorrection(meta), has_dist(false), a(0), b(0), c(0)
     {
-        // Currently disabled since the algorithm is not stable and works well with only some lenses.
-        throw std::runtime_error("panasonic correction disabled as it's not yet working properly");
+        // Currently disabled since the algorithm is not stable and works well with only
+        // some lenses.
+        throw std::runtime_error(
+            "panasonic correction disabled as it's not yet working properly");
 
         // parse();
     }
@@ -642,10 +687,12 @@ private:
     void parse()
     {
         if (Exiv2::versionNumber() < EXIV2_MAKE_VERSION(0, 27, 4)) {
-            throw std::runtime_error("cannot get Panasonic correction data, too old exiv2 version " + Exiv2::versionString());
+            throw std::runtime_error(
+                "cannot get Panasonic correction data, too old exiv2 version "
+                + Exiv2::versionString());
         }
 
-        auto &exif = metadata.exifData();
+        auto& exif = metadata.exifData();
 
         auto it = exif.findKey(Exiv2::ExifKey("Exif.PanasonicRaw.0x0119"));
         if (it != exif.end()) {
@@ -653,10 +700,11 @@ private:
             buf.resize(it->value().size());
             it->value().copy(buf.data(), Exiv2::littleEndian);
 
-            const Exiv2::byte *data = buf.data();
+            const Exiv2::byte* data = buf.data();
             // n is currently unused
             // uint32_t n = Exiv2::getShort(data + 24, Exiv2::littleEndian);
-            scale = 1.0f / (1.0f + Exiv2::getShort(data + 10, Exiv2::littleEndian) / 32768.0f);
+            scale = 1.0f
+                    / (1.0f + Exiv2::getShort(data + 10, Exiv2::littleEndian) / 32768.0f);
             a = Exiv2::getShort(data + 16, Exiv2::littleEndian) / 32768.0f;
             b = Exiv2::getShort(data + 8, Exiv2::littleEndian) / 32768.0f;
             c = Exiv2::getShort(data + 22, Exiv2::littleEndian) / 32768.0f;
@@ -675,20 +723,14 @@ private:
         return cf;
     }
 
-    double caCorrectionFactor(double rout, int channel) const override
-    {
-        return 1;
-    }
+    double caCorrectionFactor(double rout, int channel) const override { return 1; }
 
     double distortionAndCACorrectionFactor(double rout, int channel) const override
     {
         return distortionCorrectionFactor(rout);
     }
 
-    double vignettingCorrectionFactor(double r) const override
-    {
-        return 1;
-    }
+    double vignettingCorrectionFactor(double r) const override { return 1; }
 
     bool hasDistortionCorrection() const override { return has_dist; }
     // Panasonic cameras have a shading correction option that fixes vignetting
@@ -714,8 +756,8 @@ private:
 class DNGMetadataLensCorrection : public MetadataLensCorrection
 {
 public:
-    DNGMetadataLensCorrection(const FramesMetaData *meta) :
-        MetadataLensCorrection(), swap_xy(false)
+    DNGMetadataLensCorrection(const FramesMetaData* meta)
+        : MetadataLensCorrection(), swap_xy(false)
     {
         metadata = Exiv2Metadata(meta->getFileName());
         metadata.load();
@@ -748,7 +790,10 @@ private:
     std::array<std::array<double, 6>, 3> warp_rectilinear;
     std::array<double, 5> vignette_radial;
 
-    void initCorrections(int width, int height, const procparams::CoarseTransformParams &coarse, int rawRotationDeg) override
+    void initCorrections(int width,
+                         int height,
+                         const procparams::CoarseTransformParams& coarse,
+                         int rawRotationDeg) override
     {
         if (rawRotationDeg >= 0) {
             int rot = (coarse.rotate + rawRotationDeg) % 360;
@@ -770,7 +815,7 @@ private:
 
         has_dist = has_ca = has_vign = false;
 
-        auto &exif = metadata.exifData();
+        auto& exif = metadata.exifData();
 
         auto it = exif.findKey(Exiv2::ExifKey("Exif.SubImage1.OpcodeList3"));
 
@@ -779,14 +824,14 @@ private:
             buf.resize(it->value().size());
             it->value().copy(buf.data(), Exiv2::invalidByteOrder);
 
-            const Exiv2::byte *data = buf.data();
+            const Exiv2::byte* data = buf.data();
             uint32_t num_entries = Exiv2::getULong(data, Exiv2::bigEndian);
             size_t idx = 4;
 
             for (size_t i = 0; i < num_entries && idx < buf.size(); ++i) {
                 uint32_t opcodeID = Exiv2::getULong(data + idx, Exiv2::bigEndian);
                 idx += 4;
-                idx += 4; // version
+                idx += 4;  // version
                 uint32_t flags = Exiv2::getULong(data + idx, Exiv2::bigEndian);
                 idx += 4;
                 size_t paramSize = Exiv2::getULong(data + idx, Exiv2::bigEndian);
@@ -797,9 +842,11 @@ private:
                 }
 
                 if (processed_opcodes.find(opcodeID) != processed_opcodes.end()) {
-                    // we currently handle only one opcode per type and ignore next ones if provided.
+                    // we currently handle only one opcode per type and ignore next ones
+                    // if provided.
                     if (settings->verbose) {
-                        std::printf("DNG OpcodeList3 %s opcode %d already processed\n", flags & 1 ? "optional" : "mandatory", opcodeID);
+                        std::printf("DNG OpcodeList3 %s opcode %d already processed\n",
+                                    flags & 1 ? "optional" : "mandatory", opcodeID);
                     }
 
                     idx += paramSize;
@@ -809,7 +856,7 @@ private:
                 processed_opcodes.insert(opcodeID);
 
                 // we currently handle only one dist correction
-                if (opcodeID == 1 && !has_dist) { // WarpRectilinear
+                if (opcodeID == 1 && !has_dist) {  // WarpRectilinear
 
                     planes = Exiv2::getULong(data + idx, Exiv2::bigEndian);
 
@@ -819,12 +866,15 @@ private:
 
                     for (int p = 0; p < planes; p++) {
                         for (int i = 0; i < 6; i++) {
-                            warp_rectilinear[p][i] = Exiv2::getDouble(data + idx + 4 + 8 * (i + p * 6), Exiv2::bigEndian);
+                            warp_rectilinear[p][i] = Exiv2::getDouble(
+                                data + idx + 4 + 8 * (i + p * 6), Exiv2::bigEndian);
                         }
                     }
 
-                    crx_d = Exiv2::getDouble(data + idx + 4 + 8 * (0 + planes * 6), Exiv2::bigEndian);
-                    cry_d = Exiv2::getDouble(data + idx + 4 + 8 * (1 + planes * 6), Exiv2::bigEndian);
+                    crx_d = Exiv2::getDouble(data + idx + 4 + 8 * (0 + planes * 6),
+                                             Exiv2::bigEndian);
+                    cry_d = Exiv2::getDouble(data + idx + 4 + 8 * (1 + planes * 6),
+                                             Exiv2::bigEndian);
 
                     has_dist = true;
                     if (planes == 3) {
@@ -832,14 +882,15 @@ private:
                     }
 
                     // we currently handle only one vignetting correction
-                } else if (opcodeID == 3 && !has_vign) { // FixVignetteRadial
+                } else if (opcodeID == 3 && !has_vign) {  // FixVignetteRadial
                     size_t start = idx;
                     size_t end = idx + 7 * 8;
                     if (end > buf.size()) {
                         throw std::runtime_error("cannot parse DNG FixVignetteRadial");
                     }
                     for (int j = 0; j < 5; j++) {
-                        vignette_radial[j] = Exiv2::getDouble(data + start, Exiv2::bigEndian);
+                        vignette_radial[j] =
+                            Exiv2::getDouble(data + start, Exiv2::bigEndian);
                         start += 8;
                     }
                     crx_v = Exiv2::getDouble(data + start, Exiv2::bigEndian);
@@ -849,7 +900,8 @@ private:
 
                 } else {
                     if (settings->verbose) {
-                        std::printf("DNG OpcodeList3 has unsupported %s opcode %d\n", flags & 1 ? "optional" : "mandatory", opcodeID);
+                        std::printf("DNG OpcodeList3 has unsupported %s opcode %d\n",
+                                    flags & 1 ? "optional" : "mandatory", opcodeID);
                     }
                 }
 
@@ -876,7 +928,7 @@ private:
         m_v = std::sqrt(SQR(mx_v) + SQR(my_v));
     }
 
-    void correctPlaneDistortion(double &x, double &y, int cx, int cy, int plane) const
+    void correctPlaneDistortion(double& x, double& y, int cx, int cy, int plane) const
     {
         if (plane < 0 || plane > 2 || plane > planes) {
             return;
@@ -897,12 +949,19 @@ private:
         const double dx2 = SQR(dx);
         const double dy2 = SQR(dy);
         const double r2 = dx2 + dy2;
-        const double f = warp_rectilinear[plane][0] + r2 * (warp_rectilinear[plane][1] + r2 * (warp_rectilinear[plane][2] + r2 * warp_rectilinear[plane][3]));
+        const double f = warp_rectilinear[plane][0]
+                         + r2
+                               * (warp_rectilinear[plane][1]
+                                  + r2
+                                        * (warp_rectilinear[plane][2]
+                                           + r2 * warp_rectilinear[plane][3]));
         const double dx_r = f * dx;
         const double dy_r = f * dy;
         const double dxdy2 = 2 * dx * dy;
-        const double dx_t = warp_rectilinear[plane][4] * dxdy2 + warp_rectilinear[plane][5] * (r2 + 2 * dx2);
-        const double dy_t = warp_rectilinear[plane][5] * dxdy2 + warp_rectilinear[plane][4] * (r2 + 2 * dy2);
+        const double dx_t = warp_rectilinear[plane][4] * dxdy2
+                            + warp_rectilinear[plane][5] * (r2 + 2 * dx2);
+        const double dy_t = warp_rectilinear[plane][5] * dxdy2
+                            + warp_rectilinear[plane][4] * (r2 + 2 * dy2);
 
         x = cx1 + m * (dx_r + dx_t);
         y = cy1 + m * (dy_r + dy_t);
@@ -914,7 +973,11 @@ private:
         y -= cy;
     }
 
-    void correctDistortionAndCA(double &x, double &y, int cx, int cy, int channel) const override
+    void correctDistortionAndCA(double& x,
+                                double& y,
+                                int cx,
+                                int cy,
+                                int channel) const override
     {
         if (!hasDistortionCorrection() || !hasCACorrection()) {
             return;
@@ -923,21 +986,21 @@ private:
         correctPlaneDistortion(x, y, cx, cy, channel);
     }
 
-    void correctDistortion(double &x, double &y, int cx, int cy) const override
+    void correctDistortion(double& x, double& y, int cx, int cy) const override
     {
         if (!hasDistortionCorrection()) {
             return;
         }
 
-        int plane = 1; // 3 planes correction, use plane 1 (green)
+        int plane = 1;  // 3 planes correction, use plane 1 (green)
         if (planes == 1) {
-            plane = 0; // 1 single plane correction
+            plane = 0;  // 1 single plane correction
         }
 
         correctPlaneDistortion(x, y, cx, cy, plane);
     }
 
-    void correctCA(double &x, double &y, int cx, int cy, int channel) const override
+    void correctCA(double& x, double& y, int cx, int cy, int channel) const override
     {
         if (!hasCACorrection()) {
             return;
@@ -958,7 +1021,8 @@ private:
         y += ych - ygreen;
     }
 
-    void processVignetteNChannels(int width, int height, float **rawData, int channels) const
+    void
+    processVignetteNChannels(int width, int height, float** rawData, int channels) const
     {
         if (!hasVignettingCorrection()) {
             return;
@@ -971,42 +1035,46 @@ private:
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 const double r2 = m2 * (SQR(x - cx) + SQR(y - cy));
-                const double g = 1.f + r2 * (vignette_radial[0] + r2 * (vignette_radial[1] + r2 * (vignette_radial[2] + r2 * (vignette_radial[3] + r2 * vignette_radial[4]))));
+                const double g =
+                    1.f
+                    + r2
+                          * (vignette_radial[0]
+                             + r2
+                                   * (vignette_radial[1]
+                                      + r2
+                                            * (vignette_radial[2]
+                                               + r2
+                                                     * (vignette_radial[3]
+                                                        + r2 * vignette_radial[4]))));
                 for (int c = 0; c < channels; ++c) {
-                    rawData[y][x*channels + c] *= g;
+                    rawData[y][x * channels + c] *= g;
                 }
             }
         }
     }
 
-    void processVignette(int width, int height, float **rawData) const override
+    void processVignette(int width, int height, float** rawData) const override
     {
         return processVignetteNChannels(width, height, rawData, 1);
     }
 
-    void processVignette3Channels(int width, int height, float **rawData) const override
+    void processVignette3Channels(int width, int height, float** rawData) const override
     {
         return processVignetteNChannels(width, height, rawData, 3);
     }
 
-    bool isCACorrectionAvailable() const
-    {
-        return hasCACorrection();
-    }
+    bool isCACorrectionAvailable() const { return hasCACorrection(); }
 
     bool hasDistortionCorrection() const override { return has_dist; }
     bool hasVignettingCorrection() const override { return has_vign; }
     bool hasCACorrection() const override { return has_ca; }
 };
 
-std::unique_ptr<MetadataLensCorrection> MetadataLensCorrectionFinder::findCorrection(const FramesMetaData *meta)
+std::unique_ptr<MetadataLensCorrection>
+MetadataLensCorrectionFinder::findCorrection(const FramesMetaData* meta)
 {
     static const std::unordered_set<std::string> makers = {
-        "SONY",
-        "FUJIFILM",
-        "OLYMPUS",
-        "OM DIGITAL SOLUTIONS",
-        "PANASONIC",
+        "SONY", "FUJIFILM", "OLYMPUS", "OM DIGITAL SOLUTIONS", "PANASONIC",
     };
 
     std::string make = Glib::ustring(meta->getMake()).uppercase();
@@ -1029,7 +1097,7 @@ std::unique_ptr<MetadataLensCorrection> MetadataLensCorrectionFinder::findCorrec
         } else if (make == "PANASONIC") {
             correction.reset(new PanasonicMetadataLensCorrection(meta));
         }
-    } catch (std::exception &exc) {
+    } catch (std::exception& exc) {
         if (settings->verbose) {
             std::cerr << "error parsing lens metadata: " << exc.what() << std::endl;
         }
@@ -1040,4 +1108,4 @@ std::unique_ptr<MetadataLensCorrection> MetadataLensCorrectionFinder::findCorrec
     return correction;
 }
 
-} // namespace rtengine
+}  // namespace rtengine

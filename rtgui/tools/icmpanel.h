@@ -22,9 +22,9 @@
 
 #include <gtkmm.h>
 
+#include "curvelistener.h"
 #include "guiutils.h"
 #include "toolpanel.h"
-#include "curvelistener.h"
 #include "widgets/basic/adjuster.h"
 #include "widgets/basic/popupbutton.h"
 #include "widgets/basic/thresholdadjuster.h"
@@ -58,7 +58,7 @@ protected:
     Gtk::Frame* dcpFrame;
     Gtk::Frame* coipFrame;
     Gtk::Frame* redFrame;
-    Gtk::Frame* colorFramecie;    
+    Gtk::Frame* colorFramecie;
     MyExpander* trcExp;
     MyExpander* wavExp;
     MyExpander* wav2Exp;
@@ -67,7 +67,7 @@ protected:
     Adjuster* wGamma;
     Adjuster* wSlope;
     Adjuster* wapsat;
-    
+
     Adjuster* wmidtcie;
     Gtk::CheckButton* wsmoothcie;
     Adjuster* wsmoothciesli;
@@ -93,9 +93,9 @@ protected:
     bool lastwsmoothcie;
     Gtk::Label* labmga;
     Gtk::Box* gabox;
-    //Gtk::Label* blr;
-    //Gtk::Label* blg;
-    //Gtk::Label* blb;
+    // Gtk::Label* blr;
+    // Gtk::Label* blg;
+    // Gtk::Label* blb;
     Gtk::Button* neutral;
     sigc::connection trcExpconn;
     sigc::connection wavExpconn;
@@ -121,12 +121,12 @@ private:
     rtengine::ProcEvent EvICMprimariMethod;
     rtengine::ProcEvent EvICMprofileMethod;
     rtengine::ProcEvent EvICMtempMethod;
-    //rtengine::ProcEvent EvICMpredx;
-    //rtengine::ProcEvent EvICMpredy;
-    //rtengine::ProcEvent EvICMpgrex;
-    //rtengine::ProcEvent EvICMpgrey;
-    //rtengine::ProcEvent EvICMpblux;
-    //rtengine::ProcEvent EvICMpbluy;
+    // rtengine::ProcEvent EvICMpredx;
+    // rtengine::ProcEvent EvICMpredy;
+    // rtengine::ProcEvent EvICMpgrex;
+    // rtengine::ProcEvent EvICMpgrey;
+    // rtengine::ProcEvent EvICMpblux;
+    // rtengine::ProcEvent EvICMpbluy;
     rtengine::ProcEvent EvICMgamm;
     rtengine::ProcEvent EvICMslop;
     rtengine::ProcEvent EvICMtrcinMethod;
@@ -159,7 +159,7 @@ private:
     rtengine::ProcEvent EvICMresidtrc;
     rtengine::ProcEvent EvICMwavExp;
 
-    LabGrid *labgridcie;
+    LabGrid* labgridcie;
     IdleRegister idle_register;
 
     Gtk::Box* willuBox;
@@ -177,7 +177,6 @@ private:
 
     Gtk::Box* wcatBox;
     Gtk::Label* wcatlab;
-
 
     Gtk::CheckButton* obpc;
     Gtk::RadioButton* inone;
@@ -224,8 +223,9 @@ private:
     Glib::ustring camName;
     Glib::ustring filename;
     void updateDCP(int dcpIlluminant, Glib::ustring dcp_name);
-    void updateRenderingIntent(const Glib::ustring &profile);
-    void foldAllButMe(GdkEventButton *event, MyExpander *expander, const MyExpander *parent);
+    void updateRenderingIntent(const Glib::ustring& profile);
+    void
+    foldAllButMe(GdkEventButton* event, MyExpander* expander, const MyExpander* parent);
 
     float nextrx;
     float nextry;
@@ -245,13 +245,25 @@ public:
     ICMPanel();
     ~ICMPanel() override;
 
-    void read(const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited = nullptr) override;
-    void write(rtengine::procparams::ProcParams* pp, ParamsEdited* pedited = nullptr) override;
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
     void setBatchMode(bool batchMode) override;
-    void setDefaults(const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited = nullptr) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
     void adjusterChanged(Adjuster* a, double newval) override;
-    void primChanged (float rx, float ry, float bx, float by, float gx, float gy) override;
-    void iprimChanged (float r_x, float r_y, float b_x, float b_y, float g_x, float g_y, float w_x, float w_y, float m_x, float m_y) override;
+    void primChanged(float rx, float ry, float bx, float by, float gx, float gy) override;
+    void iprimChanged(float r_x,
+                      float r_y,
+                      float b_x,
+                      float b_y,
+                      float g_x,
+                      float g_y,
+                      float w_x,
+                      float w_y,
+                      float m_x,
+                      float m_y) override;
     void neutral_pressed();
     void curveChanged(CurveEditor* ce) override;
     void wavlocChanged(double nlevel, double nmax, bool curveloc) override;
@@ -269,7 +281,7 @@ public:
     void oBPCChanged();
     void fbwChanged();
     void wsmoothcieChanged();
-    
+
     void gamutChanged();
     void ipChanged();
     void ipSelectionChanged();
@@ -282,12 +294,7 @@ public:
     void setRawMeta(bool raw, const rtengine::FramesData* pMeta);
     void saveReferencePressed();
     void setListener(ToolPanelListener* tpl) override;
-    void setEditProvider(EditDataProvider *provider) override;
+    void setEditProvider(EditDataProvider* provider) override;
 
-    void setICMPanelListener(ICMPanelListener* ipl)
-    {
-        icmplistener = ipl;
-    }
-
+    void setICMPanelListener(ICMPanelListener* ipl) { icmplistener = ipl; }
 };
-

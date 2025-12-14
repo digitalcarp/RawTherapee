@@ -33,8 +33,7 @@
 
 struct ParamsEdited;
 
-namespace rtengine
-{
+namespace rtengine {
 
 class ColorGradientCurve;
 class NoiseCurve;
@@ -70,90 +69,75 @@ enum RenderingIntent : int {
     RI__COUNT
 };
 
-namespace procparams
-{
+namespace procparams {
 
-template<typename T>
-class Threshold final
+template <typename T> class Threshold final
 {
 public:
-    Threshold(T _bottom, T _top, bool _start_at_one) :
-        Threshold(_bottom, _top, 0, 0, _start_at_one, false)
+    Threshold(T _bottom, T _top, bool _start_at_one)
+        : Threshold(_bottom, _top, 0, 0, _start_at_one, false)
     {
     }
 
-    Threshold(T _bottom_left, T _top_left, T _bottom_right, T _top_right, bool _start_at_one) :
-        Threshold(_bottom_left, _top_left, _bottom_right, _top_right, _start_at_one, true)
+    Threshold(T _bottom_left,
+              T _top_left,
+              T _bottom_right,
+              T _top_right,
+              bool _start_at_one)
+        : Threshold(_bottom_left,
+                    _top_left,
+                    _bottom_right,
+                    _top_right,
+                    _start_at_one,
+                    true)
     {
     }
 
-    template<typename U = T>
-    typename std::enable_if<std::is_floating_point<U>::value, bool>::type operator ==(const Threshold<U>& rhs) const
+    template <typename U = T>
+    typename std::enable_if<std::is_floating_point<U>::value, bool>::type
+    operator==(const Threshold<U>& rhs) const
     {
         if (is_double) {
-            return
-                std::fabs(bottom_left - rhs.bottom_left) < 1e-10
-                && std::fabs(top_left - rhs.top_left) < 1e-10
-                && std::fabs(bottom_right - rhs.bottom_right) < 1e-10
-                && std::fabs(top_right - rhs.top_right) < 1e-10;
+            return std::fabs(bottom_left - rhs.bottom_left) < 1e-10
+                   && std::fabs(top_left - rhs.top_left) < 1e-10
+                   && std::fabs(bottom_right - rhs.bottom_right) < 1e-10
+                   && std::fabs(top_right - rhs.top_right) < 1e-10;
         } else {
-            return
-                std::fabs(bottom_left - rhs.bottom_left) < 1e-10
-                && std::fabs(top_left - rhs.top_left) < 1e-10;
+            return std::fabs(bottom_left - rhs.bottom_left) < 1e-10
+                   && std::fabs(top_left - rhs.top_left) < 1e-10;
         }
     }
 
-    template<typename U = T>
-    typename std::enable_if<std::is_integral<U>::value, bool>::type operator ==(const Threshold<U>& rhs) const
+    template <typename U = T>
+    typename std::enable_if<std::is_integral<U>::value, bool>::type
+    operator==(const Threshold<U>& rhs) const
     {
         if (is_double) {
-            return
-                bottom_left == rhs.bottom_left
-                && top_left == rhs.top_left
-                && bottom_right == rhs.bottom_right
-                && top_right == rhs.top_right;
+            return bottom_left == rhs.bottom_left && top_left == rhs.top_left
+                   && bottom_right == rhs.bottom_right && top_right == rhs.top_right;
         } else {
-            return
-                bottom_left == rhs.bottom_left
-                && top_left == rhs.top_left;
+            return bottom_left == rhs.bottom_left && top_left == rhs.top_left;
         }
     }
 
-    template<typename U = T>
-    typename std::enable_if<std::is_integral<U>::value, bool>::type operator !=(const Threshold<U>& rhs) const
+    template <typename U = T>
+    typename std::enable_if<std::is_integral<U>::value, bool>::type
+    operator!=(const Threshold<U>& rhs) const
     {
         return !(*this == rhs);
     }
 
-    T getBottom() const
-    {
-        return bottom_left;
-    }
+    T getBottom() const { return bottom_left; }
 
-    T getTop() const
-    {
-        return top_left;
-    }
+    T getTop() const { return top_left; }
 
-    T getBottomLeft() const
-    {
-        return bottom_left;
-    }
+    T getBottomLeft() const { return bottom_left; }
 
-    T getTopLeft() const
-    {
-        return top_left;
-    }
+    T getTopLeft() const { return top_left; }
 
-    T getBottomRight() const
-    {
-        return bottom_right;
-    }
+    T getBottomRight() const { return bottom_right; }
 
-    T getTopRight() const
-    {
-        return top_right;
-    }
+    T getTopRight() const { return top_right; }
 
     void setValues(T bottom, T top)
     {
@@ -169,41 +153,33 @@ public:
         this->top_right = top_right;
     }
 
-    bool isDouble() const
-    {
-        return is_double;
-    }
+    bool isDouble() const { return is_double; }
 
     std::vector<T> toVector() const
     {
         if (is_double) {
-            return {
-                bottom_left,
-                top_left,
-                bottom_right,
-                top_right
-            };
+            return { bottom_left, top_left, bottom_right, top_right };
         } else {
-            return {
-                bottom_left,
-                top_left
-            };
+            return { bottom_left, top_left };
         }
     }
 
     // RT: Type of the returned value
     // RV: Type of the value on the X axis
     // RV2: Type of the maximum value on the Y axis
-    template <typename RT, typename RV, typename RV2>
-    RT multiply(RV x, RV2 y_max) const
+    template <typename RT, typename RV, typename RV2> RT multiply(RV x, RV2 y_max) const
     {
         const double val = x;
 
         if (init_eql) {
             if (is_double) {
-                if (val == static_cast<double>(bottom_right) && static_cast<double>(bottom_right) == static_cast<double>(top_right)) {
-                    // This handles the special case where the 2 right values are the same, then bottom one is sent back,
-                    // useful if one wants to keep the bottom value even beyond the x max bound
+                if (val == static_cast<double>(bottom_right)
+                    && static_cast<double>(bottom_right)
+                           == static_cast<double>(top_right))
+                {
+                    // This handles the special case where the 2 right values are the
+                    // same, then bottom one is sent back, useful if one wants to keep the
+                    // bottom value even beyond the x max bound
                     return 0;
                 }
 
@@ -212,7 +188,10 @@ public:
                 }
 
                 if (val > static_cast<double>(bottom_right)) {
-                    return static_cast<double>(y_max * (val - static_cast<double>(bottom_right)) / (static_cast<double>(top_right) - static_cast<double>(bottom_right)));
+                    return static_cast<double>(y_max
+                                               * (val - static_cast<double>(bottom_right))
+                                               / (static_cast<double>(top_right)
+                                                  - static_cast<double>(bottom_right)));
                 }
             }
 
@@ -221,15 +200,24 @@ public:
             }
 
             if (val > static_cast<double>(top_left)) {
-                return static_cast<double>(y_max * (1. - (val - static_cast<double>(bottom_left)) / (static_cast<double>(top_left) - static_cast<double>(bottom_left))));
+                return static_cast<double>(
+                    y_max
+                    * (1.
+                       - (val - static_cast<double>(bottom_left))
+                             / (static_cast<double>(top_left)
+                                - static_cast<double>(bottom_left))));
             }
 
             return y_max;
         } else {
             if (is_double) {
-                if (val == static_cast<double>(bottom_right) && static_cast<double>(bottom_right) == static_cast<double>(top_right)) {
-                    // This handles the special case where the 2 right values are the same, then top one is sent back,
-                    // useful if one wants to keep the top value even beyond the x max bound
+                if (val == static_cast<double>(bottom_right)
+                    && static_cast<double>(bottom_right)
+                           == static_cast<double>(top_right))
+                {
+                    // This handles the special case where the 2 right values are the
+                    // same, then top one is sent back, useful if one wants to keep the
+                    // top value even beyond the x max bound
                     return y_max;
                 }
 
@@ -238,7 +226,12 @@ public:
                 }
 
                 if (val > static_cast<double>(top_right)) {
-                    return static_cast<double>(y_max * (1.0 - (val - static_cast<double>(top_right)) / (static_cast<double>(bottom_right) - static_cast<double>(top_right))));
+                    return static_cast<double>(
+                        y_max
+                        * (1.0
+                           - (val - static_cast<double>(top_right))
+                                 / (static_cast<double>(bottom_right)
+                                    - static_cast<double>(top_right))));
                 }
             }
 
@@ -247,7 +240,9 @@ public:
             }
 
             if (val > static_cast<double>(bottom_left)) {
-                return static_cast<double>(y_max * (val - static_cast<double>(bottom_left)) / (static_cast<double>(top_left) - static_cast<double>(bottom_left)));
+                return static_cast<double>(
+                    y_max * (val - static_cast<double>(bottom_left))
+                    / (static_cast<double>(top_left) - static_cast<double>(bottom_left)));
             }
 
             return 0;
@@ -255,13 +250,18 @@ public:
     }
 
 private:
-    Threshold(T _bottom_left, T _top_left, T _bottom_right, T _top_right, bool _start_at_one, bool _is_double) :
-        bottom_left(_bottom_left),
-        top_left(_top_left),
-        bottom_right(_bottom_right),
-        top_right(_top_right),
-        init_eql(_start_at_one),
-        is_double(_is_double)
+    Threshold(T _bottom_left,
+              T _top_left,
+              T _bottom_right,
+              T _top_right,
+              bool _start_at_one,
+              bool _is_double)
+        : bottom_left(_bottom_left),
+          top_left(_top_left),
+          bottom_right(_bottom_right),
+          top_right(_top_right),
+          init_eql(_start_at_one),
+          is_double(_is_double)
     {
     }
 
@@ -274,22 +274,23 @@ private:
 };
 
 enum class ToneCurveMode : int {
-    STD,               // Standard modes, the curve is applied on all component individually
-    WEIGHTEDSTD,       // Weighted standard mode
-    FILMLIKE,          // Film-like mode, as defined in Adobe's reference code
-    SATANDVALBLENDING, // Modify the Saturation and Value channel
-    LUMINANCE,         // Modify the Luminance channel with coefficients from Rec 709's
-    PERCEPTUAL         // Keep color appearance constant using perceptual modeling
+    STD,          // Standard modes, the curve is applied on all component individually
+    WEIGHTEDSTD,  // Weighted standard mode
+    FILMLIKE,     // Film-like mode, as defined in Adobe's reference code
+    SATANDVALBLENDING,  // Modify the Saturation and Value channel
+    LUMINANCE,          // Modify the Luminance channel with coefficients from Rec 709's
+    PERCEPTUAL          // Keep color appearance constant using perceptual modeling
 };
 
 /**
-  * Parameters of the tone curve
-  */
-struct ToneCurveParams {
+ * Parameters of the tone curve
+ */
+struct ToneCurveParams
+{
     bool autoexp;
     double clip;
-    bool hrenabled; // Highlight Reconstruction enabled
-    Glib::ustring method; // Highlight Reconstruction's method
+    bool hrenabled;        // Highlight Reconstruction enabled
+    Glib::ustring method;  // Highlight Reconstruction's method
     double expcomp;
     std::vector<double> curve;
     std::vector<double> curve2;
@@ -300,47 +301,47 @@ struct ToneCurveParams {
     int contrast;
     int saturation;
     int shcompr;
-    int hlcompr; // Highlight Recovery's compression
-    int hlbl; // Highlight Recovery's compression
-    double hlth; // Highlight Recovery's threshold
-    int hlcomprthresh; // Highlight Recovery's threshold
-    bool histmatching; // histogram matching
+    int hlcompr;        // Highlight Recovery's compression
+    int hlbl;           // Highlight Recovery's compression
+    double hlth;        // Highlight Recovery's threshold
+    int hlcomprthresh;  // Highlight Recovery's threshold
+    bool histmatching;  // histogram matching
     bool fromHistMatching;
-    bool clampOOG; // clamp out of gamut colours
+    bool clampOOG;  // clamp out of gamut colours
 
     ToneCurveParams();
 
     bool isPanningRelatedChange(const ToneCurveParams& other) const;
-    bool operator ==(const ToneCurveParams& other) const;
-    bool operator !=(const ToneCurveParams& other) const;
-
+    bool operator==(const ToneCurveParams& other) const;
+    bool operator!=(const ToneCurveParams& other) const;
 };
 
 /**
-  * Parameters of Retinex
-  */
-struct RetinexParams {
+ * Parameters of Retinex
+ */
+struct RetinexParams
+{
     bool enabled;
-    std::vector<double>   cdcurve;
-    std::vector<double>   cdHcurve;
-    std::vector<double>   lhcurve;
+    std::vector<double> cdcurve;
+    std::vector<double> cdHcurve;
+    std::vector<double> lhcurve;
     std::vector<double> transmissionCurve;
     std::vector<double> gaintransmissionCurve;
-    std::vector<double>   mapcurve;
-    int     str;
-    int     scal;
-    int     iter;
-    int     grad;
-    int     grads;
-    double  gam;
-    double  slope;
-    int     neigh;
-    int     offs;
-    int     highlights;
-    int     htonalwidth;
-    int     shadows;
-    int     stonalwidth;
-    int     radius;
+    std::vector<double> mapcurve;
+    int str;
+    int scal;
+    int iter;
+    int grad;
+    int grads;
+    double gam;
+    double slope;
+    int neigh;
+    int offs;
+    int highlights;
+    int htonalwidth;
+    int shadows;
+    int stonalwidth;
+    int radius;
 
     Glib::ustring complexmethod;
     Glib::ustring retinexMethod;
@@ -348,53 +349,54 @@ struct RetinexParams {
     Glib::ustring gammaretinex;
     Glib::ustring mapMethod;
     Glib::ustring viewMethod;
-    int     vart;
-    int     limd;
-    int     highl;
-    int     skal;
-    bool    medianmap;
+    int vart;
+    int limd;
+    int highl;
+    int skal;
+    bool medianmap;
 
     RetinexParams();
 
-    bool operator ==(const RetinexParams& other) const;
-    bool operator !=(const RetinexParams& other) const;
+    bool operator==(const RetinexParams& other) const;
+    bool operator!=(const RetinexParams& other) const;
 
-    void getCurves(RetinextransmissionCurve& transmissionCurveLUT, RetinexgaintransmissionCurve& gaintransmissionCurveLUT) const;
+    void getCurves(RetinextransmissionCurve& transmissionCurveLUT,
+                   RetinexgaintransmissionCurve& gaintransmissionCurveLUT) const;
 };
 
-
 /**
-  * Parameters of the luminance curve
-  */
-struct LCurveParams {
+ * Parameters of the luminance curve
+ */
+struct LCurveParams
+{
     bool enabled;
-    std::vector<double>   lcurve;
-    std::vector<double>   acurve;
-    std::vector<double>   bcurve;
-    std::vector<double>   cccurve;
-    std::vector<double>   chcurve;
-    std::vector<double>   lhcurve;
-    std::vector<double>   hhcurve;
-    std::vector<double>   lccurve;
-    std::vector<double>   clcurve;
-    int     brightness;
-    int     contrast;
-    int     chromaticity;
+    std::vector<double> lcurve;
+    std::vector<double> acurve;
+    std::vector<double> bcurve;
+    std::vector<double> cccurve;
+    std::vector<double> chcurve;
+    std::vector<double> lhcurve;
+    std::vector<double> hhcurve;
+    std::vector<double> lccurve;
+    std::vector<double> clcurve;
+    int brightness;
+    int contrast;
+    int chromaticity;
     Glib::ustring gamutmunselmethod;
-    double  rstprotection;
-    bool    lcredsk;
+    double rstprotection;
+    bool lcredsk;
 
     LCurveParams();
 
-    bool operator ==(const LCurveParams& other) const;
-    bool operator !=(const LCurveParams& other) const;
+    bool operator==(const LCurveParams& other) const;
+    bool operator!=(const LCurveParams& other) const;
 };
-
 
 /**
  * Parameters for local contrast
  */
-struct LocalContrastParams {
+struct LocalContrastParams
+{
     bool enabled;
     int radius;
     double amount;
@@ -403,31 +405,32 @@ struct LocalContrastParams {
 
     LocalContrastParams();
 
-    bool operator==(const LocalContrastParams &other) const;
-    bool operator!=(const LocalContrastParams &other) const;
+    bool operator==(const LocalContrastParams& other) const;
+    bool operator!=(const LocalContrastParams& other) const;
 };
 
-
 /**
-  * Parameters of the RGB curves
-  */
-struct RGBCurvesParams {
+ * Parameters of the RGB curves
+ */
+struct RGBCurvesParams
+{
     bool enabled;
     bool lumamode;
-    std::vector<double>   rcurve;
-    std::vector<double>   gcurve;
-    std::vector<double>   bcurve;
+    std::vector<double> rcurve;
+    std::vector<double> gcurve;
+    std::vector<double> bcurve;
 
     RGBCurvesParams();
 
-    bool operator ==(const RGBCurvesParams& other) const;
-    bool operator !=(const RGBCurvesParams& other) const;
+    bool operator==(const RGBCurvesParams& other) const;
+    bool operator!=(const RGBCurvesParams& other) const;
 };
 
 /**
-  * Parameters of the Color Toning
-  */
-struct ColorToningParams {
+ * Parameters of the Color Toning
+ */
+struct ColorToningParams
+{
     bool enabled;
     bool autosat;
     std::vector<double> opacityCurve;
@@ -480,7 +483,8 @@ struct ColorToningParams {
     static const double LABGRID_CORR_MAX;
     static const double LABGRID_CORR_SCALE;
 
-    struct LabCorrectionRegion {
+    struct LabCorrectionRegion
+    {
         enum { CHAN_ALL = -1, CHAN_R, CHAN_G, CHAN_B };
         double a;
         double b;
@@ -495,48 +499,54 @@ struct ColorToningParams {
         int channel;
 
         LabCorrectionRegion();
-        bool operator==(const LabCorrectionRegion &other) const;
-        bool operator!=(const LabCorrectionRegion &other) const;
+        bool operator==(const LabCorrectionRegion& other) const;
+        bool operator!=(const LabCorrectionRegion& other) const;
     };
     std::vector<LabCorrectionRegion> labregions;
     int labregionsShowMask;
 
     ColorToningParams();
 
-    bool operator ==(const ColorToningParams& other) const;
-    bool operator !=(const ColorToningParams& other) const;
+    bool operator==(const ColorToningParams& other) const;
+    bool operator!=(const ColorToningParams& other) const;
 
     /// @brief Transform the mixer values to their curve equivalences
-    void mixerToCurve(std::vector<double>& colorCurve, std::vector<double>& opacityCurve) const;
+    void mixerToCurve(std::vector<double>& colorCurve,
+                      std::vector<double>& opacityCurve) const;
     /// @brief Specifically transform the sliders values to their curve equivalences
-    void slidersToCurve(std::vector<double>& colorCurve, std::vector<double>& opacityCurve) const;
-    /// @brief Fill the ColorGradientCurve and OpacityCurve LUTf from the control points curve or sliders value
-    void getCurves(ColorGradientCurve& colorCurveLUT, OpacityCurve& opacityCurveLUT, const double xyz_rgb[3][3], bool& opautili) const;
+    void slidersToCurve(std::vector<double>& colorCurve,
+                        std::vector<double>& opacityCurve) const;
+    /// @brief Fill the ColorGradientCurve and OpacityCurve LUTf from the control points
+    /// curve or sliders value
+    void getCurves(ColorGradientCurve& colorCurveLUT,
+                   OpacityCurve& opacityCurveLUT,
+                   const double xyz_rgb[3][3],
+                   bool& opautili) const;
 };
 
-
 /**
-  * Parameters of the sharpening
-  */
-struct SharpeningParams {
-    bool           enabled;
-    double         contrast;
-    bool           autoContrast;
-    double         blurradius;
-    double         gamma;
-    double         radius;
-    int            amount;
+ * Parameters of the sharpening
+ */
+struct SharpeningParams
+{
+    bool enabled;
+    double contrast;
+    bool autoContrast;
+    double blurradius;
+    double gamma;
+    double radius;
+    int amount;
     Threshold<int> threshold;
-    bool           edgesonly;
-    double         edges_radius;
-    int            edges_tolerance;
-    bool           halocontrol;
-    int            halocontrol_amount;
-    Glib::ustring  method;
-    int            deconvamount;
-    double         deconvradius;
-    int            deconviter;
-    int            deconvdamping;
+    bool edgesonly;
+    double edges_radius;
+    int edges_tolerance;
+    bool halocontrol;
+    int halocontrol_amount;
+    Glib::ustring method;
+    int deconvamount;
+    double deconvradius;
+    int deconviter;
+    int deconvdamping;
     bool deconvAutoRadius;
     double deconvCornerBoost;
     int deconvCornerLatitude;
@@ -545,80 +555,83 @@ struct SharpeningParams {
 
     SharpeningParams();
 
-    bool operator ==(const SharpeningParams& other) const;
-    bool operator !=(const SharpeningParams& other) const;
+    bool operator==(const SharpeningParams& other) const;
+    bool operator!=(const SharpeningParams& other) const;
 };
 
-struct SharpenEdgeParams {
-    bool    enabled;
-    int     passes;
-    double  amount;
-    bool    threechannels;
+struct SharpenEdgeParams
+{
+    bool enabled;
+    int passes;
+    double amount;
+    bool threechannels;
 
     SharpenEdgeParams();
 
-    bool operator ==(const SharpenEdgeParams& other) const;
-    bool operator !=(const SharpenEdgeParams& other) const;
-
+    bool operator==(const SharpenEdgeParams& other) const;
+    bool operator!=(const SharpenEdgeParams& other) const;
 };
 
-
-struct SharpenMicroParams {
-    bool    enabled;
-    bool    matrix;
-    double  amount;
-    double  contrast;
-    int     uniformity;
+struct SharpenMicroParams
+{
+    bool enabled;
+    bool matrix;
+    double amount;
+    double contrast;
+    int uniformity;
 
     SharpenMicroParams();
 
-    bool operator ==(const SharpenMicroParams& other) const;
-    bool operator !=(const SharpenMicroParams& other) const;
+    bool operator==(const SharpenMicroParams& other) const;
+    bool operator!=(const SharpenMicroParams& other) const;
 };
 
-struct CaptureSharpeningParams {
-    bool           enabled;
-    bool           autoContrast;
-    bool           autoRadius;
-    double         contrast;
-    double         noisecap;
-    double         noisecapafter;
-    double         deconvradius;
-    double         deconvradiusOffset;
-    int            deconviter;
-    bool           deconvitercheck;
-    bool           showcap;
-    bool           noisecaptype;
+struct CaptureSharpeningParams
+{
+    bool enabled;
+    bool autoContrast;
+    bool autoRadius;
+    double contrast;
+    double noisecap;
+    double noisecapafter;
+    double deconvradius;
+    double deconvradiusOffset;
+    int deconviter;
+    bool deconvitercheck;
+    bool showcap;
+    bool noisecaptype;
 
     CaptureSharpeningParams();
 
-    bool operator ==(const CaptureSharpeningParams& other) const;
-    bool operator !=(const CaptureSharpeningParams& other) const;
+    bool operator==(const CaptureSharpeningParams& other) const;
+    bool operator!=(const CaptureSharpeningParams& other) const;
 };
 
 /**
-  * Parameters of the vibrance
-  */
-struct VibranceParams {
-    bool           enabled;
-    int            pastels;
-    int            saturated;
+ * Parameters of the vibrance
+ */
+struct VibranceParams
+{
+    bool enabled;
+    int pastels;
+    int saturated;
     Threshold<int> psthreshold;
-    bool           protectskins;
-    bool           avoidcolorshift;
-    bool           pastsattog;
+    bool protectskins;
+    bool avoidcolorshift;
+    bool pastsattog;
     std::vector<double> skintonescurve;
 
     VibranceParams();
 
-    bool operator ==(const VibranceParams& other) const;
-    bool operator !=(const VibranceParams& other) const;
+    bool operator==(const VibranceParams& other) const;
+    bool operator!=(const VibranceParams& other) const;
 };
 
 /**
-  * Parameters of the white balance adjustments
-  */
-struct WBEntry {
+ * Parameters of the white balance adjustments
+ */
+struct WBEntry
+{
     enum class Type {
         CAMERA,
         AUTO,
@@ -644,22 +657,23 @@ struct WBEntry {
     double tempBias;
 };
 
-struct WBParams {
+struct WBParams
+{
     static constexpr int CURRENT_COMPAT_VERSION = 2;
 
     bool enabled;
-    Glib::ustring    method;
-    int              temperature;
-    double           green;
-    double           equal;
-    double           tempBias;
+    Glib::ustring method;
+    int temperature;
+    double green;
+    double equal;
+    double tempBias;
     StandardObserver observer;
-    double           itcwb_green;
-    int              itcwb_rgreen;
-    bool             itcwb_nopurple;
-    bool             itcwb_alg;
-    Glib::ustring    itcwb_prim;
-    bool             itcwb_sampling;
+    double itcwb_green;
+    int itcwb_rgreen;
+    bool itcwb_nopurple;
+    bool itcwb_alg;
+    Glib::ustring itcwb_prim;
+    bool itcwb_sampling;
     /**
      * Used to maintain edits from previous versions of RawTherapee where
      * compatibility cannot be maintained simply by converting the parameters,
@@ -682,8 +696,8 @@ struct WBParams {
     WBParams();
 
     bool isPanningRelatedChange(const WBParams& other) const;
-    bool operator ==(const WBParams& other) const;
-    bool operator !=(const WBParams& other) const;
+    bool operator==(const WBParams& other) const;
+    bool operator!=(const WBParams& other) const;
 
     static const std::vector<WBEntry>& getWbEntries();
 };
@@ -691,60 +705,61 @@ struct WBParams {
 /**
  * Parameters of colorappearance
  */
-struct ColorAppearanceParams {
+struct ColorAppearanceParams
+{
     enum class TcMode {
-        LIGHT,    // Lightness mode
-        BRIGHT,   // Brightness mode
+        LIGHT,   // Lightness mode
+        BRIGHT,  // Brightness mode
     };
 
     enum class CtcMode {
-        CHROMA,   // chroma mode
-        SATUR,    // saturation mode
-        COLORF,   // colorfullness mode
+        CHROMA,  // chroma mode
+        SATUR,   // saturation mode
+        COLORF,  // colorfullness mode
     };
 
-    bool          enabled;
-    int           degree;
-    bool          autodegree;
-    int           degreeout;
-    bool          autodegreeout;
+    bool enabled;
+    int degree;
+    bool autodegree;
+    int degreeout;
+    bool autodegreeout;
     std::vector<double> curve;
     std::vector<double> curve2;
     std::vector<double> curve3;
-    TcMode     curveMode;
-    TcMode     curveMode2;
-    CtcMode    curveMode3;
+    TcMode curveMode;
+    TcMode curveMode2;
+    CtcMode curveMode3;
     Glib::ustring complexmethod;
     Glib::ustring modelmethod;
     Glib::ustring catmethod;
 
     Glib::ustring surround;
     Glib::ustring surrsrc;
-    double        adapscen;
-    bool          autoadapscen;
-    int        ybscen;
-    bool          autoybscen;
+    double adapscen;
+    bool autoadapscen;
+    int ybscen;
+    bool autoybscen;
 
-    double        adaplum;
-    int           badpixsl;
+    double adaplum;
+    int badpixsl;
     Glib::ustring wbmodel;
     Glib::ustring illum;
     Glib::ustring algo;
-    double        contrast;
-    double        qcontrast;
-    double        jlight;
-    double        qbright;
-    double        chroma;
-    double        schroma;
-    double        mchroma;
-    double        colorh;
-    double        rstprotection;
-    bool          surrsource;
-    bool          gamut;
-    bool          datacie;
-    bool          tonecie;
+    double contrast;
+    double qcontrast;
+    double jlight;
+    double qbright;
+    double chroma;
+    double schroma;
+    double mchroma;
+    double colorh;
+    double rstprotection;
+    bool surrsource;
+    bool gamut;
+    bool datacie;
+    bool tonecie;
     int tempout;
-    bool          autotempout;
+    bool autotempout;
     int ybout;
     double greenout;
     int tempsc;
@@ -752,57 +767,60 @@ struct ColorAppearanceParams {
 
     ColorAppearanceParams();
 
-    bool operator ==(const ColorAppearanceParams& other) const;
-    bool operator !=(const ColorAppearanceParams& other) const;
+    bool operator==(const ColorAppearanceParams& other) const;
+    bool operator!=(const ColorAppearanceParams& other) const;
 };
 
 /**
  * Parameters of defringing
  */
-struct DefringeParams {
-    bool    enabled;
-    double  radius;
-    int     threshold;
+struct DefringeParams
+{
+    bool enabled;
+    double radius;
+    int threshold;
     std::vector<double> huecurve;
 
     DefringeParams();
 
-    bool operator ==(const DefringeParams& other) const;
-    bool operator !=(const DefringeParams& other) const;
+    bool operator==(const DefringeParams& other) const;
+    bool operator!=(const DefringeParams& other) const;
 };
 
 /**
-  * Parameters of impulse denoising
-  */
-struct ImpulseDenoiseParams {
-    bool    enabled;
-    int     thresh;
+ * Parameters of impulse denoising
+ */
+struct ImpulseDenoiseParams
+{
+    bool enabled;
+    int thresh;
 
     ImpulseDenoiseParams();
 
-    bool operator ==(const ImpulseDenoiseParams& other) const;
-    bool operator !=(const ImpulseDenoiseParams& other) const;
+    bool operator==(const ImpulseDenoiseParams& other) const;
+    bool operator!=(const ImpulseDenoiseParams& other) const;
 };
 
 /**
  * Parameters of the directional pyramid denoising
  */
-struct DirPyrDenoiseParams {
-    std::vector<double>   lcurve;
-    std::vector<double>   cccurve;
+struct DirPyrDenoiseParams
+{
+    std::vector<double> lcurve;
+    std::vector<double> cccurve;
 
-    bool    enabled;
-    bool    enhance;
-    bool    median;
+    bool enabled;
+    bool enhance;
+    bool median;
 
-    bool    perform;
-    double  luma;
-    double  Ldetail;
-    double  chroma;
-    double  redchro;
-    double  bluechro;
+    bool perform;
+    double luma;
+    double Ldetail;
+    double chroma;
+    double redchro;
+    double bluechro;
     bool autoGain;
-    double  gamma;
+    double gamma;
     Glib::ustring dmethod;
     Glib::ustring Lmethod;
     Glib::ustring Cmethod;
@@ -811,33 +829,35 @@ struct DirPyrDenoiseParams {
     Glib::ustring medmethod;
     Glib::ustring methodmed;
     Glib::ustring rgbmethod;
-    int  passes;
+    int passes;
 
     DirPyrDenoiseParams();
 
-    bool operator ==(const DirPyrDenoiseParams& other) const;
-    bool operator !=(const DirPyrDenoiseParams& other) const;
+    bool operator==(const DirPyrDenoiseParams& other) const;
+    bool operator!=(const DirPyrDenoiseParams& other) const;
 
     void getCurves(NoiseCurve& lCurve, NoiseCurve& cCurve) const;
 };
 
 // EPD related parameters.
-struct EPDParams {
-    bool   enabled;
+struct EPDParams
+{
+    bool enabled;
     double strength;
     double gamma;
     double edgeStopping;
     double scale;
-    int    reweightingIterates;
+    int reweightingIterates;
 
     EPDParams();
 
-    bool operator ==(const EPDParams& other) const;
-    bool operator !=(const EPDParams& other) const;
+    bool operator==(const EPDParams& other) const;
+    bool operator!=(const EPDParams& other) const;
 };
 
 // Fattal02 Tone-Mapping parameters
-struct FattalToneMappingParams {
+struct FattalToneMappingParams
+{
     bool enabled;
     int threshold;
     int amount;
@@ -845,57 +865,59 @@ struct FattalToneMappingParams {
 
     FattalToneMappingParams();
 
-    bool operator ==(const FattalToneMappingParams& other) const;
-    bool operator !=(const FattalToneMappingParams& other) const;
+    bool operator==(const FattalToneMappingParams& other) const;
+    bool operator!=(const FattalToneMappingParams& other) const;
 };
 
 /**
-  * Parameters of the shadow/highlight enhancement
-  */
-struct SHParams {
-    bool    enabled;
-    int     highlights;
-    int     htonalwidth;
-    int     shadows;
-    int     stonalwidth;
-    int     radius;
-    bool    lab;
+ * Parameters of the shadow/highlight enhancement
+ */
+struct SHParams
+{
+    bool enabled;
+    int highlights;
+    int htonalwidth;
+    int shadows;
+    int stonalwidth;
+    int radius;
+    bool lab;
 
     SHParams();
 
-    bool operator ==(const SHParams& other) const;
-    bool operator !=(const SHParams& other) const;
+    bool operator==(const SHParams& other) const;
+    bool operator!=(const SHParams& other) const;
 };
 
 /**
-  * Parameters of the compression gamut
-  */
-struct CGParams {
-    bool    enabled;
-    double  th_c;
-    double  th_m;
-    double  th_y;
-    double  d_c;
+ * Parameters of the compression gamut
+ */
+struct CGParams
+{
+    bool enabled;
+    double th_c;
+    double th_m;
+    double th_y;
+    double d_c;
     bool autodc;
-    double  d_m;
+    double d_m;
     bool autodm;
-    double  d_y;
+    double d_y;
     bool autody;
-    double  pwr;
+    double pwr;
     Glib::ustring colorspace;
     bool rolloff;
 
     CGParams();
 
-    bool operator ==(const CGParams& other) const;
-    bool operator !=(const CGParams& other) const;
+    bool operator==(const CGParams& other) const;
+    bool operator!=(const CGParams& other) const;
 };
-
 
 /**
  * Tone equalizer parameters.
  */
-struct ToneEqualizerParams {
+struct ToneEqualizerParams
+{
     bool enabled;
     std::array<int, 6> bands;
     int regularization;
@@ -904,14 +926,15 @@ struct ToneEqualizerParams {
 
     ToneEqualizerParams();
 
-    bool operator ==(const ToneEqualizerParams &other) const;
-    bool operator !=(const ToneEqualizerParams &other) const;
+    bool operator==(const ToneEqualizerParams& other) const;
+    bool operator!=(const ToneEqualizerParams& other) const;
 };
 
 /**
-  * Parameters of the cropping
-  */
-struct CropParams {
+ * Parameters of the cropping
+ */
+struct CropParams
+{
     enum class Guide {
         NONE,
         FRAME,
@@ -937,30 +960,38 @@ struct CropParams {
 
     CropParams();
 
-    bool operator ==(const CropParams& other) const;
-    bool operator !=(const CropParams& other) const;
+    bool operator==(const CropParams& other) const;
+    bool operator!=(const CropParams& other) const;
 
-    void mapToResized(int resizedWidth, int resizedHeight, int scale, int& x1, int& x2, int& y1, int& y2) const;
+    void mapToResized(int resizedWidth,
+                      int resizedHeight,
+                      int scale,
+                      int& x1,
+                      int& x2,
+                      int& y1,
+                      int& y2) const;
 };
 
 /**
-  * Parameters of the coarse transformations like 90 deg rotations and h/v flipping
-  */
-struct CoarseTransformParams {
-    int     rotate;
-    bool    hflip;
-    bool    vflip;
+ * Parameters of the coarse transformations like 90 deg rotations and h/v flipping
+ */
+struct CoarseTransformParams
+{
+    int rotate;
+    bool hflip;
+    bool vflip;
 
     CoarseTransformParams();
 
-    bool operator ==(const CoarseTransformParams& other) const;
-    bool operator !=(const CoarseTransformParams& other) const;
+    bool operator==(const CoarseTransformParams& other) const;
+    bool operator!=(const CoarseTransformParams& other) const;
 };
 
 /**
-  * Common transformation parameters
-  */
-struct CommonTransformParams {
+ * Common transformation parameters
+ */
+struct CommonTransformParams
+{
     Glib::ustring method = "log";
     bool autofill = true;
     double scale = 1.0;
@@ -973,26 +1004,28 @@ struct CommonTransformParams {
     double getScaleHorizontally() const;
     double getScaleVertically() const;
 
-    bool operator ==(const CommonTransformParams& other) const;
-    bool operator !=(const CommonTransformParams& other) const;
+    bool operator==(const CommonTransformParams& other) const;
+    bool operator!=(const CommonTransformParams& other) const;
 };
 
 /**
-  * Parameters of the rotation
-  */
-struct RotateParams {
-    double  degree;
+ * Parameters of the rotation
+ */
+struct RotateParams
+{
+    double degree;
 
     RotateParams();
 
-    bool operator ==(const RotateParams& other) const;
-    bool operator !=(const RotateParams& other) const;
+    bool operator==(const RotateParams& other) const;
+    bool operator!=(const RotateParams& other) const;
 };
 
 /**
-  * Parameters of the distortion correction
-  */
-struct DistortionParams {
+ * Parameters of the distortion correction
+ */
+struct DistortionParams
+{
     static constexpr double DEFAULT_FOCAL_LENGTH = 12;
     double amount = 0.0;
     bool defish = false;
@@ -1000,18 +1033,19 @@ struct DistortionParams {
 
     DistortionParams();
 
-    bool operator ==(const DistortionParams& other) const;
-    bool operator !=(const DistortionParams& other) const;
+    bool operator==(const DistortionParams& other) const;
+    bool operator!=(const DistortionParams& other) const;
 };
 
 // Lens profile correction parameters
-struct LensProfParams {
+struct LensProfParams
+{
     enum class LcMode {
-        NONE,               // No lens correction
-        LENSFUNAUTOMATCH,   // Lens correction using auto matched lensfun database entry
-        LENSFUNMANUAL,      // Lens correction using manually selected lensfun database entry
-        LCP,                // Lens correction using lcp file
-        METADATA    // Lens correction using embedded metadata
+        NONE,              // No lens correction
+        LENSFUNAUTOMATCH,  // Lens correction using auto matched lensfun database entry
+        LENSFUNMANUAL,  // Lens correction using manually selected lensfun database entry
+        LCP,            // Lens correction using lcp file
+        METADATA        // Lens correction using embedded metadata
     };
 
     LcMode lcMode;
@@ -1023,8 +1057,8 @@ struct LensProfParams {
 
     LensProfParams();
 
-    bool operator ==(const LensProfParams& other) const;
-    bool operator !=(const LensProfParams& other) const;
+    bool operator==(const LensProfParams& other) const;
+    bool operator!=(const LensProfParams& other) const;
 
     bool useLensfun() const;
     bool lfAutoMatch() const;
@@ -1037,38 +1071,38 @@ struct LensProfParams {
     LcMode getMethodNumber(const Glib::ustring& mode) const;
 };
 
-
 /**
-  * Parameters of the perspective correction
-  */
-struct PerspectiveParams {
+ * Parameters of the perspective correction
+ */
+struct PerspectiveParams
+{
     static constexpr double DEFAULT_CAMERA_CROP_FACTOR = 1;
     static constexpr double DEFAULT_CAMERA_FOCAL_LENGTH = 24;
 
     Glib::ustring method;
-    bool    render;
-    double  horizontal;
-    double  vertical;
+    bool render;
+    double horizontal;
+    double vertical;
     /**
      * Negative and zero values indicate an unspecified crop factor and should
      * be interpreted with {@link #DEFAULT_CAMERA_CROP_FACTOR}.
      */
-    double  camera_crop_factor;
+    double camera_crop_factor;
     /**
      * Negative and zero values indicate an unspecified focal length and should
      * be interpreted with {@link #DEFAULT_CAMERA_FOCAL_LENGTH}.
      */
-    double  camera_focal_length;
-    double  camera_pitch;
-    double  camera_roll;
-    double  camera_shift_horiz;
-    double  camera_shift_vert;
-    double  camera_yaw;
-    double  projection_pitch;
-    double  projection_rotate;
-    double  projection_shift_horiz;
-    double  projection_shift_vert;
-    double  projection_yaw;
+    double camera_focal_length;
+    double camera_pitch;
+    double camera_roll;
+    double camera_shift_horiz;
+    double camera_shift_vert;
+    double camera_yaw;
+    double projection_pitch;
+    double projection_rotate;
+    double projection_shift_horiz;
+    double projection_shift_vert;
+    double projection_yaw;
     /** A line is stored as 4 integers in this order: x1, y1, x2, y2 */
     std::vector<int> control_line_values;
     /** 0 is vertical, 1 is horizontal, undefined otherwise. */
@@ -1076,51 +1110,54 @@ struct PerspectiveParams {
 
     PerspectiveParams();
 
-    bool operator ==(const PerspectiveParams& other) const;
-    bool operator !=(const PerspectiveParams& other) const;
+    bool operator==(const PerspectiveParams& other) const;
+    bool operator!=(const PerspectiveParams& other) const;
 };
 
 /**
-  * Parameters of the gradient filter
-  */
-struct GradientParams {
-    bool   enabled;
+ * Parameters of the gradient filter
+ */
+struct GradientParams
+{
+    bool enabled;
     double degree;
-    int    feather;
+    int feather;
     double strength;
-    int    centerX;
-    int    centerY;
+    int centerX;
+    int centerY;
 
     GradientParams();
 
-    bool operator ==(const GradientParams& other) const;
-    bool operator !=(const GradientParams& other) const;
+    bool operator==(const GradientParams& other) const;
+    bool operator!=(const GradientParams& other) const;
 };
 
 /**
-  * Parameters of the Local Lab
-  */
-struct LocallabParams {
-    struct LocallabSpot {
+ * Parameters of the Local Lab
+ */
+struct LocallabParams
+{
+    struct LocallabSpot
+    {
         // Control spot settings
         Glib::ustring name;
         bool isvisible;
-        Glib::ustring prevMethod; // show, hide
-        Glib::ustring shape; // ELI, RECT
-        Glib::ustring spotMethod; // norm, exc
-        Glib::ustring wavMethod; // D2, D4, D6, D10, D14
+        Glib::ustring prevMethod;  // show, hide
+        Glib::ustring shape;       // ELI, RECT
+        Glib::ustring spotMethod;  // norm, exc
+        Glib::ustring wavMethod;   // D2, D4, D6, D10, D14
         int sensiexclu;
         int structexclu;
         double struc;
-        Glib::ustring shapeMethod; // IND, SYM, INDSL, SYMSL
-        Glib::ustring avoidgamutMethod; // NONE, LAB, XYZ
-		
-        std::vector<int> loc; // For ellipse/rectangle: {locX, locXL, locY, locYT}
+        Glib::ustring shapeMethod;       // IND, SYM, INDSL, SYMSL
+        Glib::ustring avoidgamutMethod;  // NONE, LAB, XYZ
+
+        std::vector<int> loc;  // For ellipse/rectangle: {locX, locXL, locY, locYT}
         int centerX;
         int centerY;
         int circrad;
-        Glib::ustring qualityMethod; // none, std, enh, enhsup, contr, sob2
-        Glib::ustring complexMethod; // sim, mod, all
+        Glib::ustring qualityMethod;  // none, std, enh, enhsup, contr, sob2
+        Glib::ustring complexMethod;  // sim, mod, all
         double transit;
         double feather;
         double thresh;
@@ -1181,11 +1218,13 @@ struct LocallabParams {
         int shadmaskcol;
         double strumaskcol;
         double lapmaskcol;
-        Glib::ustring qualitycurveMethod; // none, std
-        Glib::ustring gridMethod; // one, two
-        Glib::ustring merMethod; // mone, mtwo, mthr, mfou, mfiv
-        Glib::ustring toneMethod; // one, two, thr, fou
-        Glib::ustring mergecolMethod; // one, two, thr, fou, fiv, six, sev, sev0, sev1, sev2, hei, nin, ten, ele, twe, thi, for, hue, sat, col, lum
+        Glib::ustring qualitycurveMethod;  // none, std
+        Glib::ustring gridMethod;          // one, two
+        Glib::ustring merMethod;           // mone, mtwo, mthr, mfou, mfiv
+        Glib::ustring toneMethod;          // one, two, thr, fou
+        Glib::ustring
+            mergecolMethod;  // one, two, thr, fou, fiv, six, sev, sev0, sev1, sev2, hei,
+                             // nin, ten, ele, twe, thi, for, hue, sat, col, lum
         std::vector<double> llcurve;
         std::vector<double> lccurve;
         std::vector<double> cccurve;
@@ -1251,8 +1290,8 @@ struct LocallabParams {
         double angmaskexp;
         double softradiusexp;
         std::vector<double> Lmaskexpcurve;
-        Glib::ustring expMethod; // std, pde
-        Glib::ustring exnoiseMethod; // none, med, medhi
+        Glib::ustring expMethod;      // std, pde
+        Glib::ustring exnoiseMethod;  // none, med, medhi
         double laplacexp;
         double reparexp;
         double balanexp;
@@ -1271,9 +1310,9 @@ struct LocallabParams {
         bool visishadhigh;
         bool expshadhigh;
         int complexshadhigh;
-        Glib::ustring shMethod; // std, tone
-        Glib::ustring ghsMethod; // rgb, lum, sat
-        Glib::ustring ghsMode; // lin, ghs
+        Glib::ustring shMethod;   // std, tone
+        Glib::ustring ghsMethod;  // rgb, lum, sat
+        Glib::ustring ghsMode;    // lin, ghs
         double ghs_D;
         double ghs_slope;
         double ghs_chro;
@@ -1366,7 +1405,7 @@ struct LocallabParams {
         int streng;
         int sensisf;
         double laplace;
-        Glib::ustring softMethod; // soft, reti
+        Glib::ustring softMethod;  // soft, reti
         // Blur & Noise
         bool visiblur;
         bool expblur;
@@ -1391,11 +1430,11 @@ struct LocallabParams {
         int scalegr;
         double divgr;
         int epsbl;
-        Glib::ustring blMethod; // blur, med, guid
-        Glib::ustring chroMethod; // lum, chr, all
-        Glib::ustring quamethod; // cons agre
-        Glib::ustring blurMethod; // norm, inv
-        Glib::ustring medMethod; // none, 33, 55, 77, 99
+        Glib::ustring blMethod;    // blur, med, guid
+        Glib::ustring chroMethod;  // lum, chr, all
+        Glib::ustring quamethod;   // cons agre
+        Glib::ustring blurMethod;  // norm, inv
+        Glib::ustring medMethod;   // none, 33, 55, 77, 99
         bool usemask;
         bool invmaskd;
         bool invmask;
@@ -1491,7 +1530,7 @@ struct LocallabParams {
         bool visireti;
         bool expreti;
         int complexreti;
-        Glib::ustring retinexMethod; // low, uni, high
+        Glib::ustring retinexMethod;  // low, uni, high
         double str;
         double chrrt;
         double neigh;
@@ -1549,11 +1588,11 @@ struct LocallabParams {
         Glib::ustring methodcap;
         double capradius;
         bool deconvAutoRadius;
-        double deconvCoBoost;                
-        double deconvCoProt;                
-        double deconvCoLat;                
-        double deconvCogam;                
-        double reparsha;                
+        double deconvCoBoost;
+        double deconvCoProt;
+        double deconvCoLat;
+        double deconvCogam;
+        double reparsha;
 
         // Local Contrast
         bool visicontrast;
@@ -1617,9 +1656,9 @@ struct LocallabParams {
         bool wavcompre;
         bool origlc;
         bool processwav;
-        Glib::ustring localcontMethod; // loc, wav
-        Glib::ustring localedgMethod; // fir, sec, thr
-        Glib::ustring localneiMethod; // none, low, high
+        Glib::ustring localcontMethod;  // loc, wav
+        Glib::ustring localedgMethod;   // fir, sec, thr
+        Glib::ustring localneiMethod;   // none, low, high
         std::vector<double> locwavcurve;
         Threshold<int> csthreshold;
         std::vector<double> loclevwavcurve;
@@ -1746,7 +1785,7 @@ struct LocallabParams {
         std::vector<double> Lmask_curve;
         std::vector<double> LLmask_curvewav;
         Threshold<int> csthresholdmask;
-        //ciecam
+        // ciecam
         bool visicie;
         bool expcie;
         bool expprecam;
@@ -1861,7 +1900,7 @@ struct LocallabParams {
         double kslopesmor;
         double kslopesmog;
         double kslopesmob;
-        std::vector<double> invcurve;//inverse color negative
+        std::vector<double> invcurve;  // inverse color negative
         Glib::ustring midtciemet;
         int midtcie;
         double grexl;
@@ -1883,7 +1922,7 @@ struct LocallabParams {
         double labgridcieWy;
         double labgridcieMx;
         double labgridcieMy;
-        
+
         int whitescie;
         int blackscie;
         Glib::ustring illMethod;
@@ -1925,19 +1964,19 @@ struct LocallabParams {
         double higthrescie;
         double decaycie;
         double strumaskcie;
-		bool toolcie;
+        bool toolcie;
         bool fftcieMask;
-		double contcie;
-		double blurcie;
-		double highmaskcie;
-		double shadmaskcie;
+        double contcie;
+        double blurcie;
+        double highmaskcie;
+        double shadmaskcie;
         std::vector<double> LLmaskciecurvewav;
         Threshold<int> csthresholdcie;
-		
+
         LocallabSpot();
 
-        bool operator ==(const LocallabSpot& other) const;
-        bool operator !=(const LocallabSpot& other) const;
+        bool operator==(const LocallabSpot& other) const;
+        bool operator!=(const LocallabSpot& other) const;
     };
 
     static const double LABGRIDL_CORR_MAX;
@@ -1950,45 +1989,48 @@ struct LocallabParams {
 
     LocallabParams();
 
-    bool operator ==(const LocallabParams& other) const;
-    bool operator !=(const LocallabParams& other) const;
+    bool operator==(const LocallabParams& other) const;
+    bool operator!=(const LocallabParams& other) const;
 };
 
 /**
-  * Parameters of the post-crop vignette filter
-  */
-struct PCVignetteParams {
-    bool   enabled;
+ * Parameters of the post-crop vignette filter
+ */
+struct PCVignetteParams
+{
+    bool enabled;
     double strength;
-    int    feather;
-    int    roundness;
+    int feather;
+    int roundness;
 
     PCVignetteParams();
 
-    bool operator ==(const PCVignetteParams& other) const;
-    bool operator !=(const PCVignetteParams& other) const;
+    bool operator==(const PCVignetteParams& other) const;
+    bool operator!=(const PCVignetteParams& other) const;
 };
 
 /**
-  * Parameters of the vignetting correction
-  */
-struct VignettingParams {
-    int  amount;
-    int  radius;
-    int  strength;
-    int  centerX;
-    int  centerY;
+ * Parameters of the vignetting correction
+ */
+struct VignettingParams
+{
+    int amount;
+    int radius;
+    int strength;
+    int centerX;
+    int centerY;
 
     VignettingParams();
 
-    bool operator ==(const VignettingParams& other) const;
-    bool operator !=(const VignettingParams& other) const;
+    bool operator==(const VignettingParams& other) const;
+    bool operator!=(const VignettingParams& other) const;
 };
 
 /**
-  * Parameters of the color mixer
-  */
-struct ChannelMixerParams {
+ * Parameters of the color mixer
+ */
+struct ChannelMixerParams
+{
     bool enabled;
     int red[3];
     int green[3];
@@ -1996,13 +2038,14 @@ struct ChannelMixerParams {
 
     ChannelMixerParams();
 
-    bool operator ==(const ChannelMixerParams& other) const;
-    bool operator !=(const ChannelMixerParams& other) const;
+    bool operator==(const ChannelMixerParams& other) const;
+    bool operator!=(const ChannelMixerParams& other) const;
 };
 
-struct BlackWhiteParams {
+struct BlackWhiteParams
+{
     enum class TcMode {
-        STD_BW,               // Standard modes, the curve is applied on all component individually
+        STD_BW,  // Standard modes, the curve is applied on all component individually
         WEIGHTEDSTD_BW,       // Weighted standard mode
         FILMLIKE_BW,          // Film-like mode, as defined in Adobe's reference code
         SATANDVALBLENDING_BW  // Modify the Saturation and Value channel
@@ -2035,27 +2078,29 @@ struct BlackWhiteParams {
 
     BlackWhiteParams();
 
-    bool operator ==(const BlackWhiteParams& other) const;
-    bool operator !=(const BlackWhiteParams& other) const;
+    bool operator==(const BlackWhiteParams& other) const;
+    bool operator!=(const BlackWhiteParams& other) const;
 };
 
 /**
-  * Parameters of the c/a correction
-  */
-struct CACorrParams {
+ * Parameters of the c/a correction
+ */
+struct CACorrParams
+{
     double red;
     double blue;
 
     CACorrParams();
 
-    bool operator ==(const CACorrParams& other) const;
-    bool operator !=(const CACorrParams& other) const;
+    bool operator==(const CACorrParams& other) const;
+    bool operator!=(const CACorrParams& other) const;
 };
 
 /**
-  * Parameters of the resizing
-  */
-struct ResizeParams {
+ * Parameters of the resizing
+ */
+struct ResizeParams
+{
     bool enabled;
     double scale;
     Glib::ustring appliesTo;
@@ -2069,11 +2114,12 @@ struct ResizeParams {
 
     ResizeParams();
 
-    bool operator ==(const ResizeParams& other) const;
-    bool operator !=(const ResizeParams& other) const;
+    bool operator==(const ResizeParams& other) const;
+    bool operator!=(const ResizeParams& other) const;
 };
 
-struct FramingParams {
+struct FramingParams
+{
     // How is framed size determined?
     enum class FramingMethod {
         STANDARD,   // Unconstrained framed size
@@ -2082,11 +2128,7 @@ struct FramingParams {
     };
 
     // Orientation of framed image
-    enum class Orientation {
-        AS_IMAGE,
-        LANDSCAPE,
-        PORTRAIT
-    };
+    enum class Orientation { AS_IMAGE, LANDSCAPE, PORTRAIT };
 
     // How to size border?
     enum class BorderSizing {
@@ -2097,11 +2139,11 @@ struct FramingParams {
 
     // Which dimension to use for percentage based border sizing?
     enum class Basis {
-        AUTO,    // Determine by aspect ratio of image and frame
+        AUTO,  // Determine by aspect ratio of image and frame
         WIDTH,
         HEIGHT,
-        LONG,    // Use long side of image
-        SHORT    // Use short side of image
+        LONG,  // Use long side of image
+        SHORT  // Use short side of image
     };
 
     // Indicates to use the image aspect ratio for border
@@ -2131,14 +2173,15 @@ struct FramingParams {
     int borderGreen;
     int borderBlue;
 
-    bool operator ==(const FramingParams& other) const;
-    bool operator !=(const FramingParams& other) const;
+    bool operator==(const FramingParams& other) const;
+    bool operator!=(const FramingParams& other) const;
 };
 
 /**
-  * Parameters entry
-  */
-struct SpotEntry {
+ * Parameters entry
+ */
+struct SpotEntry
+{
     Coord sourcePos;
     Coord targetPos;
     int radius;
@@ -2148,14 +2191,15 @@ struct SpotEntry {
     SpotEntry();
     float getFeatherRadius() const;
 
-    bool operator ==(const SpotEntry& other) const;
-    bool operator !=(const SpotEntry& other) const;
+    bool operator==(const SpotEntry& other) const;
+    bool operator!=(const SpotEntry& other) const;
 };
 
 /**
-  * Parameters of the dust removal tool
-  */
-struct SpotParams {
+ * Parameters of the dust removal tool
+ */
+struct SpotParams
+{
     bool enabled;
     std::vector<SpotEntry> entries;
 
@@ -2165,24 +2209,16 @@ struct SpotParams {
 
     SpotParams();
 
-    bool operator ==(const SpotParams& other) const;
-    bool operator !=(const SpotParams& other) const;
+    bool operator==(const SpotParams& other) const;
+    bool operator!=(const SpotParams& other) const;
 };
 
-
 /**
-  * Parameters of the color spaces used during the processing
-  */
-struct ColorManagementParams {
-    enum class WorkingTrc {
-        NONE,
-        CUSTOM,
-        BT709,
-        SRGB,
-        GAMMA_2_2,
-        GAMMA_1_8,
-        LINEAR
-    };
+ * Parameters of the color spaces used during the processing
+ */
+struct ColorManagementParams
+{
+    enum class WorkingTrc { NONE, CUSTOM, BT709, SRGB, GAMMA_2_2, GAMMA_1_8, LINEAR };
 
     enum class Illuminant {
         DEFAULT,
@@ -2217,13 +2253,7 @@ struct ColorManagementParams {
         CUSTOM_GRID
     };
 
-    enum class Cat {
-        BRAD,
-        CAT16,
-        CAT02,
-        CAT_VK,
-        CAT_XYZ
-    };
+    enum class Cat { BRAD, CAT16, CAT02, CAT_VK, CAT_XYZ };
 
     Glib::ustring inputProfile;
     bool toneCurve;
@@ -2245,7 +2275,7 @@ struct ColorManagementParams {
     double offstrc;
     double residtrc;
     int pyrwavtrc;
-    std::vector<double> opacityCurveWLI;   
+    std::vector<double> opacityCurveWLI;
     bool wsmoothcie;
     double wsmoothciesli;
     double redx;
@@ -2283,18 +2313,16 @@ struct ColorManagementParams {
 
     ColorManagementParams();
 
-    bool operator ==(const ColorManagementParams& other) const;
-    bool operator !=(const ColorManagementParams& other) const;
-    
-    void getCurves(
-    WavOpacityCurveWL& opacityCurveLUTWLI
-    ) const;
+    bool operator==(const ColorManagementParams& other) const;
+    bool operator!=(const ColorManagementParams& other) const;
 
+    void getCurves(WavOpacityCurveWL& opacityCurveLUTWLI) const;
 };
 
 /**
-  * Minimal wrapper allowing forward declaration for representing a key/value for the exif metadata information
-  */
+ * Minimal wrapper allowing forward declaration for representing a key/value for the exif
+ * metadata information
+ */
 class ExifPairs final
 {
 private:
@@ -2304,112 +2332,65 @@ public:
     using const_iterator = Pairs::const_iterator;
     using size_type = Pairs::size_type;
 
-    const_iterator find(const Glib::ustring& key) const
-    {
-        return pairs.find(key);
-    }
+    const_iterator find(const Glib::ustring& key) const { return pairs.find(key); }
 
-    const_iterator begin() const
-    {
-        return pairs.begin();
-    }
+    const_iterator begin() const { return pairs.begin(); }
 
-    const_iterator end() const
-    {
-        return pairs.end();
-    }
+    const_iterator end() const { return pairs.end(); }
 
-    void clear()
-    {
-        pairs.clear();
-    }
+    void clear() { pairs.clear(); }
 
-    size_type erase(const Glib::ustring& key)
-    {
-        return pairs.erase(key);
-    }
+    size_type erase(const Glib::ustring& key) { return pairs.erase(key); }
 
-    bool empty() const
-    {
-        return pairs.empty();
-    }
+    bool empty() const { return pairs.empty(); }
 
-    Glib::ustring& operator[](const Glib::ustring& key)
-    {
-        return pairs[key];
-    }
+    Glib::ustring& operator[](const Glib::ustring& key) { return pairs[key]; }
 
-    bool operator ==(const ExifPairs& other) const
-    {
-        return pairs == other.pairs;
-    }
+    bool operator==(const ExifPairs& other) const { return pairs == other.pairs; }
 
 private:
     Pairs pairs;
 };
 
 /**
-  * The IPTC key/value pairs
-  */
+ * The IPTC key/value pairs
+ */
 class IPTCPairs final
 {
 public:
     using iterator = std::map<Glib::ustring, std::vector<Glib::ustring>>::iterator;
-    using const_iterator = std::map<Glib::ustring, std::vector<Glib::ustring>>::const_iterator;
+    using const_iterator =
+        std::map<Glib::ustring, std::vector<Glib::ustring>>::const_iterator;
 
-    iterator find(const Glib::ustring& key)
-    {
-        return pairs.find(key);
-    }
+    iterator find(const Glib::ustring& key) { return pairs.find(key); }
 
-    const_iterator begin() const
-    {
-        return pairs.begin();
-    }
+    const_iterator begin() const { return pairs.begin(); }
 
-    const_iterator end() const
-    {
-        return pairs.end();
-    }
+    const_iterator end() const { return pairs.end(); }
 
-    bool empty() const
-    {
-        return pairs.empty();
-    }
+    bool empty() const { return pairs.empty(); }
 
-    iterator erase(const const_iterator& key)
-    {
-        return pairs.erase(key);
-    }
+    iterator erase(const const_iterator& key) { return pairs.erase(key); }
 
-    void clear()
-    {
-        pairs.clear();
-    }
+    void clear() { pairs.clear(); }
 
     std::vector<Glib::ustring>& operator[](const Glib::ustring& key)
     {
         return pairs[key];
     }
 
-    bool operator ==(const IPTCPairs& other) const
-    {
-        return pairs == other.pairs;
-    }
+    bool operator==(const IPTCPairs& other) const { return pairs == other.pairs; }
 
 private:
     std::map<Glib::ustring, std::vector<Glib::ustring>> pairs;
 };
 
 /**
-  * Parameters for metadata handling
-  */
-struct MetaDataParams {
-    enum Mode {
-        TUNNEL,
-        EDIT,
-        STRIP
-    };
+ * Parameters for metadata handling
+ */
+struct MetaDataParams
+{
+    enum Mode { TUNNEL, EDIT, STRIP };
     Mode mode;
     std::vector<std::string> exifKeys;
     ExifPairs exif;
@@ -2417,21 +2398,21 @@ struct MetaDataParams {
 
     MetaDataParams();
 
-    bool operator ==(const MetaDataParams &other) const;
-    bool operator !=(const MetaDataParams &other) const;
+    bool operator==(const MetaDataParams& other) const;
+    bool operator!=(const MetaDataParams& other) const;
 
     static std::vector<std::string> basicExifKeys;
 };
 
-
-struct WaveletParams {
+struct WaveletParams
+{
     std::vector<double> ccwcurve;
     std::vector<double> wavdenoise;
     std::vector<double> wavdenoiseh;
     std::vector<double> blcurve;
     std::vector<double> levelshc;
     std::vector<double> opacityCurveRG;
-    //std::vector<double> opacityCurveSH;
+    // std::vector<double> opacityCurveSH;
     std::vector<double> opacityCurveBY;
     std::vector<double> opacityCurveW;
     std::vector<double> opacityCurveWL;
@@ -2504,7 +2485,7 @@ struct WaveletParams {
     Glib::ustring Backmethod;
     Glib::ustring Tilesmethod;
     Glib::ustring complexmethod;
-    //Glib::ustring denmethod;
+    // Glib::ustring denmethod;
     Glib::ustring mixmethod;
     Glib::ustring slimethod;
     Glib::ustring quamethod;
@@ -2570,26 +2551,25 @@ struct WaveletParams {
 
     WaveletParams();
 
-    bool operator ==(const WaveletParams& other) const;
-    bool operator !=(const WaveletParams& other) const;
+    bool operator==(const WaveletParams& other) const;
+    bool operator!=(const WaveletParams& other) const;
 
-    void getCurves(
-        WavCurve& cCurve,
-        WavCurve& wavdenoise,
-        WavCurve& wavdenoiseh,
-        Wavblcurve& tCurve,
-        WavOpacityCurveRG& opacityCurveLUTRG,
-        WavOpacityCurveSH& opacityCurveLUTSH,
-        WavOpacityCurveBY& opacityCurveLUTBY,
-        WavOpacityCurveW& opacityCurveLUTW,
-        WavOpacityCurveWL& opacityCurveLUTWL 
-    ) const;
+    void getCurves(WavCurve& cCurve,
+                   WavCurve& wavdenoise,
+                   WavCurve& wavdenoiseh,
+                   Wavblcurve& tCurve,
+                   WavOpacityCurveRG& opacityCurveLUTRG,
+                   WavOpacityCurveSH& opacityCurveLUTSH,
+                   WavOpacityCurveBY& opacityCurveLUTBY,
+                   WavOpacityCurveW& opacityCurveLUTW,
+                   WavOpacityCurveWL& opacityCurveLUTWL) const;
 };
 
 /**
-* Directional pyramid equalizer params
-*/
-struct DirPyrEqualizerParams {
+ * Directional pyramid equalizer params
+ */
+struct DirPyrEqualizerParams
+{
     bool enabled;
     bool gamutlab;
     double mult[6];
@@ -2600,14 +2580,15 @@ struct DirPyrEqualizerParams {
 
     DirPyrEqualizerParams();
 
-    bool operator ==(const DirPyrEqualizerParams& other) const;
-    bool operator !=(const DirPyrEqualizerParams& other) const;
+    bool operator==(const DirPyrEqualizerParams& other) const;
+    bool operator!=(const DirPyrEqualizerParams& other) const;
 };
 
 /**
  * HSV equalizer params
  */
-struct HSVEqualizerParams {
+struct HSVEqualizerParams
+{
     bool enabled;
     std::vector<double> hcurve;
     std::vector<double> scurve;
@@ -2615,36 +2596,38 @@ struct HSVEqualizerParams {
 
     HSVEqualizerParams();
 
-    bool operator ==(const HSVEqualizerParams& other) const;
-    bool operator !=(const HSVEqualizerParams& other) const;
+    bool operator==(const HSVEqualizerParams& other) const;
+    bool operator!=(const HSVEqualizerParams& other) const;
 };
 
 /**
  *  Film simulation params
  */
-struct FilmSimulationParams {
+struct FilmSimulationParams
+{
     bool enabled;
     Glib::ustring clutFilename;
     int strength;
 
     FilmSimulationParams();
 
-    bool operator ==(const FilmSimulationParams& other) const;
-    bool operator !=(const FilmSimulationParams& other) const;
+    bool operator==(const FilmSimulationParams& other) const;
+    bool operator!=(const FilmSimulationParams& other) const;
 };
 
-struct SoftLightParams {
+struct SoftLightParams
+{
     bool enabled;
     int strength;
 
     SoftLightParams();
 
-    bool operator==(const SoftLightParams &other) const;
-    bool operator!=(const SoftLightParams &other) const;
+    bool operator==(const SoftLightParams& other) const;
+    bool operator!=(const SoftLightParams& other) const;
 };
 
-
-struct DehazeParams {
+struct DehazeParams
+{
     bool enabled;
     int strength;
     int saturation;
@@ -2653,18 +2636,20 @@ struct DehazeParams {
 
     DehazeParams();
 
-    bool operator==(const DehazeParams &other) const;
-    bool operator!=(const DehazeParams &other) const;
+    bool operator==(const DehazeParams& other) const;
+    bool operator!=(const DehazeParams& other) const;
 };
 
 /**
-  * Parameters for RAW demosaicing, common to all sensor type
-  */
-struct RAWParams {
+ * Parameters for RAW demosaicing, common to all sensor type
+ */
+struct RAWParams
+{
     /**
      * Parameters for RAW demosaicing specific to Bayer sensors
      */
-    struct BayerSensor {
+    struct BayerSensor
+    {
         enum class Method {
             AMAZE,
             AMAZEBILINEAR,
@@ -2687,18 +2672,9 @@ struct RAWParams {
             NONE
         };
 
-        enum class PSMotionCorrectionMethod {
-            OFF,
-            AUTO,
-            CUSTOM
-        };
+        enum class PSMotionCorrectionMethod { OFF, AUTO, CUSTOM };
 
-        enum class PSDemosaicMethod {
-            AMAZE,
-            AMAZEVNG4,
-            RCDVNG4,
-            LMMSE
-        };
+        enum class PSDemosaicMethod { AMAZE, AMAZEVNG4, RCDVNG4, LMMSE };
 
         Glib::ustring method;
         int border;
@@ -2711,12 +2687,7 @@ struct RAWParams {
         bool twogreen;
         bool Dehablack;
         int linenoise;
-        enum class LineNoiseDirection {
-            HORIZONTAL = 1,
-            VERTICAL,
-            BOTH,
-            PDAF_LINES = 5
-        };
+        enum class LineNoiseDirection { HORIZONTAL = 1, VERTICAL, BOTH, PDAF_LINES = 5 };
         LineNoiseDirection linenoiseDirection;
         int greenthresh;
         int dcb_iterations;
@@ -2743,8 +2714,8 @@ struct RAWParams {
 
         BayerSensor();
 
-        bool operator ==(const BayerSensor& other) const;
-        bool operator !=(const BayerSensor& other) const;
+        bool operator==(const BayerSensor& other) const;
+        bool operator!=(const BayerSensor& other) const;
 
         void setPixelShiftDefaults();
 
@@ -2758,16 +2729,9 @@ struct RAWParams {
     /**
      * Parameters for RAW demosaicing specific to X-Trans sensors
      */
-    struct XTransSensor {
-        enum class Method {
-            FOUR_PASS,
-            THREE_PASS,
-            TWO_PASS,
-            ONE_PASS,
-            FAST,
-            MONO,
-            NONE
-        };
+    struct XTransSensor
+    {
+        enum class Method { FOUR_PASS, THREE_PASS, TWO_PASS, ONE_PASS, FAST, MONO, NONE };
 
         Glib::ustring method;
         bool dualDemosaicAutoContrast;
@@ -2781,15 +2745,15 @@ struct RAWParams {
 
         XTransSensor();
 
-        bool operator ==(const XTransSensor& other) const;
-        bool operator !=(const XTransSensor& other) const;
+        bool operator==(const XTransSensor& other) const;
+        bool operator!=(const XTransSensor& other) const;
 
         static const std::vector<const char*>& getMethodStrings();
         static Glib::ustring getMethodString(Method method);
     };
 
-    BayerSensor bayersensor;         ///< RAW parameters for Bayer sensors
-    XTransSensor xtranssensor;       ///< RAW parameters for X-Trans sensors
+    BayerSensor bayersensor;    ///< RAW parameters for Bayer sensors
+    XTransSensor xtranssensor;  ///< RAW parameters for X-Trans sensors
 
     enum class FlatFieldBlurType {
         AREA,
@@ -2818,18 +2782,16 @@ struct RAWParams {
     // exposure before interpolation
     double expos;
 
-    struct PreprocessWB {
-        enum class Mode {
-            CAMERA = 0,
-            AUTO
-        };
+    struct PreprocessWB
+    {
+        enum class Mode { CAMERA = 0, AUTO };
 
         Mode mode;
 
         PreprocessWB();
 
-        bool operator ==(const PreprocessWB& other) const;
-        bool operator !=(const PreprocessWB& other) const;
+        bool operator==(const PreprocessWB& other) const;
+        bool operator!=(const PreprocessWB& other) const;
     };
 
     PreprocessWB preprocessWB;
@@ -2840,28 +2802,30 @@ struct RAWParams {
 
     RAWParams();
 
-    bool operator ==(const RAWParams& other) const;
-    bool operator !=(const RAWParams& other) const;
+    bool operator==(const RAWParams& other) const;
+    bool operator!=(const RAWParams& other) const;
 
     static const std::vector<const char*>& getFlatFieldBlurTypeStrings();
     static Glib::ustring getFlatFieldBlurTypeString(FlatFieldBlurType type);
 };
 
 /**
-  * Parameters of film negative
-  */
-struct FilmNegativeParams {
+ * Parameters of film negative
+ */
+struct FilmNegativeParams
+{
     bool enabled;
     double redRatio;
     double greenExp;
     double blueRatio;
 
-    struct RGB {
+    struct RGB
+    {
         float r, g, b;
 
-        bool operator ==(const RGB& other) const;
-        bool operator !=(const RGB& other) const;
-        RGB operator *(const RGB& other) const;
+        bool operator==(const RGB& other) const;
+        bool operator!=(const RGB& other) const;
+        RGB operator*(const RGB& other) const;
     };
 
     RGB refInput;
@@ -2880,163 +2844,175 @@ struct FilmNegativeParams {
 
     FilmNegativeParams();
 
-    bool operator ==(const FilmNegativeParams& other) const;
-    bool operator !=(const FilmNegativeParams& other) const;
+    bool operator==(const FilmNegativeParams& other) const;
+    bool operator!=(const FilmNegativeParams& other) const;
 };
 
 /**
-  * This class holds all the processing parameters applied on the images
-  */
+ * This class holds all the processing parameters applied on the images
+ */
 class ProcParams
 {
 
 public:
-    ToneCurveParams         toneCurve;       ///< Tone curve parameters
-    LCurveParams            labCurve;        ///< CIELAB luminance curve parameters
-    RetinexParams           retinex;         ///< Retinex parameters
-    LocalContrastParams     localContrast;   ////< Local contrast parameters
-    RGBCurvesParams         rgbCurves;       ///< RGB curves parameters
-    ColorToningParams       colorToning;     ///< Color Toning parameters
-    SharpeningParams        sharpening;      ///< Sharpening parameters
-    SharpeningParams        prsharpening;    ///< Sharpening parameters for post resize sharpening
-    CaptureSharpeningParams pdsharpening;    ///< Sharpening parameters for post demosaic sharpening
-    SharpenEdgeParams       sharpenEdge;     ///< Sharpen edge parameters
-    SharpenMicroParams      sharpenMicro;    ///< Sharpen microcontrast parameters
-    VibranceParams          vibrance;        ///< Vibrance parameters
-    WBParams                wb;              ///< White balance parameters
-    ColorAppearanceParams   colorappearance;
-    DefringeParams          defringe;        ///< Defringing parameters
-    ImpulseDenoiseParams    impulseDenoise;  ///< Impulse denoising parameters
-    DirPyrDenoiseParams     dirpyrDenoise;   ///< Directional Pyramid denoising parameters
-    EPDParams               epd;             ///< Edge Preserving Decomposition parameters
-    FattalToneMappingParams fattal;          ///< Fattal02 tone mapping
-    SHParams                sh;              ///< Shadow/highlight enhancement parameters
-    CGParams                cg;              ///< Compression gamut
-    ToneEqualizerParams     toneEqualizer;   ///< Tone equalizer parameters
-    CropParams              crop;            ///< Crop parameters
-    CoarseTransformParams   coarse;          ///< Coarse transformation (90, 180, 270 deg rotation, h/v flipping) parameters
-    CommonTransformParams   commonTrans;     ///< Common transformation parameters (autofill)
-    RotateParams            rotate;          ///< Rotation parameters
-    DistortionParams        distortion;      ///< Lens distortion correction parameters
-    LensProfParams          lensProf;        ///< Lens correction profile parameters
-    PerspectiveParams       perspective;     ///< Perspective correction parameters
-    GradientParams          gradient;        ///< Gradient filter parameters
-    LocallabParams          locallab;        ///< Local lab parameters
-    PCVignetteParams        pcvignette;      ///< Post-crop vignette filter parameters
-    CACorrParams            cacorrection;    ///< Lens c/a correction parameters
-    VignettingParams        vignetting;      ///< Lens vignetting correction parameters
-    ChannelMixerParams      chmixer;         ///< Channel mixer parameters
-    BlackWhiteParams        blackwhite;      ///< Black&  White parameters
-    ResizeParams            resize;          ///< Resize parameters
-    FramingParams           framing;         ///< Framing parameters
-    SpotParams              spot;            ///< Spot removal tool
-    ColorManagementParams   icm;             ///< profiles/color spaces used during the image processing
-    RAWParams               raw;             ///< RAW parameters before demosaicing
-    WaveletParams           wavelet;         ///< Wavelet parameters
-    DirPyrEqualizerParams   dirpyrequalizer; ///< directional pyramid wavelet parameters
-    HSVEqualizerParams      hsvequalizer;    ///< hsv wavelet parameters
-    FilmSimulationParams    filmSimulation;  ///< film simulation parameters
-    SoftLightParams         softlight;       ///< softlight parameters
-    DehazeParams            dehaze;          ///< dehaze parameters
-    FilmNegativeParams      filmNegative;    ///< Film negative parameters
-    int                     rank;            ///< Custom image quality ranking
-    int                     colorlabel;      ///< Custom color label
-    bool                    inTrash;         ///< Marks deleted image
-    Glib::ustring           appVersion;      ///< Version of the application that generated the parameters
-    int                     ppVersion;       ///< Version of the PP file from which the parameters have been read
+    ToneCurveParams toneCurve;          ///< Tone curve parameters
+    LCurveParams labCurve;              ///< CIELAB luminance curve parameters
+    RetinexParams retinex;              ///< Retinex parameters
+    LocalContrastParams localContrast;  ////< Local contrast parameters
+    RGBCurvesParams rgbCurves;          ///< RGB curves parameters
+    ColorToningParams colorToning;      ///< Color Toning parameters
+    SharpeningParams sharpening;        ///< Sharpening parameters
+    SharpeningParams prsharpening;  ///< Sharpening parameters for post resize sharpening
+    CaptureSharpeningParams
+        pdsharpening;  ///< Sharpening parameters for post demosaic sharpening
+    SharpenEdgeParams sharpenEdge;    ///< Sharpen edge parameters
+    SharpenMicroParams sharpenMicro;  ///< Sharpen microcontrast parameters
+    VibranceParams vibrance;          ///< Vibrance parameters
+    WBParams wb;                      ///< White balance parameters
+    ColorAppearanceParams colorappearance;
+    DefringeParams defringe;              ///< Defringing parameters
+    ImpulseDenoiseParams impulseDenoise;  ///< Impulse denoising parameters
+    DirPyrDenoiseParams dirpyrDenoise;    ///< Directional Pyramid denoising parameters
+    EPDParams epd;                        ///< Edge Preserving Decomposition parameters
+    FattalToneMappingParams fattal;       ///< Fattal02 tone mapping
+    SHParams sh;                          ///< Shadow/highlight enhancement parameters
+    CGParams cg;                          ///< Compression gamut
+    ToneEqualizerParams toneEqualizer;    ///< Tone equalizer parameters
+    CropParams crop;                      ///< Crop parameters
+    CoarseTransformParams coarse;  ///< Coarse transformation (90, 180, 270 deg rotation,
+                                   ///< h/v flipping) parameters
+    CommonTransformParams commonTrans;  ///< Common transformation parameters (autofill)
+    RotateParams rotate;                ///< Rotation parameters
+    DistortionParams distortion;        ///< Lens distortion correction parameters
+    LensProfParams lensProf;            ///< Lens correction profile parameters
+    PerspectiveParams perspective;      ///< Perspective correction parameters
+    GradientParams gradient;            ///< Gradient filter parameters
+    LocallabParams locallab;            ///< Local lab parameters
+    PCVignetteParams pcvignette;        ///< Post-crop vignette filter parameters
+    CACorrParams cacorrection;          ///< Lens c/a correction parameters
+    VignettingParams vignetting;        ///< Lens vignetting correction parameters
+    ChannelMixerParams chmixer;         ///< Channel mixer parameters
+    BlackWhiteParams blackwhite;        ///< Black&  White parameters
+    ResizeParams resize;                ///< Resize parameters
+    FramingParams framing;              ///< Framing parameters
+    SpotParams spot;                    ///< Spot removal tool
+    ColorManagementParams
+        icm;                ///< profiles/color spaces used during the image processing
+    RAWParams raw;          ///< RAW parameters before demosaicing
+    WaveletParams wavelet;  ///< Wavelet parameters
+    DirPyrEqualizerParams dirpyrequalizer;  ///< directional pyramid wavelet parameters
+    HSVEqualizerParams hsvequalizer;        ///< hsv wavelet parameters
+    FilmSimulationParams filmSimulation;    ///< film simulation parameters
+    SoftLightParams softlight;              ///< softlight parameters
+    DehazeParams dehaze;                    ///< dehaze parameters
+    FilmNegativeParams filmNegative;        ///< Film negative parameters
+    int rank;                               ///< Custom image quality ranking
+    int colorlabel;                         ///< Custom color label
+    bool inTrash;                           ///< Marks deleted image
+    Glib::ustring
+        appVersion;  ///< Version of the application that generated the parameters
+    int ppVersion;   ///< Version of the PP file from which the parameters have been read
 
-    MetaDataParams          metadata;        ///< Metadata parameters
-    // ExifPairs               exif;            ///< List of modifications appplied on the exif tags of the input image
-    // IPTCPairs               iptc;            ///< The IPTC tags and values to be saved to the output image
+    MetaDataParams metadata;  ///< Metadata parameters
+    // ExifPairs               exif;            ///< List of modifications appplied on the
+    // exif tags of the input image IPTCPairs               iptc;            ///< The IPTC
+    // tags and values to be saved to the output image
 
     /**
-      * The constructor only sets the hand-wired defaults.
-      */
+     * The constructor only sets the hand-wired defaults.
+     */
     ProcParams();
     /**
-      * Sets the hand-wired defaults parameters.
-      */
+     * Sets the hand-wired defaults parameters.
+     */
     void setDefaults();
     /**
-      * Saves the parameters to possibly two files. This is a performance improvement if a function has to
-      * save the same file in two different location, i.e. the cache and the image's directory
-      * @param fname   the name of the first file (can be an empty string)
-      * @param fname2  the name of the second file (can be an empty string) (optional)
-      * @param fnameAbsolute set to false if embedded filenames (if any, darkframe/flatfield) should be stored as relative
-      * filenames if they are inside the same directory or in a sub-directory to fname's directory.
-      * @param pedited pointer to a ParamsEdited object (optional) to store which values has to be saved
-      * @return Error code (=0 if all supplied filenames where created correctly)
-      */
-    int save(const Glib::ustring& fname, const Glib::ustring& fname2 = Glib::ustring(), bool fnameAbsolute = true, ParamsEdited* pedited = nullptr);
+     * Saves the parameters to possibly two files. This is a performance improvement if a
+     * function has to save the same file in two different location, i.e. the cache and
+     * the image's directory
+     * @param fname   the name of the first file (can be an empty string)
+     * @param fname2  the name of the second file (can be an empty string) (optional)
+     * @param fnameAbsolute set to false if embedded filenames (if any,
+     * darkframe/flatfield) should be stored as relative filenames if they are inside the
+     * same directory or in a sub-directory to fname's directory.
+     * @param pedited pointer to a ParamsEdited object (optional) to store which values
+     * has to be saved
+     * @return Error code (=0 if all supplied filenames where created correctly)
+     */
+    int save(const Glib::ustring& fname,
+             const Glib::ustring& fname2 = Glib::ustring(),
+             bool fnameAbsolute = true,
+             ParamsEdited* pedited = nullptr);
     /**
-      * Loads the parameters from a file.
-      * @param fname the name of the file
-      * @params pedited pointer to a ParamsEdited object (optional) to store which values has been loaded
-      * @return Error code (=0 if no error)
-      */
+     * Loads the parameters from a file.
+     * @param fname the name of the file
+     * @params pedited pointer to a ParamsEdited object (optional) to store which values
+     * has been loaded
+     * @return Error code (=0 if no error)
+     */
     int load(const Glib::ustring& fname, ParamsEdited* pedited = nullptr);
 
     /** Creates a new instance of ProcParams.
-      * @return a pointer to the new ProcParams instance. */
+     * @return a pointer to the new ProcParams instance. */
     static ProcParams* create();
 
     /** Destroys an instance of ProcParams.
-      * @param pp a pointer to the ProcParams instance to destroy. */
+     * @param pp a pointer to the ProcParams instance to destroy. */
     static void destroy(ProcParams* pp);
 
     static void init();
     static void cleanup();
 
-    bool operator ==(const ProcParams& other) const;
-    bool operator !=(const ProcParams& other) const;
+    bool operator==(const ProcParams& other) const;
+    bool operator!=(const ProcParams& other) const;
 
 private:
     /** Write the ProcParams's text in the file of the given name.
-    * @param fname the name of the file
-    * @param content the text to write
-    * @return Error code (=0 if no error)
-    * */
+     * @param fname the name of the file
+     * @param content the text to write
+     * @return Error code (=0 if no error)
+     * */
     int write(const Glib::ustring& fname, const Glib::ustring& content) const;
 };
 
 /**
-  * This class associate a ProcParams object and a ParamEdited object through a pointer
-  * to instance of each type in order to handle partial pp3 file loading (and later maybe
-  * saving too)
-  *
-  * PartialProfile is not responsible of ProcParams and ParamsEdited object creation
-  * and hence is not responsible of their destructions. The function that instantiate
-  * PartialProfile object has to handle all this itself.
-  */
-class PartialProfile :
-    public NonCopyable
+ * This class associate a ProcParams object and a ParamEdited object through a pointer
+ * to instance of each type in order to handle partial pp3 file loading (and later maybe
+ * saving too)
+ *
+ * PartialProfile is not responsible of ProcParams and ParamsEdited object creation
+ * and hence is not responsible of their destructions. The function that instantiate
+ * PartialProfile object has to handle all this itself.
+ */
+class PartialProfile : public NonCopyable
 {
 public:
     PartialProfile(bool createInstance = false, bool paramsEditedValue = false);
-    explicit PartialProfile(ProcParams* pp, ParamsEdited* pe = nullptr, bool fullCopy = false);
+    explicit PartialProfile(ProcParams* pp,
+                            ParamsEdited* pe = nullptr,
+                            bool fullCopy = false);
     explicit PartialProfile(const ProcParams* pp, const ParamsEdited* pe = nullptr);
     void deleteInstance();
     void clearGeneral();
-    int  load(const Glib::ustring& fName);
+    int load(const Glib::ustring& fName);
     void set(bool v);
-    void applyTo(ProcParams* destParams, bool fromLastSaved = false) const ;
+    void applyTo(ProcParams* destParams, bool fromLastSaved = false) const;
 
     rtengine::procparams::ProcParams* pparams;
     ParamsEdited* pedited;
 };
 
 /**
-  * This class automatically create the pparams and pedited instance in the constructor,
-  * and automatically delete them in the destructor. This class has been mostly created
-  * to be used with vectors, which use the default constructor/destructor
-  */
-class AutoPartialProfile :
-    public PartialProfile
+ * This class automatically create the pparams and pedited instance in the constructor,
+ * and automatically delete them in the destructor. This class has been mostly created
+ * to be used with vectors, which use the default constructor/destructor
+ */
+class AutoPartialProfile : public PartialProfile
 {
 public:
     AutoPartialProfile();
     ~AutoPartialProfile();
 };
 
-}
-}
+}  // namespace procparams
+}  // namespace rtengine

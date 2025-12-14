@@ -36,46 +36,47 @@ typedef __m128i vint2;
 //
 #define LVF(x) _mm_load_ps((const float*)&x)
 #define LVFU(x) _mm_loadu_ps(&x)
-#define STVF(x,y) _mm_store_ps(&x,y)
-#define STVFU(x,y) _mm_storeu_ps(&x,y)
+#define STVF(x, y) _mm_store_ps(&x, y)
+#define STVFU(x, y) _mm_storeu_ps(&x, y)
 #define LVI(x) _mm_load_si128((__m128i*)&x)
 
 #ifdef __AVX__
-#define PERMUTEPS(a,mask) _mm_permute_ps(a,mask)
+#define PERMUTEPS(a, mask) _mm_permute_ps(a, mask)
 #else
-#define PERMUTEPS(a,mask) _mm_shuffle_ps(a,a,mask)
+#define PERMUTEPS(a, mask) _mm_shuffle_ps(a, a, mask)
 #endif
 
-static INLINE vfloat LC2VFU(float &a)
+static INLINE vfloat LC2VFU(float& a)
 {
     // Load 8 floats from a and combine a[0],a[2],a[4] and a[6] into a vector of 4 floats
-    vfloat a1 = _mm_loadu_ps( &a );
-    vfloat a2 = _mm_loadu_ps( (&a) + 4 );
-    return _mm_shuffle_ps(a1,a2,_MM_SHUFFLE( 2,0,2,0 ));
+    vfloat a1 = _mm_loadu_ps(&a);
+    vfloat a2 = _mm_loadu_ps((&a) + 4);
+    return _mm_shuffle_ps(a1, a2, _MM_SHUFFLE(2, 0, 2, 0));
 }
-
 
 // Store a vector of 4 floats in a[0],a[2],a[4] and a[6]
 #ifdef __SSE4_1__
 // SSE4.1 => use _mm_blend_ps instead of _mm_set_epi32 and vself
-#define STC2VFU(a,v) {\
-                         __m128 TST1V = _mm_loadu_ps(&a);\
-                         __m128 TST2V = _mm_unpacklo_ps(v,v);\
-                         _mm_storeu_ps(&a, _mm_blend_ps(TST1V,TST2V,5));\
-                         TST1V = _mm_loadu_ps((&a)+4);\
-                         TST2V = _mm_unpackhi_ps(v,v);\
-                         _mm_storeu_ps((&a)+4, _mm_blend_ps(TST1V,TST2V,5));\
-                     }
+#define STC2VFU(a, v)                                           \
+    {                                                           \
+        __m128 TST1V = _mm_loadu_ps(&a);                        \
+        __m128 TST2V = _mm_unpacklo_ps(v, v);                   \
+        _mm_storeu_ps(&a, _mm_blend_ps(TST1V, TST2V, 5));       \
+        TST1V = _mm_loadu_ps((&a) + 4);                         \
+        TST2V = _mm_unpackhi_ps(v, v);                          \
+        _mm_storeu_ps((&a) + 4, _mm_blend_ps(TST1V, TST2V, 5)); \
+    }
 #else
-#define STC2VFU(a,v) {\
-                         __m128 TST1V = _mm_loadu_ps(&a);\
-                         __m128 TST2V = _mm_unpacklo_ps(v,v);\
-                         vmask cmask = _mm_set_epi32(0xffffffff,0,0xffffffff,0);\
-                         _mm_storeu_ps(&a, vself(cmask,TST1V,TST2V));\
-                         TST1V = _mm_loadu_ps((&a)+4);\
-                         TST2V = _mm_unpackhi_ps(v,v);\
-                         _mm_storeu_ps((&a)+4, vself(cmask,TST1V,TST2V));\
-                     }
+#define STC2VFU(a, v)                                              \
+    {                                                              \
+        __m128 TST1V = _mm_loadu_ps(&a);                           \
+        __m128 TST2V = _mm_unpacklo_ps(v, v);                      \
+        vmask cmask = _mm_set_epi32(0xffffffff, 0, 0xffffffff, 0); \
+        _mm_storeu_ps(&a, vself(cmask, TST1V, TST2V));             \
+        TST1V = _mm_loadu_ps((&a) + 4);                            \
+        TST2V = _mm_unpackhi_ps(v, v);                             \
+        _mm_storeu_ps((&a) + 4, vself(cmask, TST1V, TST2V));       \
+    }
 #endif
 
 #define ZEROV _mm_setzero_ps()
@@ -127,8 +128,10 @@ static INLINE vfloat vcast_vf_f(float f)
     return _mm_set_ps(f, f, f, f);
 }
 
-// Don't use intrinsics here. Newer gcc versions (>= 4.9, maybe also before 4.9) generate better code when not using intrinsics
-// example: vaddf(vmulf(a,b),c) will generate an FMA instruction when build for chips with that feature only when vaddf and vmulf don't use intrinsics
+// Don't use intrinsics here. Newer gcc versions (>= 4.9, maybe also before 4.9) generate
+// better code when not using intrinsics example: vaddf(vmulf(a,b),c) will generate an FMA
+// instruction when build for chips with that feature only when vaddf and vmulf don't use
+// intrinsics
 static INLINE vfloat vaddf(vfloat x, vfloat y)
 {
     return x + y;
@@ -145,11 +148,13 @@ static INLINE vfloat vdivf(vfloat x, vfloat y)
 {
     return x / y;
 }
-// Also don't use intrinsic here: Some chips support FMA instructions with 3 and 4 operands
-// 3 operands: a = a*b+c, b = a*b+c, c = a*b+c // destination has to be one of a,b,c
-// 4 operands: d = a*b+c // destination does not have to be one of a,b,c
-// gcc will use the one which fits best when not using intrinsics. With using intrinsics that's not possible
-static INLINE vfloat vmlaf(vfloat x, vfloat y, vfloat z) {
+// Also don't use intrinsic here: Some chips support FMA instructions with 3 and 4
+// operands 3 operands: a = a*b+c, b = a*b+c, c = a*b+c // destination has to be one of
+// a,b,c 4 operands: d = a*b+c // destination does not have to be one of a,b,c gcc will
+// use the one which fits best when not using intrinsics. With using intrinsics that's not
+// possible
+static INLINE vfloat vmlaf(vfloat x, vfloat y, vfloat z)
+{
     return x * y + z;
 }
 static INLINE vfloat vrecf(vfloat x)
@@ -336,7 +341,6 @@ static INLINE vmask vmaskf_ge(vfloat x, vfloat y)
     return (__m128i)_mm_cmpge_ps(x, y);
 }
 
-
 static INLINE vmask vmaski_eq(vint x, vint y)
 {
     __m128 s = (__m128)_mm_cmpeq_epi32(x, y);
@@ -350,7 +354,8 @@ static INLINE vdouble vsel(vmask mask, vdouble x, vdouble y)
 
 static INLINE vint vseli_lt(vdouble d0, vdouble d1, vint x, vint y)
 {
-    vmask mask = (vmask)_mm_cmpeq_ps(_mm_cvtpd_ps((vdouble)vmask_lt(d0, d1)), _mm_set_ps(0, 0, 0, 0));
+    vmask mask = (vmask)_mm_cmpeq_ps(_mm_cvtpd_ps((vdouble)vmask_lt(d0, d1)),
+                                     _mm_set_ps(0, 0, 0, 0));
     return vori(vandnoti(mask, x), vandi(mask, y));
 }
 
@@ -453,7 +458,9 @@ static INLINE vmask vsignbit(vdouble d)
 
 static INLINE vdouble vsign(vdouble d)
 {
-    return (__m128d)_mm_or_si128((__m128i)_mm_set_pd(1, 1), _mm_and_si128((__m128i)d, _mm_set_epi32(0x80000000, 0x0, 0x80000000, 0x0)));
+    return (__m128d)_mm_or_si128(
+        (__m128i)_mm_set_pd(1, 1),
+        _mm_and_si128((__m128i)d, _mm_set_epi32(0x80000000, 0x0, 0x80000000, 0x0)));
 }
 
 static INLINE vdouble vmulsign(vdouble x, vdouble y)
@@ -483,7 +490,8 @@ static INLINE vmask vmask_isnan(vdouble d)
 
 static INLINE vdouble visinf(vdouble d)
 {
-    return (__m128d)_mm_and_si128(vmask_isinf(d), _mm_or_si128(vsignbit(d), (__m128i)_mm_set_pd(1, 1)));
+    return (__m128d)_mm_and_si128(vmask_isinf(d),
+                                  _mm_or_si128(vsignbit(d), (__m128i)_mm_set_pd(1, 1)));
 }
 
 static INLINE vdouble visinf2(vdouble d, vdouble m)
@@ -513,28 +521,31 @@ static INLINE vint vilogbp1(vdouble d)
 {
     vint m = vmask_lt(d, vcast_vd_d(4.9090934652977266E-91));
     d = vsel(m, vmul(vcast_vd_d(2.037035976334486E90), d), d);
-    __m128i q = _mm_and_si128((__m128i)d, _mm_set_epi32(((1 << 12) - 1) << 20, 0, ((1 << 12) - 1) << 20, 0));
+    __m128i q = _mm_and_si128(
+        (__m128i)d, _mm_set_epi32(((1 << 12) - 1) << 20, 0, ((1 << 12) - 1) << 20, 0));
     q = _mm_srli_epi32(q, 20);
-    q = vorm(vandm   (m, _mm_sub_epi32(q, _mm_set_epi32(300 + 0x3fe, 0, 300 + 0x3fe, 0))),
-             vandnotm(m, _mm_sub_epi32(q, _mm_set_epi32(      0x3fe, 0,       0x3fe, 0))));
+    q = vorm(vandm(m, _mm_sub_epi32(q, _mm_set_epi32(300 + 0x3fe, 0, 300 + 0x3fe, 0))),
+             vandnotm(m, _mm_sub_epi32(q, _mm_set_epi32(0x3fe, 0, 0x3fe, 0))));
     q = (__m128i)_mm_shuffle_ps((__m128)q, (__m128)q, _MM_SHUFFLE(0, 0, 3, 1));
     return q;
 }
 
 static INLINE vdouble vupper(vdouble d)
 {
-    return (__m128d)_mm_and_si128((__m128i)d, _mm_set_epi32(0xffffffff, 0xf8000000, 0xffffffff, 0xf8000000));
+    return (__m128d)_mm_and_si128(
+        (__m128i)d, _mm_set_epi32(0xffffffff, 0xf8000000, 0xffffffff, 0xf8000000));
 }
 
 //
 
-typedef struct {
+typedef struct
+{
     vdouble x, y;
 } vdouble2;
 
 static INLINE vdouble2 dd(vdouble h, vdouble l)
 {
-    vdouble2 ret = {h, l};
+    vdouble2 ret = { h, l };
     return ret;
 }
 

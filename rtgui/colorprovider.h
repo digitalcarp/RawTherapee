@@ -32,18 +32,16 @@ protected:
     ColorProvider* colorProvider;
 
 public:
-    enum ElemType {
-        CCET_POINT,
-        CCET_VERTICAL_BAR,
-        CCET_HORIZONTAL_BAR,
-        CCET_BACKGROUND
-    };
+    enum ElemType { CCET_POINT, CCET_VERTICAL_BAR, CCET_HORIZONTAL_BAR, CCET_BACKGROUND };
     double ccRed;
     double ccGreen;
     double ccBlue;
 
-    ColorCaller() : colorCallerId(-1), colorProvider(nullptr), ccRed(0.), ccGreen(0.), ccBlue(0.) {}
-    void setColorProvider (ColorProvider* p, int id)
+    ColorCaller()
+        : colorCallerId(-1), colorProvider(nullptr), ccRed(0.), ccGreen(0.), ccBlue(0.)
+    {
+    }
+    void setColorProvider(ColorProvider* p, int id)
     {
         colorProvider = p;
         colorCallerId = id;
@@ -60,5 +58,9 @@ class ColorProvider
 {
 public:
     virtual ~ColorProvider() = default;
-    virtual void colorForValue (double valX, double valY, enum ColorCaller::ElemType elemType, int callerId, ColorCaller* caller) {};
+    virtual void colorForValue(double valX,
+                               double valY,
+                               enum ColorCaller::ElemType elemType,
+                               int callerId,
+                               ColorCaller* caller) {};
 };

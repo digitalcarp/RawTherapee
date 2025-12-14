@@ -23,16 +23,16 @@
 
 Clipboard clipboard;
 
-Clipboard::Clipboard () :
-    _hasIPTC(false),
-    iptc(new rtengine::procparams::IPTCPairs),
-    partProfile(new rtengine::procparams::PartialProfile(false)),
-    hasDiagonalCurveDataType(DCT_Empty),
-    hasFlatCurveDataType(FCT_Empty)
+Clipboard::Clipboard()
+    : _hasIPTC(false),
+      iptc(new rtengine::procparams::IPTCPairs),
+      partProfile(new rtengine::procparams::PartialProfile(false)),
+      hasDiagonalCurveDataType(DCT_Empty),
+      hasFlatCurveDataType(FCT_Empty)
 {
 }
 
-Clipboard::~Clipboard ()
+Clipboard::~Clipboard()
 {
     partProfile->deleteInstance();
 }
@@ -151,7 +151,7 @@ FlatCurveType Clipboard::hasFlatCurveData() const
     return hasFlatCurveDataType;
 }
 
-const std::vector<double>& Clipboard:: getFlatCurveData() const
+const std::vector<double>& Clipboard::getFlatCurveData() const
 {
     return flatCurve;
 }

@@ -34,8 +34,7 @@
 #include <iomanip>
 #include <vector>
 
-namespace
-{
+namespace {
 
 using namespace rtengine;
 using rtengine::procparams::FramingParams;
@@ -47,24 +46,22 @@ constexpr int INDEX_STANDARD = 0;
 constexpr int INDEX_BBOX = 1;
 constexpr int INDEX_FIXED = 2;
 constexpr int INDEX_FRAMING_METHOD_UNCHANGED = 3;
-constexpr std::array<const char*, 3> FRAMING_METHODS = {
-    "TP_FRAMING_METHOD_STANDARD",
-    "TP_FRAMING_METHOD_BBOX",
-    "TP_FRAMING_METHOD_FIXED"
-};
+constexpr std::array<const char*, 3> FRAMING_METHODS = { "TP_FRAMING_METHOD_STANDARD",
+                                                         "TP_FRAMING_METHOD_BBOX",
+                                                         "TP_FRAMING_METHOD_FIXED" };
 
 int mapFramingMethod(FramingParams::FramingMethod framingMethod)
 {
     using FramingMethod = FramingParams::FramingMethod;
     switch (framingMethod) {
-        case FramingMethod::STANDARD:
-            return INDEX_STANDARD;
-        case FramingMethod::BBOX:
-            return INDEX_BBOX;
-        case FramingMethod::FIXED_SIZE:
-            return INDEX_FIXED;
-        default:
-            return INDEX_STANDARD;
+    case FramingMethod::STANDARD:
+        return INDEX_STANDARD;
+    case FramingMethod::BBOX:
+        return INDEX_BBOX;
+    case FramingMethod::FIXED_SIZE:
+        return INDEX_FIXED;
+    default:
+        return INDEX_STANDARD;
     }
 }
 
@@ -72,14 +69,14 @@ FramingParams::FramingMethod mapFramingMethod(int comboIndex)
 {
     using FramingMethod = FramingParams::FramingMethod;
     switch (comboIndex) {
-        case INDEX_STANDARD:
-            return FramingMethod::STANDARD;
-        case INDEX_BBOX:
-            return FramingMethod::BBOX;
-        case INDEX_FIXED:
-            return FramingMethod::FIXED_SIZE;
-        default:
-            return FramingMethod::STANDARD;
+    case INDEX_STANDARD:
+        return FramingMethod::STANDARD;
+    case INDEX_BBOX:
+        return FramingMethod::BBOX;
+    case INDEX_FIXED:
+        return FramingMethod::FIXED_SIZE;
+    default:
+        return FramingMethod::STANDARD;
     }
 }
 
@@ -88,24 +85,22 @@ constexpr int INDEX_AS_IMAGE = 0;
 constexpr int INDEX_LANDSCAPE = 1;
 constexpr int INDEX_PORTRAIT = 2;
 constexpr int INDEX_ORIENTATION_UNCHANGED = 3;
-constexpr std::array<const char*, 3> ORIENTATION = {
-    "GENERAL_ASIMAGE",
-    "GENERAL_LANDSCAPE",
-    "GENERAL_PORTRAIT"
-};
+constexpr std::array<const char*, 3> ORIENTATION = { "GENERAL_ASIMAGE",
+                                                     "GENERAL_LANDSCAPE",
+                                                     "GENERAL_PORTRAIT" };
 
 int mapOrientation(FramingParams::Orientation orientation)
 {
     using Orientation = FramingParams::Orientation;
     switch (orientation) {
-        case Orientation::AS_IMAGE:
-            return INDEX_AS_IMAGE;
-        case Orientation::LANDSCAPE:
-            return INDEX_LANDSCAPE;
-        case Orientation::PORTRAIT:
-            return INDEX_PORTRAIT;
-        default:
-            return INDEX_AS_IMAGE;
+    case Orientation::AS_IMAGE:
+        return INDEX_AS_IMAGE;
+    case Orientation::LANDSCAPE:
+        return INDEX_LANDSCAPE;
+    case Orientation::PORTRAIT:
+        return INDEX_PORTRAIT;
+    default:
+        return INDEX_AS_IMAGE;
     }
 }
 
@@ -113,14 +108,14 @@ FramingParams::Orientation mapOrientation(int comboIndex)
 {
     using Orientation = FramingParams::Orientation;
     switch (comboIndex) {
-        case INDEX_AS_IMAGE:
-            return Orientation::AS_IMAGE;
-        case INDEX_LANDSCAPE:
-            return Orientation::LANDSCAPE;
-        case INDEX_PORTRAIT:
-            return Orientation::PORTRAIT;
-        default:
-            return Orientation::AS_IMAGE;
+    case INDEX_AS_IMAGE:
+        return Orientation::AS_IMAGE;
+    case INDEX_LANDSCAPE:
+        return Orientation::LANDSCAPE;
+    case INDEX_PORTRAIT:
+        return Orientation::PORTRAIT;
+    default:
+        return Orientation::AS_IMAGE;
     }
 }
 
@@ -130,8 +125,7 @@ constexpr int INDEX_SIZE_UNIFORM_RELATIVE = 1;
 constexpr int INDEX_SIZE_ABSOLUTE = 2;
 constexpr int INDEX_SIZE_UNCHANGED = 3;
 constexpr std::array<const char*, 3> BORDER_SIZE_METHODS = {
-    "TP_FRAMING_BORDER_SIZE_RELATIVE",
-    "TP_FRAMING_BORDER_SIZE_UNIFORM_RELATIVE",
+    "TP_FRAMING_BORDER_SIZE_RELATIVE", "TP_FRAMING_BORDER_SIZE_UNIFORM_RELATIVE",
     "TP_FRAMING_BORDER_SIZE_ABSOLUTE"
 };
 
@@ -139,14 +133,14 @@ int mapBorderSizeMethod(FramingParams::BorderSizing sizing)
 {
     using BorderSizing = FramingParams::BorderSizing;
     switch (sizing) {
-        case BorderSizing::PERCENTAGE:
-            return INDEX_SIZE_RELATIVE;
-        case BorderSizing::UNIFORM_PERCENTAGE:
-            return INDEX_SIZE_UNIFORM_RELATIVE;
-        case BorderSizing::FIXED_SIZE:
-            return INDEX_SIZE_ABSOLUTE;
-        default:
-            return INDEX_SIZE_RELATIVE;
+    case BorderSizing::PERCENTAGE:
+        return INDEX_SIZE_RELATIVE;
+    case BorderSizing::UNIFORM_PERCENTAGE:
+        return INDEX_SIZE_UNIFORM_RELATIVE;
+    case BorderSizing::FIXED_SIZE:
+        return INDEX_SIZE_ABSOLUTE;
+    default:
+        return INDEX_SIZE_RELATIVE;
     }
 }
 
@@ -154,14 +148,14 @@ FramingParams::BorderSizing mapBorderSizeMethod(int comboIndex)
 {
     using BorderSizing = FramingParams::BorderSizing;
     switch (comboIndex) {
-        case INDEX_SIZE_RELATIVE:
-            return BorderSizing::PERCENTAGE;
-        case INDEX_SIZE_UNIFORM_RELATIVE:
-            return BorderSizing::UNIFORM_PERCENTAGE;
-        case INDEX_SIZE_ABSOLUTE:
-            return BorderSizing::FIXED_SIZE;
-        default:
-            return BorderSizing::PERCENTAGE;
+    case INDEX_SIZE_RELATIVE:
+        return BorderSizing::PERCENTAGE;
+    case INDEX_SIZE_UNIFORM_RELATIVE:
+        return BorderSizing::UNIFORM_PERCENTAGE;
+    case INDEX_SIZE_ABSOLUTE:
+        return BorderSizing::FIXED_SIZE;
+    default:
+        return BorderSizing::PERCENTAGE;
     }
 }
 
@@ -173,48 +167,45 @@ constexpr int INDEX_BASIS_LONG = 3;
 constexpr int INDEX_BASIS_SHORT = 4;
 constexpr int INDEX_BASIS_UNCHANGED = 5;
 constexpr std::array<const char*, 5> BORDER_SIZE_BASIS = {
-    "TP_FRAMING_BASIS_AUTO",
-    "TP_FRAMING_BASIS_WIDTH",
-    "TP_FRAMING_BASIS_HEIGHT",
-    "TP_FRAMING_BASIS_LONG_SIDE",
-    "TP_FRAMING_BASIS_SHORT_SIDE"
+    "TP_FRAMING_BASIS_AUTO", "TP_FRAMING_BASIS_WIDTH", "TP_FRAMING_BASIS_HEIGHT",
+    "TP_FRAMING_BASIS_LONG_SIDE", "TP_FRAMING_BASIS_SHORT_SIDE"
 };
 
 int mapBasis(FramingParams::Basis basis)
 {
     using Basis = FramingParams::Basis;
-    switch(basis) {
-        case Basis::AUTO:
-            return INDEX_BASIS_AUTO;
-        case Basis::WIDTH:
-            return INDEX_BASIS_WIDTH;
-        case Basis::HEIGHT:
-            return INDEX_BASIS_HEIGHT;
-        case Basis::LONG:
-            return INDEX_BASIS_LONG;
-        case Basis::SHORT:
-            return INDEX_BASIS_SHORT;
-        default:
-            return INDEX_BASIS_AUTO;
+    switch (basis) {
+    case Basis::AUTO:
+        return INDEX_BASIS_AUTO;
+    case Basis::WIDTH:
+        return INDEX_BASIS_WIDTH;
+    case Basis::HEIGHT:
+        return INDEX_BASIS_HEIGHT;
+    case Basis::LONG:
+        return INDEX_BASIS_LONG;
+    case Basis::SHORT:
+        return INDEX_BASIS_SHORT;
+    default:
+        return INDEX_BASIS_AUTO;
     }
 }
 
 FramingParams::Basis mapBasis(int comboIndex)
 {
     using Basis = FramingParams::Basis;
-    switch(comboIndex) {
-        case INDEX_BASIS_AUTO:
-            return Basis::AUTO;
-        case INDEX_BASIS_WIDTH:
-            return Basis::WIDTH;
-        case INDEX_BASIS_HEIGHT:
-            return Basis::HEIGHT;
-        case INDEX_BASIS_LONG:
-            return Basis::LONG;
-        case INDEX_BASIS_SHORT:
-            return Basis::SHORT;
-        default:
-            return Basis::AUTO;
+    switch (comboIndex) {
+    case INDEX_BASIS_AUTO:
+        return Basis::AUTO;
+    case INDEX_BASIS_WIDTH:
+        return Basis::WIDTH;
+    case INDEX_BASIS_HEIGHT:
+        return Basis::HEIGHT;
+    case INDEX_BASIS_LONG:
+        return Basis::LONG;
+    case INDEX_BASIS_SHORT:
+        return Basis::SHORT;
+    default:
+        return Basis::AUTO;
     }
 }
 
@@ -252,11 +243,7 @@ class Framing::AspectRatios
 public:
     static constexpr int INDEX_CURRENT = 0;
 
-    AspectRatios() :
-        ratios{{M("GENERAL_ASIMAGE")}}
-    {
-        fillAspectRatios(ratios);
-    }
+    AspectRatios() : ratios{ { M("GENERAL_ASIMAGE") } } { fillAspectRatios(ratios); }
 
     void fillCombo(MyComboBoxText* combo) const
     {
@@ -268,10 +255,7 @@ public:
 
     int unchangedIndex() const { return ratios.size(); }
 
-    double value(int index) const
-    {
-        return ratios.at(index).value;
-    }
+    double value(int index) const { return ratios.at(index).value; }
 
     int findIndex(double aspectRatio) const
     {
@@ -302,16 +286,17 @@ Framing::DimensionGui::DimensionGui(Gtk::Box* parent, const char* text)
 
 void Framing::DimensionGui::connect(Framing& framing, CallbackFunc callback)
 {
-    connection = value->signal_value_changed().connect(sigc::mem_fun(framing, callback), true);
+    connection =
+        value->signal_value_changed().connect(sigc::mem_fun(framing, callback), true);
 }
 
-Framing::Framing() :
-    FoldableToolPanel(this, TOOL_NAME, M("TP_FRAMING_LABEL"), false, true),
-    aspectRatioData(new AspectRatios),
-    imgWidth(INITIAL_IMG_WIDTH),
-    imgHeight(INITIAL_IMG_HEIGHT),
-    lastAllowUpscaling(false),
-    lastMinSizeEnabled(false)
+Framing::Framing()
+    : FoldableToolPanel(this, TOOL_NAME, M("TP_FRAMING_LABEL"), false, true),
+      aspectRatioData(new AspectRatios),
+      imgWidth(INITIAL_IMG_WIDTH),
+      imgHeight(INITIAL_IMG_HEIGHT),
+      lastAllowUpscaling(false),
+      lastMinSizeEnabled(false)
 {
     setupEvents();
     setupFramingMethodGui();
@@ -321,7 +306,8 @@ Framing::Framing() :
     setupBorderColorsGui();
 }
 
-Framing::~Framing() {
+Framing::~Framing()
+{
     idleRegister.destroy();
 }
 
@@ -443,7 +429,8 @@ void Framing::setupBorderSizeGui()
 
     pack_start(*combos);
 
-    relativeBorderSize = Gtk::manage(new Adjuster(M("TP_FRAMING_BORDER_SIZE"), 0, 1, 0.01, 0.1));
+    relativeBorderSize =
+        Gtk::manage(new Adjuster(M("TP_FRAMING_BORDER_SIZE"), 0, 1, 0.01, 0.1));
     pack_start(*relativeBorderSize);
 
     minSizeFrame = Gtk::manage(new Gtk::Frame());
@@ -474,8 +461,8 @@ void Framing::setupBorderSizeGui()
 
     borderSizeMethodChanged = borderSizeMethod->signal_changed().connect(
         sigc::mem_fun(*this, &Framing::onBorderSizeMethodChanged));
-    basisChanged = basis->signal_changed().connect(
-        sigc::mem_fun(*this, &Framing::onBasisChanged));
+    basisChanged =
+        basis->signal_changed().connect(sigc::mem_fun(*this, &Framing::onBasisChanged));
     relativeBorderSize->setAdjusterListener(this);
     minSizeEnabledConnection = minSizeEnabled->signal_toggled().connect(
         sigc::mem_fun(*this, &Framing::onMinSizeToggled));
@@ -494,11 +481,14 @@ void Framing::setupBorderColorsGui()
     frame->set_label_widget(*label);
 
     Gtk::Box* const box = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
-    redAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_RED"), 0, MAX_COLOR_VAL, 1, MAX_COLOR_VAL));
+    redAdj = Gtk::manage(
+        new Adjuster(M("TP_FRAMING_RED"), 0, MAX_COLOR_VAL, 1, MAX_COLOR_VAL));
     box->add(*redAdj);
-    greenAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_GREEN"), 0, MAX_COLOR_VAL, 1, MAX_COLOR_VAL));
+    greenAdj = Gtk::manage(
+        new Adjuster(M("TP_FRAMING_GREEN"), 0, MAX_COLOR_VAL, 1, MAX_COLOR_VAL));
     box->add(*greenAdj);
-    blueAdj = Gtk::manage(new Adjuster(M("TP_FRAMING_BLUE"), 0, MAX_COLOR_VAL, 1, MAX_COLOR_VAL));
+    blueAdj = Gtk::manage(
+        new Adjuster(M("TP_FRAMING_BLUE"), 0, MAX_COLOR_VAL, 1, MAX_COLOR_VAL));
     box->add(*blueAdj);
 
     Gtk::Frame* const colorFrame = Gtk::manage(new Gtk::Frame());
@@ -516,7 +506,8 @@ void Framing::setupBorderColorsGui()
     blueAdj->setAdjusterListener(this);
 }
 
-void Framing::read(const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited)
+void Framing::read(const rtengine::procparams::ProcParams* pp,
+                   const ParamsEdited* pedited)
 {
     DisableListener disableListener(this);
 
@@ -643,7 +634,8 @@ void Framing::writeParams(rtengine::procparams::ProcParams* pp)
     params.framedHeight = height.value->get_value_as_int();
     params.allowUpscaling = allowUpscaling->get_active();
 
-    params.borderSizingMethod = mapBorderSizeMethod(borderSizeMethod->get_active_row_number());
+    params.borderSizingMethod =
+        mapBorderSizeMethod(borderSizeMethod->get_active_row_number());
     params.basis = mapBasis(basis->get_active_row_number());
     params.relativeBorderSize = relativeBorderSize->getValue();
     params.minSizeEnabled = minSizeEnabled->get_active();
@@ -665,14 +657,18 @@ void Framing::writeEdited(ParamsEdited* pedited)
 
     edits.enabled = !get_inconsistent();
 
-    edits.framingMethod = framingMethod->get_active_row_number() != INDEX_FRAMING_METHOD_UNCHANGED;
-    edits.aspectRatio = aspectRatio->get_active_row_number() != aspectRatioData->unchangedIndex();
-    edits.orientation = orientation->get_active_row_number() != INDEX_ORIENTATION_UNCHANGED;
+    edits.framingMethod =
+        framingMethod->get_active_row_number() != INDEX_FRAMING_METHOD_UNCHANGED;
+    edits.aspectRatio =
+        aspectRatio->get_active_row_number() != aspectRatioData->unchangedIndex();
+    edits.orientation =
+        orientation->get_active_row_number() != INDEX_ORIENTATION_UNCHANGED;
     edits.framedWidth = width.isDirty;
     edits.framedHeight = height.isDirty;
     edits.allowUpscaling = !allowUpscaling->get_inconsistent();
 
-    edits.borderSizingMethod = borderSizeMethod->get_active_row_number() != INDEX_SIZE_UNCHANGED;
+    edits.borderSizingMethod =
+        borderSizeMethod->get_active_row_number() != INDEX_SIZE_UNCHANGED;
     edits.basis = basis->get_active_row_number() != INDEX_BASIS_UNCHANGED;
     edits.relativeBorderSize = relativeBorderSize->getEditedState();
     edits.minSizeEnabled = !minSizeEnabled->get_inconsistent();
@@ -686,7 +682,8 @@ void Framing::writeEdited(ParamsEdited* pedited)
     edits.borderBlue = blueAdj->getEditedState();
 }
 
-void Framing::setDefaults(const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited)
+void Framing::setDefaults(const rtengine::procparams::ProcParams* defParams,
+                          const ParamsEdited* pedited)
 {
     const FramingParams& params = defParams->framing;
 
@@ -698,7 +695,8 @@ void Framing::setDefaults(const rtengine::procparams::ProcParams* defParams, con
     if (pedited) {
         const FramingParamsEdited& edits = pedited->framing;
 
-        relativeBorderSize->setDefaultEditedState(edits.relativeBorderSize ? Edited : UnEdited);
+        relativeBorderSize->setDefaultEditedState(edits.relativeBorderSize ? Edited
+                                                                           : UnEdited);
         redAdj->setDefaultEditedState(edits.borderRed ? Edited : UnEdited);
         greenAdj->setDefaultEditedState(edits.borderGreen ? Edited : UnEdited);
         blueAdj->setDefaultEditedState(edits.borderBlue ? Edited : UnEdited);
@@ -755,7 +753,9 @@ void Framing::update(int originalWidth, int originalHeight)
     }
 }
 
-void Framing::setAdjusterBehavior(bool addRelativeBorderSize, bool addRed, bool addGreen,
+void Framing::setAdjusterBehavior(bool addRelativeBorderSize,
+                                  bool addRed,
+                                  bool addGreen,
                                   bool addBlue)
 {
     relativeBorderSize->setAddMode(addRelativeBorderSize);
@@ -1002,7 +1002,8 @@ void Framing::onBorderSizeMethodChanged()
     updateBorderSizeGui();
 
     if (listener && (getEnabled() || batchMode)) {
-        listener->panelChanged(EvFramingBorderSizingMethod, borderSizeMethod->get_active_text());
+        listener->panelChanged(EvFramingBorderSizingMethod,
+                               borderSizeMethod->get_active_text());
     }
 }
 
@@ -1087,7 +1088,8 @@ void Framing::onAbsHeightChanged()
     absHeight.isDirty = true;
 
     if (listener && (getEnabled() || batchMode)) {
-        listener->panelChanged(EvFramingAbsHeight,
-                               Glib::ustring::format(absHeight.value->get_value_as_int()));
+        listener->panelChanged(
+            EvFramingAbsHeight,
+            Glib::ustring::format(absHeight.value->get_value_as_int()));
     }
 }

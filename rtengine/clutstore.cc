@@ -15,15 +15,12 @@
 
 #include "rtgui/options.h"
 
-namespace
-{
+namespace {
 
-bool loadFile(
-    const Glib::ustring& filename,
-    const Glib::ustring& working_color_space,
-    AlignedBuffer<std::uint16_t>& clut_image,
-    unsigned int& clut_level
-)
+bool loadFile(const Glib::ustring& filename,
+              const Glib::ustring& working_color_space,
+              AlignedBuffer<std::uint16_t>& clut_image,
+              unsigned int& clut_level)
 {
     rtengine::StdImageSource img_src;
 
@@ -51,19 +48,23 @@ bool loadFile(
 
     if (res) {
         rtengine::ColorTemp curr_wb = img_src.getWB();
-        std::unique_ptr<rtengine::Imagefloat> img_float = std::unique_ptr<rtengine::Imagefloat>(new rtengine::Imagefloat(fw, fh));
+        std::unique_ptr<rtengine::Imagefloat> img_float =
+            std::unique_ptr<rtengine::Imagefloat>(new rtengine::Imagefloat(fw, fh));
         const PreviewProps pp(0, 0, fw, fh, 1);
 
         rtengine::procparams::ColorManagementParams icm;
         icm.workingProfile = working_color_space;
 
-        img_src.getImage(curr_wb, TR_NONE, img_float.get(), pp, rtengine::procparams::ToneCurveParams(), rtengine::procparams::RAWParams());
+        img_src.getImage(curr_wb, TR_NONE, img_float.get(), pp,
+                         rtengine::procparams::ToneCurveParams(),
+                         rtengine::procparams::RAWParams());
 
         if (!working_color_space.empty()) {
             img_src.convertColorSpace(img_float.get(), icm, curr_wb);
         }
 
-        AlignedBuffer<std::uint16_t> image(fw * fh * 4 + 4); // getClutValues() loads one pixel in advance
+        AlignedBuffer<std::uint16_t> image(
+            fw * fh * 4 + 4);  // getClutValues() loads one pixel in advance
 
         std::size_t index = 0;
 
@@ -87,12 +88,11 @@ bool loadFile(
 #ifdef __SSE2__
 vfloat2 getClutValues(const AlignedBuffer<std::uint16_t>& clut_image, size_t index)
 {
-    const vint v_values = _mm_loadu_si128(reinterpret_cast<const vint*>(clut_image.data + index));
+    const vint v_values =
+        _mm_loadu_si128(reinterpret_cast<const vint*>(clut_image.data + index));
 #ifdef __SSE4_1__
-    return {
-        _mm_cvtepi32_ps(_mm_cvtepu16_epi32(v_values)),
-        _mm_cvtepi32_ps(_mm_cvtepu16_epi32(_mm_srli_si128(v_values, 8)))
-    };
+    return { _mm_cvtepi32_ps(_mm_cvtepu16_epi32(v_values)),
+             _mm_cvtepi32_ps(_mm_cvtepu16_epi32(_mm_srli_si128(v_values, 8))) };
 #else
     const vint v_mask = _mm_set1_epi32(0x0000FFFF);
 
@@ -105,27 +105,19 @@ vfloat2 getClutValues(const AlignedBuffer<std::uint16_t>& clut_image, size_t ind
     v_low = vandm(v_low, v_mask);
     v_high = vandm(v_high, v_mask);
 
-    return {
-        _mm_cvtepi32_ps(v_low),
-        _mm_cvtepi32_ps(v_high)
-    };
+    return { _mm_cvtepi32_ps(v_low), _mm_cvtepi32_ps(v_high) };
 #endif
 }
 #endif
 
-}
+}  // namespace
 
-rtengine::HaldCLUT::HaldCLUT() :
-    clut_level(0),
-    flevel_minus_one(0.0f),
-    flevel_minus_two(0.0f),
-    clut_profile("sRGB")
+rtengine::HaldCLUT::HaldCLUT()
+    : clut_level(0), flevel_minus_one(0.0f), flevel_minus_two(0.0f), clut_profile("sRGB")
 {
 }
 
-rtengine::HaldCLUT::~HaldCLUT()
-{
-}
+rtengine::HaldCLUT::~HaldCLUT() {}
 
 bool rtengine::HaldCLUT::load(const Glib::ustring& filename)
 {
@@ -158,16 +150,14 @@ Glib::ustring rtengine::HaldCLUT::getProfile() const
     return clut_profile;
 }
 
-void rtengine::HaldCLUT::getRGB(
-    float strength,
-    std::size_t line_size,
-    const float* r,
-    const float* g,
-    const float* b,
-    float* out_rgbx
-) const
+void rtengine::HaldCLUT::getRGB(float strength,
+                                std::size_t line_size,
+                                const float* r,
+                                const float* g,
+                                const float* b,
+                                float* out_rgbx) const
 {
-    const unsigned int level = clut_level; // This is important
+    const unsigned int level = clut_level;  // This is important
 
     const unsigned int level_square = level * level;
 
@@ -175,7 +165,9 @@ void rtengine::HaldCLUT::getRGB(
     const vfloat v_strength = F2V(strength);
 #endif
 
-    for (std::size_t column = 0; column < line_size; ++column, ++r, ++g, ++b, out_rgbx += 4) {
+    for (std::size_t column = 0; column < line_size;
+         ++column, ++r, ++g, ++b, out_rgbx += 4)
+    {
         const unsigned int red = std::min(flevel_minus_two, *r * flevel_minus_one);
         const unsigned int green = std::min(flevel_minus_two, *g * flevel_minus_one);
         const unsigned int blue = std::min(flevel_minus_two, *b * flevel_minus_one);
@@ -231,7 +223,9 @@ void rtengine::HaldCLUT::getRGB(
 #else
         const vfloat v_in = _mm_set_ps(0.0f, *b, *g, *r);
         const vfloat v_tmp = v_in * F2V(flevel_minus_one);
-        const vfloat v_rgb = v_tmp - _mm_cvtepi32_ps(_mm_cvttps_epi32(vminf(v_tmp, F2V(flevel_minus_two))));
+        const vfloat v_rgb =
+            v_tmp
+            - _mm_cvtepi32_ps(_mm_cvttps_epi32(vminf(v_tmp, F2V(flevel_minus_two))));
 
         size_t index = color * 4;
 
@@ -270,13 +264,11 @@ void rtengine::HaldCLUT::getRGB(
     }
 }
 
-void rtengine::HaldCLUT::splitClutFilename(
-    const Glib::ustring& filename,
-    Glib::ustring& name,
-    Glib::ustring& extension,
-    Glib::ustring& profile_name,
-    bool checkProfile
-)
+void rtengine::HaldCLUT::splitClutFilename(const Glib::ustring& filename,
+                                           Glib::ustring& name,
+                                           Glib::ustring& extension,
+                                           Glib::ustring& profile_name,
+                                           bool checkProfile)
 {
     Glib::ustring basename = Glib::path_get_basename(filename);
 
@@ -293,11 +285,15 @@ void rtengine::HaldCLUT::splitClutFilename(
         profile_name = "sRGB";
 
         if (!name.empty()) {
-            for (const auto& working_profile : rtengine::ICCStore::getInstance()->getWorkingProfiles()) {
-                if (
-                    !working_profile.empty() // This isn't strictly needed, but an empty wp name should be skipped anyway
-                    && std::search(name.rbegin(), name.rend(), working_profile.rbegin(), working_profile.rend()) == name.rbegin()
-                ) {
+            for (const auto& working_profile :
+                 rtengine::ICCStore::getInstance()->getWorkingProfiles())
+            {
+                if (!working_profile.empty()  // This isn't strictly needed, but an empty
+                                              // wp name should be skipped anyway
+                    && std::search(name.rbegin(), name.rend(), working_profile.rbegin(),
+                                   working_profile.rend())
+                           == name.rbegin())
+                {
                     profile_name = working_profile;
                     name.erase(name.size() - working_profile.size());
                     break;
@@ -313,7 +309,8 @@ rtengine::CLUTStore& rtengine::CLUTStore::getInstance()
     return instance;
 }
 
-std::shared_ptr<rtengine::HaldCLUT> rtengine::CLUTStore::getClut(const Glib::ustring& filename) const
+std::shared_ptr<rtengine::HaldCLUT>
+rtengine::CLUTStore::getClut(const Glib::ustring& filename) const
 {
     std::shared_ptr<rtengine::HaldCLUT> result;
 
@@ -339,7 +336,4 @@ void rtengine::CLUTStore::clearCache()
     cache.clear();
 }
 
-rtengine::CLUTStore::CLUTStore() :
-    cache(App::get().options().clutCacheSize)
-{
-}
+rtengine::CLUTStore::CLUTStore() : cache(App::get().options().clutCacheSize) {}

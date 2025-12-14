@@ -17,8 +17,8 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "myfile.h"
-#include <cstdarg>
 #include "rtengine.h"
+#include <cstdarg>
 // get mmap() sorted out
 #ifdef MYFILE_MMAP
 
@@ -30,16 +30,17 @@
 // dummy values
 #define MAP_PRIVATE 1
 #define PROT_READ 1
-#define MAP_FAILED (void *)-1
+#define MAP_FAILED (void*)-1
 
-#ifdef __GNUC__ // silence warning
+#ifdef __GNUC__  // silence warning
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 
-void* mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset)
+void* mmap(void* start, size_t length, int prot, int flags, int fd, off_t offset)
 {
-    HANDLE handle = CreateFileMapping((HANDLE)_get_osfhandle(fd), NULL, PAGE_WRITECOPY, 0, 0, NULL);
+    HANDLE handle =
+        CreateFileMapping((HANDLE)_get_osfhandle(fd), NULL, PAGE_WRITECOPY, 0, 0, NULL);
 
     if (handle != NULL) {
         start = MapViewOfFile(handle, FILE_MAP_COPY, 0, offset, length);
@@ -50,7 +51,7 @@ void* mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset
     return MAP_FAILED;
 }
 
-int munmap(void *start, size_t length)
+int munmap(void* start, size_t length)
 {
     UnmapViewOfFile(start);
     return 0;
@@ -59,53 +60,56 @@ int munmap(void *start, size_t length)
 #pragma GCC diagnostic pop
 #endif
 
-#else // _WIN32
+#else  // _WIN32
 
-#include <unistd.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <unistd.h>
 
-#endif // _WIN32
-#endif // MYFILE_MMAP
+#endif  // _WIN32
+#endif  // MYFILE_MMAP
 
 #ifdef MYFILE_MMAP
 
-rtengine::IMFILE* rtengine::fopen (const char* fname)
+rtengine::IMFILE* rtengine::fopen(const char* fname)
 {
     int fd;
 
 #ifdef _WIN32
 
     fd = -1;
-    // First convert UTF8 to UTF16, then use Windows function to open the file and convert back to file descriptor.
-    std::unique_ptr<wchar_t, GFreeFunc> wfname (reinterpret_cast<wchar_t*>(g_utf8_to_utf16 (fname, -1, NULL, NULL, NULL)), g_free);
+    // First convert UTF8 to UTF16, then use Windows function to open the file and convert
+    // back to file descriptor.
+    std::unique_ptr<wchar_t, GFreeFunc> wfname(
+        reinterpret_cast<wchar_t*>(g_utf8_to_utf16(fname, -1, NULL, NULL, NULL)), g_free);
 
-    HANDLE hFile = CreateFileW (wfname.get (), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE hFile = CreateFileW(wfname.get(), GENERIC_READ, FILE_SHARE_READ, NULL,
+                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (hFile != INVALID_HANDLE_VALUE) {
         fd = _open_osfhandle((intptr_t)hFile, 0);
     }
 
 #else
 
-    fd = ::g_open (fname, O_RDONLY);
+    fd = ::g_open(fname, O_RDONLY);
 
 #endif
 
-    if ( fd < 0 ) {
+    if (fd < 0) {
         return nullptr;
     }
 
     struct stat stat_buffer;
 
-    if ( fstat(fd, &stat_buffer) < 0 ) {
+    if (fstat(fd, &stat_buffer) < 0) {
         printf("no stat\n");
-        close (fd);
+        close(fd);
         return nullptr;
     }
 
     void* data = mmap(nullptr, stat_buffer.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
 
-    if ( data == MAP_FAILED ) {
+    if (data == MAP_FAILED) {
         printf("no mmap %s\n", fname);
         close(fd);
         return nullptr;
@@ -123,16 +127,16 @@ rtengine::IMFILE* rtengine::fopen (const char* fname)
     return mf;
 }
 
-rtengine::IMFILE* rtengine::gfopen (const char* fname)
+rtengine::IMFILE* rtengine::gfopen(const char* fname)
 {
     return fopen(fname);
 }
 #else
 
-rtengine::IMFILE* rtengine::fopen (const char* fname)
+rtengine::IMFILE* rtengine::fopen(const char* fname)
 {
 
-    FILE* f = g_fopen (fname, "rb");
+    FILE* f = g_fopen(fname, "rb");
 
     if (!f) {
         return NULL;
@@ -140,22 +144,22 @@ rtengine::IMFILE* rtengine::fopen (const char* fname)
 
     IMFILE* mf = new IMFILE;
     memset(mf, 0, sizeof(*mf));
-    fseek (f, 0, SEEK_END);
-    mf->size = ftell (f);
-    mf->data = new char [mf->size];
-    fseek (f, 0, SEEK_SET);
-    fread (mf->data, 1, mf->size, f);
-    fclose (f);
+    fseek(f, 0, SEEK_END);
+    mf->size = ftell(f);
+    mf->data = new char[mf->size];
+    fseek(f, 0, SEEK_SET);
+    fread(mf->data, 1, mf->size, f);
+    fclose(f);
     mf->pos = 0;
     mf->eof = false;
 
     return mf;
 }
 
-rtengine::IMFILE* rtengine::gfopen (const char* fname)
+rtengine::IMFILE* rtengine::gfopen(const char* fname)
 {
 
-    FILE* f = g_fopen (fname, "rb");
+    FILE* f = g_fopen(fname, "rb");
 
     if (!f) {
         return NULL;
@@ -163,51 +167,51 @@ rtengine::IMFILE* rtengine::gfopen (const char* fname)
 
     IMFILE* mf = new IMFILE;
     memset(mf, 0, sizeof(*mf));
-    fseek (f, 0, SEEK_END);
-    mf->size = ftell (f);
-    mf->data = new char [mf->size];
-    fseek (f, 0, SEEK_SET);
-    fread (mf->data, 1, mf->size, f);
-    fclose (f);
+    fseek(f, 0, SEEK_END);
+    mf->size = ftell(f);
+    mf->data = new char[mf->size];
+    fseek(f, 0, SEEK_SET);
+    fread(mf->data, 1, mf->size, f);
+    fclose(f);
     mf->pos = 0;
     mf->eof = false;
 
     return mf;
 }
-#endif //MYFILE_MMAP
+#endif  // MYFILE_MMAP
 
-rtengine::IMFILE* rtengine::fopen (unsigned* buf, int size)
+rtengine::IMFILE* rtengine::fopen(unsigned* buf, int size)
 {
 
     IMFILE* mf = new IMFILE;
     memset(mf, 0, sizeof(*mf));
     mf->fd = -1;
     mf->size = size;
-    mf->data = new char [mf->size];
-    memcpy ((void*)mf->data, buf, size);
+    mf->data = new char[mf->size];
+    memcpy((void*)mf->data, buf, size);
     mf->pos = 0;
     mf->eof = false;
     return mf;
 }
 
-void rtengine::fclose (IMFILE* f)
+void rtengine::fclose(IMFILE* f)
 {
 #ifdef MYFILE_MMAP
 
-    if ( f->fd == -1 ) {
-        delete [] f->data;
+    if (f->fd == -1) {
+        delete[] f->data;
     } else {
         munmap((void*)f->data, f->size);
         close(f->fd);
     }
 
 #else
-    delete [] f->data;
+    delete[] f->data;
 #endif
     delete f;
 }
 
-int rtengine::fscanf (IMFILE* f, const char* s ...)
+int rtengine::fscanf(IMFILE* f, const char* s...)
 {
     // fscanf not easily wrapped since we have no terminating \0 at end
     // of file data and vsscanf() won't tell us how many characters that
@@ -223,37 +227,36 @@ int rtengine::fscanf (IMFILE* f, const char* s ...)
     memcpy(buf, &f->data[f->pos], copy_sz);
     buf[copy_sz] = '\0';
     va_list ap;
-    va_start (ap, s);
+    va_start(ap, s);
 
     if (strcmp(s, "%d") == 0) {
         int i = strtol(buf, &endptr, 10);
 
         if (endptr == buf) {
-            va_end (ap);
+            va_end(ap);
             return 0;
         }
 
-        int *pi = va_arg(ap, int*);
+        int* pi = va_arg(ap, int*);
         *pi = i;
     } else if (strcmp(s, "%f") == 0) {
         float f = strtof(buf, &endptr);
 
         if (endptr == buf) {
-            va_end (ap);
+            va_end(ap);
             return 0;
         }
 
-        float *pf = va_arg(ap, float*);
+        float* pf = va_arg(ap, float*);
         *pf = f;
     }
 
-    va_end (ap);
+    va_end(ap);
     f->pos += endptr - buf;
     return 1;
 }
 
-
-char* rtengine::fgets (char* s, int n, IMFILE* f)
+char* rtengine::fgets(char* s, int n, IMFILE* f)
 {
 
     if (f->pos >= f->size) {
@@ -270,7 +273,9 @@ char* rtengine::fgets (char* s, int n, IMFILE* f)
     return s;
 }
 
-void rtengine::imfile_set_plistener(IMFILE *f, rtengine::ProgressListener *plistener, double progress_range)
+void rtengine::imfile_set_plistener(IMFILE* f,
+                                    rtengine::ProgressListener* plistener,
+                                    double progress_range)
 {
     f->plistener = plistener;
     f->progress_range = progress_range;
@@ -278,7 +283,7 @@ void rtengine::imfile_set_plistener(IMFILE *f, rtengine::ProgressListener *plist
     f->progress_current = 0;
 }
 
-void rtengine::imfile_update_progress(IMFILE *f)
+void rtengine::imfile_update_progress(IMFILE* f)
 {
     if (!f->plistener || f->progress_current < f->progress_next) {
         return;
@@ -291,8 +296,9 @@ void rtengine::imfile_update_progress(IMFILE *f)
     double p = (double)f->progress_current / f->size;
 
     if (p > 1.0) {
-        /* this can happen if same bytes are read over and over again. Progress bar is not intended
-           to be exact, just give some progress indication for normal raw file access patterns */
+        /* this can happen if same bytes are read over and over again. Progress bar is not
+           intended to be exact, just give some progress indication for normal raw file
+           access patterns */
         p = 1.0;
     }
 

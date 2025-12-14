@@ -6,9 +6,8 @@
  */
 #pragma once
 
-namespace rtengine
-{
+namespace rtengine {
 
-extern Glib::Thread *batchThread;
+extern Glib::Thread* batchThread;
 
 }

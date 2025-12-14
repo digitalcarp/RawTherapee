@@ -24,8 +24,7 @@
 class ImageArea;
 class RTImage;
 
-class IndicateClippedPanel :
-    public Gtk::Box
+class IndicateClippedPanel : public Gtk::Box
 {
 
 protected:
@@ -48,22 +47,13 @@ public:
     void buttonToggled(Gtk::ToggleButton* tb);
     void toggleClipped(bool highlights);  // inverts a toggle programmatically
     void toggleFocusMask();
-    void silentlyDisableSharpMask();  // toggle the button off without throwing a toggle event
+    void
+    silentlyDisableSharpMask();  // toggle the button off without throwing a toggle event
     void toggleSharpMask();
 
     sigc::connection connFocusMask, connSharpMask, connClippedS, connClippedH;
 
-
-    bool showFocusMask ()
-    {
-        return previewFocusMask->get_active ();
-    }
-    bool showClippedShadows()
-    {
-        return indClippedS->get_active();
-    }
-    bool showClippedHighlights()
-    {
-        return indClippedH->get_active();
-    }
+    bool showFocusMask() { return previewFocusMask->get_active(); }
+    bool showClippedShadows() { return indClippedS->get_active(); }
+    bool showClippedHighlights() { return indClippedH->get_active(); }
 };

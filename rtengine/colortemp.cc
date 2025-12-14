@@ -21,18 +21,15 @@
 
 #include "colortemp.h"
 #include "iccmatrices.h"
+#include "iccstore.h"
 #include "rt_math.h"
+#include "settings.h"
+#include "sleef.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "sleef.h"
-#include "settings.h"
-#include "iccstore.h"
 
-
-namespace rtengine
-{
-
+namespace rtengine {
 
 // clang-format off
 static const color_match_type cie_colour_match_jd2 = {//350nm to 830nm   5 nm J.Desmis 2° Standard Observer.

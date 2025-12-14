@@ -1,5 +1,5 @@
 /** -*- C++ -*-
- *  
+ *
  *  This file is part of RawTherapee.
  *
  *  Copyright (c) 2017 Alberto Griggio <alberto.griggio@gmail.com>
@@ -24,32 +24,40 @@
 
 #include <gtkmm.h>
 
-class LocalContrast final : public ToolParamBlock, public AdjusterListener, public FoldableToolPanel
+class LocalContrast final :
+    public ToolParamBlock,
+    public AdjusterListener,
+    public FoldableToolPanel
 {
 private:
-    Adjuster *radius;
-    Adjuster *amount;
-    Adjuster *darkness;
-    Adjuster *lightness;
+    Adjuster* radius;
+    Adjuster* amount;
+    Adjuster* darkness;
+    Adjuster* lightness;
 
     rtengine::ProcEvent EvLocalContrastEnabled;
     rtengine::ProcEvent EvLocalContrastRadius;
     rtengine::ProcEvent EvLocalContrastAmount;
     rtengine::ProcEvent EvLocalContrastDarkness;
     rtengine::ProcEvent EvLocalContrastLightness;
-    
+
 public:
     static const Glib::ustring TOOL_NAME;
 
     LocalContrast();
 
-    void read(const rtengine::procparams::ProcParams *pp, const ParamsEdited *pedited=nullptr) override;
-    void write(rtengine::procparams::ProcParams *pp, ParamsEdited *pedited=nullptr) override;
-    void setDefaults(const rtengine::procparams::ProcParams *defParams, const ParamsEdited *pedited=nullptr) override;
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
     void setBatchMode(bool batchMode) override;
 
-    void adjusterChanged(Adjuster *a, double newval) override;
+    void adjusterChanged(Adjuster* a, double newval) override;
     void enabledChanged() override;
-    void setAdjusterBehavior(bool radiusAdd, bool amountAdd, bool darknessAdd, bool lightnessAdd);
+    void setAdjusterBehavior(bool radiusAdd,
+                             bool amountAdd,
+                             bool darknessAdd,
+                             bool lightnessAdd);
 };
-

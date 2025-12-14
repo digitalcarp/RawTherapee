@@ -22,9 +22,7 @@
 
 #include "saveformatpanel.h"
 
-class SaveAsDialog final :
-    public Gtk::Dialog,
-    public FormatChangeListener
+class SaveAsDialog final : public Gtk::Dialog, public FormatChangeListener
 {
 
 protected:
@@ -40,28 +38,28 @@ protected:
                                       *  1 -> putToQueueHead
                                       *  2 -> putToQueueTail
                                       */
-    void  forceFmtOptsSwitched ();
-    void  saveImmediatlyClicked ();
-    void  putToQueueClicked ();
+    void forceFmtOptsSwitched();
+    void saveImmediatlyClicked();
+    void putToQueueClicked();
 
 public:
-    explicit SaveAsDialog (const Glib::ustring &initialDir, Gtk::Window* parent);
+    explicit SaveAsDialog(const Glib::ustring& initialDir, Gtk::Window* parent);
 
-    Glib::ustring   getFileName        ();
-    Glib::ustring   getDirectory       ();
-    SaveFormat      getFormat          ();
-    bool            getForceFormatOpts ();
-    bool            getAutoSuffix      ();
-    bool            getImmediately     ();
-    bool            getToHeadOfQueue   ();
-    bool            getToTailOfQueue   ();
-    int             getSaveMethodNum   ();
+    Glib::ustring getFileName();
+    Glib::ustring getDirectory();
+    SaveFormat getFormat();
+    bool getForceFormatOpts();
+    bool getAutoSuffix();
+    bool getImmediately();
+    bool getToHeadOfQueue();
+    bool getToTailOfQueue();
+    int getSaveMethodNum();
 
-    void  setInitialFileName (const Glib::ustring& iname);
-    void  setImagePath (const Glib::ustring& imagePath);
+    void setInitialFileName(const Glib::ustring& iname);
+    void setImagePath(const Glib::ustring& imagePath);
 
-    void okPressed ();
-    void cancelPressed ();
+    void okPressed();
+    void cancelPressed();
     void formatChanged(const Glib::ustring& format) override;
-    bool keyPressed (GdkEventKey* event);
+    bool keyPressed(GdkEventKey* event);
 };

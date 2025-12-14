@@ -24,11 +24,16 @@
 
 #include "rtgui/editcallbacks.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
-PipetteBuffer::PipetteBuffer(::EditDataProvider *dataProvider) :
-    dataProvider(dataProvider), imgFloatBuffer(nullptr), LabBuffer(nullptr), singlePlaneBuffer(), ready(false) {}
+PipetteBuffer::PipetteBuffer(::EditDataProvider* dataProvider)
+    : dataProvider(dataProvider),
+      imgFloatBuffer(nullptr),
+      LabBuffer(nullptr),
+      singlePlaneBuffer(),
+      ready(false)
+{
+}
 
 PipetteBuffer::~PipetteBuffer()
 {
@@ -37,8 +42,8 @@ PipetteBuffer::~PipetteBuffer()
 
 void PipetteBuffer::createBuffer(int width, int height)
 {
-    //printf("Appel de createBuffer %d x %d\n", width, height);
-    resize (width, height);
+    // printf("Appel de createBuffer %d x %d\n", width, height);
+    resize(width, height);
 }
 
 void PipetteBuffer::flush()
@@ -68,7 +73,8 @@ EditUniqueID PipetteBuffer::getEditID()
 
 void PipetteBuffer::resize(int newWidth, int newHeight)
 {
-    resize(newWidth, newHeight, dataProvider ? dataProvider->getCurrSubscriber() : nullptr);
+    resize(newWidth, newHeight,
+           dataProvider ? dataProvider->getCurrSubscriber() : nullptr);
 }
 
 // Resize buffers if they already exist
@@ -88,7 +94,8 @@ void PipetteBuffer::resize(int newWidth, int newHeight, EditSubscriber* newSubsc
             }
 
             if (newSubscriber->getPipetteBufferType() == BT_LABIMAGE) {
-                if (LabBuffer && (LabBuffer->W != newWidth && LabBuffer->H != newHeight)) {
+                if (LabBuffer && (LabBuffer->W != newWidth && LabBuffer->H != newHeight))
+                {
                     delete LabBuffer;
                     LabBuffer = nullptr;
                 }
@@ -184,4 +191,4 @@ void PipetteBuffer::getPipetteData(int x, int y, const int squareSize)
     }
 }
 
-}
+}  // namespace rtengine

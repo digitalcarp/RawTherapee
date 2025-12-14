@@ -20,11 +20,11 @@
 
 #include "homogeneouscoordinates.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
 template <typename T>
-homogeneous::Vector<T> operator*(const homogeneous::Matrix<T>& a, const homogeneous::Vector<T>& b)
+homogeneous::Vector<T> operator*(const homogeneous::Matrix<T>& a,
+                                 const homogeneous::Vector<T>& b)
 {
     homogeneous::Vector<T> prod;
 
@@ -40,7 +40,8 @@ homogeneous::Vector<T> operator*(const homogeneous::Matrix<T>& a, const homogene
 }
 
 template <typename T>
-homogeneous::Matrix<T> operator*(const homogeneous::Matrix<T>& a, const homogeneous::Matrix<T>& b)
+homogeneous::Matrix<T> operator*(const homogeneous::Matrix<T>& a,
+                                 const homogeneous::Matrix<T>& b)
 {
     homogeneous::Matrix<T> prod;
 
@@ -57,11 +58,9 @@ homogeneous::Matrix<T> operator*(const homogeneous::Matrix<T>& a, const homogene
     return prod;
 }
 
-namespace homogeneous
-{
+namespace homogeneous {
 
-template <typename T>
-Matrix<T> projectionMatrix(T location, Axis normal)
+template <typename T> Matrix<T> projectionMatrix(T location, Axis normal)
 {
     Matrix<T> matrix;
 
@@ -77,63 +76,62 @@ Matrix<T> projectionMatrix(T location, Axis normal)
     matrix[3][3] = 0;
 
     switch (normal) {
-        case X:
-            matrix[3][0] = 1;
-            break;
+    case X:
+        matrix[3][0] = 1;
+        break;
 
-        case Y:
-            matrix[3][1] = 1;
-            break;
+    case Y:
+        matrix[3][1] = 1;
+        break;
 
-        case Z:
-            matrix[3][2] = 1;
-            break;
+    case Z:
+        matrix[3][2] = 1;
+        break;
     }
 
     return matrix;
 }
 
-template <typename T>
-Matrix<T> rotationMatrix(double radians, Axis axis)
+template <typename T> Matrix<T> rotationMatrix(double radians, Axis axis)
 {
     Matrix<T> matrix;
 
     switch (axis) {
-        case X:
-            matrix[0][0] = 1;
-            matrix[0][1] = 0;
-            matrix[0][2] = 0;
-            matrix[1][0] = 0;
-            matrix[1][1] = cos(radians);
-            matrix[1][2] = -sin(radians);
-            matrix[2][0] = 0;
-            matrix[2][1] = sin(radians);
-            matrix[2][2] = cos(radians);
-            break;
+    case X:
+        matrix[0][0] = 1;
+        matrix[0][1] = 0;
+        matrix[0][2] = 0;
+        matrix[1][0] = 0;
+        matrix[1][1] = cos(radians);
+        matrix[1][2] = -sin(radians);
+        matrix[2][0] = 0;
+        matrix[2][1] = sin(radians);
+        matrix[2][2] = cos(radians);
+        break;
 
-        case Y:
-            matrix[0][0] = cos(radians);
-            matrix[0][1] = 0;
-            matrix[0][2] = sin(radians);
-            matrix[1][0] = 0;
-            matrix[1][1] = 1;
-            matrix[1][2] = 0;
-            matrix[2][0] = -sin(radians);
-            matrix[2][1] = 0;
-            matrix[2][2] = cos(radians);
-            break;
+    case Y:
+        matrix[0][0] = cos(radians);
+        matrix[0][1] = 0;
+        matrix[0][2] = sin(radians);
+        matrix[1][0] = 0;
+        matrix[1][1] = 1;
+        matrix[1][2] = 0;
+        matrix[2][0] = -sin(radians);
+        matrix[2][1] = 0;
+        matrix[2][2] = cos(radians);
+        break;
 
-        case Z:
-            matrix[0][0] = cos(radians);
-            matrix[0][1] = -sin(radians);
-            matrix[0][2] = 0;
-            matrix[1][0] = sin(radians);
-            matrix[1][1] = cos(radians);
-            matrix[1][2] = 0;
-            matrix[2][0] = 0;
-            matrix[2][1] = 0;
-            matrix[2][2] = 1;
-            break;
+    case Z:
+        matrix[0][0] = cos(radians);
+        matrix[0][1] = -sin(radians);
+        matrix[0][2] = 0;
+        matrix[1][0] = sin(radians);
+        matrix[1][1] = cos(radians);
+        matrix[1][2] = 0;
+        matrix[2][0] = 0;
+        matrix[2][1] = 0;
+        matrix[2][2] = 1;
+        break;
     }
 
     matrix[0][3] = 0;
@@ -147,8 +145,7 @@ Matrix<T> rotationMatrix(double radians, Axis axis)
     return matrix;
 }
 
-template <typename T>
-Matrix<T> scaleMatrix(T x, T y, T z)
+template <typename T> Matrix<T> scaleMatrix(T x, T y, T z)
 {
     Matrix<T> matrix;
 
@@ -164,8 +161,7 @@ Matrix<T> scaleMatrix(T x, T y, T z)
     return matrix;
 }
 
-template <typename T>
-Matrix<T> translationMatrix(T x, T y, T z)
+template <typename T> Matrix<T> translationMatrix(T x, T y, T z)
 {
     Matrix<T> matrix;
 
@@ -186,6 +182,6 @@ Matrix<T> translationMatrix(T x, T y, T z)
     return matrix;
 }
 
-}
+}  // namespace homogeneous
 
-}
+}  // namespace rtengine

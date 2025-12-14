@@ -31,7 +31,7 @@
 class RTAppChooserDialog : public Gtk::AppChooserDialog
 {
 public:
-    RTAppChooserDialog(const Glib::ustring &content_type);
+    RTAppChooserDialog(const Glib::ustring& content_type);
     ~RTAppChooserDialog();
 
     Glib::RefPtr<Gio::AppInfo> get_app_info();

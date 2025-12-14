@@ -17,25 +17,23 @@
  *  along with RawTherapee.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "improcfun.h"
 #include "alpha.h"
-#include "procparams.h"
-#include "imagesource.h"
 #include "imagefloat.h"
+#include "imagesource.h"
+#include "improcfun.h"
+#include "procparams.h"
 #include "rt_math.h"
 #include <iostream>
 #include <set>
 #include <unordered_set>
 
-namespace rtengine
-{
+namespace rtengine {
 
 class SpotBox;
 
 }
 
-namespace
-{
+namespace {
 
 using Boxes = std::vector<std::shared_ptr<rtengine::SpotBox>>;
 
@@ -48,7 +46,10 @@ using Boxes = std::vector<std::shared_ptr<rtengine::SpotBox>>;
  * @param srcSpots Information on spot sources.
  * @param dstSpots Information on spot destinations.
  */
-void addSpotDependencies(int spotNum, std::unordered_set<int> &dependencies, const Boxes &srcSpots, const Boxes &dstSpots);
+void addSpotDependencies(int spotNum,
+                         std::unordered_set<int>& dependencies,
+                         const Boxes& srcSpots,
+                         const Boxes& dstSpots);
 
 /**
  * Returns the supplied spots and all their dependencies.
@@ -57,22 +58,21 @@ void addSpotDependencies(int spotNum, std::unordered_set<int> &dependencies, con
  * @param srcSpots Information on spot sources.
  * @param dstSpots Information on spot destinations.
  */
-std::unordered_set<int> calcSpotDependencies(const std::set<int> &visibleSpots, const Boxes &srcSpots, const Boxes &dstSpots);
-}
+std::unordered_set<int> calcSpotDependencies(const std::set<int>& visibleSpots,
+                                             const Boxes& srcSpots,
+                                             const Boxes& dstSpots);
+}  // namespace
 
-namespace rtengine
+namespace rtengine {
+
+class SpotBox
 {
 
-class SpotBox {
-
 public:
-    enum class Type {
-        SOURCE,
-        TARGET,
-        FINAL
-    };
+    enum class Type { SOURCE, TARGET, FINAL };
 
-    struct Rectangle {
+    struct Rectangle
+    {
         int x1;
         int y1;
         int x2;
@@ -81,29 +81,23 @@ public:
         Rectangle() : Rectangle(0, 0, 0, 0) {}
         Rectangle(int X1, int Y1, int X2, int Y2) : x1(X1), y1(Y1), x2(X2), y2(Y2) {}
 
-        int getWidth() {
-            return x2 - x1 + 1;
-        }
+        int getWidth() { return x2 - x1 + 1; }
 
-        int getHeight() {
-            return y2 - y1 + 1;
-        }
+        int getHeight() { return y2 - y1 + 1; }
 
-        bool intersects(const Rectangle &other) const {
+        bool intersects(const Rectangle& other) const
+        {
             return (other.x1 <= x2 && other.x2 >= x1)
-                && (other.y1 <= y2 && other.y2 >= y1);
+                   && (other.y1 <= y2 && other.y2 >= y1);
         }
 
-        bool getIntersection(const Rectangle &other, std::unique_ptr<Rectangle> &intersection) const {
+        bool getIntersection(const Rectangle& other,
+                             std::unique_ptr<Rectangle>& intersection) const
+        {
             if (intersects(other)) {
-                std::unique_ptr<Rectangle> intsec(
-                    new Rectangle(
-                        rtengine::max(x1, other.x1),
-                        rtengine::max(y1, other.y1),
-                        rtengine::min(x2, other.x2),
-                        rtengine::min(y2, other.y2)
-                    )
-                );
+                std::unique_ptr<Rectangle> intsec(new Rectangle(
+                    rtengine::max(x1, other.x1), rtengine::max(y1, other.y1),
+                    rtengine::min(x2, other.x2), rtengine::min(y2, other.y2)));
 
                 if (intsec->x1 > intsec->x2 || intsec->y1 > intsec->y2) {
                     return false;
@@ -119,7 +113,8 @@ public:
             return false;
         }
 
-        Rectangle& operator+=(const Coord &v) {
+        Rectangle& operator+=(const Coord& v)
+        {
             x1 += v.x;
             y1 += v.y;
             x2 += v.x;
@@ -127,7 +122,8 @@ public:
             return *this;
         }
 
-        Rectangle& operator-=(const Coord &v) {
+        Rectangle& operator-=(const Coord& v)
+        {
             x1 -= v.x;
             y1 -= v.y;
             x2 -= v.x;
@@ -135,7 +131,8 @@ public:
             return *this;
         }
 
-        Rectangle& operator/=(int v) {
+        Rectangle& operator/=(int v)
+        {
             if (v == 1) {
                 return *this;
             }
@@ -158,56 +155,83 @@ private:
     Imagefloat* image;
 
 public:
-    // top/left and bottom/right coordinates of the spot in image space (at some point divided by scale factor)
+    // top/left and bottom/right coordinates of the spot in image space (at some point
+    // divided by scale factor)
     Rectangle spotArea;
-    // top/left and bottom/right coordinates of the spot in scaled image space (on borders, imgArea won't cover spotArea)
+    // top/left and bottom/right coordinates of the spot in scaled image space (on
+    // borders, imgArea won't cover spotArea)
     Rectangle imgArea;
-    // top/left and bottom/right coordinates of useful part of the image in scaled image space (rounding error workaround)
+    // top/left and bottom/right coordinates of useful part of the image in scaled image
+    // space (rounding error workaround)
     Rectangle intersectionArea;
     float radius;
     float featherRadius;
 
-    SpotBox (int tl_x, int tl_y, int br_x, int br_y, int radius, int feather_radius, Imagefloat* image, Type type) :
-       type(type),
-       image(image),
-       spotArea(tl_x, tl_y, br_x, br_y),
-       imgArea(spotArea),
-       intersectionArea(),
-       radius(radius),
-       featherRadius(feather_radius)
-    {}
-
-    SpotBox (int tl_x, int tl_y, int radius, int feather_radius, Imagefloat* image, Type type) :
-       type(type),
-       image(image),
-       spotArea(tl_x, tl_y, image ? tl_x + image->getWidth() - 1 : 0, image ? tl_y + image->getHeight() - 1 : 0),
-       imgArea(spotArea),
-       intersectionArea(),
-       radius(radius),
-       featherRadius(feather_radius)
-    {}
-
-    SpotBox (SpotEntry &spot, Type type) :
-        type(type),
-        image(nullptr),
-        intersectionArea(),
-        radius(spot.radius),
-        featherRadius(int(spot.getFeatherRadius() + 0.5f))  // rounding to int before resizing
+    SpotBox(int tl_x,
+            int tl_y,
+            int br_x,
+            int br_y,
+            int radius,
+            int feather_radius,
+            Imagefloat* image,
+            Type type)
+        : type(type),
+          image(image),
+          spotArea(tl_x, tl_y, br_x, br_y),
+          imgArea(spotArea),
+          intersectionArea(),
+          radius(radius),
+          featherRadius(feather_radius)
     {
-        spotArea.x1 = int ((type == Type::SOURCE ? spot.sourcePos.x : spot.targetPos.x) - featherRadius);
-        spotArea.x2 = int ((type == Type::SOURCE ? spot.sourcePos.x : spot.targetPos.x) + featherRadius);
-        spotArea.y1 = int ((type == Type::SOURCE ? spot.sourcePos.y : spot.targetPos.y) - featherRadius);
-        spotArea.y2 = int ((type == Type::SOURCE ? spot.sourcePos.y : spot.targetPos.y) + featherRadius);
+    }
+
+    SpotBox(int tl_x,
+            int tl_y,
+            int radius,
+            int feather_radius,
+            Imagefloat* image,
+            Type type)
+        : type(type),
+          image(image),
+          spotArea(tl_x,
+                   tl_y,
+                   image ? tl_x + image->getWidth() - 1 : 0,
+                   image ? tl_y + image->getHeight() - 1 : 0),
+          imgArea(spotArea),
+          intersectionArea(),
+          radius(radius),
+          featherRadius(feather_radius)
+    {
+    }
+
+    SpotBox(SpotEntry& spot, Type type)
+        : type(type),
+          image(nullptr),
+          intersectionArea(),
+          radius(spot.radius),
+          featherRadius(
+              int(spot.getFeatherRadius() + 0.5f))  // rounding to int before resizing
+    {
+        spotArea.x1 = int((type == Type::SOURCE ? spot.sourcePos.x : spot.targetPos.x)
+                          - featherRadius);
+        spotArea.x2 = int((type == Type::SOURCE ? spot.sourcePos.x : spot.targetPos.x)
+                          + featherRadius);
+        spotArea.y1 = int((type == Type::SOURCE ? spot.sourcePos.y : spot.targetPos.y)
+                          - featherRadius);
+        spotArea.y2 = int((type == Type::SOURCE ? spot.sourcePos.y : spot.targetPos.y)
+                          + featherRadius);
         imgArea = spotArea;
     }
 
-    ~SpotBox() {
+    ~SpotBox()
+    {
         if (image && type != Type::FINAL) {
             delete image;
         }
     }
 
-    SpotBox& operator /=(int v) {
+    SpotBox& operator/=(int v)
+    {
         if (v == 1) {
             return *this;
         }
@@ -219,38 +243,30 @@ public:
         return *this;
     }
 
-    int getWidth() {
-        return spotArea.getWidth();
-    }
+    int getWidth() { return spotArea.getWidth(); }
 
-    int getHeight() {
-        return spotArea.getHeight();
-    }
+    int getHeight() { return spotArea.getHeight(); }
 
-    int getImageWidth() {
-        return imgArea.getWidth();
-    }
+    int getImageWidth() { return imgArea.getWidth(); }
 
-    int getImageHeight() {
-        return imgArea.getHeight();
-    }
+    int getImageHeight() { return imgArea.getHeight(); }
 
-    int getIntersectionWidth() {
-        return intersectionArea.getWidth();
-    }
+    int getIntersectionWidth() { return intersectionArea.getWidth(); }
 
-    int getIntersectionHeight() {
-        return intersectionArea.getHeight();
-    }
+    int getIntersectionHeight() { return intersectionArea.getHeight(); }
 
-    bool checkImageSize() {
-        if (!image || getImageWidth() != image->getWidth() || getImageHeight() != image->getHeight()) {
+    bool checkImageSize()
+    {
+        if (!image || getImageWidth() != image->getWidth()
+            || getImageHeight() != image->getHeight())
+        {
             return false;
         }
         return true;
     }
 
-    void tuneImageSize() {
+    void tuneImageSize()
+    {
         if (!image) {
             return;
         }
@@ -262,15 +278,20 @@ public:
         }
     }
 
-    Imagefloat *getImage() {  // TODO: this should send back a const value, but getImage don't want it to be const...
+    Imagefloat* getImage()
+    {  // TODO: this should send back a const value, but getImage don't want it to be
+       // const...
         return image;
     }
 
-    void allocImage() {
+    void allocImage()
+    {
         int newW = imgArea.x2 - imgArea.x1 + 1;
         int newH = imgArea.y2 - imgArea.y1 + 1;
 
-        if (image && type != Type::FINAL && (image->getWidth() != newW || image->getHeight() != newH)) {
+        if (image && type != Type::FINAL
+            && (image->getWidth() != newW || image->getHeight() != newH))
+        {
             delete image;
             image = nullptr;
         }
@@ -279,15 +300,19 @@ public:
         }
     }
 
-    bool spotIntersects(const SpotBox &other) const {
+    bool spotIntersects(const SpotBox& other) const
+    {
         return spotArea.intersects(other.spotArea);
     }
 
-    bool getSpotIntersection(const SpotBox &other, std::unique_ptr<Rectangle> &intersection) const {
+    bool getSpotIntersection(const SpotBox& other,
+                             std::unique_ptr<Rectangle>& intersection) const
+    {
         return spotArea.getIntersection(other.spotArea, intersection);
     }
 
-    bool imageIntersects(const SpotBox &other, bool atDestLocation=false) const {
+    bool imageIntersects(const SpotBox& other, bool atDestLocation = false) const
+    {
         if (atDestLocation) {
             Coord v(other.spotArea.x1 - spotArea.x1, other.spotArea.y1 - spotArea.y1);
             Rectangle imgArea2(imgArea.x1, imgArea.y1, imgArea.x2, imgArea.y2);
@@ -297,7 +322,8 @@ public:
         return imgArea.intersects(other.imgArea);
     }
 
-    bool mutuallyClipImageArea(SpotBox &other) {
+    bool mutuallyClipImageArea(SpotBox& other)
+    {
         Coord v(other.spotArea.x1 - spotArea.x1, other.spotArea.y1 - spotArea.y1);
         Rectangle imgArea2 = imgArea;
         imgArea2 += v;
@@ -312,7 +338,8 @@ public:
         return true;
     }
 
-    bool setIntersectionWith(const SpotBox &other) {
+    bool setIntersectionWith(const SpotBox& other)
+    {
         if (!spotIntersects(other)) {
             return false;
         }
@@ -326,18 +353,20 @@ public:
         return true;
     }
 
-    bool processIntersectionWith(SpotBox &destBox) {
-        Imagefloat *dstImg = destBox.image;
+    bool processIntersectionWith(SpotBox& destBox)
+    {
+        Imagefloat* dstImg = destBox.image;
 
         if (image == nullptr || dstImg == nullptr) {
-            std::cerr << "One of the source or destination SpotBox image is missing !" << std::endl;
+            std::cerr << "One of the source or destination SpotBox image is missing !"
+                      << std::endl;
             return false;
         }
 
         int srcImgY = intersectionArea.y1 - imgArea.y1;
         int dstImgY = destBox.intersectionArea.y1 - destBox.imgArea.y1;
         for (int y = intersectionArea.y1; y <= intersectionArea.y2; ++y) {
-            float  dy = float(y - spotArea.y1) - featherRadius;
+            float dy = float(y - spotArea.y1) - featherRadius;
 
             int srcImgX = intersectionArea.x1 - imgArea.x1;
             int dstImgX = destBox.intersectionArea.x1 - destBox.imgArea.x1;
@@ -356,9 +385,18 @@ public:
                     dstImg->b(dstImgY, dstImgX) = image->b(srcImgY, srcImgX);
                 } else {
                     float opacity = (featherRadius - r) / (featherRadius - radius);
-                    dstImg->r(dstImgY, dstImgX) = (image->r(srcImgY, srcImgX) - dstImg->r(dstImgY, dstImgX)) * opacity + dstImg->r(dstImgY,dstImgX);
-                    dstImg->g(dstImgY, dstImgX) = (image->g(srcImgY, srcImgX) - dstImg->g(dstImgY, dstImgX)) * opacity + dstImg->g(dstImgY,dstImgX);
-                    dstImg->b(dstImgY, dstImgX) = (image->b(srcImgY, srcImgX) - dstImg->b(dstImgY, dstImgX)) * opacity + dstImg->b(dstImgY,dstImgX);
+                    dstImg->r(dstImgY, dstImgX) =
+                        (image->r(srcImgY, srcImgX) - dstImg->r(dstImgY, dstImgX))
+                            * opacity
+                        + dstImg->r(dstImgY, dstImgX);
+                    dstImg->g(dstImgY, dstImgX) =
+                        (image->g(srcImgY, srcImgX) - dstImg->g(dstImgY, dstImgX))
+                            * opacity
+                        + dstImg->g(dstImgY, dstImgX);
+                    dstImg->b(dstImgY, dstImgX) =
+                        (image->b(srcImgY, srcImgX) - dstImg->b(dstImgY, dstImgX))
+                            * opacity
+                        + dstImg->b(dstImgY, dstImgX);
                 }
                 ++srcImgX;
                 ++dstImgX;
@@ -371,11 +409,13 @@ public:
     }
 
     // Copy the intersecting part
-    bool copyImgTo(SpotBox &destBox) {
-        Imagefloat *destImg = destBox.image;
+    bool copyImgTo(SpotBox& destBox)
+    {
+        Imagefloat* destImg = destBox.image;
 
         if (image == nullptr || destImg == nullptr) {
-            std::cerr << "One of the source or destination SpotBox image is missing !" << std::endl;
+            std::cerr << "One of the source or destination SpotBox image is missing !"
+                      << std::endl;
             return false;
         }
 
@@ -385,8 +425,8 @@ public:
             return false;
         }
 
-        Imagefloat *srcImg = image;
-        Imagefloat *dstImg = destBox.image;
+        Imagefloat* srcImg = image;
+        Imagefloat* dstImg = destBox.image;
 
         int srcImgY = intersection->y1 - imgArea.y1;
         int dstImgY = intersection->y1 - destBox.imgArea.y1;
@@ -409,27 +449,33 @@ public:
     }
 };
 
-void ImProcFunctions::removeSpots (Imagefloat* img, ImageSource* imgsrc, const std::vector<SpotEntry> &entries, const PreviewProps &pp, const ColorTemp &currWB, const ColorManagementParams *cmp, int tr)
+void ImProcFunctions::removeSpots(Imagefloat* img,
+                                  ImageSource* imgsrc,
+                                  const std::vector<SpotEntry>& entries,
+                                  const PreviewProps& pp,
+                                  const ColorTemp& currWB,
+                                  const ColorManagementParams* cmp,
+                                  int tr)
 {
-    //Get the clipped image areas (src & dst) from the source image
+    // Get the clipped image areas (src & dst) from the source image
 
-    std::vector< std::shared_ptr<SpotBox> > srcSpotBoxs;
-    std::vector< std::shared_ptr<SpotBox> > dstSpotBoxs;
+    std::vector<std::shared_ptr<SpotBox>> srcSpotBoxs;
+    std::vector<std::shared_ptr<SpotBox>> dstSpotBoxs;
     int fullImgWidth = 0;
     int fullImgHeight = 0;
     imgsrc->getFullSize(fullImgWidth, fullImgHeight, tr);
-    SpotBox fullImageBox(0, 0, fullImgWidth - 1, fullImgHeight - 1, 0, 0, nullptr, SpotBox::Type::FINAL);
-    SpotBox cropBox(pp.getX(), pp.getY(),
-                    pp.getX() + pp.getWidth() - 1, pp.getY() + pp.getHeight() - 1,
-                    0, 0, img, SpotBox::Type::FINAL);
+    SpotBox fullImageBox(0, 0, fullImgWidth - 1, fullImgHeight - 1, 0, 0, nullptr,
+                         SpotBox::Type::FINAL);
+    SpotBox cropBox(pp.getX(), pp.getY(), pp.getX() + pp.getWidth() - 1,
+                    pp.getY() + pp.getHeight() - 1, 0, 0, img, SpotBox::Type::FINAL);
 
-    std::set<int> visibleSpots;   // list of dest spots intersecting the preview's crop
+    std::set<int> visibleSpots;  // list of dest spots intersecting the preview's crop
     int i = 0;
 
     for (auto entry : params->spot.entries) {
-        std::shared_ptr<SpotBox> srcSpotBox(new SpotBox(entry,  SpotBox::Type::SOURCE));
-        std::shared_ptr<SpotBox> dstSpotBox(new SpotBox(entry,  SpotBox::Type::TARGET));
-        if (   !srcSpotBox->setIntersectionWith(fullImageBox)
+        std::shared_ptr<SpotBox> srcSpotBox(new SpotBox(entry, SpotBox::Type::SOURCE));
+        std::shared_ptr<SpotBox> dstSpotBox(new SpotBox(entry, SpotBox::Type::TARGET));
+        if (!srcSpotBox->setIntersectionWith(fullImageBox)
             || !dstSpotBox->setIntersectionWith(fullImageBox)
             || !srcSpotBox->imageIntersects(*dstSpotBox, true))
         {
@@ -444,13 +490,14 @@ void ImProcFunctions::removeSpots (Imagefloat* img, ImageSource* imgsrc, const s
 
         // Source area
         PreviewProps spp(srcSpotBox->imgArea.x1, srcSpotBox->imgArea.y1,
-                         srcSpotBox->getImageWidth(), srcSpotBox->getImageHeight(), pp.getSkip());
+                         srcSpotBox->getImageWidth(), srcSpotBox->getImageHeight(),
+                         pp.getSkip());
         int w = 0;
         int h = 0;
         imgsrc->getSize(spp, w, h);
         *srcSpotBox /= pp.getSkip();
         srcSpotBox->allocImage();
-        Imagefloat *srcImage = srcSpotBox->getImage();
+        Imagefloat* srcImage = srcSpotBox->getImage();
         for (int y = 0; y < (int)srcImage->getHeight(); ++y) {
             for (int x = 0; x < (int)srcImage->getWidth(); ++x) {
                 srcImage->r(y, x) = 60000.f;
@@ -459,19 +506,19 @@ void ImProcFunctions::removeSpots (Imagefloat* img, ImageSource* imgsrc, const s
             }
         }
 
-        imgsrc->getImage(currWB, tr, srcSpotBox->getImage(), spp, params->toneCurve, params->raw);
+        imgsrc->getImage(currWB, tr, srcSpotBox->getImage(), spp, params->toneCurve,
+                         params->raw);
         if (cmp) {
             imgsrc->convertColorSpace(srcImage, *cmp, currWB);
         }
         assert(srcSpotBox->checkImageSize());
 
-
         // Destination area
-        spp.set(dstSpotBox->imgArea.x1, dstSpotBox->imgArea.y1, dstSpotBox->getImageWidth(),
-                dstSpotBox->getImageHeight(), pp.getSkip());
+        spp.set(dstSpotBox->imgArea.x1, dstSpotBox->imgArea.y1,
+                dstSpotBox->getImageWidth(), dstSpotBox->getImageHeight(), pp.getSkip());
         *dstSpotBox /= pp.getSkip();
         dstSpotBox->allocImage();
-        Imagefloat *dstImage = dstSpotBox->getImage();
+        Imagefloat* dstImage = dstSpotBox->getImage();
         for (int y = 0; y < (int)dstImage->getHeight(); ++y) {
             for (int x = 0; x < (int)dstImage->getWidth(); ++x) {
                 dstImage->r(y, x) = 500.f;
@@ -479,7 +526,8 @@ void ImProcFunctions::removeSpots (Imagefloat* img, ImageSource* imgsrc, const s
                 dstImage->b(y, x) = 60000.f;
             }
         }
-        imgsrc->getImage(currWB, tr, dstSpotBox->getImage(), spp, params->toneCurve, params->raw);
+        imgsrc->getImage(currWB, tr, dstSpotBox->getImage(), spp, params->toneCurve,
+                         params->raw);
         if (cmp) {
             imgsrc->convertColorSpace(dstImage, *cmp, currWB);
         }
@@ -490,12 +538,12 @@ void ImProcFunctions::removeSpots (Imagefloat* img, ImageSource* imgsrc, const s
             srcSpotBoxs.push_back(srcSpotBox);
             dstSpotBoxs.push_back(dstSpotBox);
         }
-
     }
 
     // Construct list of upstream dependencies
 
-    std::unordered_set<int> requiredSpotsSet = calcSpotDependencies(visibleSpots, srcSpotBoxs, dstSpotBoxs);
+    std::unordered_set<int> requiredSpotsSet =
+        calcSpotDependencies(visibleSpots, srcSpotBoxs, dstSpotBoxs);
     std::vector<int> requiredSpots(requiredSpotsSet.size());
     std::copy(requiredSpotsSet.begin(), requiredSpotsSet.end(), requiredSpots.begin());
     std::sort(requiredSpots.begin(), requiredSpots.end());
@@ -534,19 +582,21 @@ void ImProcFunctions::removeSpots (Imagefloat* img, ImageSource* imgsrc, const s
     }
 }
 
-}
+}  // namespace rtengine
 
-namespace
-{
+namespace {
 
-void addSpotDependencies(int spotNum, std::unordered_set<int> &dependencies, const Boxes &srcSpots, const Boxes &dstSpots)
+void addSpotDependencies(int spotNum,
+                         std::unordered_set<int>& dependencies,
+                         const Boxes& srcSpots,
+                         const Boxes& dstSpots)
 {
     dependencies.insert(spotNum);
 
     // Our spot can depend on previous spots.
     for (int i = spotNum - 1; i >= 0; --i) {
         if (dependencies.find(i) != dependencies.end()) {
-            continue; // Spot already has its dependencies added.
+            continue;  // Spot already has its dependencies added.
         }
 
         // Check if our spot depends on this previous spot.
@@ -557,7 +607,9 @@ void addSpotDependencies(int spotNum, std::unordered_set<int> &dependencies, con
     }
 }
 
-std::unordered_set<int> calcSpotDependencies(const std::set<int> &visibleSpots, const Boxes &srcSpots, const Boxes &dstSpots)
+std::unordered_set<int> calcSpotDependencies(const std::set<int>& visibleSpots,
+                                             const Boxes& srcSpots,
+                                             const Boxes& dstSpots)
 {
     std::unordered_set<int> dependencies;
     std::vector<int> visibleSpotsOrdered(visibleSpots.size());
@@ -568,7 +620,7 @@ std::unordered_set<int> calcSpotDependencies(const std::set<int> &visibleSpots, 
     // Add dependencies, starting with the last spot.
     for (auto i = visibleSpotsOrdered.crbegin(); i != visibleSpotsOrdered.crend(); ++i) {
         if (dependencies.find(*i) != dependencies.end()) {
-            continue; // Spot already has its dependencies added.
+            continue;  // Spot already has its dependencies added.
         }
         addSpotDependencies(*i, dependencies, srcSpots, dstSpots);
     }
@@ -576,5 +628,4 @@ std::unordered_set<int> calcSpotDependencies(const std::set<int> &visibleSpots, 
     return dependencies;
 }
 
-}
-
+}  // namespace

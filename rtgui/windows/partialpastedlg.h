@@ -20,17 +20,14 @@
 
 #include <gtkmm.h>
 
-namespace rtengine
-{
-namespace procparams
-{
+namespace rtengine {
+namespace procparams {
 
 class ProcParams;
 
-
 }
 
-}
+}  // namespace rtengine
 
 struct ParamsEdited;
 
@@ -39,11 +36,7 @@ class PartialSpotWidget;
 class PartialSpotWidgetListener
 {
 public:
-    enum UpdateStatus {
-        AllSelection = 1,
-        NoSelection = 2,
-        PartialSelection = 3
-    };
+    enum UpdateStatus { AllSelection = 1, NoSelection = 2, PartialSelection = 3 };
 
 public:
     PartialSpotWidgetListener() {};
@@ -53,13 +46,11 @@ public:
 };
 
 /* ==== PartialSpotWidget ==== */
-class PartialSpotWidget:
-    public Gtk::Box
+class PartialSpotWidget : public Gtk::Box
 {
 private:
     // Tree model to manage spot selection widget
-    class SpotRow:
-        public Gtk::TreeModel::ColumnRecord
+    class SpotRow : public Gtk::TreeModel::ColumnRecord
     {
     public:
         Gtk::TreeModelColumn<bool> keep;
@@ -91,7 +82,8 @@ public:
     }
 
     // Spot selection widget management functions
-    void updateSpotWidget(const rtengine::procparams::ProcParams* pp, const bool defValue);
+    void updateSpotWidget(const rtengine::procparams::ProcParams* pp,
+                          const bool defValue);
     void enableAll();
     void disableAll();
     std::vector<bool> getSelectionStatus();
@@ -102,18 +94,15 @@ private:
     void render_spotname(Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter);
 
     // Event management function
-    void keepToggled(const Glib::ustring &path);
+    void keepToggled(const Glib::ustring& path);
 };
 
 /* ==== PartialPasteDlg ==== */
-class PartialPasteDlg final:
-    public Gtk::Dialog,
-    public PartialSpotWidgetListener
+class PartialPasteDlg final : public Gtk::Dialog, public PartialSpotWidgetListener
 {
 
 public:
-
-    Gtk::ScrolledWindow *scrolledwindow;
+    Gtk::ScrolledWindow* scrolledwindow;
 
     Gtk::CheckButton* everything;
 
@@ -148,7 +137,7 @@ public:
     Gtk::CheckButton* sharpenedge;
     Gtk::CheckButton* sharpenmicro;
     Gtk::CheckButton* impden;
-    //Gtk::CheckButton* waveq;
+    // Gtk::CheckButton* waveq;
     Gtk::CheckButton* dirpyrden;
     Gtk::CheckButton* defringe;
     Gtk::CheckButton* dirpyreq;
@@ -186,7 +175,7 @@ public:
     Gtk::CheckButton* commonTrans;
 
     // options in meta:
-    Gtk::CheckButton *metadata;
+    Gtk::CheckButton* metadata;
     Gtk::CheckButton* exifch;
     Gtk::CheckButton* iptc;
 
@@ -226,36 +215,51 @@ public:
     Gtk::CheckButton* captureSharpening;
     Gtk::CheckButton* raw_preprocwb;
 
-    sigc::connection everythingConn, basicConn, detailConn, colorConn, lensConn, compositionConn, metaConn, rawConn, advancedConn;
+    sigc::connection everythingConn, basicConn, detailConn, colorConn, lensConn,
+        compositionConn, metaConn, rawConn, advancedConn;
     sigc::connection locallabConn;
-    sigc::connection wbConn, exposureConn, localcontrastConn, shConn, pcvignetteConn, gradientConn, labcurveConn, colorappearanceConn;
+    sigc::connection wbConn, exposureConn, localcontrastConn, shConn, pcvignetteConn,
+        gradientConn, labcurveConn, colorappearanceConn;
     sigc::connection toneEqualizerConn;
-    sigc::connection spotConn, sharpenConn, gradsharpenConn, microcontrastConn, impdenConn, dirpyrdenConn, defringeConn, epdConn, fattalConn, dirpyreqConn, waveletConn, retinexConn, dehazeConn;
-    sigc::connection compressGamutConn, vibranceConn, chmixerConn, hsveqConn, rgbcurvesConn, chmixerbwConn, colortoningConn, filmSimulationConn, softlightConn;
+    sigc::connection spotConn, sharpenConn, gradsharpenConn, microcontrastConn,
+        impdenConn, dirpyrdenConn, defringeConn, epdConn, fattalConn, dirpyreqConn,
+        waveletConn, retinexConn, dehazeConn;
+    sigc::connection compressGamutConn, vibranceConn, chmixerConn, hsveqConn,
+        rgbcurvesConn, chmixerbwConn, colortoningConn, filmSimulationConn, softlightConn;
     sigc::connection distortionConn, cacorrConn, vignettingConn, lcpConn;
-    sigc::connection coarserotConn, finerotConn, cropConn, resizeConn, prsharpeningConn, framingConn, perspectiveConn, commonTransConn;
+    sigc::connection coarserotConn, finerotConn, cropConn, resizeConn, prsharpeningConn,
+        framingConn, perspectiveConn, commonTransConn;
     sigc::connection metadataConn, exifchConn, iptcConn, icmConn;
-    sigc::connection df_fileConn, df_AutoSelectConn, ff_fileConn, ff_AutoSelectConn, ff_FromMetaDataConn, ff_BlurRadiusConn, ff_BlurTypeConn, ff_ClipControlConn;
-    sigc::connection raw_caredblueConn, raw_ca_autocorrectConn, raw_ca_avoid_colourshiftconn, raw_hotpix_filtConn, raw_deadpix_filtConn, raw_pdaf_lines_filterConn, raw_linenoiseConn, raw_greenthreshConn, raw_ccStepsConn, raw_methodConn, raw_borderConn, raw_imagenumConn, raw_dcb_iterationsConn, raw_lmmse_iterationsConn, raw_pixelshiftConn, raw_dcb_enhanceConn, raw_exposConn, raw_blackConn;
+    sigc::connection df_fileConn, df_AutoSelectConn, ff_fileConn, ff_AutoSelectConn,
+        ff_FromMetaDataConn, ff_BlurRadiusConn, ff_BlurTypeConn, ff_ClipControlConn;
+    sigc::connection raw_caredblueConn, raw_ca_autocorrectConn,
+        raw_ca_avoid_colourshiftconn, raw_hotpix_filtConn, raw_deadpix_filtConn,
+        raw_pdaf_lines_filterConn, raw_linenoiseConn, raw_greenthreshConn,
+        raw_ccStepsConn, raw_methodConn, raw_borderConn, raw_imagenumConn,
+        raw_dcb_iterationsConn, raw_lmmse_iterationsConn, raw_pixelshiftConn,
+        raw_dcb_enhanceConn, raw_exposConn, raw_blackConn;
     sigc::connection filmNegativeConn;
     sigc::connection captureSharpeningConn;
     sigc::connection raw_preprocwbConn;
 
 public:
-    PartialPasteDlg (const Glib::ustring &title, Gtk::Window* parent);
+    PartialPasteDlg(const Glib::ustring& title, Gtk::Window* parent);
 
-    void applyPaste (rtengine::procparams::ProcParams* dstPP, ParamsEdited* dstPE, const rtengine::procparams::ProcParams* srcPP, const ParamsEdited* srcPE = nullptr);
+    void applyPaste(rtengine::procparams::ProcParams* dstPP,
+                    ParamsEdited* dstPE,
+                    const rtengine::procparams::ProcParams* srcPP,
+                    const ParamsEdited* srcPE = nullptr);
 
-    void everythingToggled ();
-    void basicToggled ();
-    void detailToggled ();
-    void colorToggled ();
-    void lensToggled ();
-    void compositionToggled ();
-    void metaToggled ();
-    void rawToggled ();
-    void advancedToggled ();
-    void locallabToggled ();
+    void everythingToggled();
+    void basicToggled();
+    void detailToggled();
+    void colorToggled();
+    void lensToggled();
+    void compositionToggled();
+    void metaToggled();
+    void rawToggled();
+    void advancedToggled();
+    void locallabToggled();
 
     void updateSpotWidget(const rtengine::procparams::ProcParams* pp);
     void partialSpotUpdated(const UpdateStatus status);

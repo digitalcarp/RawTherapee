@@ -23,8 +23,8 @@
 
 #include <gtkmm.h>
 
-#include "thumbimageupdater.h"
 #include "thumbbrowserentrybase.h"
+#include "thumbimageupdater.h"
 
 #include "guiutils.h"
 #include "threadutils.h"
@@ -36,33 +36,38 @@
 #include <omp.h>
 #endif
 
-#define DEBUG(format,args...)
-//#define DEBUG(format,args...) printf("ThumbImageUpdate::%s: " format "\n", __FUNCTION__, ## args)
+#define DEBUG(format, args...)
+// #define DEBUG(format,args...) printf("ThumbImageUpdate::%s: " format "\n",
+// __FUNCTION__, ## args)
 
-class ThumbImageUpdater::Impl :
-    public rtengine::NonCopyable
+class ThumbImageUpdater::Impl : public rtengine::NonCopyable
 {
 public:
+    struct Job
+    {
+        Job(ThumbBrowserEntryBase* tbe,
+            bool* priority,
+            bool upgrade,
+            bool forceUpgrade,
+            ThumbImageUpdateListener* listener)
+            : tbe_(tbe),
+              /*pparams_(pparams),
+              height_(height), */
+              priority_(priority),
+              upgrade_(upgrade),
+              force_upgrade_(forceUpgrade),
+              listener_(listener)
+        {
+        }
 
-    struct Job {
-        Job(ThumbBrowserEntryBase* tbe, bool* priority, bool upgrade,
-            bool forceUpgrade, ThumbImageUpdateListener* listener):
-            tbe_(tbe),
-            /*pparams_(pparams),
-            height_(height), */
-            priority_(priority),
-            upgrade_(upgrade),
-            force_upgrade_(forceUpgrade),
-            listener_(listener)
-        {}
-
-        Job():
-            tbe_(nullptr),
-            priority_(nullptr),
-            upgrade_(false),
-            force_upgrade_(false),
-            listener_(nullptr)
-        {}
+        Job()
+            : tbe_(nullptr),
+              priority_(nullptr),
+              upgrade_(false),
+              force_upgrade_(false),
+              listener_(nullptr)
+        {
+        }
 
         ThumbBrowserEntryBase* tbe_;
         /*rtengine::procparams::ProcParams pparams_;
@@ -75,9 +80,7 @@ public:
 
     typedef std::list<Job> JobList;
 
-    Impl():
-        active_(0),
-        inactive_waiting_(false)
+    Impl() : active_(0), inactive_waiting_(false)
     {
         int threadCount = 1;
 #ifdef _OPENMP
@@ -90,7 +93,8 @@ public:
     std::unique_ptr<Glib::ThreadPool> threadPool_;
 
     // Need to be a std::mutex because used in a std::condition_variable object...
-    // This is the only exceptions along with GThreadMutex (guiutils.cc), MyMutex is used everywhere else
+    // This is the only exceptions along with GThreadMutex (guiutils.cc), MyMutex is used
+    // everywhere else
     std::mutex mutex_;
 
     JobList jobs_;
@@ -101,8 +105,7 @@ public:
 
     std::condition_variable inactive_;
 
-    void
-    processNextJob()
+    void processNextJob()
     {
         Job j;
 
@@ -110,7 +113,7 @@ public:
             std::lock_guard<std::mutex> lock(mutex_);
 
             // nothing to do; could be jobs have been removed
-            if ( jobs_.empty() ) {
+            if (jobs_.empty()) {
                 DEBUG("processing: nothing to do (%d)", jobs_.empty());
                 return;
             }
@@ -118,25 +121,27 @@ public:
             JobList::iterator i;
 
             // see if any priority jobs exist
-            for ( i = jobs_.begin(); i != jobs_.end(); ++i) {
-                if ( *(i->priority_) ) {
-                    DEBUG("processing(priority) %s", i->tbe_->thumbnail->getFileName().c_str());
+            for (i = jobs_.begin(); i != jobs_.end(); ++i) {
+                if (*(i->priority_)) {
+                    DEBUG("processing(priority) %s",
+                          i->tbe_->thumbnail->getFileName().c_str());
                     break;
                 }
             }
 
             // see if any none upgrade jobs exist
-            if ( i == jobs_.end() ) {
-                for ( i = jobs_.begin(); i != jobs_.end(); ++i) {
-                    if ( !i->upgrade_ ) {
-                        DEBUG("processing(not-upgrade) %s", i->tbe_->thumbnail->getFileName().c_str());
+            if (i == jobs_.end()) {
+                for (i = jobs_.begin(); i != jobs_.end(); ++i) {
+                    if (!i->upgrade_) {
+                        DEBUG("processing(not-upgrade) %s",
+                              i->tbe_->thumbnail->getFileName().c_str());
                         break;
                     }
                 }
             }
 
             // if none, then use first
-            if ( i == jobs_.end() ) {
+            if (i == jobs_.end()) {
                 i = jobs_.begin();
                 DEBUG("processing(first) %s", i->tbe_->thumbnail->getFileName().c_str());
             }
@@ -146,7 +151,7 @@ public:
 
             // remove so not run again
             jobs_.erase(i);
-            DEBUG("%d job(s) remaining", int(jobs_.size()) );
+            DEBUG("%d job(s) remaining", int(jobs_.size()));
 
             ++active_;
         }
@@ -161,9 +166,10 @@ public:
         int device_scale = size_and_scale.second;
         int preview_height = logical.scaleToDevice(device_scale).height;
 
-        if ( j.upgrade_ ) {
-            if ( thm->isQuick() || j.force_upgrade_ ) {
-                img = thm->upgradeThumbImage(thm->getProcParams(), preview_height, scale, j.force_upgrade_);
+        if (j.upgrade_) {
+            if (thm->isQuick() || j.force_upgrade_) {
+                img = thm->upgradeThumbImage(thm->getProcParams(), preview_height, scale,
+                                             j.force_upgrade_);
             }
         } else {
             img = thm->processThumbImage(thm->getProcParams(), preview_height, scale);
@@ -171,11 +177,12 @@ public:
 
         if (img) {
             DEBUG("pushing image %s", thm->getFileName().c_str());
-            ThumbImageUpdateListener::ImageUpdate update(img, logical, device_scale, scale, thm->getProcParams().crop);
+            ThumbImageUpdateListener::ImageUpdate update(
+                img, logical, device_scale, scale, thm->getProcParams().crop);
             j.listener_->updateImage(update);
         }
 
-        if ( --active_ == 0 ) {
+        if (--active_ == 0) {
             std::lock_guard<std::mutex> lock(mutex_);
             if (inactive_waiting_) {
                 inactive_waiting_ = false;
@@ -185,26 +192,27 @@ public:
     }
 };
 
-ThumbImageUpdater*
-ThumbImageUpdater::getInstance()
+ThumbImageUpdater* ThumbImageUpdater::getInstance()
 {
     static ThumbImageUpdater instance_;
     return &instance_;
 }
 
-ThumbImageUpdater::ThumbImageUpdater():
-    impl_(new Impl())
-{
-}
+ThumbImageUpdater::ThumbImageUpdater() : impl_(new Impl()) {}
 
-ThumbImageUpdater::~ThumbImageUpdater() {
+ThumbImageUpdater::~ThumbImageUpdater()
+{
     delete impl_;
 }
 
-void ThumbImageUpdater::add(ThumbBrowserEntryBase* tbe, bool* priority, bool upgrade, bool forceUpgrade, ThumbImageUpdateListener* l)
+void ThumbImageUpdater::add(ThumbBrowserEntryBase* tbe,
+                            bool* priority,
+                            bool upgrade,
+                            bool forceUpgrade,
+                            ThumbImageUpdateListener* l)
 {
     // nobody listening?
-    if ( l == nullptr ) {
+    if (l == nullptr) {
         return;
     }
 
@@ -213,11 +221,10 @@ void ThumbImageUpdater::add(ThumbBrowserEntryBase* tbe, bool* priority, bool upg
     // look up if an older version is in the queue
     Impl::JobList::iterator i(impl_->jobs_.begin());
 
-    for ( ; i != impl_->jobs_.end(); ++i ) {
-        if ( i->tbe_ == tbe &&
-                i->listener_ == l &&
-                i->upgrade_ == upgrade &&
-                i->force_upgrade_ == forceUpgrade) {
+    for (; i != impl_->jobs_.end(); ++i) {
+        if (i->tbe_ == tbe && i->listener_ == l && i->upgrade_ == upgrade
+            && i->force_upgrade_ == forceUpgrade)
+        {
             DEBUG("updating job %s", tbe->shortname.c_str());
             // we have one, update queue entry, will be picked up by thread when processed
             /*i->pparams_ = params;
@@ -232,9 +239,9 @@ void ThumbImageUpdater::add(ThumbBrowserEntryBase* tbe, bool* priority, bool upg
     impl_->jobs_.push_back(Impl::Job(tbe, priority, upgrade, forceUpgrade, l));
 
     DEBUG("adding run request %s", tbe->shortname.c_str());
-    impl_->threadPool_->push(sigc::mem_fun(*impl_, &ThumbImageUpdater::Impl::processNextJob));
+    impl_->threadPool_->push(
+        sigc::mem_fun(*impl_, &ThumbImageUpdater::Impl::processNextJob));
 }
-
 
 void ThumbImageUpdater::removeJobs(ThumbImageUpdateListener* listener)
 {
@@ -243,7 +250,7 @@ void ThumbImageUpdater::removeJobs(ThumbImageUpdateListener* listener)
     {
         std::lock_guard<std::mutex> lock(impl_->mutex_);
 
-        for( Impl::JobList::iterator i(impl_->jobs_.begin()); i != impl_->jobs_.end(); ) {
+        for (Impl::JobList::iterator i(impl_->jobs_.begin()); i != impl_->jobs_.end();) {
             if (i->listener_ == listener) {
                 DEBUG("erasing specific job");
                 Impl::JobList::iterator e(i++);
@@ -254,7 +261,7 @@ void ThumbImageUpdater::removeJobs(ThumbImageUpdateListener* listener)
         }
     }
 
-    while ( impl_->active_ != 0 ) {
+    while (impl_->active_ != 0) {
         DEBUG("waiting for running jobs1");
         {
             std::unique_lock<std::mutex> lock(impl_->mutex_);
@@ -274,7 +281,7 @@ void ThumbImageUpdater::removeAllJobs()
         impl_->jobs_.clear();
     }
 
-    while ( impl_->active_ != 0 ) {
+    while (impl_->active_ != 0) {
         DEBUG("waiting for running jobs2");
         {
             std::unique_lock<std::mutex> lock(impl_->mutex_);
@@ -283,4 +290,3 @@ void ThumbImageUpdater::removeAllJobs()
         }
     }
 }
-

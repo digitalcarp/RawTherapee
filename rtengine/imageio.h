@@ -18,8 +18,8 @@
  */
 #pragma once
 
-#include <memory>
 #include <glibmm/ustring.h>
+#include <memory>
 
 #include "iimage.h"
 #include "imagedimensions.h"
@@ -38,16 +38,14 @@ enum {
     IMIO_CANNOTWRITEFILE
 };
 
-namespace rtengine
-{
+namespace rtengine {
 
-namespace procparams
-{
+namespace procparams {
 
 class ExifPairs;
 class IPTCPairs;
 
-}
+}  // namespace procparams
 
 class ColorTemp;
 class ProgressListener;
@@ -69,59 +67,68 @@ protected:
     Exiv2Metadata metadataInfo;
 
 private:
-    void deleteLoadedProfileData( );
+    void deleteLoadedProfileData();
 
 public:
     ImageIO();
     ~ImageIO() override;
 
-    void setProgressListener (ProgressListener* l);
+    void setProgressListener(ProgressListener* l);
     void setSampleFormat(IIOSampleFormat sFormat);
     IIOSampleFormat getSampleFormat() const;
     void setSampleArrangement(IIOSampleArrangement sArrangement);
     IIOSampleArrangement getSampleArrangement() const;
 
-    virtual void getStdImage (const ColorTemp &ctemp, int tran, Imagefloat* image, const PreviewProps &pp) const = 0;
-    virtual int getBPS () const = 0;
-    virtual void getScanline (int row, unsigned char* buffer, int bps, bool isFloat = false) const = 0;
-    virtual void setScanline (int row, const unsigned char* buffer, int bps, unsigned int numSamples = 3) = 0;
-    virtual const char* getType () const = 0;
+    virtual void getStdImage(const ColorTemp& ctemp,
+                             int tran,
+                             Imagefloat* image,
+                             const PreviewProps& pp) const = 0;
+    virtual int getBPS() const = 0;
+    virtual void
+    getScanline(int row, unsigned char* buffer, int bps, bool isFloat = false) const = 0;
+    virtual void setScanline(int row,
+                             const unsigned char* buffer,
+                             int bps,
+                             unsigned int numSamples = 3) = 0;
+    virtual const char* getType() const = 0;
 
-    int load (const Glib::ustring &fname);
-    int save (const Glib::ustring &fname) const;
+    int load(const Glib::ustring& fname);
+    int save(const Glib::ustring& fname) const;
 
 #ifdef LIBJXL
-    int loadJXL (const Glib::ustring &fname);
+    int loadJXL(const Glib::ustring& fname);
 #endif
 
-    int loadPNG (const Glib::ustring &fname);
-    int loadJPEG (const Glib::ustring &fname);
-    int loadTIFF (const Glib::ustring &fname);
-    static int getPNGSampleFormat (const Glib::ustring &fname, IIOSampleFormat &sFormat, IIOSampleArrangement &sArrangement);
-    static int getTIFFSampleFormat (const Glib::ustring &fname, IIOSampleFormat &sFormat, IIOSampleArrangement &sArrangement);
+    int loadPNG(const Glib::ustring& fname);
+    int loadJPEG(const Glib::ustring& fname);
+    int loadTIFF(const Glib::ustring& fname);
+    static int getPNGSampleFormat(const Glib::ustring& fname,
+                                  IIOSampleFormat& sFormat,
+                                  IIOSampleArrangement& sArrangement);
+    static int getTIFFSampleFormat(const Glib::ustring& fname,
+                                   IIOSampleFormat& sFormat,
+                                   IIOSampleArrangement& sArrangement);
 
-    int loadJPEGFromMemory (const char* buffer, int bufsize);
+    int loadJPEGFromMemory(const char* buffer, int bufsize);
     int loadPPMFromMemory(const char* buffer, int width, int height, bool swap, int bps);
 
-    int savePNG (const Glib::ustring &fname, int bps = -1) const;
-    int saveJPEG (const Glib::ustring &fname, int quality = 100, int subSamp = 3) const;
-    int saveTIFF (
-        const Glib::ustring &fname,
-        int bps = -1,
-        bool isFloat = false,
-        bool uncompressed = false,
-        bool big = false
-    ) const;
+    int savePNG(const Glib::ustring& fname, int bps = -1) const;
+    int saveJPEG(const Glib::ustring& fname, int quality = 100, int subSamp = 3) const;
+    int saveTIFF(const Glib::ustring& fname,
+                 int bps = -1,
+                 bool isFloat = false,
+                 bool uncompressed = false,
+                 bool big = false) const;
 
-    cmsHPROFILE getEmbeddedProfile () const;
-    void getEmbeddedProfileData (int& length, unsigned char*& pdata) const;
+    cmsHPROFILE getEmbeddedProfile() const;
+    void getEmbeddedProfileData(int& length, unsigned char*& pdata) const;
 
     void setMetadata(Exiv2Metadata info);
     void setOutputProfile(const std::string& pdata);
 
-    bool saveMetadata(const Glib::ustring &fname) const;
+    bool saveMetadata(const Glib::ustring& fname) const;
 
-    MyMutex& mutex ();
+    MyMutex& mutex();
 };
 
-}
+}  // namespace rtengine

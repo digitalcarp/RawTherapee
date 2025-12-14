@@ -29,19 +29,21 @@
 
 #include "rtengine/colortemp.h"
 
-namespace
-{
+namespace {
 using RGB = rtengine::procparams::FilmNegativeParams::RGB;
 using ColorSpace = rtengine::procparams::FilmNegativeParams::ColorSpace;
 using BackCompat = rtengine::procparams::FilmNegativeParams::BackCompat;
-}
+}  // namespace
 
 class FilmNegProvider
 {
 public:
     virtual ~FilmNegProvider() = default;
 
-    virtual bool getFilmNegativeSpot(rtengine::Coord spot, int spotSize, RGB &refInput, RGB &refOutput) = 0;
+    virtual bool getFilmNegativeSpot(rtengine::Coord spot,
+                                     int spotSize,
+                                     RGB& refInput,
+                                     RGB& refOutput) = 0;
 };
 
 class FilmNegative final :
@@ -57,16 +59,19 @@ public:
     FilmNegative();
     ~FilmNegative() override;
 
-    void read(const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited = nullptr) override;
-    void write(rtengine::procparams::ProcParams* pp, ParamsEdited* pedited = nullptr) override;
-    void setDefaults(const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited = nullptr) override;
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
     void setBatchMode(bool batchMode) override;
 
     void adjusterChanged(Adjuster* a, double newval) override;
     void enabledChanged() override;
     void colorSpaceChanged();
 
-    void filmRefValuesChanged(const RGB &refInput, const RGB &refOutput) override;
+    void filmRefValuesChanged(const RGB& refInput, const RGB& refOutput) override;
 
     void setFilmNegProvider(FilmNegProvider* provider);
 
@@ -84,10 +89,11 @@ private:
     void editToggled();
     void refSpotToggled();
 
-    void readOutputSliders(RGB &refOutput);
-    void writeOutputSliders(const RGB &refOutput);
+    void readOutputSliders(RGB& refOutput);
+    void writeOutputSliders(const RGB& refOutput);
 
-    // ColorTemp value corresponding to neutral RGB multipliers (1,1,1). Should be around 6500K.
+    // ColorTemp value corresponding to neutral RGB multipliers (1,1,1). Should be around
+    // 6500K.
     const rtengine::ColorTemp NEUTRAL_TEMP;
 
     const rtengine::ProcEvent evFilmNegativeExponents;
@@ -107,7 +113,8 @@ private:
      * samples in sequence; values are set on the initial white balance spot sampling,
      * and reset every time params are read, or the output sliders are changed.
      */
-    struct {
+    struct
+    {
         RGB input;
         float lum;
     } refLuminance;
@@ -134,5 +141,4 @@ private:
     Adjuster* const blueBalance;
 
     IdleRegister idle_register;
-
 };

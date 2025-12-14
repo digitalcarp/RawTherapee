@@ -18,23 +18,20 @@
  */
 #pragma once
 
-
 #include <cairomm/cairomm.h>
 
-namespace Glib
-{
+namespace Glib {
 
 class ustring;
 
 }
 
-namespace rtengine
-{
+namespace rtengine {
 
 /** @brief Get a quick preview image out of a raw or standard file
  *
- * This class reads the full size preview image (at least the biggest one available) from the raw file,
- * or the fast demosaiced version if no suitable embedded preview is found.
+ * This class reads the full size preview image (at least the biggest one available) from
+ * the raw file, or the fast demosaiced version if no suitable embedded preview is found.
  *
  * For standard image, it simply read it with fast conversion for 32 bits images
  */
@@ -47,14 +44,16 @@ private:
 public:
     typedef enum mode {
         PIM_EmbeddedPreviewOnly,  /// Get the embedded image only, fail if doesn't exist
-        PIM_EmbeddedOrRaw,        /// Get the embedded image if it exist, or use the raw file otherwise
-        PIM_ForceRaw              /// Get a preview of the raw file, even if an embedded image exist
+        PIM_EmbeddedOrRaw,  /// Get the embedded image if it exist, or use the raw file
+                            /// otherwise
+        PIM_ForceRaw  /// Get a preview of the raw file, even if an embedded image exist
     } PreviewImageMode;
 
-    PreviewImage (const Glib::ustring &fname, const Glib::ustring &ext, const PreviewImageMode mode);
+    PreviewImage(const Glib::ustring& fname,
+                 const Glib::ustring& ext,
+                 const PreviewImageMode mode);
 
     Cairo::RefPtr<Cairo::ImageSurface> getImage();
-
 };
 
-}
+}  // namespace rtengine

@@ -21,8 +21,7 @@
 #include "color.h"
 #include "curves.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
 class SatAndValueBlendingToneCurve : public ToneCurve
 {
@@ -32,10 +31,10 @@ public:
 
 // Tone curve modifying the value channel only, preserving hue and saturation
 // values in 0xffff space
-inline void SatAndValueBlendingToneCurve::Apply (float& ir, float& ig, float& ib) const
+inline void SatAndValueBlendingToneCurve::Apply(float& ir, float& ig, float& ib) const
 {
 
-    assert (lutToneCurve);
+    assert(lutToneCurve);
 
     float r = CLIP(ir);
     float g = CLIP(ig);
@@ -59,7 +58,7 @@ inline void SatAndValueBlendingToneCurve::Apply (float& ir, float& ig, float& ib
         s *= 1.f - coef;
     } else {
         // Linearly targeting Value = 0
-        const float coef = (newLum - lum) / lum ;
+        const float coef = (newLum - lum) / lum;
         dV = v * coef;
     }
     Color::hsv2rgbdcp(h, s, v + dV, r, g, b);
@@ -67,4 +66,4 @@ inline void SatAndValueBlendingToneCurve::Apply (float& ir, float& ig, float& ib
     setUnlessOOG(ir, ig, ib, r, g, b);
 }
 
-}
+}  // namespace rtengine

@@ -52,32 +52,19 @@ const std::string TITLE("Iptc.Application2.ObjectName");
 const std::string TRANS_REFERENCE("Iptc.Application2.TransmissionReference");
 
 const std::set<std::string> iptc_keys = {
-    CAPTION,
-    CAPTION_WRITER,
-    CATEGORY,
-    CITY,
-    COPYRIGHT,
-    COUNTRY,
-    CREATOR,
-    CREATOR_JOB_TITLE,
-    CREDIT,
-    DATE_CREATED,
-    HEADLINE,
-    INSTRUCTIONS,
-    KEYWORDS,
-    PROVINCE,
-    SOURCE,
-    SUPPLEMENTAL_CATEGORIES,
-    TITLE,
-    TRANS_REFERENCE
+    CAPTION,   CAPTION_WRITER, CATEGORY, CITY,
+    COPYRIGHT, COUNTRY,        CREATOR,  CREATOR_JOB_TITLE,
+    CREDIT,    DATE_CREATED,   HEADLINE, INSTRUCTIONS,
+    KEYWORDS,  PROVINCE,       SOURCE,   SUPPLEMENTAL_CATEGORIES,
+    TITLE,     TRANS_REFERENCE
 };
 
-} // namespace
+}  // namespace
 
-IPTCPanel::IPTCPanel():
-    changeList(new rtengine::procparams::IPTCPairs),
-    defChangeList(new rtengine::procparams::IPTCPairs),
-    embeddedData(new rtengine::procparams::IPTCPairs)
+IPTCPanel::IPTCPanel()
+    : changeList(new rtengine::procparams::IPTCPairs),
+      defChangeList(new rtengine::procparams::IPTCPairs),
+      embeddedData(new rtengine::procparams::IPTCPairs)
 {
 
     set_orientation(Gtk::ORIENTATION_VERTICAL);
@@ -93,9 +80,11 @@ IPTCPanel::IPTCPanel():
     setExpandAlignProperties(capl, true, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
     captionText = Gtk::TextBuffer::create();
     captionView = Gtk::manage(new Gtk::TextView(captionText));
-    setExpandAlignProperties(captionView, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(captionView, true, false, Gtk::ALIGN_FILL,
+                             Gtk::ALIGN_CENTER);
     Gtk::ScrolledWindow* scrolledWindowc = Gtk::manage(new Gtk::ScrolledWindow());
-    setExpandAlignProperties(scrolledWindowc, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties(scrolledWindowc, true, false, Gtk::ALIGN_FILL,
+                             Gtk::ALIGN_START);
     scrolledWindowc->set_min_content_height(100);
     scrolledWindowc->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
     scrolledWindowc->add(*captionView);
@@ -107,10 +96,12 @@ IPTCPanel::IPTCPanel():
 
     // --------------------------
 
-    Gtk::Label* capwl = Gtk::manage(new Gtk::Label(M("IPTCPANEL_DESCRIPTIONWRITER") + ":"));
+    Gtk::Label* capwl =
+        Gtk::manage(new Gtk::Label(M("IPTCPANEL_DESCRIPTIONWRITER") + ":"));
     setExpandAlignProperties(capwl, true, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
     captionWriter = Gtk::manage(new Gtk::Entry());
-    setExpandAlignProperties(captionWriter, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(captionWriter, true, false, Gtk::ALIGN_FILL,
+                             Gtk::ALIGN_CENTER);
     capwl->set_tooltip_text(M("IPTCPANEL_DESCRIPTIONWRITERHINT"));
     captionWriter->set_tooltip_text(M("IPTCPANEL_DESCRIPTIONWRITERHINT"));
     iptc->attach(*capwl, 0, row++, 1, 1);
@@ -132,7 +123,8 @@ IPTCPanel::IPTCPanel():
     Gtk::Label* instl = Gtk::manage(new Gtk::Label(M("IPTCPANEL_INSTRUCTIONS") + ":"));
     setExpandAlignProperties(instl, true, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
     instructions = Gtk::manage(new Gtk::Entry());
-    setExpandAlignProperties(instructions, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(instructions, true, false, Gtk::ALIGN_FILL,
+                             Gtk::ALIGN_CENTER);
     instl->set_tooltip_text(M("IPTCPANEL_INSTRUCTIONSHINT"));
     instructions->set_tooltip_text(M("IPTCPANEL_INSTRUCTIONSHINT"));
     iptc->attach(*instl, 0, row++, 1, 1);
@@ -154,11 +146,12 @@ IPTCPanel::IPTCPanel():
     keywords->set_headers_visible(false);
     keywords->set_size_request(50, 95);
     Gtk::ScrolledWindow* scrolledWindowkw = Gtk::manage(new Gtk::ScrolledWindow());
-    setExpandAlignProperties(scrolledWindowkw, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties(scrolledWindowkw, true, false, Gtk::ALIGN_FILL,
+                             Gtk::ALIGN_START);
     scrolledWindowkw->set_min_content_height(100);
     scrolledWindowkw->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
     scrolledWindowkw->add(*keywords);
-    keyword  = Gtk::manage(new MyComboBoxText(true));
+    keyword = Gtk::manage(new MyComboBoxText(true));
     setExpandAlignProperties(keyword, true, true, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
     keyword->set_size_request(75);
     keywords->set_tooltip_text(M("IPTCPANEL_KEYWORDSHINT"));
@@ -167,10 +160,14 @@ IPTCPanel::IPTCPanel():
     setExpandAlignProperties(addKW, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
     delKW = Gtk::manage(new Gtk::Button());
     setExpandAlignProperties(delKW, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
-    Gtk::Image* const addKWImg = Gtk::manage(new RTImage("add-small", Gtk::ICON_SIZE_BUTTON));
-    setExpandAlignProperties(addKWImg, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
-    Gtk::Image* const delKWImg = Gtk::manage(new RTImage("remove-small", Gtk::ICON_SIZE_BUTTON));
-    setExpandAlignProperties(delKWImg, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+    Gtk::Image* const addKWImg =
+        Gtk::manage(new RTImage("add-small", Gtk::ICON_SIZE_BUTTON));
+    setExpandAlignProperties(addKWImg, false, false, Gtk::ALIGN_CENTER,
+                             Gtk::ALIGN_CENTER);
+    Gtk::Image* const delKWImg =
+        Gtk::manage(new RTImage("remove-small", Gtk::ICON_SIZE_BUTTON));
+    setExpandAlignProperties(delKWImg, false, false, Gtk::ALIGN_CENTER,
+                             Gtk::ALIGN_CENTER);
     addKW->add(*addKWImg);
     delKW->add(*delKWImg);
     Gtk::Grid* kwgrid = Gtk::manage(new Gtk::Grid());
@@ -198,16 +195,19 @@ IPTCPanel::IPTCPanel():
     category->set_tooltip_text(M("IPTCPANEL_CATEGORYHINT"));
     Gtk::Label* scl = Gtk::manage(new Gtk::Label(M("IPTCPANEL_SUPPCATEGORIES") + ":"));
     setExpandAlignProperties(scl, true, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
-    suppCategories = Gtk::manage(new Gtk::ListViewText(1, false, Gtk::SELECTION_MULTIPLE));
-    setExpandAlignProperties(suppCategories, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    suppCategories =
+        Gtk::manage(new Gtk::ListViewText(1, false, Gtk::SELECTION_MULTIPLE));
+    setExpandAlignProperties(suppCategories, true, false, Gtk::ALIGN_FILL,
+                             Gtk::ALIGN_CENTER);
     suppCategories->set_headers_visible(false);
     suppCategories->set_size_request(50, 95);
     Gtk::ScrolledWindow* scrolledWindowsc = Gtk::manage(new Gtk::ScrolledWindow());
-    setExpandAlignProperties(scrolledWindowsc, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    setExpandAlignProperties(scrolledWindowsc, true, false, Gtk::ALIGN_FILL,
+                             Gtk::ALIGN_START);
     scrolledWindowsc->set_min_content_height(100);
     scrolledWindowsc->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
     scrolledWindowsc->add(*suppCategories);
-    suppCategory  = Gtk::manage(new MyComboBoxText(true));
+    suppCategory = Gtk::manage(new MyComboBoxText(true));
     suppCategory->set_size_request(75);
     setExpandAlignProperties(suppCategory, true, true, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
     scl->set_tooltip_text(M("IPTCPANEL_SUPPCATEGORIESHINT"));
@@ -217,10 +217,14 @@ IPTCPanel::IPTCPanel():
     setExpandAlignProperties(addSC, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
     delSC = Gtk::manage(new Gtk::Button());
     setExpandAlignProperties(delSC, false, true, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
-    Gtk::Image* const addSCImg = Gtk::manage(new RTImage("add-small", Gtk::ICON_SIZE_BUTTON));
-    setExpandAlignProperties(addSCImg, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
-    Gtk::Image* const delSCImg = Gtk::manage(new RTImage("remove-small", Gtk::ICON_SIZE_BUTTON));
-    setExpandAlignProperties(delSCImg, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+    Gtk::Image* const addSCImg =
+        Gtk::manage(new RTImage("add-small", Gtk::ICON_SIZE_BUTTON));
+    setExpandAlignProperties(addSCImg, false, false, Gtk::ALIGN_CENTER,
+                             Gtk::ALIGN_CENTER);
+    Gtk::Image* const delSCImg =
+        Gtk::manage(new RTImage("remove-small", Gtk::ICON_SIZE_BUTTON));
+    setExpandAlignProperties(delSCImg, false, false, Gtk::ALIGN_CENTER,
+                             Gtk::ALIGN_CENTER);
     addSC->add(*addSCImg);
     delSC->add(*delSCImg);
     Gtk::Grid* scgrid = Gtk::manage(new Gtk::Grid());
@@ -243,7 +247,8 @@ IPTCPanel::IPTCPanel():
     // --------------------------
 
     Gtk::Label* creatorLbl = Gtk::manage(new Gtk::Label(M("IPTCPANEL_CREATOR") + ":"));
-    setExpandAlignProperties(creatorLbl, true, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(creatorLbl, true, false, Gtk::ALIGN_START,
+                             Gtk::ALIGN_CENTER);
     creator = Gtk::manage(new Gtk::Entry());
     setExpandAlignProperties(creator, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
     creatorLbl->set_tooltip_text(M("IPTCPANEL_CREATORHINT"));
@@ -253,10 +258,13 @@ IPTCPanel::IPTCPanel():
 
     // --------------------------
 
-    Gtk::Label* creatorJobTitleLbl = Gtk::manage(new Gtk::Label(M("IPTCPANEL_CREATORJOBTITLE") + ":"));
-    setExpandAlignProperties(creatorJobTitleLbl, true, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
-    creatorJobTitle = Gtk::manage(  new Gtk::Entry());
-    setExpandAlignProperties(creatorJobTitle, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    Gtk::Label* creatorJobTitleLbl =
+        Gtk::manage(new Gtk::Label(M("IPTCPANEL_CREATORJOBTITLE") + ":"));
+    setExpandAlignProperties(creatorJobTitleLbl, true, false, Gtk::ALIGN_START,
+                             Gtk::ALIGN_CENTER);
+    creatorJobTitle = Gtk::manage(new Gtk::Entry());
+    setExpandAlignProperties(creatorJobTitle, true, false, Gtk::ALIGN_FILL,
+                             Gtk::ALIGN_CENTER);
     creatorJobTitleLbl->set_tooltip_text(M("IPTCPANEL_CREATORJOBTITLEHINT"));
     creatorJobTitle->set_tooltip_text(M("IPTCPANEL_CREATORJOBTITLEHINT"));
     iptc->attach(*creatorJobTitleLbl, 0, row++, 1, 1);
@@ -349,8 +357,9 @@ IPTCPanel::IPTCPanel():
 
     Gtk::Label* dcl = Gtk::manage(new Gtk::Label(M("IPTCPANEL_DATECREATED") + ":"));
     setExpandAlignProperties(dcl, true, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
-    dateCreated = Gtk::manage(  new Gtk::Entry());
-    setExpandAlignProperties(dateCreated, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    dateCreated = Gtk::manage(new Gtk::Entry());
+    setExpandAlignProperties(dateCreated, true, false, Gtk::ALIGN_FILL,
+                             Gtk::ALIGN_CENTER);
     dcl->set_tooltip_text(M("IPTCPANEL_DATECREATEDHINT"));
     dateCreated->set_tooltip_text(M("IPTCPANEL_DATECREATEDHINT"));
     iptc->attach(*dcl, 0, row++, 1, 1);
@@ -361,7 +370,8 @@ IPTCPanel::IPTCPanel():
     Gtk::Label* trl = Gtk::manage(new Gtk::Label(M("IPTCPANEL_TRANSREFERENCE") + ":"));
     setExpandAlignProperties(trl, true, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
     transReference = Gtk::manage(new Gtk::Entry());
-    setExpandAlignProperties(transReference, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(transReference, true, false, Gtk::ALIGN_FILL,
+                             Gtk::ALIGN_CENTER);
     trl->set_tooltip_text(M("IPTCPANEL_TRANSREFERENCEHINT"));
     transReference->set_tooltip_text(M("IPTCPANEL_TRANSREFERENCEHINT"));
     iptc->attach(*trl, 0, row++, 1, 1);
@@ -370,7 +380,8 @@ IPTCPanel::IPTCPanel():
     // --------------------------
 
     Gtk::ScrolledWindow* scrolledWindow = Gtk::manage(new Gtk::ScrolledWindow());
-    setExpandAlignProperties(scrolledWindow, false, true, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
+    setExpandAlignProperties(scrolledWindow, false, true, Gtk::ALIGN_FILL,
+                             Gtk::ALIGN_FILL);
     scrolledWindow->set_shadow_type(Gtk::SHADOW_NONE);
     scrolledWindow->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
     scrolledWindow->property_window_placement().set_value(Gtk::CORNER_TOP_RIGHT);
@@ -417,30 +428,47 @@ IPTCPanel::IPTCPanel():
     copy->signal_clicked().connect(sigc::mem_fun(*this, &IPTCPanel::copyClicked));
     paste->signal_clicked().connect(sigc::mem_fun(*this, &IPTCPanel::pasteClicked));
 
-
     addKW->signal_clicked().connect(sigc::mem_fun(*this, &IPTCPanel::addKeyWord));
     delKW->signal_clicked().connect(sigc::mem_fun(*this, &IPTCPanel::delKeyWord));
     addSC->signal_clicked().connect(sigc::mem_fun(*this, &IPTCPanel::addSuppCategory));
     delSC->signal_clicked().connect(sigc::mem_fun(*this, &IPTCPanel::delSuppCategory));
-    keyword->get_entry()->signal_activate().connect(sigc::mem_fun(*this, &IPTCPanel::addKeyWord));
-    suppCategory->get_entry()->signal_activate().connect(sigc::mem_fun(*this, &IPTCPanel::addSuppCategory));
+    keyword->get_entry()->signal_activate().connect(
+        sigc::mem_fun(*this, &IPTCPanel::addKeyWord));
+    suppCategory->get_entry()->signal_activate().connect(
+        sigc::mem_fun(*this, &IPTCPanel::addSuppCategory));
 
-    conns[0] = captionText->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
-    conns[1] = captionWriter->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
-    conns[2] = headline->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
-    conns[3] = instructions->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
-    conns[4] = category->get_entry()->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
-    conns[5] = creator->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
-    conns[6] = creatorJobTitle->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
-    conns[7] = credit->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
-    conns[8] = source->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
-    conns[9] = copyright->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
-    conns[10] = city->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
-    conns[11] = province->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
-    conns[12] = country->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
-    conns[13] = title->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
-    conns[14] = dateCreated->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
-    conns[15] = transReference->signal_changed().connect(sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[0] = captionText->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[1] = captionWriter->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[2] = headline->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[3] = instructions->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[4] = category->get_entry()->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[5] = creator->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[6] = creatorJobTitle->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[7] = credit->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[8] = source->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[9] = copyright->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[10] = city->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[11] = province->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[12] = country->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[13] = title->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[14] = dateCreated->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
+    conns[15] = transReference->signal_changed().connect(
+        sigc::mem_fun(*this, &IPTCPanel::updateChangeList));
 
     category->get_entry()->set_max_length(3);
     keyword->get_entry()->set_max_length(64);
@@ -461,8 +489,7 @@ IPTCPanel::IPTCPanel():
     show_all();
 }
 
-
-void IPTCPanel::read (const ProcParams* pp, const ParamsEdited* pedited)
+void IPTCPanel::read(const ProcParams* pp, const ParamsEdited* pedited)
 {
     disableListener();
     changeList->clear();
@@ -479,8 +506,7 @@ void IPTCPanel::read (const ProcParams* pp, const ParamsEdited* pedited)
     enableListener();
 }
 
-
-void IPTCPanel::write (ProcParams* pp, ParamsEdited* pedited)
+void IPTCPanel::write(ProcParams* pp, ParamsEdited* pedited)
 {
     if (changelist_valid_) {
         pp->metadata.iptc = *changeList;
@@ -489,12 +515,10 @@ void IPTCPanel::write (ProcParams* pp, ParamsEdited* pedited)
     }
 }
 
-
-void IPTCPanel::setDefaults (const ProcParams* defParams, const ParamsEdited* pedited)
+void IPTCPanel::setDefaults(const ProcParams* defParams, const ParamsEdited* pedited)
 {
     *defChangeList = defParams->metadata.iptc;
 }
-
 
 void IPTCPanel::setImageData(const FramesMetaData* id)
 {
@@ -517,14 +541,12 @@ void IPTCPanel::setImageData(const FramesMetaData* id)
     file->set_sensitive(!embeddedData->empty());
 }
 
-
 void IPTCPanel::notifyListener()
 {
     if (listener) {
         listener->panelChanged(EvIPTC, M("HISTORY_CHANGED"));
     }
 }
-
 
 void IPTCPanel::addKeyWord()
 {
@@ -540,7 +562,9 @@ void IPTCPanel::addKeyWord()
     keyword->prepend(keyword->get_entry()->get_text());
     std::vector<Glib::ustring> items;
 
-    for (Gtk::TreeModel::iterator i = keyword->get_model()->children().begin(); i != keyword->get_model()->children().end(); ++i) {
+    for (Gtk::TreeModel::iterator i = keyword->get_model()->children().begin();
+         i != keyword->get_model()->children().end(); ++i)
+    {
         Glib::ustring s;
         i->get_value(0, s);
         items.push_back(s);
@@ -552,11 +576,11 @@ void IPTCPanel::addKeyWord()
         keyword->append(items[i]);
     }
 
-    keywords->scroll_to_row(keywords->get_model()->get_path(--keywords->get_model()->children().end()));
+    keywords->scroll_to_row(
+        keywords->get_model()->get_path(--keywords->get_model()->children().end()));
 
     updateChangeList();
 }
-
 
 void IPTCPanel::delKeyWord()
 {
@@ -572,7 +596,7 @@ void IPTCPanel::delKeyWord()
 
         keywords->clear_items();
 
-        for(unsigned int i = 0; i < keep.size(); i++) {
+        for (unsigned int i = 0; i < keep.size(); i++) {
             keywords->append(keep[i]);
         }
     }
@@ -592,7 +616,9 @@ void IPTCPanel::addSuppCategory()
     suppCategory->prepend(suppCategory->get_entry()->get_text());
     std::vector<Glib::ustring> items;
 
-    for (Gtk::TreeModel::iterator i = suppCategory->get_model()->children().begin(); i != suppCategory->get_model()->children().end(); ++i) {
+    for (Gtk::TreeModel::iterator i = suppCategory->get_model()->children().begin();
+         i != suppCategory->get_model()->children().end(); ++i)
+    {
         Glib::ustring s;
         i->get_value(0, s);
         items.push_back(s);
@@ -604,8 +630,10 @@ void IPTCPanel::addSuppCategory()
         suppCategory->append(items[i]);
     }
 
-    suppCategories->scroll_to_row(suppCategories->get_model()->get_path(--suppCategories->get_model()->children().end()));
-    suppCategory->get_entry()->select_region(0, suppCategory->get_entry()->get_text().size());
+    suppCategories->scroll_to_row(suppCategories->get_model()->get_path(
+        --suppCategories->get_model()->children().end()));
+    suppCategory->get_entry()->select_region(
+        0, suppCategory->get_entry()->get_text().size());
 
     updateChangeList();
 }
@@ -647,7 +675,7 @@ void IPTCPanel::updateChangeList()
     for (unsigned int i = 0; i < keywords->size(); i++) {
         sset.insert(keywords->get_text(i));
     }
-    for (auto &s : sset) {
+    for (auto& s : sset) {
         (*changeList)[KEYWORDS].push_back(s);
     }
 
@@ -657,7 +685,7 @@ void IPTCPanel::updateChangeList()
     for (unsigned int i = 0; i < suppCategories->size(); i++) {
         sset.insert(suppCategories->get_text(i));
     }
-    for (auto &s : sset) {
+    for (auto& s : sset) {
         (*changeList)[SUPPLEMENTAL_CATEGORIES].push_back(s);
     }
 
@@ -673,7 +701,7 @@ void IPTCPanel::updateChangeList()
     (*changeList)[DATE_CREATED].push_back(dateCreated->get_text());
     (*changeList)[TRANS_REFERENCE].push_back(transReference->get_text());
 
-    for (auto &p : *embeddedData) {
+    for (auto& p : *embeddedData) {
         auto it = changeList->find(p.first);
         if (it != changeList->end() && p.second == it->second) {
             changeList->erase(it);
@@ -682,7 +710,6 @@ void IPTCPanel::updateChangeList()
 
     notifyListener();
 }
-
 
 void IPTCPanel::applyChangeList()
 {
@@ -711,7 +738,9 @@ void IPTCPanel::applyChangeList()
     keyword->get_entry()->set_text("");
     suppCategory->get_entry()->set_text("");
 
-    for (rtengine::procparams::IPTCPairs::const_iterator i = changeList->begin(); i != changeList->end(); ++i) {
+    for (rtengine::procparams::IPTCPairs::const_iterator i = changeList->begin();
+         i != changeList->end(); ++i)
+    {
         if (i->first == CAPTION && !i->second.empty()) {
             captionText->set_text(i->second.at(0));
         } else if (i->first == CAPTION_WRITER && !i->second.empty()) {
@@ -725,7 +754,7 @@ void IPTCPanel::applyChangeList()
             for (unsigned int j = 0; j < i->second.size(); j++) {
                 sset.insert(i->second[j]);
             }
-            for (auto &s : sset) {
+            for (auto& s : sset) {
                 keywords->append(s);
             }
         } else if (i->first == CATEGORY && !i->second.empty()) {
@@ -735,7 +764,7 @@ void IPTCPanel::applyChangeList()
             for (unsigned int j = 0; j < i->second.size(); j++) {
                 sset.insert(i->second[j]);
             }
-            for (auto &s : sset) {
+            for (auto& s : sset) {
                 suppCategories->append(s);
             }
         } else if (i->first == CREATOR && !i->second.empty()) {

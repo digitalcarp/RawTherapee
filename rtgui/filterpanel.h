@@ -28,17 +28,17 @@ class FilterPanelListener
 {
 public:
     virtual ~FilterPanelListener() = default;
-    virtual void exifFilterChanged () = 0;
+    virtual void exifFilterChanged() = 0;
 };
 
 class FilterPanel : public Gtk::Box
 {
 
 protected:
-    Gtk::ListViewText*      filetype;
-    Gtk::ListViewText*      camera;
-    Gtk::ListViewText*      lens;
-    Gtk::ListViewText*      expcomp;
+    Gtk::ListViewText* filetype;
+    Gtk::ListViewText* camera;
+    Gtk::ListViewText* lens;
+    Gtk::ListViewText* expcomp;
     Gtk::Entry* fnumberFrom;
     Gtk::Entry* fnumberTo;
     Gtk::Entry* shutterFrom;
@@ -66,20 +66,14 @@ protected:
     std::unique_ptr<RTSurface> ornamentSurface;
 
 public:
-    FilterPanel ();
+    FilterPanel();
 
-    void setFilterPanelListener (FilterPanelListener* l)
-    {
-        listener = l;
-    }
+    void setFilterPanelListener(FilterPanelListener* l) { listener = l; }
 
-    void setFilter (ExifFilterSettings& defefs, bool updateLists);
-    ExifFilterSettings getFilter ();
-    bool isEnabled ();
+    void setFilter(ExifFilterSettings& defefs, bool updateLists);
+    ExifFilterSettings getFilter();
+    bool isEnabled();
 
-    void valueChanged ();
-    void setEnabled(bool enabledState)
-    {
-        enabled->set_active(enabledState);
-    }
+    void valueChanged();
+    void setEnabled(bool enabledState) { enabled->set_active(enabledState); }
 };

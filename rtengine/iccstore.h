@@ -27,17 +27,15 @@
 
 #include <lcms2.h>
 
-namespace rtengine
-{
+namespace rtengine {
 
-namespace procparams
-{
+namespace procparams {
 
-    struct ColorManagementParams;
+struct ColorManagementParams;
 
 }
 
-typedef const double(*TMatrix)[3];
+typedef const double (*TMatrix)[3];
 
 class ProfileContent final
 {
@@ -65,38 +63,41 @@ public:
 
     static ICCStore* getInstance();
 
-    void init(const Glib::ustring& usrICCDir, const Glib::ustring& stdICCDir, bool loadAll);
+    void
+    init(const Glib::ustring& usrICCDir, const Glib::ustring& stdICCDir, bool loadAll);
 
-    cmsHPROFILE      workingSpace(const Glib::ustring& name) const;
+    cmsHPROFILE workingSpace(const Glib::ustring& name) const;
     // cmsHPROFILE      workingSpaceGamma(const Glib::ustring& name) const;
-    TMatrix          workingSpaceMatrix(const Glib::ustring& name) const;
-    TMatrix          workingSpaceInverseMatrix(const Glib::ustring& name) const;
+    TMatrix workingSpaceMatrix(const Glib::ustring& name) const;
+    TMatrix workingSpaceInverseMatrix(const Glib::ustring& name) const;
 
-    bool             outputProfileExist(const Glib::ustring& name) const;
-    cmsHPROFILE      getProfile(const Glib::ustring& name) const;
-    cmsHPROFILE      getStdProfile(const Glib::ustring& name) const;
-    ProfileContent   getContent(const Glib::ustring& name) const;
+    bool outputProfileExist(const Glib::ustring& name) const;
+    cmsHPROFILE getProfile(const Glib::ustring& name) const;
+    cmsHPROFILE getStdProfile(const Glib::ustring& name) const;
+    ProfileContent getContent(const Glib::ustring& name) const;
 
     Glib::ustring getDefaultMonitorProfileName() const;
-    void setDefaultMonitorProfileName(const Glib::ustring &name);
+    void setDefaultMonitorProfileName(const Glib::ustring& name);
 
-    cmsHPROFILE      getXYZProfile() const;
-    cmsHPROFILE      getsRGBProfile() const;
+    cmsHPROFILE getXYZProfile() const;
+    cmsHPROFILE getsRGBProfile() const;
 
     std::vector<Glib::ustring> getProfiles(ProfileType type = ProfileType::MONITOR) const;
     std::vector<Glib::ustring> getProfilesFromDir(const Glib::ustring& dirName) const;
 
-    std::uint8_t     getInputIntents(cmsHPROFILE profile) const;
-    std::uint8_t     getOutputIntents(cmsHPROFILE profile) const;
-    std::uint8_t     getProofIntents(cmsHPROFILE profile) const;
+    std::uint8_t getInputIntents(cmsHPROFILE profile) const;
+    std::uint8_t getOutputIntents(cmsHPROFILE profile) const;
+    std::uint8_t getProofIntents(cmsHPROFILE profile) const;
 
-    std::uint8_t     getInputIntents(const Glib::ustring& name) const;
-    std::uint8_t     getOutputIntents(const Glib::ustring& name) const;
-    std::uint8_t     getProofIntents(const Glib::ustring& name) const;
+    std::uint8_t getInputIntents(const Glib::ustring& name) const;
+    std::uint8_t getOutputIntents(const Glib::ustring& name) const;
+    std::uint8_t getProofIntents(const Glib::ustring& name) const;
 
     /*static*/ std::vector<Glib::ustring> getWorkingProfiles();
 
-    static cmsHPROFILE createFromMatrix(const double matrix[3][3], bool gamma = false, const Glib::ustring& name = Glib::ustring());
+    static cmsHPROFILE createFromMatrix(const double matrix[3][3],
+                                        bool gamma = false,
+                                        const Glib::ustring& name = Glib::ustring());
 
 private:
     class Implementation;
@@ -107,4 +108,4 @@ private:
     const std::unique_ptr<Implementation> implementation;
 };
 
-}
+}  // namespace rtengine

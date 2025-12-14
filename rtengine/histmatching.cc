@@ -29,30 +29,31 @@
 #include "rtthumbnail.h"
 #include "settings.h"
 
-//#define BENCHMARK
+// #define BENCHMARK
 #include "StopWatch.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
 namespace {
 
-struct CdfInfo {
+struct CdfInfo
+{
     std::vector<int> cdf;
     int min_val;
     int max_val;
 
-    CdfInfo(): cdf(256), min_val(-1), max_val(-1) {}
+    CdfInfo() : cdf(256), min_val(-1), max_val(-1) {}
 };
 
-
-CdfInfo getCdf(const IImage8 &img)
+CdfInfo getCdf(const IImage8& img)
 {
     CdfInfo ret;
 
     for (int y = 0; y < img.getHeight(); ++y) {
         for (int x = 0; x < img.getWidth(); ++x) {
-            int lum = LIM(int(Color::rgbLuminance(float(img.r(y, x)), float(img.g(y, x)), float(img.b(y, x)))), 0, 255);
+            int lum = LIM(int(Color::rgbLuminance(float(img.r(y, x)), float(img.g(y, x)),
+                                                  float(img.b(y, x)))),
+                          0, 255);
             ++ret.cdf[lum];
         }
     }
@@ -72,15 +73,14 @@ CdfInfo getCdf(const IImage8 &img)
     return ret;
 }
 
-
-int findMatch(int val, const std::vector<int> &cdf, int j)
+int findMatch(int val, const std::vector<int>& cdf, int j)
 {
     if (cdf[j] <= val) {
         for (; j < int(cdf.size()); ++j) {
             if (cdf[j] == val) {
                 return j;
             } else if (cdf[j] > val) {
-                return (cdf[j] - val <= val - cdf[j-1] ? j : j-1);
+                return (cdf[j] - val <= val - cdf[j - 1] ? j : j - 1);
             }
         }
         return 255;
@@ -89,15 +89,14 @@ int findMatch(int val, const std::vector<int> &cdf, int j)
             if (cdf[j] == val) {
                 return j;
             } else if (cdf[j] < val) {
-                return (val - cdf[j] <= cdf[j+1] - val ? j : j+1);
+                return (val - cdf[j] <= cdf[j + 1] - val ? j : j + 1);
             }
         }
         return 0;
     }
 }
 
-
-void mappingToCurve(const std::vector<int> &mapping, std::vector<double> &curve)
+void mappingToCurve(const std::vector<int>& mapping, std::vector<double>& curve)
 {
     curve.clear();
 
@@ -108,37 +107,36 @@ void mappingToCurve(const std::vector<int> &mapping, std::vector<double> &curve)
         }
     }
     if (idx == int(mapping.size())) {
-        for (idx = 1; idx < int(mapping.size())-1; ++idx) {
+        for (idx = 1; idx < int(mapping.size()) - 1; ++idx) {
             if (mapping[idx] >= idx) {
                 break;
             }
         }
     }
 
-    auto coord = [](int v) -> double { return double(v)/255.0; };
-    auto doit =
-        [&](int start, int stop, int step, bool addstart, int maxdelta=0) -> void
-        {
-            if (!maxdelta) maxdelta = step * 2;
-            int prev = start;
-            if (addstart && mapping[start] >= 0) {
-                curve.push_back(coord(start));
-                curve.push_back(coord(mapping[start]));
+    auto coord = [](int v) -> double { return double(v) / 255.0; };
+    auto doit = [&](int start, int stop, int step, bool addstart,
+                    int maxdelta = 0) -> void {
+        if (!maxdelta) maxdelta = step * 2;
+        int prev = start;
+        if (addstart && mapping[start] >= 0) {
+            curve.push_back(coord(start));
+            curve.push_back(coord(mapping[start]));
+        }
+        for (int i = start; i < stop; ++i) {
+            int v = mapping[i];
+            if (v < 0) {
+                continue;
             }
-            for (int i = start; i < stop; ++i) {
-                int v = mapping[i];
-                if (v < 0) {
-                    continue;
-                }
-                bool change = i > 0 && v != mapping[i-1];
-                int diff = i - prev;
-                if ((change && std::abs(diff - step) <= 1) || diff > maxdelta) {
-                    curve.push_back(coord(i));
-                    curve.push_back(coord(v));
-                    prev = i;
-                }
+            bool change = i > 0 && v != mapping[i - 1];
+            int diff = i - prev;
+            if ((change && std::abs(diff - step) <= 1) || diff > maxdelta) {
+                curve.push_back(coord(i));
+                curve.push_back(coord(v));
+                prev = i;
             }
-        };
+        }
+    };
 
     curve.push_back(0.0);
     curve.push_back(0.0);
@@ -149,7 +147,7 @@ void mappingToCurve(const std::vector<int> &mapping, std::vector<double> &curve)
     }
 
     const int npoints = 8;
-    int step = std::max(int(mapping.size())/npoints, 1);
+    int step = std::max(int(mapping.size()) / npoints, 1);
     int end = mapping.size();
     if (idx <= end / 3) {
         doit(start, idx, idx / 2, true);
@@ -157,10 +155,12 @@ void mappingToCurve(const std::vector<int> &mapping, std::vector<double> &curve)
         doit(idx, end, step, false, step);
     } else {
         doit(start, idx, idx > step ? step : idx / 2, true);
-        doit(idx, end, step, idx - step > step / 2 && std::abs(curve[curve.size()-2] - coord(idx)) > 0.01);
+        doit(idx, end, step,
+             idx - step > step / 2
+                 && std::abs(curve[curve.size() - 2] - coord(idx)) > 0.01);
     }
 
-    if (curve.size() > 2 && (1 - curve[curve.size()-2] <= coord(step) / 3)) {
+    if (curve.size() > 2 && (1 - curve[curve.size() - 2] <= coord(step) / 3)) {
         curve.pop_back();
         curve.pop_back();
     }
@@ -170,17 +170,15 @@ void mappingToCurve(const std::vector<int> &mapping, std::vector<double> &curve)
 
     // we assume we are matching an S-shaped curve, so try to avoid
     // concavities in the upper part of the S
-    const auto getpos =
-        [](float x, float xa, float ya, float xb, float yb)
-        {
-            // line equation:
-            // (x - xa) / (xb - xa) = (y - ya) / (yb - ya)
-            return (x - xa) / (xb - xa) * (yb - ya) + ya;
-        };
+    const auto getpos = [](float x, float xa, float ya, float xb, float yb) {
+        // line equation:
+        // (x - xa) / (xb - xa) = (y - ya) / (yb - ya)
+        return (x - xa) / (xb - xa) * (yb - ya) + ya;
+    };
     idx = -1;
-    for (ssize_t i = curve.size()-1; i > 0; i -= 2) {
+    for (ssize_t i = curve.size() - 1; i > 0; i -= 2) {
         if (curve[i] <= 0.0) {
-            idx = i+1;
+            idx = i + 1;
             break;
         }
     }
@@ -189,17 +187,17 @@ void mappingToCurve(const std::vector<int> &mapping, std::vector<double> &curve)
         // for each 3 consecutive points (xa, ya), (x, y), (xb, yb) we check
         // that y is above the point at x of the line between the other two
         // if this is not the case, we remove (x, y) from the curve
-        while (size_t(idx+5) < curve.size()) {
+        while (size_t(idx + 5) < curve.size()) {
             float xa = curve[idx];
-            float ya = curve[idx+1];
-            float x = curve[idx+2];
-            float y = curve[idx+3];
-            float xb = curve[idx+4];
-            float yb = curve[idx+5];
+            float ya = curve[idx + 1];
+            float x = curve[idx + 2];
+            float y = curve[idx + 3];
+            float xb = curve[idx + 4];
+            float yb = curve[idx + 5];
             float yy = getpos(x, xa, ya, xb, yb);
             if (yy > y) {
                 // we have to remove (x, y) from the curve
-                curve.erase(curve.begin()+(idx+2), curve.begin()+(idx+4));
+                curve.erase(curve.begin() + (idx + 2), curve.begin() + (idx + 4));
             } else {
                 // move on to the next point
                 idx += 2;
@@ -208,7 +206,7 @@ void mappingToCurve(const std::vector<int> &mapping, std::vector<double> &curve)
     }
 
     if (curve.size() < 4) {
-        curve = { DCT_Linear }; // not enough points, fall back to linear
+        curve = { DCT_Linear };  // not enough points, fall back to linear
     } else {
         curve.insert(curve.begin(), DCT_Spline);
         DiagonalCurve c(curve);
@@ -226,27 +224,28 @@ void mappingToCurve(const std::vector<int> &mapping, std::vector<double> &curve)
     }
 }
 
-} // namespace
+}  // namespace
 
-
-void RawImageSource::getAutoMatchedToneCurve(const ColorManagementParams &cp, const procparams::RAWParams &rawParams, StandardObserver observer, std::vector<double> &outCurve)
+void RawImageSource::getAutoMatchedToneCurve(const ColorManagementParams& cp,
+                                             const procparams::RAWParams& rawParams,
+                                             StandardObserver observer,
+                                             std::vector<double>& outCurve)
 {
     BENCHFUN
 
     if (settings->verbose) {
-        std::cout << "performing histogram matching for " << getFileName() << " on the embedded thumbnail" << std::endl;
+        std::cout << "performing histogram matching for " << getFileName()
+                  << " on the embedded thumbnail" << std::endl;
     }
 
-    const auto same_profile =
-        [](const ColorManagementParams &a, const ColorManagementParams &b) -> bool
-        {
-            return (a.inputProfile == b.inputProfile
-                    && a.toneCurve == b.toneCurve
-                    && a.applyLookTable == b.applyLookTable
-                    && a.applyBaselineExposureOffset == b.applyBaselineExposureOffset
-                    && a.applyHueSatMap == b.applyHueSatMap
-                    && a.dcpIlluminant == b.dcpIlluminant);
-        };
+    const auto same_profile = [](const ColorManagementParams& a,
+                                 const ColorManagementParams& b) -> bool {
+        return (a.inputProfile == b.inputProfile && a.toneCurve == b.toneCurve
+                && a.applyLookTable == b.applyLookTable
+                && a.applyBaselineExposureOffset == b.applyBaselineExposureOffset
+                && a.applyHueSatMap == b.applyHueSatMap
+                && a.dcpIlluminant == b.dcpIlluminant);
+    };
 
     if (!histMatchingCache.empty() && same_profile(*histMatchingParams, cp)) {
         if (settings->verbose) {
@@ -266,39 +265,48 @@ void RawImageSource::getAutoMatchedToneCurve(const ColorManagementParams &cp, co
     int skip = 3;
 
     if (settings->verbose) {
-        std::cout << "histogram matching: full raw image size is " << fw << "x" << fh << std::endl;
+        std::cout << "histogram matching: full raw image size is " << fw << "x" << fh
+                  << std::endl;
     }
 
     ProcParams neutral;
     neutral.icm = cp;
-    neutral.raw.bayersensor.method = RAWParams::BayerSensor::getMethodString(RAWParams::BayerSensor::Method::FAST);
-    neutral.raw.xtranssensor.method = RAWParams::XTransSensor::getMethodString(RAWParams::XTransSensor::Method::FAST);
+    neutral.raw.bayersensor.method =
+        RAWParams::BayerSensor::getMethodString(RAWParams::BayerSensor::Method::FAST);
+    neutral.raw.xtranssensor.method =
+        RAWParams::XTransSensor::getMethodString(RAWParams::XTransSensor::Method::FAST);
     neutral.icm.outputProfile = ColorManagementParams::NoICMString;
 
     std::unique_ptr<IImage8> source;
     {
         eSensorType sensor_type;
         int w = 0, h = 0;
-        const std::unique_ptr<Thumbnail> thumb(Thumbnail::loadQuickFromRaw(getFileName(), sensor_type, w, h, 1, false, true, true));
+        const std::unique_ptr<Thumbnail> thumb(Thumbnail::loadQuickFromRaw(
+            getFileName(), sensor_type, w, h, 1, false, true, true));
         if (!thumb) {
             if (settings->verbose) {
-                std::cout << "histogram matching: no thumbnail found, generating a neutral curve" << std::endl;
+                std::cout
+                    << "histogram matching: no thumbnail found, generating a neutral curve"
+                    << std::endl;
             }
             histMatchingCache = outCurve;
             *histMatchingParams = cp;
             return;
         } else if (w * 33 < fw || w * h < 19200) {
-             // Some cameras have extremely small thumbs, for example Canon PowerShot A3100 IS has 128x96 thumbs.
-             // For them we skip histogram matching.
-             // With 160x120 thumbs from RICOH GR DIGITAL 2 it works fine, so we use 19200 as limit.
+            // Some cameras have extremely small thumbs, for example Canon PowerShot A3100
+            // IS has 128x96 thumbs. For them we skip histogram matching. With 160x120
+            // thumbs from RICOH GR DIGITAL 2 it works fine, so we use 19200 as limit.
             if (settings->verbose) {
-                std::cout << "histogram matching: the embedded thumbnail is too small: " << w << "x" << h << std::endl;
+                std::cout << "histogram matching: the embedded thumbnail is too small: "
+                          << w << "x" << h << std::endl;
             }
             histMatchingCache = outCurve;
             *histMatchingParams = cp;
             return;
         }
-        skip = LIM(skip * fh / h, 6, 10); // adjust the skip factor -- the larger the thumbnail, the less we should skip to get a good match
+        skip = LIM(skip * fh / h, 6,
+                   10);  // adjust the skip factor -- the larger the thumbnail, the less
+                         // we should skip to get a good match
         source.reset(thumb->quickProcessImage(neutral, fh / skip, TI_Nearest));
 
         if (settings->verbose) {
@@ -311,16 +319,21 @@ void RawImageSource::getAutoMatchedToneCurve(const ColorManagementParams &cp, co
         eSensorType sensor_type;
         double scale;
         int w = fw / skip, h = fh / skip;
-        const std::unique_ptr<Thumbnail> thumb(Thumbnail::loadFromRaw(getFileName(), sensor_type, w, h, 1, false, observer, false, &rawParams, true));
+        const std::unique_ptr<Thumbnail> thumb(
+            Thumbnail::loadFromRaw(getFileName(), sensor_type, w, h, 1, false, observer,
+                                   false, &rawParams, true));
         if (!thumb) {
             if (settings->verbose) {
-                std::cout << "histogram matching: raw decoding failed, generating a neutral curve" << std::endl;
+                std::cout
+                    << "histogram matching: raw decoding failed, generating a neutral curve"
+                    << std::endl;
             }
             histMatchingCache = outCurve;
             *histMatchingParams = cp;
             return;
         }
-        target.reset(thumb->processImage(neutral, sensor_type, fh / skip, TI_Nearest, getMetaData(), scale, false, true));
+        target.reset(thumb->processImage(neutral, sensor_type, fh / skip, TI_Nearest,
+                                         getMetaData(), scale, false, true));
 
         int sw = source->getWidth(), sh = source->getHeight();
         int tw = target->getWidth(), th = target->getHeight();
@@ -340,19 +353,22 @@ void RawImageSource::getAutoMatchedToneCurve(const ColorManagementParams &cp, co
                 tw -= cw;
             }
             if (settings->verbose) {
-                std::cout << "histogram matching: cropping target to get an aspect ratio of " << round(thumb_ratio * 100)/100.f << ":1, new size is " << tw << "x" << th << std::endl;
+                std::cout
+                    << "histogram matching: cropping target to get an aspect ratio of "
+                    << round(thumb_ratio * 100) / 100.f << ":1, new size is " << tw << "x"
+                    << th << std::endl;
             }
 
             if (cx || cy) {
-                Image8 *tmp = new Image8(tw, th);
+                Image8* tmp = new Image8(tw, th);
 #ifdef _OPENMP
-                #pragma omp parallel for
+#pragma omp parallel for
 #endif
                 for (int y = 0; y < th; ++y) {
                     for (int x = 0; x < tw; ++x) {
-                        tmp->r(y, x) = target->r(y+cy, x+cx);
-                        tmp->g(y, x) = target->g(y+cy, x+cx);
-                        tmp->b(y, x) = target->b(y+cy, x+cx);
+                        tmp->r(y, x) = target->r(y + cy, x + cx);
+                        tmp->g(y, x) = target->g(y + cy, x + cx);
+                        tmp->b(y, x) = target->b(y + cy, x + cx);
                     }
                 }
                 target.reset(tmp);
@@ -363,8 +379,10 @@ void RawImageSource::getAutoMatchedToneCurve(const ColorManagementParams &cp, co
             std::cout << "histogram matching: generated neutral rendering" << std::endl;
         }
     }
-    if (target->getWidth() != source->getWidth() || target->getHeight() != source->getHeight()) {
-        Image8 *tmp = new Image8(source->getWidth(), source->getHeight());
+    if (target->getWidth() != source->getWidth()
+        || target->getHeight() != source->getHeight())
+    {
+        Image8* tmp = new Image8(source->getWidth(), source->getHeight());
         target->resizeImgTo(source->getWidth(), source->getHeight(), TI_Nearest, tmp);
         target.reset(tmp);
     }
@@ -375,7 +393,9 @@ void RawImageSource::getAutoMatchedToneCurve(const ColorManagementParams &cp, co
     int j = 0;
     for (int i = 0; i < int(tcdf.cdf.size()); ++i) {
         j = findMatch(tcdf.cdf[i], scdf.cdf, j);
-        if (i >= tcdf.min_val && i <= tcdf.max_val && j >= scdf.min_val && j <= scdf.max_val) {
+        if (i >= tcdf.min_val && i <= tcdf.max_val && j >= scdf.min_val
+            && j <= scdf.max_val)
+        {
             mapping.push_back(j);
         } else {
             mapping.push_back(-1);
@@ -385,11 +405,12 @@ void RawImageSource::getAutoMatchedToneCurve(const ColorManagementParams &cp, co
     mappingToCurve(mapping, outCurve);
 
     if (settings->verbose) {
-        std::cout << "histogram matching: generated curve with " << outCurve.size()/2 << " control points" << std::endl;
+        std::cout << "histogram matching: generated curve with " << outCurve.size() / 2
+                  << " control points" << std::endl;
     }
 
     histMatchingCache = outCurve;
     *histMatchingParams = cp;
 }
 
-} // namespace rtengine
+}  // namespace rtengine

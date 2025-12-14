@@ -25,31 +25,30 @@
 #include "noncopyable.h"
 #include "rawimagesource.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
 class RawImage;
 
-class PDAFLinesFilter: public rtengine::NonCopyable
+class PDAFLinesFilter : public rtengine::NonCopyable
 {
 public:
-    explicit PDAFLinesFilter(RawImage *ri);
+    explicit PDAFLinesFilter(RawImage* ri);
     ~PDAFLinesFilter();
-    
-    int mark(const array2D<float> &rawData, PixelsMap &bpMap);
-    RawImageSource::GreenEqulibrateThreshold &greenEqThreshold();
+
+    int mark(const array2D<float>& rawData, PixelsMap& bpMap);
+    RawImageSource::GreenEqulibrateThreshold& greenEqThreshold();
     std::unique_ptr<RawImageSource::CFALineDenoiseRowBlender> lineDenoiseRowBlender();
 
 private:
-    int markLine(const array2D<float>& rawData, PixelsMap &bpMap, int y);
+    int markLine(const array2D<float>& rawData, PixelsMap& bpMap, int y);
 
-    RawImage *ri_;
+    RawImage* ri_;
     int W_;
     int H_;
     std::vector<int> pattern_;
     int offset_;
     std::vector<bool> rowmap_;
-    RawImageSource::GreenEqulibrateThreshold *gthresh_;
+    RawImageSource::GreenEqulibrateThreshold* gthresh_;
 };
 
-} // namespace rtengine
+}  // namespace rtengine

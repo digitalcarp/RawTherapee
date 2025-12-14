@@ -22,8 +22,7 @@
 
 #include "rtengine/noncopyable.h"
 
-namespace Glib
-{
+namespace Glib {
 
 class ustring;
 
@@ -50,8 +49,7 @@ public:
     virtual void previewsFinished(int dir_id_) = 0;
 };
 
-class PreviewLoader :
-    public rtengine::NonCopyable
+class PreviewLoader : public rtengine::NonCopyable
 {
 public:
     /**
@@ -85,7 +83,6 @@ public:
     void removeAllJobs(void);
 
 private:
-
     PreviewLoader();
     ~PreviewLoader();
 

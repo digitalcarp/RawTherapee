@@ -37,31 +37,30 @@ class EditSubscriber;
 class ObjectMOBuffer
 {
 private:
-
-    // Used to draw the objects where the color correspond to the object's ID, in order to find the correct object when hovering
+    // Used to draw the objects where the color correspond to the object's ID, in order to
+    // find the correct object when hovering
     Cairo::RefPtr<Cairo::ImageSurface> objectMap;
     ObjectMode objectMode;
 
 protected:
-
-    // To avoid duplicated information, we points to a EditDataProvider that contains the current EditSubscriber
-    // instead of pointing to the EditSubscriber directly
+    // To avoid duplicated information, we points to a EditDataProvider that contains the
+    // current EditSubscriber instead of pointing to the EditSubscriber directly
     EditDataProvider* dataProvider;
 
     void createBuffer(int width, int height);
     void resize(int newWidth, int newHeight);
     void flush();
-    EditSubscriber *getEditSubscriber ();
+    EditSubscriber* getEditSubscriber();
 
 public:
-    explicit ObjectMOBuffer (EditDataProvider *dataProvider);
+    explicit ObjectMOBuffer(EditDataProvider* dataProvider);
     ~ObjectMOBuffer();
 
-    EditDataProvider* getDataProvider ();
-    void setObjectMode (ObjectMode newType);
-    ObjectMode getObjectMode ();
+    EditDataProvider* getDataProvider();
+    void setObjectMode(ObjectMode newType);
+    ObjectMode getObjectMode();
 
-    Cairo::RefPtr<Cairo::ImageSurface>& getObjectMap ();
+    Cairo::RefPtr<Cairo::ImageSurface>& getObjectMap();
 
     // return true if the buffer has been allocated
     bool bufferCreated();
@@ -69,16 +68,17 @@ public:
     int getObjectID(const rtengine::Coord& location);
 };
 
-inline EditDataProvider* ObjectMOBuffer::getDataProvider () {
+inline EditDataProvider* ObjectMOBuffer::getDataProvider()
+{
     return dataProvider;
 }
 
-inline ObjectMode ObjectMOBuffer::getObjectMode () {
+inline ObjectMode ObjectMOBuffer::getObjectMode()
+{
     return objectMode;
 }
 
-inline Cairo::RefPtr<Cairo::ImageSurface>& ObjectMOBuffer::getObjectMap () {
+inline Cairo::RefPtr<Cairo::ImageSurface>& ObjectMOBuffer::getObjectMap()
+{
     return objectMap;
 }
-
-

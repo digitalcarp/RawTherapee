@@ -45,7 +45,7 @@ public:
     }
 #endif
 
-    void set ()
+    void set()
     {
 #ifdef _WIN32
         LARGE_INTEGER ulf;
@@ -61,7 +61,7 @@ public:
 #endif
     }
 
-    int etime (const MyTime &a) const
+    int etime(const MyTime& a) const
     {
 #ifndef _WIN32
         return (t.tv_sec - a.t.tv_sec) * 1000000 + (t.tv_nsec - a.t.tv_nsec) / 1000;

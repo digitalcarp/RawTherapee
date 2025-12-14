@@ -45,10 +45,11 @@
 #include "eventmapper.h"
 #include "toolpanel.h"
 
-
-class LabGridArea final : public Gtk::DrawingArea {
+class LabGridArea final : public Gtk::DrawingArea
+{
 public:
-    struct FunctionParams {
+    struct FunctionParams
+    {
         using Function = std::function<double(double)>;
         using ResolutionFunction = std::function<int(int)>;
 
@@ -70,18 +71,21 @@ public:
          * It takes the width of the plot, in pixels, and returns the number of
          * line segments that should be used to plot the function.
          */
-        ResolutionFunction resolution_function{[](int width) { return width; }};
+        ResolutionFunction resolution_function{ [](int width) { return width; } };
 
         FunctionParams() = default;
-        FunctionParams(double x_min, double x_max, double y_min, double y_max,
-            const Function &function,
-            const ResolutionFunction & resolution_function) :
-            x_min(x_min),
-            x_max(x_max),
-            y_min(y_min),
-            y_max(y_max),
-            function(function),
-            resolution_function(resolution_function)
+        FunctionParams(double x_min,
+                       double x_max,
+                       double y_min,
+                       double y_max,
+                       const Function& function,
+                       const ResolutionFunction& resolution_function)
+            : x_min(x_min),
+              x_max(x_max),
+              y_min(y_min),
+              y_max(y_max),
+              function(function),
+              resolution_function(resolution_function)
         {
         }
 
@@ -92,7 +96,7 @@ private:
     rtengine::ProcEvent evt;
     Glib::ustring evtMsg;
 
-    enum State { NONE, HIGH, LOW, GRE};
+    enum State { NONE, HIGH, LOW, GRE };
     State litPoint;
     double low_a;
     double high_a;
@@ -105,7 +109,7 @@ private:
     double me_x;
     double me_y;
     FunctionParams function_params;
-    
+
     double defaultLow_a;
     double defaultHigh_a;
     double defaultLow_b;
@@ -117,7 +121,7 @@ private:
     double defaultme_x;
     double defaultme_y;
 
-    ToolPanelListener *listener;
+    ToolPanelListener* listener;
     bool edited;
     bool isDragged;
     sigc::connection delayconn;
@@ -132,16 +136,49 @@ private:
     void getLitPoint();
 
 public:
-    LabGridArea(rtengine::ProcEvent evt, const Glib::ustring &msg, bool enable_low=true, bool ciexy=false, bool ghs=false, bool mous=false);
+    LabGridArea(rtengine::ProcEvent evt,
+                const Glib::ustring& msg,
+                bool enable_low = true,
+                bool ciexy = false,
+                bool ghs = false,
+                bool mous = false);
 
-    void getParams(double &la, double &lb, double &ha, double &hb, double &gx, double &gy, double &wx, double &wy, double &mx, double &my) const;
-    void setParams(double la, double lb, double ha, double hb, double gx, double gy, double wx, double wy, double mx, double my, bool notify);
-    void setFunctionParams(const FunctionParams &params);
-    void setDefault (double la, double lb, double ha, double hb, double gx, double gy, double wx, double wy, double mx, double my);
+    void getParams(double& la,
+                   double& lb,
+                   double& ha,
+                   double& hb,
+                   double& gx,
+                   double& gy,
+                   double& wx,
+                   double& wy,
+                   double& mx,
+                   double& my) const;
+    void setParams(double la,
+                   double lb,
+                   double ha,
+                   double hb,
+                   double gx,
+                   double gy,
+                   double wx,
+                   double wy,
+                   double mx,
+                   double my,
+                   bool notify);
+    void setFunctionParams(const FunctionParams& params);
+    void setDefault(double la,
+                    double lb,
+                    double ha,
+                    double hb,
+                    double gx,
+                    double gy,
+                    double wx,
+                    double wy,
+                    double mx,
+                    double my);
     void setEdited(bool yes);
     bool getEdited() const;
     void reset(bool toInitial);
-    void setListener(ToolPanelListener *l);
+    void setListener(ToolPanelListener* l);
 
     bool lowEnabled() const;
     void setLowEnabled(bool yes);
@@ -151,41 +188,82 @@ public:
     void setghsEnabled(bool yes);
     bool mousEnabled() const;
     void setmousEnabled(bool yes);
- 
-    bool on_draw(const ::Cairo::RefPtr<Cairo::Context> &cr) override;
-    void on_style_updated () override;
-    bool on_button_press_event(GdkEventButton *event) override;
-    bool on_button_release_event(GdkEventButton *event) override;
-    bool on_motion_notify_event(GdkEventMotion *event) override;
+
+    bool on_draw(const ::Cairo::RefPtr<Cairo::Context>& cr) override;
+    void on_style_updated() override;
+    bool on_button_press_event(GdkEventButton* event) override;
+    bool on_button_release_event(GdkEventButton* event) override;
+    bool on_motion_notify_event(GdkEventMotion* event) override;
     Gtk::SizeRequestMode get_request_mode_vfunc() const override;
-    void get_preferred_width_vfunc(int &minimum_width, int &natural_width) const override;
-    void get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const override;
+    void get_preferred_width_vfunc(int& minimum_width, int& natural_width) const override;
+    void get_preferred_height_for_width_vfunc(int width,
+                                              int& minimum_height,
+                                              int& natural_height) const override;
 };
 
-
-class LabGrid: public Gtk::Box {
+class LabGrid : public Gtk::Box
+{
 private:
     LabGridArea grid;
 
-    bool resetPressed(GdkEventButton *event);
+    bool resetPressed(GdkEventButton* event);
 
 public:
-    LabGrid(rtengine::ProcEvent evt, const Glib::ustring &msg, bool enable_low=true, bool ciexy=false, bool ghs=false, bool mous=true);
+    LabGrid(rtengine::ProcEvent evt,
+            const Glib::ustring& msg,
+            bool enable_low = true,
+            bool ciexy = false,
+            bool ghs = false,
+            bool mous = true);
 
-    void getParams(double &la, double &lb, double &ha, double &hb, double &gx, double &gy, double &wx, double &wy, double &mx, double &my)
-        const { return grid.getParams(la, lb, ha, hb, gx, gy, wx, wy, mx, my); }
-    void setParams(double la, double lb, double ha, double hb, double gx, double gy, double wx, double wy, double mx, double my, bool notify)
-        { grid.setParams(la, lb, ha, hb, gx, gy, wx, wy, mx, my, notify); }
-    void setFunctionParams(const LabGridArea::FunctionParams &params)
+    void getParams(double& la,
+                   double& lb,
+                   double& ha,
+                   double& hb,
+                   double& gx,
+                   double& gy,
+                   double& wx,
+                   double& wy,
+                   double& mx,
+                   double& my) const
+    {
+        return grid.getParams(la, lb, ha, hb, gx, gy, wx, wy, mx, my);
+    }
+    void setParams(double la,
+                   double lb,
+                   double ha,
+                   double hb,
+                   double gx,
+                   double gy,
+                   double wx,
+                   double wy,
+                   double mx,
+                   double my,
+                   bool notify)
+    {
+        grid.setParams(la, lb, ha, hb, gx, gy, wx, wy, mx, my, notify);
+    }
+    void setFunctionParams(const LabGridArea::FunctionParams& params)
     {
         grid.setFunctionParams(params);
     }
-    void setDefault (double la, double lb, double ha, double hb, double gx, double gy, double wx, double wy, double mx, double my)
-        { grid.setDefault(la, lb, ha, hb, gx, gy, wx, wy, mx, my); }
+    void setDefault(double la,
+                    double lb,
+                    double ha,
+                    double hb,
+                    double gx,
+                    double gy,
+                    double wx,
+                    double wy,
+                    double mx,
+                    double my)
+    {
+        grid.setDefault(la, lb, ha, hb, gx, gy, wx, wy, mx, my);
+    }
     void setEdited(bool yes) { grid.setEdited(yes); }
     bool getEdited() const { return grid.getEdited(); }
     void reset(bool toInitial) { grid.reset(toInitial); }
-    void setListener(ToolPanelListener *l) { grid.setListener(l); }
+    void setListener(ToolPanelListener* l) { grid.setListener(l); }
     bool lowEnabled() const { return grid.lowEnabled(); }
     void setLowEnabled(bool yes) { grid.setLowEnabled(yes); }
     bool ciexyEnabled() const { return grid.ciexyEnabled(); }
@@ -194,5 +272,4 @@ public:
     void setghsEnabled(bool yes) { grid.setghsEnabled(yes); }
     bool mousEnabled() const { return grid.mousEnabled(); }
     void setmousEnabled(bool yes) { grid.setmousEnabled(yes); }
-
 };

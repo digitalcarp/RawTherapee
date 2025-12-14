@@ -18,54 +18,54 @@
  *  along with RawTherapee.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
+#include <giomm.h>
 #include <glib/gstdio.h>
 #include <iostream>
-#include <giomm.h>
 #include <set>
+#include <stdio.h>
 
-#include "metadata.h"
-#include "settings.h"
 #include "imagedata.h"
-#include "rtgui/version.h"
+#include "metadata.h"
 #include "rtgui/pathutils.h"
+#include "rtgui/version.h"
+#include "settings.h"
 #include <ctime>
 
-
-#if EXIV2_TEST_VERSION(0,28,0)
+#if EXIV2_TEST_VERSION(0, 28, 0)
 using Exiv2Error = Exiv2::Error;
 #else
 using Exiv2Error = Exiv2::AnyError;
 #endif
 
-
 namespace rtengine {
 
-extern const Settings *settings;
+extern const Settings* settings;
 
 std::unique_ptr<Exiv2Metadata::ImageCache> Exiv2Metadata::cache_(nullptr);
 
 namespace {
 
-class Error: public Exiv2Error {
+class Error : public Exiv2Error
+{
 public:
-    Error(const std::string &msg):
-#if EXIV2_TEST_VERSION(0,28,0)
-        Exiv2Error(Exiv2::ErrorCode::kerGeneralError),
+    Error(const std::string& msg)
+        :
+#if EXIV2_TEST_VERSION(0, 28, 0)
+          Exiv2Error(Exiv2::ErrorCode::kerGeneralError),
 #endif
-        msg_(msg) {}
-    const char *what() const throw() { return msg_.c_str(); }
+          msg_(msg)
+    {
+    }
+    const char* what() const throw() { return msg_.c_str(); }
     int code() const throw() { return 0; }
 
 private:
     std::string msg_;
 };
 
-
 constexpr size_t IMAGE_CACHE_SIZE = 200;
 
-std::unique_ptr<Exiv2::Image> open_exiv2(const Glib::ustring& fname,
-                                         bool check_exif)
+std::unique_ptr<Exiv2::Image> open_exiv2(const Glib::ustring& fname, bool check_exif)
 {
 #ifdef EXV_UNICODE_PATH
     glong ws_size = 0;
@@ -82,7 +82,7 @@ std::unique_ptr<Exiv2::Image> open_exiv2(const Glib::ustring& fname,
 #endif
     image->readMetadata();
     if (!image->good() || (check_exif && image->exifData().empty())) {
-#if EXIV2_TEST_VERSION(0,27,0)
+#if EXIV2_TEST_VERSION(0, 27, 0)
         auto error_code = Exiv2::ErrorCode::kerErrorMessage;
 #else
         auto error_code = 1;
@@ -93,9 +93,7 @@ std::unique_ptr<Exiv2::Image> open_exiv2(const Glib::ustring& fname,
     return ret;
 }
 
-
-template <class Data, class Key>
-void clear_metadata_key(Data &data, const Key &key)
+template <class Data, class Key> void clear_metadata_key(Data& data, const Key& key)
 {
     while (true) {
         auto it = data.findKey(key);
@@ -107,53 +105,57 @@ void clear_metadata_key(Data &data, const Key &key)
     }
 }
 
-} // namespace
+}  // namespace
 
-
-Exiv2Metadata::Exiv2Metadata():
-    src_(""),
-    merge_xmp_(false),
-    image_(nullptr),
-    exif_(new rtengine::procparams::ExifPairs),
-    iptc_(new rtengine::procparams::IPTCPairs)
+Exiv2Metadata::Exiv2Metadata()
+    : src_(""),
+      merge_xmp_(false),
+      image_(nullptr),
+      exif_(new rtengine::procparams::ExifPairs),
+      iptc_(new rtengine::procparams::IPTCPairs)
 {
 }
 
-
-Exiv2Metadata::Exiv2Metadata(const Glib::ustring &path):
-    src_(path),
-    merge_xmp_(settings->metadata_xmp_sync != Settings::MetadataXmpSync::NONE),
-    image_(nullptr),
-    exif_(new rtengine::procparams::ExifPairs),
-    iptc_(new rtengine::procparams::IPTCPairs)
+Exiv2Metadata::Exiv2Metadata(const Glib::ustring& path)
+    : src_(path),
+      merge_xmp_(settings->metadata_xmp_sync != Settings::MetadataXmpSync::NONE),
+      image_(nullptr),
+      exif_(new rtengine::procparams::ExifPairs),
+      iptc_(new rtengine::procparams::IPTCPairs)
 {
 }
 
-
-Exiv2Metadata::Exiv2Metadata(const Glib::ustring &path, bool merge_xmp_sidecar):
-    src_(path),
-    merge_xmp_(merge_xmp_sidecar),
-    image_(nullptr),
-    exif_(new rtengine::procparams::ExifPairs),
-    iptc_(new rtengine::procparams::IPTCPairs)
+Exiv2Metadata::Exiv2Metadata(const Glib::ustring& path, bool merge_xmp_sidecar)
+    : src_(path),
+      merge_xmp_(merge_xmp_sidecar),
+      image_(nullptr),
+      exif_(new rtengine::procparams::ExifPairs),
+      iptc_(new rtengine::procparams::IPTCPairs)
 {
 }
-
 
 void Exiv2Metadata::load() const
 {
-    if (!src_.empty() && !image_.get() && Glib::file_test(src_.c_str(), Glib::FILE_TEST_EXISTS)) {
+    if (!src_.empty() && !image_.get()
+        && Glib::file_test(src_.c_str(), Glib::FILE_TEST_EXISTS))
+    {
         CacheVal val;
-        auto finfo = Gio::File::create_for_path(src_)->query_info(G_FILE_ATTRIBUTE_TIME_MODIFIED);
+        auto finfo =
+            Gio::File::create_for_path(src_)->query_info(G_FILE_ATTRIBUTE_TIME_MODIFIED);
         Glib::TimeVal xmp_mtime(0, 0);
         if (merge_xmp_) {
             auto xmpname = xmpSidecarPath(src_);
             if (Glib::file_test(xmpname.c_str(), Glib::FILE_TEST_EXISTS)) {
-                xmp_mtime = Gio::File::create_for_path(xmpname)->query_info(G_FILE_ATTRIBUTE_TIME_MODIFIED)->modification_time();
+                xmp_mtime = Gio::File::create_for_path(xmpname)
+                                ->query_info(G_FILE_ATTRIBUTE_TIME_MODIFIED)
+                                ->modification_time();
             }
         }
 
-        if (cache_ && cache_->get(src_, val) && val.image_mtime >= finfo->modification_time() && val.use_xmp == merge_xmp_ && val.xmp_mtime >= xmp_mtime) {
+        if (cache_ && cache_->get(src_, val)
+            && val.image_mtime >= finfo->modification_time() && val.use_xmp == merge_xmp_
+            && val.xmp_mtime >= xmp_mtime)
+        {
             image_ = val.image;
         } else {
             auto img = open_exiv2(src_, true);
@@ -179,7 +181,7 @@ Exiv2::ExifData& Exiv2Metadata::exifData()
 
 const Exiv2::ExifData& Exiv2Metadata::exifData() const
 {
-    return const_cast<Exiv2Metadata *>(this)->exifData();
+    return const_cast<Exiv2Metadata*>(this)->exifData();
 }
 
 Exiv2::IptcData& Exiv2Metadata::iptcData()
@@ -189,7 +191,7 @@ Exiv2::IptcData& Exiv2Metadata::iptcData()
 
 const Exiv2::IptcData& Exiv2Metadata::iptcData() const
 {
-    return const_cast<Exiv2Metadata *>(this)->iptcData();
+    return const_cast<Exiv2Metadata*>(this)->iptcData();
 }
 
 Exiv2::XmpData& Exiv2Metadata::xmpData()
@@ -199,7 +201,7 @@ Exiv2::XmpData& Exiv2Metadata::xmpData()
 
 const Exiv2::XmpData& Exiv2Metadata::xmpData() const
 {
-    return const_cast<Exiv2Metadata *>(this)->xmpData();
+    return const_cast<Exiv2Metadata*>(this)->xmpData();
 }
 
 const Glib::ustring& Exiv2Metadata::filename() const
@@ -217,19 +219,19 @@ const rtengine::procparams::IPTCPairs& Exiv2Metadata::iptc() const
     return *iptc_;
 }
 
-void Exiv2Metadata::setExif(const rtengine::procparams::ExifPairs &exif)
+void Exiv2Metadata::setExif(const rtengine::procparams::ExifPairs& exif)
 {
     *exif_ = exif;
 }
 
-void Exiv2Metadata::setIptc(const rtengine::procparams::IPTCPairs &iptc)
+void Exiv2Metadata::setIptc(const rtengine::procparams::IPTCPairs& iptc)
 {
     *iptc_ = iptc;
 }
 
-void Exiv2Metadata::do_merge_xmp(Exiv2::Image *dst, bool keep_all) const
+void Exiv2Metadata::do_merge_xmp(Exiv2::Image* dst, bool keep_all) const
 {
-    try { 
+    try {
         auto xmp = getXmpSidecar(src_);
         Exiv2::ExifData exif;
         Exiv2::IptcData iptc;
@@ -240,12 +242,12 @@ void Exiv2Metadata::do_merge_xmp(Exiv2::Image *dst, bool keep_all) const
         if (!keep_all) {
             remove_unwanted(exif);
         }
-        
-        for (auto &datum : exif) {
+
+        for (auto& datum : exif) {
             dst->exifData()[datum.key()] = datum;
         }
-        for (auto &datum : iptc) {
-            auto &s = seen[datum.key()];
+        for (auto& datum : iptc) {
+            auto& s = seen[datum.key()];
             if (s.empty()) {
                 clear_metadata_key(dst->iptcData(), Exiv2::IptcKey(datum.key()));
                 dst->iptcData()[datum.key()] = datum;
@@ -255,8 +257,8 @@ void Exiv2Metadata::do_merge_xmp(Exiv2::Image *dst, bool keep_all) const
             }
         }
         seen.clear();
-        for (auto &datum : xmp) {
-            auto &s = seen[datum.key()];
+        for (auto& datum : xmp) {
+            auto& s = seen[datum.key()];
             if (s.empty()) {
                 clear_metadata_key(dst->xmpData(), Exiv2::XmpKey(datum.key()));
                 dst->xmpData()[datum.key()] = datum;
@@ -265,16 +267,15 @@ void Exiv2Metadata::do_merge_xmp(Exiv2::Image *dst, bool keep_all) const
                 dst->xmpData().add(datum);
             }
         }
-    } catch (std::exception &exc) {
+    } catch (std::exception& exc) {
         if (settings->verbose) {
-            std::cerr << "Error loading metadata from XMP sidecar: "
-                      << exc.what() << std::endl;
+            std::cerr << "Error loading metadata from XMP sidecar: " << exc.what()
+                      << std::endl;
         }
     }
 }
 
-
-void Exiv2Metadata::saveToImage(const Glib::ustring &path, bool preserve_all_tags) const
+void Exiv2Metadata::saveToImage(const Glib::ustring& path, bool preserve_all_tags) const
 {
     auto dst = open_exiv2(path, false);
     if (image_.get()) {
@@ -287,8 +288,8 @@ void Exiv2Metadata::saveToImage(const Glib::ustring &path, bool preserve_all_tag
         if (!preserve_all_tags) {
             remove_unwanted(srcexif);
         }
-        //dst->setExifData(srcexif);
-        for (auto &tag : srcexif) {
+        // dst->setExifData(srcexif);
+        for (auto& tag : srcexif) {
             if (tag.count() > 0) {
                 dst->exifData()[tag.key()] = tag;
             }
@@ -306,7 +307,7 @@ void Exiv2Metadata::saveToImage(const Glib::ustring &path, bool preserve_all_tag
     if (std::strftime(mbstr, sizeof(mbstr), "%Y:%m:%d %H:%M:%S", std::localtime(&t))) {
         dst->exifData()["Exif.Image.DateTime"] = mbstr;
     }
-    
+
     import_exif_pairs(dst->exifData());
     import_iptc_pairs(dst->iptcData());
     bool xmp_tried = false;
@@ -315,18 +316,18 @@ void Exiv2Metadata::saveToImage(const Glib::ustring &path, bool preserve_all_tag
         try {
             dst->writeMetadata();
             return;
-        } catch (Exiv2::Error &exc) {
+        } catch (Exiv2::Error& exc) {
             if (exc.code() == Exiv2::ErrorCode::kerTooLargeJpegSegment) {
                 std::string msg = exc.what();
-                if (msg.find("XMP") != std::string::npos &&
-                    !dst->xmpData().empty()) {
+                if (msg.find("XMP") != std::string::npos && !dst->xmpData().empty()) {
                     dst->xmpData().clear();
                     if (!xmp_tried && merge_xmp_) {
                         do_merge_xmp(dst.get(), preserve_all_tags);
                         xmp_tried = true;
                     }
-                } else if (msg.find("IPTC") != std::string::npos &&
-                           !dst->iptcData().empty()) {
+                } else if (msg.find("IPTC") != std::string::npos
+                           && !dst->iptcData().empty())
+                {
                     dst->iptcData().clear();
                     if (!iptc_tried) {
                         import_iptc_pairs(dst->iptcData());
@@ -340,9 +341,8 @@ void Exiv2Metadata::saveToImage(const Glib::ustring &path, bool preserve_all_tag
     }
 }
 
-
-void Exiv2Metadata::remove_unwanted(Exiv2::ExifData &dst) const
-{                
+void Exiv2Metadata::remove_unwanted(Exiv2::ExifData& dst) const
+{
     Exiv2::ExifThumb thumb(dst);
     thumb.erase();
 
@@ -408,29 +408,27 @@ void Exiv2Metadata::remove_unwanted(Exiv2::ExifData &dst) const
         "Exif.Photo.CompressedBitsPerPixel"
     };
 
-    static const std::vector<std::string> badpatterns = {
-        "Exif.SubImage"
-    };
+    static const std::vector<std::string> badpatterns = { "Exif.SubImage" };
 
     if (exif_keys_ && !src_.empty()) {
         try {
             FramesData fd(src_);
             fd.fillBasicTags(dst);
-        } catch (std::exception &exc) {
-            std::cout << "Error reading metadata from " << src_
-                      << std::endl;
+        } catch (std::exception& exc) {
+            std::cout << "Error reading metadata from " << src_ << std::endl;
         }
     }
-    
-    for (auto it = dst.begin(); it != dst.end(); ) {
-        int relevant = exif_keys_ ? (exif_keys_->find(it->key()) != exif_keys_->end() ? 1 : 0) : -1;
+
+    for (auto it = dst.begin(); it != dst.end();) {
+        int relevant =
+            exif_keys_ ? (exif_keys_->find(it->key()) != exif_keys_->end() ? 1 : 0) : -1;
         if (badtags.find(it->key()) != badtags.end() && relevant != 1) {
             it = dst.erase(it);
         } else if (relevant == 0) {
             it = dst.erase(it);
         } else {
             bool found = false;
-            for (auto &p : badpatterns) {
+            for (auto& p : badpatterns) {
                 if (it->key().find(p) == 0) {
                     it = dst.erase(it);
                     found = true;
@@ -441,30 +439,28 @@ void Exiv2Metadata::remove_unwanted(Exiv2::ExifData &dst) const
                 ++it;
             }
         }
-    }    
+    }
 }
 
-
-void Exiv2Metadata::import_exif_pairs(Exiv2::ExifData &out) const
+void Exiv2Metadata::import_exif_pairs(Exiv2::ExifData& out) const
 {
-    for (auto &p : *exif_) {
+    for (auto& p : *exif_) {
         try {
             out[p.first] = p.second;
-        } catch (std::exception &exc) {
+        } catch (std::exception& exc) {
             if (settings->verbose) {
-                std::cout << "Error setting " << p.first << " to " << p.second
-                          << ": " << exc.what() << std::endl;
+                std::cout << "Error setting " << p.first << " to " << p.second << ": "
+                          << exc.what() << std::endl;
             }
         }
     }
 }
 
-
-void Exiv2Metadata::import_iptc_pairs(Exiv2::IptcData &out) const
+void Exiv2Metadata::import_iptc_pairs(Exiv2::IptcData& out) const
 {
-    for (auto &p : *iptc_) {
+    for (auto& p : *iptc_) {
         try {
-            auto &v = p.second;
+            auto& v = p.second;
             if (v.size() >= 1) {
                 clear_metadata_key(out, Exiv2::IptcKey(p.first));
                 Exiv2::Iptcdatum d(Exiv2::IptcKey(p.first));
@@ -475,22 +471,21 @@ void Exiv2Metadata::import_iptc_pairs(Exiv2::IptcData &out) const
                     out.add(d);
                 }
             }
-        } catch (std::exception &exc) {
+        } catch (std::exception& exc) {
             if (settings->verbose) {
-                std::cout << "Error setting " << p.first
-                          << ": " << exc.what() << std::endl;
+                std::cout << "Error setting " << p.first << ": " << exc.what()
+                          << std::endl;
             }
         }
     }
 }
 
-
-void Exiv2Metadata::saveToXmp(const Glib::ustring &path) const
+void Exiv2Metadata::saveToXmp(const Glib::ustring& path) const
 {
     Exiv2::XmpData xmp;
     Exiv2::copyExifToXmp(exifData(), xmp);
     Exiv2::copyIptcToXmp(iptcData(), xmp);
-    for (auto &datum : xmpData()) {
+    for (auto& datum : xmpData()) {
         xmp[datum.key()] = datum;
     }
     Exiv2::ExifData exif;
@@ -502,10 +497,14 @@ void Exiv2Metadata::saveToXmp(const Glib::ustring &path) const
 
     std::string data;
     bool err = false;
-    if (Exiv2::XmpParser::encode(data, xmp, Exiv2::XmpParser::omitPacketWrapper|Exiv2::XmpParser::useCompactFormat) != 0) {
+    if (Exiv2::XmpParser::encode(data, xmp,
+                                 Exiv2::XmpParser::omitPacketWrapper
+                                     | Exiv2::XmpParser::useCompactFormat)
+        != 0)
+    {
         err = true;
     } else {
-        FILE *out = g_fopen(path.c_str(), "wb");
+        FILE* out = g_fopen(path.c_str(), "wb");
         if (!out || fputs(data.c_str(), out) == EOF) {
             err = true;
         }
@@ -519,8 +518,7 @@ void Exiv2Metadata::saveToXmp(const Glib::ustring &path) const
     }
 }
 
-
-void Exiv2Metadata::setExifKeys(const std::vector<std::string> *keys)
+void Exiv2Metadata::setExifKeys(const std::vector<std::string>* keys)
 {
     exif_keys_.reset();
     if (keys) {
@@ -529,12 +527,11 @@ void Exiv2Metadata::setExifKeys(const std::vector<std::string> *keys)
     }
 }
 
-
-void Exiv2Metadata::getDimensions(int &w, int &h) const
+void Exiv2Metadata::getDimensions(int& w, int& h) const
 {
     if (image_) {
-        if (dynamic_cast<const Exiv2::XmpSidecar *>(image_.get())) {
-            auto &exif = image_->exifData();
+        if (dynamic_cast<const Exiv2::XmpSidecar*>(image_.get())) {
+            auto& exif = image_->exifData();
             auto itw = exif.findKey(Exiv2::ExifKey("Exif.Image.ImageWidth"));
             auto ith = exif.findKey(Exiv2::ExifKey("Exif.Image.ImageLength"));
             if (itw != exif.end() && ith != exif.end()) {
@@ -552,8 +549,7 @@ void Exiv2Metadata::getDimensions(int &w, int &h) const
     }
 }
 
-
-Glib::ustring Exiv2Metadata::xmpSidecarPath(const Glib::ustring &path)
+Glib::ustring Exiv2Metadata::xmpSidecarPath(const Glib::ustring& path)
 {
     Glib::ustring fn = path;
     if (settings->xmp_sidecar_style == Settings::XmpSidecarStyle::STD) {
@@ -562,8 +558,7 @@ Glib::ustring Exiv2Metadata::xmpSidecarPath(const Glib::ustring &path)
     return fn + ".xmp";
 }
 
-
-Exiv2::XmpData Exiv2Metadata::getXmpSidecar(const Glib::ustring &path)
+Exiv2::XmpData Exiv2Metadata::getXmpSidecar(const Glib::ustring& path)
 {
     Exiv2::XmpData ret;
     auto fname = xmpSidecarPath(path);
@@ -574,7 +569,6 @@ Exiv2::XmpData Exiv2Metadata::getXmpSidecar(const Glib::ustring &path)
     return ret;
 }
 
-
 void Exiv2Metadata::init()
 {
     cache_.reset(new ImageCache(IMAGE_CACHE_SIZE));
@@ -584,12 +578,10 @@ void Exiv2Metadata::init()
 #endif
 }
 
-
 void Exiv2Metadata::cleanup()
 {
     Exiv2::XmpParser::terminate();
 }
-
 
 Exiv2::ExifData Exiv2Metadata::getOutputExifData() const
 {
@@ -597,15 +589,15 @@ Exiv2::ExifData Exiv2Metadata::getOutputExifData() const
     try {
         auto xmp = getXmpSidecar(src_);
         Exiv2::moveXmpToExif(xmp, exif);
-    } catch (std::exception &exc) {
+    } catch (std::exception& exc) {
         if (settings->verbose) {
-            std::cerr << "Error loading metadata from XMP sidecar: "
-                      << exc.what() << std::endl;
+            std::cerr << "Error loading metadata from XMP sidecar: " << exc.what()
+                      << std::endl;
         }
     }
     remove_unwanted(exif);
     import_exif_pairs(exif);
-    for (auto it = exif.begin(); it != exif.end(); ) {
+    for (auto it = exif.begin(); it != exif.end();) {
         if (it->count() > 0) {
             ++it;
         } else {
@@ -615,5 +607,4 @@ Exiv2::ExifData Exiv2Metadata::getOutputExifData() const
     return exif;
 }
 
-
-} // namespace rtengine
+}  // namespace rtengine

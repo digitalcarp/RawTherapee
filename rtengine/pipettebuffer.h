@@ -25,8 +25,7 @@ class EditSubscriber;
 
 enum EditUniqueID : int;
 
-namespace rtengine
-{
+namespace rtengine {
 
 class Imagefloat;
 class LabImage;
@@ -35,13 +34,13 @@ class LabImage;
 class PipetteBuffer
 {
 protected:
-
-    // To avoid duplicated information, we points to a EditDataProvider that contains the current EditSubscriber
-    // instead of pointing to the EditSubscriber directly
+    // To avoid duplicated information, we points to a EditDataProvider that contains the
+    // current EditSubscriber instead of pointing to the EditSubscriber directly
     ::EditDataProvider* dataProvider;
 
-    // TODO: Unfortunately, buffer can be of several type, each one representing a floating point image. Maybe we could unify everything one day!?
-    // Only one of the following pointers will be allocated at a time, if any; "one chunk" allocation
+    // TODO: Unfortunately, buffer can be of several type, each one representing a
+    // floating point image. Maybe we could unify everything one day!? Only one of the
+    // following pointers will be allocated at a time, if any; "one chunk" allocation
     Imagefloat* imgFloatBuffer;
     LabImage* LabBuffer;
     PlanarWhateverData<float> singlePlaneBuffer;
@@ -54,39 +53,21 @@ protected:
     void flush();
 
 public:
-    explicit PipetteBuffer(::EditDataProvider *dataProvider);
+    explicit PipetteBuffer(::EditDataProvider* dataProvider);
     ~PipetteBuffer();
 
     /** @brief Getter to know if the pipette buffer is correctly filled */
-    bool isReady() const
-    {
-        return ready;
-    }
+    bool isReady() const { return ready; }
 
     /** @brief Setter to tell that the pipette buffer is correctly filled
      *  You have to use this method once the pipette is filled, so it can be read. */
-    void setReady()
-    {
-        ready = true;
-    }
+    void setReady() { ready = true; }
 
-    ::EditDataProvider* getDataProvider()
-    {
-        return dataProvider;
-    }
+    ::EditDataProvider* getDataProvider() { return dataProvider; }
     EditUniqueID getEditID();
-    Imagefloat* getImgFloatBuffer()
-    {
-        return imgFloatBuffer;
-    }
-    LabImage* getLabBuffer()
-    {
-        return LabBuffer;
-    }
-    PlanarWhateverData<float>* getSinglePlaneBuffer()
-    {
-        return &singlePlaneBuffer;
-    }
+    Imagefloat* getImgFloatBuffer() { return imgFloatBuffer; }
+    LabImage* getLabBuffer() { return LabBuffer; }
+    PlanarWhateverData<float>* getSinglePlaneBuffer() { return &singlePlaneBuffer; }
 
     // return true if the buffer has been allocated
     bool bufferCreated();
@@ -95,4 +76,4 @@ public:
     void getPipetteData(int x, int y, int squareSize);
 };
 
-}
+}  // namespace rtengine

@@ -20,23 +20,25 @@
  */
 #pragma once
 
+#include "mytime.h"
 #include <iostream>
 #include <string>
-#include "mytime.h"
 
 #ifdef BENCHMARK
-    #define BENCHFUN StopWatch StopFun(__func__);
-    #define BENCHFUNMICRO StopWatch StopFun(__func__, true);
+#define BENCHFUN StopWatch StopFun(__func__);
+#define BENCHFUNMICRO StopWatch StopFun(__func__, true);
 #else
-    #define BENCHFUN
-    #define BENCHFUNMICRO
+#define BENCHFUN
+#define BENCHFUNMICRO
 #endif
 
 class StopWatch
 {
 public:
-
-    explicit StopWatch(const char* msg, bool microSeconds = false) : message(msg), unit(microSeconds ? " us" : " ms"), divisor(microSeconds ? 1 : 1000)
+    explicit StopWatch(const char* msg, bool microSeconds = false)
+        : message(msg),
+          unit(microSeconds ? " us" : " ms"),
+          divisor(microSeconds ? 1 : 1000)
     {
         start();
         stopped = false;
@@ -47,10 +49,7 @@ public:
             stop();
         }
     }
-    void start()
-    {
-        startTime.set();
-    }
+    void start() { startTime.set(); }
     void stop()
     {
         stopTime.set();

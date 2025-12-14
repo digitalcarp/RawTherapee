@@ -54,7 +54,10 @@ public:
     void enabledChanged() override;
 
     void update(int originalWidth = 0, int originalHeight = 0);
-    void setAdjusterBehavior(bool addRelativeBorderSize, bool addRed, bool addGreen, bool addBlue);
+    void setAdjusterBehavior(bool addRelativeBorderSize,
+                             bool addRed,
+                             bool addGreen,
+                             bool addBlue);
 
     // AdjusterListener
     void adjusterChanged(Adjuster* adj, double newVal) override;
@@ -80,7 +83,7 @@ private:
     // Helper struct for repeated patterns
     struct DimensionGui
     {
-        using CallbackFunc = void(Framing::*)();
+        using CallbackFunc = void (Framing::*)();
 
         DimensionGui() = default;
         DimensionGui(Gtk::Box* parent, const char* text);

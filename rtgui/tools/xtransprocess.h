@@ -34,7 +34,6 @@ class XTransProcess final :
 {
 
 protected:
-
     MyComboBoxText* method;
     Gtk::Box* borderbox;
     Adjuster* border;
@@ -54,17 +53,20 @@ protected:
 public:
     static const Glib::ustring TOOL_NAME;
 
-    XTransProcess ();
-    ~XTransProcess () override;
+    XTransProcess();
+    ~XTransProcess() override;
 
-    void read(const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited = nullptr) override;
-    void write(rtengine::procparams::ProcParams* pp, ParamsEdited* pedited = nullptr) override;
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
     void setAdjusterBehavior(bool falsecoloradd, bool dualDemosaicContrastAdd);
     void setBatchMode(bool batchMode) override;
-    void setDefaults(const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited = nullptr) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
 
     void methodChanged();
-    void autoContrastChanged (double autoContrast) override;
+    void autoContrastChanged(double autoContrast) override;
     void adjusterChanged(Adjuster* a, double newval) override;
     void checkBoxToggled(CheckBox* c, CheckValue newval) override;
     void adjusterAutoToggled(Adjuster* a, bool newval) override;

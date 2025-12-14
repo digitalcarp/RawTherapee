@@ -25,21 +25,17 @@
 
 #include "toolpanel.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
-namespace procparams
-{
+namespace procparams {
 
 class ExifPairs;
 
 }
 
-}
+}  // namespace rtengine
 
-class ExifPanel final :
-    public Gtk::Box,
-    public ToolPanel
+class ExifPanel final : public Gtk::Box, public ToolPanel
 {
 
 private:
@@ -76,7 +72,7 @@ private:
         }
     };
 
-    //Glib::ustring keepicon;
+    // Glib::ustring keepicon;
     Glib::ustring editicon;
     Glib::ustring open_icon_;
     Glib::ustring closed_icon_;
@@ -89,8 +85,8 @@ private:
     Gtk::Button* add;
     Gtk::Button* reset;
     Gtk::Button* resetAll;
-    Gtk::Button *activate_all_;
-    Gtk::Button *activate_none_;
+    Gtk::Button* activate_all_;
+    Gtk::Button* activate_none_;
 
     Gtk::CellRendererToggle exif_active_renderer_;
     Gtk::TreeView::Column exif_active_column_;
@@ -100,9 +96,13 @@ private:
     std::unordered_set<std::string> initial_active_keys_;
     std::unordered_set<std::string> cur_active_keys_;
 
-    rtengine::ProgressListener *pl_;
+    rtengine::ProgressListener* pl_;
 
-    void addTag(const std::string &key, const std::pair<Glib::ustring, Glib::ustring> &label, const Glib::ustring &value, bool editable, bool edited);
+    void addTag(const std::string& key,
+                const std::pair<Glib::ustring, Glib::ustring>& label,
+                const Glib::ustring& value,
+                bool editable,
+                bool edited);
     void refreshTags();
     void resetIt(const Gtk::TreeModel::const_iterator& iter);
     void resetPressed();
@@ -111,33 +111,38 @@ private:
     void activateAllPressed();
     void activateNonePressed();
 
-    void setKeyActive(Gtk::CellRenderer *renderer, const Gtk::TreeModel::iterator &it);
-    void onKeyActiveToggled(const Glib::ustring &path);
+    void setKeyActive(Gtk::CellRenderer* renderer, const Gtk::TreeModel::iterator& it);
+    void onKeyActiveToggled(const Glib::ustring& path);
 
     bool all_keys_active() const;
     std::unordered_set<std::string> get_active_keys() const;
 
-    void onExifTreeClick(GdkEventButton *event);
-    void onExifRowExpanded(const Gtk::TreeModel::iterator &it, const Gtk::TreeModel::Path &path);
-    void onExifRowCollapsed(const Gtk::TreeModel::iterator &it, const Gtk::TreeModel::Path &path);
+    void onExifTreeClick(GdkEventButton* event);
+    void onExifRowExpanded(const Gtk::TreeModel::iterator& it,
+                           const Gtk::TreeModel::Path& path);
+    void onExifRowCollapsed(const Gtk::TreeModel::iterator& it,
+                            const Gtk::TreeModel::Path& path);
 
-    void setExifTagValue(Gtk::CellRenderer *renderer, const Gtk::TreeModel::iterator &it);
-    void onEditExifTagValue(const Glib::ustring &path, const Glib::ustring &value);
+    void setExifTagValue(Gtk::CellRenderer* renderer, const Gtk::TreeModel::iterator& it);
+    void onEditExifTagValue(const Glib::ustring& path, const Glib::ustring& value);
 
 public:
-    ExifPanel ();
+    ExifPanel();
     ~ExifPanel() override;
 
-    void read (const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited = nullptr) override;
-    void write (rtengine::procparams::ProcParams* pp, ParamsEdited* pedited = nullptr) override;
-    void setDefaults (const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited = nullptr) override;
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
 
-    void setImageData (const rtengine::FramesMetaData* id);
+    void setImageData(const rtengine::FramesMetaData* id);
 
     void exifSelectionChanged();
     // void row_activated (const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column);
 
     void notifyListener();
 
-    void setProgressListener(rtengine::ProgressListener *pl);
+    void setProgressListener(rtengine::ProgressListener* pl);
 };

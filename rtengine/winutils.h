@@ -30,8 +30,7 @@
  *
  * Memory is automatically freed when the object goes out of scope.
  */
-template <typename T>
-class WinHeapPtr : public rtengine::NonCopyable
+template <typename T> class WinHeapPtr : public rtengine::NonCopyable
 {
 private:
     const T ptr;
@@ -40,7 +39,8 @@ public:
     WinHeapPtr() = delete;
 
     /** Allocates the specified number of bytes in the process heap. */
-    explicit WinHeapPtr(SIZE_T bytes): ptr(static_cast<T>(HeapAlloc(GetProcessHeap(), 0, bytes))) {};
+    explicit WinHeapPtr(SIZE_T bytes)
+        : ptr(static_cast<T>(HeapAlloc(GetProcessHeap(), 0, bytes))) {};
 
     ~WinHeapPtr()
     {
@@ -48,15 +48,9 @@ public:
         HeapFree(GetProcessHeap(), 0, static_cast<LPVOID>(ptr));
     }
 
-    T operator ->() const
-    {
-        return ptr;
-    }
+    T operator->() const { return ptr; }
 
-    operator T() const
-    {
-        return ptr;
-    }
+    operator T() const { return ptr; }
 };
 
 /**
@@ -64,8 +58,7 @@ public:
  *
  * Memory is automatically freed when the object goes out of scope.
  */
-template <typename T>
-class WinLocalPtr : public rtengine::NonCopyable
+template <typename T> class WinLocalPtr : public rtengine::NonCopyable
 {
 private:
     const T ptr;
@@ -74,7 +67,7 @@ public:
     WinLocalPtr() = delete;
 
     /** Wraps a raw pointer. */
-    WinLocalPtr(T pointer): ptr(pointer) {};
+    WinLocalPtr(T pointer) : ptr(pointer) {};
 
     ~WinLocalPtr()
     {
@@ -82,15 +75,9 @@ public:
         LocalFree(static_cast<HLOCAL>(ptr));
     }
 
-    T operator ->() const
-    {
-        return ptr;
-    }
+    T operator->() const { return ptr; }
 
-    operator T() const
-    {
-        return ptr;
-    }
+    operator T() const { return ptr; }
 };
 
 /**
@@ -107,17 +94,11 @@ public:
     WinHandle() = delete;
 
     /** Wraps a HANDLE. */
-    WinHandle(HANDLE handle): handle(handle) {};
+    WinHandle(HANDLE handle) : handle(handle) {};
 
-    ~WinHandle()
-    {
-        CloseHandle(handle);
-    }
+    ~WinHandle() { CloseHandle(handle); }
 
-    operator HANDLE() const
-    {
-        return handle;
-    }
+    operator HANDLE() const { return handle; }
 };
 
 #endif

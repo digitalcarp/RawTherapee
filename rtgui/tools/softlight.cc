@@ -1,5 +1,5 @@
 /** -*- C++ -*-
- *  
+ *
  *  This file is part of RawTherapee.
  *
  *  Copyright (c) 2018 Alberto Griggio <alberto.griggio@gmail.com>
@@ -31,12 +31,13 @@ using namespace rtengine::procparams;
 
 const Glib::ustring SoftLight::TOOL_NAME = "softlight";
 
-SoftLight::SoftLight(): FoldableToolPanel(this, TOOL_NAME, M("TP_SOFTLIGHT_LABEL"), false, true)
+SoftLight::SoftLight()
+    : FoldableToolPanel(this, TOOL_NAME, M("TP_SOFTLIGHT_LABEL"), false, true)
 {
     auto m = ProcEventMapper::getInstance();
     EvSoftLightEnabled = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_SOFTLIGHT_ENABLED");
     EvSoftLightStrength = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_SOFTLIGHT_STRENGTH");
-    
+
     strength = Gtk::manage(new Adjuster(M("TP_SOFTLIGHT_STRENGTH"), 0., 100., 1., 30.));
     strength->setAdjusterListener(this);
     strength->show();
@@ -44,8 +45,7 @@ SoftLight::SoftLight(): FoldableToolPanel(this, TOOL_NAME, M("TP_SOFTLIGHT_LABEL
     pack_start(*strength);
 }
 
-
-void SoftLight::read(const ProcParams *pp, const ParamsEdited *pedited)
+void SoftLight::read(const ProcParams* pp, const ParamsEdited* pedited)
 {
     disableListener();
 
@@ -60,8 +60,7 @@ void SoftLight::read(const ProcParams *pp, const ParamsEdited *pedited)
     enableListener();
 }
 
-
-void SoftLight::write(ProcParams *pp, ParamsEdited *pedited)
+void SoftLight::write(ProcParams* pp, ParamsEdited* pedited)
 {
     pp->softlight.strength = strength->getValue();
     pp->softlight.enabled = getEnabled();
@@ -72,7 +71,7 @@ void SoftLight::write(ProcParams *pp, ParamsEdited *pedited)
     }
 }
 
-void SoftLight::setDefaults(const ProcParams *defParams, const ParamsEdited *pedited)
+void SoftLight::setDefaults(const ProcParams* defParams, const ParamsEdited* pedited)
 {
     strength->setDefault(defParams->softlight.strength);
 
@@ -83,7 +82,6 @@ void SoftLight::setDefaults(const ProcParams *defParams, const ParamsEdited *ped
     }
 }
 
-
 void SoftLight::adjusterChanged(Adjuster* a, double newval)
 {
     if (listener && getEnabled()) {
@@ -91,7 +89,7 @@ void SoftLight::adjusterChanged(Adjuster* a, double newval)
     }
 }
 
-void SoftLight::enabledChanged ()
+void SoftLight::enabledChanged()
 {
     if (listener) {
         if (get_inconsistent()) {
@@ -104,7 +102,6 @@ void SoftLight::enabledChanged ()
     }
 }
 
-
 void SoftLight::setBatchMode(bool batchMode)
 {
     ToolPanel::setBatchMode(batchMode);
@@ -112,9 +109,7 @@ void SoftLight::setBatchMode(bool batchMode)
     strength->showEditedCB();
 }
 
-
 void SoftLight::setAdjusterBehavior(bool strengthAdd)
 {
     strength->setAddMode(strengthAdd);
 }
-

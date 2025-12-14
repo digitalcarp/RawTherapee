@@ -67,15 +67,15 @@ protected:
     Gtk::Grid* gamgrid;
     Gtk::Button* neutral;
 
-    MyComboBoxText*   retinexMethod;
-    MyComboBoxText*   retinexcolorspace;
-    MyComboBoxText*   gammaretinex;
-    MyComboBoxText*   mapMethod;
-    MyComboBoxText*   viewMethod;
+    MyComboBoxText* retinexMethod;
+    MyComboBoxText* retinexcolorspace;
+    MyComboBoxText* gammaretinex;
+    MyComboBoxText* mapMethod;
+    MyComboBoxText* viewMethod;
     Gtk::CheckButton* medianmap;
     MyComboBoxText* complexmethod;
-    sigc::connection  complexmethodconn;
-    
+    sigc::connection complexmethodconn;
+
     double nextmin;
     double nextmax;
     double nextminiT;
@@ -88,11 +88,11 @@ protected:
     Gtk::Label* mMLabels;
     Gtk::Label* transLabels;
     Gtk::Label* transLabels2;
-    Gtk::Frame *gainFrame;
-    Gtk::Frame *tranFrame;
-    Gtk::Frame *iterFrame;
-    Gtk::Frame *maskFrame;
-    Gtk::Frame *equalFrame;
+    Gtk::Frame* gainFrame;
+    Gtk::Frame* tranFrame;
+    Gtk::Frame* iterFrame;
+    Gtk::Frame* maskFrame;
+    Gtk::Frame* equalFrame;
 
     DiagonalCurveEditor* cdshape;
     DiagonalCurveEditor* cdshapeH;
@@ -114,15 +114,25 @@ public:
     Retinex();
     ~Retinex() override;
 
-    void read(const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited = nullptr) override;
-    void write(rtengine::procparams::ProcParams* pp, ParamsEdited* pedited = nullptr) override;
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
     void setBatchMode(bool batchMode) override;
-    void setDefaults(const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited = nullptr) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
     void trimValues(rtengine::procparams::ProcParams* pp) override;
     void adjusterChanged(Adjuster* a, double newval) override;
     void autoOpenCurve() override;
     void medianmapChanged();
-    void minmaxChanged(double cdma, double cdmin, double mini, double maxi, double Tmean, double Tsigma, double Tmin, double Tmax) override;
+    void minmaxChanged(double cdma,
+                       double cdmin,
+                       double mini,
+                       double maxi,
+                       double Tmean,
+                       double Tsigma,
+                       double Tmin,
+                       double Tmax) override;
     void updateLabel();
     void updateTrans();
     void neutral_pressed();
@@ -135,26 +145,34 @@ public:
     void retinexColorSpaceChanged();
     void gammaretinexChanged();
     void ColorSpaceUpdateUI();
-    void writeOptions(std::vector<int> &tpOpen);
+    void writeOptions(std::vector<int>& tpOpen);
     void updateToolState(const std::vector<int>& tpOpen);
-    void setAdjusterBehavior (bool strAdd, bool neighAdd, bool limdAdd, bool offsAdd, bool vartAdd, bool gamAdd, bool slopeAdd);
-    void updateCurveBackgroundHistogram(
-        const LUTu& histToneCurve,
-        const LUTu& histLCurve,
-        const LUTu& histCCurve,
-        const LUTu& histLCAM,
-        const LUTu& histCCAM,
-        const LUTu& histRed,
-        const LUTu& histGreen,
-        const LUTu& histBlue,
-        const LUTu& histLuma,
-        const LUTu& histLRETI
-    );
+    void setAdjusterBehavior(bool strAdd,
+                             bool neighAdd,
+                             bool limdAdd,
+                             bool offsAdd,
+                             bool vartAdd,
+                             bool gamAdd,
+                             bool slopeAdd);
+    void updateCurveBackgroundHistogram(const LUTu& histToneCurve,
+                                        const LUTu& histLCurve,
+                                        const LUTu& histCCurve,
+                                        const LUTu& histLCAM,
+                                        const LUTu& histCCAM,
+                                        const LUTu& histRed,
+                                        const LUTu& histGreen,
+                                        const LUTu& histBlue,
+                                        const LUTu& histLuma,
+                                        const LUTu& histLRETI);
 
-    void colorForValue(double valX, double valY, enum ColorCaller::ElemType elemType, int callerId, ColorCaller* caller) override;
+    void colorForValue(double valX,
+                       double valY,
+                       enum ColorCaller::ElemType elemType,
+                       int callerId,
+                       ColorCaller* caller) override;
 
 private:
-    void foldAllButMe(GdkEventButton* event, MyExpander *expander);
+    void foldAllButMe(GdkEventButton* event, MyExpander* expander);
     void convertParamToNormal();
     void updateGUIToMode(int mode);
     void complexmethodChanged();

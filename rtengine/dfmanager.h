@@ -24,8 +24,7 @@
 
 #include <glibmm/ustring.h>
 
-namespace rtengine
-{
+namespace rtengine {
 
 struct badPix;
 
@@ -39,11 +38,21 @@ public:
     void init(const Glib::ustring& pathname);
     Glib::ustring getPathname() const;
     void getStat(int& totFiles, int& totTemplates) const;
-    const RawImage* searchDarkFrame(const std::string& mak, const std::string& mod, int iso, double shut, time_t t);
+    const RawImage* searchDarkFrame(const std::string& mak,
+                                    const std::string& mod,
+                                    int iso,
+                                    double shut,
+                                    time_t t);
     const RawImage* searchDarkFrame(const Glib::ustring& filename);
-    const std::vector<badPix>* getHotPixels(const std::string& mak, const std::string& mod, int iso, double shut, time_t t);
+    const std::vector<badPix>* getHotPixels(const std::string& mak,
+                                            const std::string& mod,
+                                            int iso,
+                                            double shut,
+                                            time_t t);
     const std::vector<badPix>* getHotPixels(const Glib::ustring& filename);
-    const std::vector<badPix>* getBadPixels(const std::string& mak, const std::string& mod, const std::string& serial) const;
+    const std::vector<badPix>* getBadPixels(const std::string& mak,
+                                            const std::string& mod,
+                                            const std::string& serial) const;
 
 private:
     DFManager();
@@ -54,4 +63,4 @@ private:
     const std::unique_ptr<Implementation> implementation;
 };
 
-}
+}  // namespace rtengine

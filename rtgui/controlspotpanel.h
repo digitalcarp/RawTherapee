@@ -23,8 +23,8 @@
 
 #include <memory>
 
-#include "rtengine/coord.h"
 #include "editcallbacks.h"
+#include "rtengine/coord.h"
 #include "threadutils.h"
 #include "toolpanel.h"
 #include "widgets/basic/adjuster.h"
@@ -36,11 +36,10 @@ public:
     virtual ~ControlPanelListener() {};
 
     virtual void resetToolMaskView() = 0;
-    virtual void spotNameChanged(const Glib::ustring &newName) = 0;
+    virtual void spotNameChanged(const Glib::ustring& newName) = 0;
 };
 
-
-class ControlSpotPanel:
+class ControlSpotPanel :
     public ToolParamBlock,
     public AdjusterListener,
     public EditSubscriber,
@@ -50,15 +49,18 @@ public:
     /**
      * A SpotRow structure allows exchanges from and to ControlSpotClass
      */
-    struct SpotRow {
+    struct SpotRow
+    {
         Glib::ustring name;
         bool isvisible;
-        int prevMethod; // 0 = Normal, 1 = Excluding
-        int shape; // 0 = Ellipse, 1 = Rectangle
-        int spotMethod; // 0 = Normal, 1 = Excluding  2 = fullimage 3 = main
+        int prevMethod;  // 0 = Normal, 1 = Excluding
+        int shape;       // 0 = Ellipse, 1 = Rectangle
+        int spotMethod;  // 0 = Normal, 1 = Excluding  2 = fullimage 3 = main
         int sensiexclu;
         int structexclu;
-        int shapeMethod; // 0 = Independent (mouse), 1 = Symmetrical (mouse), 2 = Independent (mouse + sliders), 3 = Symmetrical (mouse + sliders)
+        int shapeMethod;  // 0 = Independent (mouse), 1 = Symmetrical (mouse), 2 =
+                          // Independent (mouse + sliders), 3 = Symmetrical (mouse +
+                          // sliders)
         int avoidgamutMethod;
         int locX;
         int locXL;
@@ -67,7 +69,7 @@ public:
         int centerX;
         int centerY;
         int circrad;
-        int qualityMethod; // 0 = Standard, 1 = Enhanced, 2 = Enhanced + chroma denoise
+        int qualityMethod;  // 0 = Standard, 1 = Enhanced, 2 = Enhanced + chroma denoise
         double transit;
         double transitweak;
         double transitgrad;
@@ -91,13 +93,14 @@ public:
         double denoichmask;
         bool shortc;
         int lumask;
-        //bool savrest;
-        int complexMethod; // 0 = Simple, 1 = Moderate, 2 = all
-        int wavMethod; // 0 = D2, 1 = D4, 2 = D6, 3 = D10, 4 = D14
+        // bool savrest;
+        int complexMethod;  // 0 = Simple, 1 = Moderate, 2 = all
+        int wavMethod;      // 0 = D2, 1 = D4, 2 = D6, 3 = D10, 4 = D14
     };
 
     /**
-     * An event type enumeration allows exchanges of spot panel event type from and to ControlSpotClass
+     * An event type enumeration allows exchanges of spot panel event type from and to
+     * ControlSpotClass
      */
     enum eventType {
         None = 0,
@@ -170,10 +173,7 @@ public:
      *
      * @param ind True is mask preview is active
      */
-    void setMaskPrevActive(bool ind)
-    {
-        maskPrevActive = ind;
-    }
+    void setMaskPrevActive(bool ind) { maskPrevActive = ind; }
     /**
      * Getter for deltaE preview active
      *
@@ -191,7 +191,7 @@ public:
      *
      * @param newSpot A SpotRow structure containing new spot params
      */
-    void addControlSpot(const SpotRow &newSpot);
+    void addControlSpot(const SpotRow& newSpot);
 
     // Control spot delete function
     /**
@@ -206,9 +206,11 @@ public:
      * Implementation of setDefaults function of toolpanel.h
      *
      * @param defParams ProcParams containing default values to set to the adjusters
-     * @param pedited ParamsEdited containing default state values to set to the adjusters (not used because batch mode is deactivated for Locallab)
+     * @param pedited ParamsEdited containing default state values to set to the adjusters
+     * (not used because batch mode is deactivated for Locallab)
      */
-    void setDefaults(const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited = nullptr) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
     /**
      * Enable or disable the interactions with panel widgets
      *
@@ -222,11 +224,25 @@ public:
 
     // Batch mode management
     // Note: Batch mode is deactivated for Locallab
-    
+
     /**
      * upadte function to work with Preferences and spotMethod
-    */
-    void updateguiset(int spottype, bool iscolor,  bool issh, bool isvib, bool isexpos, bool issoft, bool isblur, bool istom, bool isret, bool issharp, bool iscont, bool iscbdl, bool islog, bool ismas, bool isci);
+     */
+    void updateguiset(int spottype,
+                      bool iscolor,
+                      bool issh,
+                      bool isvib,
+                      bool isexpos,
+                      bool issoft,
+                      bool isblur,
+                      bool istom,
+                      bool isret,
+                      bool issharp,
+                      bool iscont,
+                      bool iscbdl,
+                      bool islog,
+                      bool ismas,
+                      bool isci);
     void updateguiscopeset(int scope);
 
 private:
@@ -253,7 +269,7 @@ private:
     void shapeMethodChanged();
     void qualityMethodChanged();
     void avoidgamutMethodChanged();
-   //void complexMethodChanged();
+    // void complexMethodChanged();
     void wavMethodChanged();
 
     void updateParamVisibility();
@@ -268,7 +284,7 @@ private:
     void laplacChanged();
     void deltaeChanged();
     void shortcChanged();
-    //void savrestChanged();
+    // void savrestChanged();
 
     void previewChanged();
 
@@ -286,22 +302,25 @@ private:
 
     using ToolPanel::setDefaults;
 
-    class ControlSpots:
-        public Gtk::TreeModel::ColumnRecord
+    class ControlSpots : public Gtk::TreeModel::ColumnRecord
     {
     public:
         ControlSpots();
 
-        Gtk::TreeModelColumn<bool> mouseover; // Used to manage spot enlightening when mouse over
+        Gtk::TreeModelColumn<bool>
+            mouseover;  // Used to manage spot enlightening when mouse over
         Gtk::TreeModelColumn<Glib::ustring> name;
         Gtk::TreeModelColumn<bool> isvisible;
-        Gtk::TreeModelColumn<int> curveid; // Associated curve id
-        Gtk::TreeModelColumn<int> prevMethod; // 0 = hide, 1 = show
-        Gtk::TreeModelColumn<int> shape; // 0 = Ellipse, 1 = Rectangle
-        Gtk::TreeModelColumn<int> spotMethod; // 0 = Normal, 1 = Excluding
+        Gtk::TreeModelColumn<int> curveid;     // Associated curve id
+        Gtk::TreeModelColumn<int> prevMethod;  // 0 = hide, 1 = show
+        Gtk::TreeModelColumn<int> shape;       // 0 = Ellipse, 1 = Rectangle
+        Gtk::TreeModelColumn<int> spotMethod;  // 0 = Normal, 1 = Excluding
         Gtk::TreeModelColumn<int> sensiexclu;
         Gtk::TreeModelColumn<int> structexclu;
-        Gtk::TreeModelColumn<int> shapeMethod; // 0 = Independent (mouse), 1 = Symmetrical (mouse), 2 = Independent (mouse + sliders), 3 = Symmetrical (mouse + sliders)
+        Gtk::TreeModelColumn<int>
+            shapeMethod;  // 0 = Independent (mouse), 1 = Symmetrical (mouse), 2 =
+                          // Independent (mouse + sliders), 3 = Symmetrical (mouse +
+                          // sliders)
         Gtk::TreeModelColumn<int> avoidgamutMethod;
         Gtk::TreeModelColumn<int> locX;
         Gtk::TreeModelColumn<int> locXL;
@@ -310,7 +329,8 @@ private:
         Gtk::TreeModelColumn<int> centerX;
         Gtk::TreeModelColumn<int> centerY;
         Gtk::TreeModelColumn<int> circrad;
-        Gtk::TreeModelColumn<int> qualityMethod; // 0 = Standard, 1 = Enhanced, 2 = Enhanced + chroma denoise
+        Gtk::TreeModelColumn<int>
+            qualityMethod;  // 0 = Standard, 1 = Enhanced, 2 = Enhanced + chroma denoise
         Gtk::TreeModelColumn<double> transit;
         Gtk::TreeModelColumn<double> transitweak;
         Gtk::TreeModelColumn<double> transitgrad;
@@ -334,21 +354,17 @@ private:
         Gtk::TreeModelColumn<int> denoichmask;
         Gtk::TreeModelColumn<bool> shortc;
         Gtk::TreeModelColumn<int> lumask;
-        //Gtk::TreeModelColumn<bool> savrest;
-        Gtk::TreeModelColumn<int> complexMethod; // 0 = Simple, 1 = mod, 2 = all
-        Gtk::TreeModelColumn<int> wavMethod; // 0 = D2, 1 = D4, 2 = D6, 3 = D10, 4 = D14
+        // Gtk::TreeModelColumn<bool> savrest;
+        Gtk::TreeModelColumn<int> complexMethod;  // 0 = Simple, 1 = mod, 2 = all
+        Gtk::TreeModelColumn<int> wavMethod;  // 0 = D2, 1 = D4, 2 = D6, 3 = D10, 4 = D14
     };
 
-    class RenameDialog:
-        public Gtk::Dialog
+    class RenameDialog : public Gtk::Dialog
     {
     public:
-        enum DialogButton {
-            OkButton = 1,
-            CancelButton = 2
-        };
+        enum DialogButton { OkButton = 1, CancelButton = 2 };
 
-        RenameDialog(const Glib::ustring &actualname, Gtk::Window &parent);
+        RenameDialog(const Glib::ustring& actualname, Gtk::Window& parent);
         Glib::ustring get_new_name();
 
     private:
@@ -377,7 +393,6 @@ private:
     Gtk::Button* const button_visibility_;
     sigc::connection buttonvisibilityconn_;
 
-
     MyComboBoxText* const prevMethod_;
     sigc::connection prevMethodconn_;
     MyComboBoxText* const shape_;
@@ -388,12 +403,12 @@ private:
     sigc::connection shapeMethodconn_;
     MyComboBoxText* const qualityMethod_;
     sigc::connection qualityMethodconn_;
-    //MyComboBoxText* const complexMethod_;
-    //sigc::connection complexMethodconn_;
+    // MyComboBoxText* const complexMethod_;
+    // sigc::connection complexMethodconn_;
     MyComboBoxText* const wavMethod_;
     sigc::connection wavMethodconn_;
     MyComboBoxText* const avoidgamutMethod_;
-	sigc::connection avoidgamutconn_;
+    sigc::connection avoidgamutconn_;
 
     Adjuster* const sensiexclu_;
     Adjuster* const structexclu_;
@@ -436,8 +451,8 @@ private:
     sigc::connection deltaeConn_;
     Gtk::CheckButton* const shortc_;
     sigc::connection shortcConn_;
-    //Gtk::CheckButton* const savrest_;
-    //sigc::connection savrestConn_;
+    // Gtk::CheckButton* const savrest_;
+    // sigc::connection savrestConn_;
 
     MyExpander* const expTransGrad_;
     MyExpander* const expShapeDetect_;
@@ -450,7 +465,7 @@ private:
     Gtk::Box* const ctboxshape;
     Gtk::Box* const ctboxactivmethod;
     Gtk::Box* const ctboxspotmethod;
-    
+
     Gtk::Box* const ctboxshapemethod;
     Gtk::Box* const ctboxgamut;
     ToolParamBlock* const artifBox2;
@@ -463,7 +478,8 @@ private:
     bool selSpotChanged_;
     bool nameChanged_;
     bool visibilityChanged_;
-    int eventType; // 0 = No event, 1 = Spot creation event, 2 = Spot deletion event, 3 = Spot selection event, 4 = Spot duplication event
+    int eventType;  // 0 = No event, 1 = Spot creation event, 2 = Spot deletion event, 3 =
+                    // Spot selection event, 4 = Spot duplication event
     Gtk::Frame* const excluFrame;
     bool maskPrevActive;
 
@@ -474,4 +490,4 @@ private:
     MyMutex mTreeview;
 };
 
-#endif // _CONTROLSPOTPANEL_H_
+#endif  // _CONTROLSPOTPANEL_H_

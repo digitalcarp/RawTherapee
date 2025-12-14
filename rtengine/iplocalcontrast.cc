@@ -24,15 +24,19 @@
 
 #include "array2D.h"
 #include "gauss.h"
-#include "labimage.h"
 #include "improcfun.h"
+#include "labimage.h"
 #include "procparams.h"
 #include "settings.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
-void ImProcFunctions::localContrast(LabImage *lab, float **destination, const rtengine::procparams::LocalContrastParams &localContrastParams, bool fftwlc, double scale)
+void ImProcFunctions::localContrast(
+    LabImage* lab,
+    float** destination,
+    const rtengine::procparams::LocalContrastParams& localContrastParams,
+    bool fftwlc,
+    double scale)
 {
     if (!localContrastParams.enabled) {
         return;
@@ -45,18 +49,19 @@ void ImProcFunctions::localContrast(LabImage *lab, float **destination, const rt
     const float light = localContrastParams.lightness;
     array2D<float> buf(width, height);
     float sigma = localContrastParams.radius / scale;
-    //printf("wi%i he=%i am=%f da=%f li=%f si=%f\n", width, height, a, dark, light, sigma);
-    if(!fftwlc) {
+    // printf("wi%i he=%i am=%f da=%f li=%f si=%f\n", width, height, a, dark, light,
+    // sigma);
+    if (!fftwlc) {
 #ifdef _OPENMP
-        #pragma omp parallel if(multiThread)
+#pragma omp parallel if (multiThread)
 #endif
         gaussianBlur(lab->L, buf, width, height, sigma);
     } else {
-        //OPENMP disabled
+        // OPENMP disabled
         ImProcFunctions::fftw_convol_blur2(lab->L, buf, width, height, sigma, 0, 0);
     }
 #ifdef _OPENMP
-    #pragma omp parallel for if(multiThread)
+#pragma omp parallel for if (multiThread)
 #endif
 
     for (int y = 0; y < height; ++y) {
@@ -72,4 +77,4 @@ void ImProcFunctions::localContrast(LabImage *lab, float **destination, const rt
     }
 }
 
-} // namespace rtengine
+}  // namespace rtengine

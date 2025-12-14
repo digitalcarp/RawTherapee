@@ -21,8 +21,7 @@
 #include "procparams.h"
 #include "rtengine.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
 class ProcessingJobImpl final : public ProcessingJob
 {
@@ -34,16 +33,21 @@ public:
     procparams::ProcParams pparams;
     bool fast;
 
-    ProcessingJobImpl (const Glib::ustring& fn, bool iR, const procparams::ProcParams& pp, bool ff)
-        : fname(fn), isRaw(iR), initialImage(nullptr), pparams(pp), fast(ff) {}
+    ProcessingJobImpl(const Glib::ustring& fn,
+                      bool iR,
+                      const procparams::ProcParams& pp,
+                      bool ff)
+        : fname(fn), isRaw(iR), initialImage(nullptr), pparams(pp), fast(ff)
+    {
+    }
 
-    ProcessingJobImpl (InitialImage* iImage, const procparams::ProcParams& pp, bool ff)
+    ProcessingJobImpl(InitialImage* iImage, const procparams::ProcParams& pp, bool ff)
         : fname(""), isRaw(true), initialImage(iImage), pparams(pp), fast(ff)
     {
         iImage->increaseRef();
     }
 
-    ~ProcessingJobImpl () override
+    ~ProcessingJobImpl() override
     {
         if (initialImage) {
             initialImage->decreaseRef();
@@ -53,4 +57,4 @@ public:
     bool fastPipeline() const override { return fast; }
 };
 
-}
+}  // namespace rtengine

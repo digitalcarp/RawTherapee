@@ -18,13 +18,13 @@
  *  2018 Pierre Cabrera <pierre.cab@gmail.com>
  */
 
-#include "rtengine/rt_math.h"
 #include "controlspotpanel.h"
 #include "editwidgets.h"
+#include "eventmapper.h"
 #include "options.h"
 #include "rtengine/procparams.h"
+#include "rtengine/rt_math.h"
 #include "rtimage.h"
-#include "eventmapper.h"
 
 using namespace rtengine;
 using namespace procparams;
@@ -33,116 +33,150 @@ using namespace procparams;
 // ControlSpotPanel
 //-----------------------------------------------------------------------------
 
-ControlSpotPanel::ControlSpotPanel():
-    EditSubscriber(ET_OBJECTS),
-    FoldableToolPanel(this, "controlspotpanel", M("TP_LOCALLAB_SETTINGS")),
+ControlSpotPanel::ControlSpotPanel()
+    : EditSubscriber(ET_OBJECTS),
+      FoldableToolPanel(this, "controlspotpanel", M("TP_LOCALLAB_SETTINGS")),
 
-    scrolledwindow_(Gtk::manage(new Gtk::ScrolledWindow())),
-    treeview_(Gtk::manage(new Gtk::TreeView())),
+      scrolledwindow_(Gtk::manage(new Gtk::ScrolledWindow())),
+      treeview_(Gtk::manage(new Gtk::TreeView())),
 
-    button_add_(Gtk::manage(new Gtk::Button(M("TP_LOCALLAB_BUTTON_ADD")))),
-    button_delete_(Gtk::manage(new Gtk::Button(M("TP_LOCALLAB_BUTTON_DEL")))),
-    button_duplicate_(Gtk::manage(new Gtk::Button(M("TP_LOCALLAB_BUTTON_DUPL")))),
+      button_add_(Gtk::manage(new Gtk::Button(M("TP_LOCALLAB_BUTTON_ADD")))),
+      button_delete_(Gtk::manage(new Gtk::Button(M("TP_LOCALLAB_BUTTON_DEL")))),
+      button_duplicate_(Gtk::manage(new Gtk::Button(M("TP_LOCALLAB_BUTTON_DUPL")))),
 
-    button_rename_(Gtk::manage(new Gtk::Button(M("TP_LOCALLAB_BUTTON_REN")))),
-    button_visibility_(Gtk::manage(new Gtk::Button(M("TP_LOCALLAB_BUTTON_VIS")))),
+      button_rename_(Gtk::manage(new Gtk::Button(M("TP_LOCALLAB_BUTTON_REN")))),
+      button_visibility_(Gtk::manage(new Gtk::Button(M("TP_LOCALLAB_BUTTON_VIS")))),
 
-    prevMethod_(Gtk::manage(new MyComboBoxText())),
-    shape_(Gtk::manage(new MyComboBoxText())),
-    spotMethod_(Gtk::manage(new MyComboBoxText())),
-    shapeMethod_(Gtk::manage(new MyComboBoxText())),
-    qualityMethod_(Gtk::manage(new MyComboBoxText())),
-    //complexMethod_(Gtk::manage(new MyComboBoxText())),
-    wavMethod_(Gtk::manage(new MyComboBoxText())),
-    avoidgamutMethod_(Gtk::manage(new MyComboBoxText())),
+      prevMethod_(Gtk::manage(new MyComboBoxText())),
+      shape_(Gtk::manage(new MyComboBoxText())),
+      spotMethod_(Gtk::manage(new MyComboBoxText())),
+      shapeMethod_(Gtk::manage(new MyComboBoxText())),
+      qualityMethod_(Gtk::manage(new MyComboBoxText())),
+      // complexMethod_(Gtk::manage(new MyComboBoxText())),
+      wavMethod_(Gtk::manage(new MyComboBoxText())),
+      avoidgamutMethod_(Gtk::manage(new MyComboBoxText())),
 
-    sensiexclu_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_SENSIEXCLU"), 0, 100, 1, 12))),
-    structexclu_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_STRUCCOL"), 0, 100, 1, 0))),
-    locX_(Gtk::manage(new Adjuster(M("TP_LOCAL_WIDTH"), 2, 3000, 1, 150))),
-    locXL_(Gtk::manage(new Adjuster(M("TP_LOCAL_WIDTH_L"), 2, 3000, 1, 150))),
-    locY_(Gtk::manage(new Adjuster(M("TP_LOCAL_HEIGHT"), 2, 3000, 1, 150))),
-    locYT_(Gtk::manage(new Adjuster(M("TP_LOCAL_HEIGHT_T"), 2, 3000, 1, 150))),
-    centerX_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_CENTER_X"), -1000, 1000, 1, 0))),
-    centerY_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_CENTER_Y"), -1000, 1000, 1, 0))),
-    circrad_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_CIRCRADIUS"), 1.5, 150., 0.5, 18.))),
-    transit_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_TRANSITVALUE"), 2., 100., 0.1, 60.))),
-    transitweak_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_TRANSITWEAK"), 0.5, 25.0, 0.1, 1.0))),
-    transitgrad_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_TRANSITGRAD"), -1.0, 1.0, 0.01, 0.0))),
-    feather_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_FEATVALUE_MASK"), 10., 100., 0.1, 25.))),
-    struc_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_THRES"), 1.0, 12.0, 0.1, 4.0))),
-    thresh_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_THRESDELTAE"), 0.0, 15.0, 0.1, 2.0))),
-    iter_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_PROXI"), 0.2, 10.0, 0.1, 2.0))),
-   // balan_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_BALAN"), 0.05, 2.5, 0.05, 1.0, Gtk::manage(new RTImage("rawtherapee-logo-16")),  Gtk::manage(new RTImage("circle-white-small"))))),
-    balan_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_BALAN"), 0.05, 2.5, 0.05, 1.0, Gtk::manage(new RTImage("circle-yellow-small")),  Gtk::manage(new RTImage("circle-white-small"))))),
-    balanh_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_BALANH"), 0.2, 2.5, 0.1, 1.0, Gtk::manage(new RTImage("circle-multicolor-small")), Gtk::manage(new RTImage("circle-red-green-small"))))),
-    colorde_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_COLORDE"), -15, 15, 2, 5, Gtk::manage(new RTImage("circle-blue-yellow-small")), Gtk::manage(new RTImage("circle-gray-green-small"))))),
-    colorscope_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_COLORSCOPE"), 0., 100.0, 1., 30.))),
-    avoidrad_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_AVOIDRAD"), 0., 30.0, 0.1, 0.))),
-    scopemask_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_SCOPEMASK"), 0, 100, 1, 60))),
-    denoichmask_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_DENOIMASK"), 0., 100., 0.5, 0))),
-    lumask_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_LUMASK"), -50, 30, 1, 10, Gtk::manage(new RTImage("circle-yellow-small")), Gtk::manage(new RTImage("circle-gray-small")) ))),
+      sensiexclu_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_SENSIEXCLU"), 0, 100, 1, 12))),
+      structexclu_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_STRUCCOL"), 0, 100, 1, 0))),
+      locX_(Gtk::manage(new Adjuster(M("TP_LOCAL_WIDTH"), 2, 3000, 1, 150))),
+      locXL_(Gtk::manage(new Adjuster(M("TP_LOCAL_WIDTH_L"), 2, 3000, 1, 150))),
+      locY_(Gtk::manage(new Adjuster(M("TP_LOCAL_HEIGHT"), 2, 3000, 1, 150))),
+      locYT_(Gtk::manage(new Adjuster(M("TP_LOCAL_HEIGHT_T"), 2, 3000, 1, 150))),
+      centerX_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_CENTER_X"), -1000, 1000, 1, 0))),
+      centerY_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_CENTER_Y"), -1000, 1000, 1, 0))),
+      circrad_(
+          Gtk::manage(new Adjuster(M("TP_LOCALLAB_CIRCRADIUS"), 1.5, 150., 0.5, 18.))),
+      transit_(
+          Gtk::manage(new Adjuster(M("TP_LOCALLAB_TRANSITVALUE"), 2., 100., 0.1, 60.))),
+      transitweak_(
+          Gtk::manage(new Adjuster(M("TP_LOCALLAB_TRANSITWEAK"), 0.5, 25.0, 0.1, 1.0))),
+      transitgrad_(
+          Gtk::manage(new Adjuster(M("TP_LOCALLAB_TRANSITGRAD"), -1.0, 1.0, 0.01, 0.0))),
+      feather_(Gtk::manage(
+          new Adjuster(M("TP_LOCALLAB_FEATVALUE_MASK"), 10., 100., 0.1, 25.))),
+      struc_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_THRES"), 1.0, 12.0, 0.1, 4.0))),
+      thresh_(
+          Gtk::manage(new Adjuster(M("TP_LOCALLAB_THRESDELTAE"), 0.0, 15.0, 0.1, 2.0))),
+      iter_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_PROXI"), 0.2, 10.0, 0.1, 2.0))),
+      // balan_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_BALAN"), 0.05, 2.5, 0.05, 1.0,
+      // Gtk::manage(new RTImage("rawtherapee-logo-16")),  Gtk::manage(new
+      // RTImage("circle-white-small"))))),
+      balan_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_BALAN"),
+                                      0.05,
+                                      2.5,
+                                      0.05,
+                                      1.0,
+                                      Gtk::manage(new RTImage("circle-yellow-small")),
+                                      Gtk::manage(new RTImage("circle-white-small"))))),
+      balanh_(
+          Gtk::manage(new Adjuster(M("TP_LOCALLAB_BALANH"),
+                                   0.2,
+                                   2.5,
+                                   0.1,
+                                   1.0,
+                                   Gtk::manage(new RTImage("circle-multicolor-small")),
+                                   Gtk::manage(new RTImage("circle-red-green-small"))))),
+      colorde_(
+          Gtk::manage(new Adjuster(M("TP_LOCALLAB_COLORDE"),
+                                   -15,
+                                   15,
+                                   2,
+                                   5,
+                                   Gtk::manage(new RTImage("circle-blue-yellow-small")),
+                                   Gtk::manage(new RTImage("circle-gray-green-small"))))),
+      colorscope_(
+          Gtk::manage(new Adjuster(M("TP_LOCALLAB_COLORSCOPE"), 0., 100.0, 1., 30.))),
+      avoidrad_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_AVOIDRAD"), 0., 30.0, 0.1, 0.))),
+      scopemask_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_SCOPEMASK"), 0, 100, 1, 60))),
+      denoichmask_(
+          Gtk::manage(new Adjuster(M("TP_LOCALLAB_DENOIMASK"), 0., 100., 0.5, 0))),
+      lumask_(Gtk::manage(new Adjuster(M("TP_LOCALLAB_LUMASK"),
+                                       -50,
+                                       30,
+                                       1,
+                                       10,
+                                       Gtk::manage(new RTImage("circle-yellow-small")),
+                                       Gtk::manage(new RTImage("circle-gray-small"))))),
 
-    hishow_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_PREVSHOW")))),
-    activ_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_ACTIVSPOT")))),
-    avoidneg_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_AVOIDNEG")))),
-    blwh_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_BLWH")))),
-    recurs_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_RECURS")))),
-    laplac_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_LAPLACC")))),
-    deltae_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_DELTAEC")))),
-    shortc_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_SHORTC")))),
-    //savrest_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_SAVREST")))),
+      hishow_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_PREVSHOW")))),
+      activ_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_ACTIVSPOT")))),
+      avoidneg_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_AVOIDNEG")))),
+      blwh_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_BLWH")))),
+      recurs_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_RECURS")))),
+      laplac_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_LAPLACC")))),
+      deltae_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_DELTAEC")))),
+      shortc_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_SHORTC")))),
+      // savrest_(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_SAVREST")))),
 
-    expTransGrad_(Gtk::manage(new MyExpander(false, M("TP_LOCALLAB_TRANSIT")))),
-    expShapeDetect_(Gtk::manage(new MyExpander(false, M("TP_LOCALLAB_ARTIF")))),
-    expSpecCases_(Gtk::manage(new MyExpander(false, M("TP_LOCALLAB_SPECCASE")))),
-    expMaskMerge_(Gtk::manage(new MyExpander(false, M("TP_LOCALLAB_MASFRAME")))),
+      expTransGrad_(Gtk::manage(new MyExpander(false, M("TP_LOCALLAB_TRANSIT")))),
+      expShapeDetect_(Gtk::manage(new MyExpander(false, M("TP_LOCALLAB_ARTIF")))),
+      expSpecCases_(Gtk::manage(new MyExpander(false, M("TP_LOCALLAB_SPECCASE")))),
+      expMaskMerge_(Gtk::manage(new MyExpander(false, M("TP_LOCALLAB_MASFRAME")))),
 
-    preview_(Gtk::manage(new Gtk::ToggleButton(M("TP_LOCALLAB_PREVIEW")))),
-    ctboxshape(Gtk::manage(new Gtk::Box())),
-    ctboxactivmethod(Gtk::manage(new Gtk::Box())),
-    ctboxspotmethod(Gtk::manage(new Gtk::Box())),    
-    ctboxshapemethod(Gtk::manage(new Gtk::Box())),
-    ctboxgamut(Gtk::manage(new Gtk::Box())),
-    artifBox2(Gtk::manage(new ToolParamBlock())),
+      preview_(Gtk::manage(new Gtk::ToggleButton(M("TP_LOCALLAB_PREVIEW")))),
+      ctboxshape(Gtk::manage(new Gtk::Box())),
+      ctboxactivmethod(Gtk::manage(new Gtk::Box())),
+      ctboxspotmethod(Gtk::manage(new Gtk::Box())),
+      ctboxshapemethod(Gtk::manage(new Gtk::Box())),
+      ctboxgamut(Gtk::manage(new Gtk::Box())),
+      artifBox2(Gtk::manage(new ToolParamBlock())),
 
-    controlPanelListener(nullptr),
-    lastObject_(-1),
-    nbSpotChanged_(false),
-    selSpotChanged_(false),
-    nameChanged_(false),
-    visibilityChanged_(false),
-    eventType(None),
-    excluFrame(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_EXCLUF")))),
-    maskPrevActive(false)
+      controlPanelListener(nullptr),
+      lastObject_(-1),
+      nbSpotChanged_(false),
+      selSpotChanged_(false),
+      nameChanged_(false),
+      visibilityChanged_(false),
+      eventType(None),
+      excluFrame(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_EXCLUF")))),
+      maskPrevActive(false)
 {
     auto m = ProcEventMapper::getInstance();
     EvLocallabavoidgamutMethod = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_GAMUTMUNSEL");
-    EvLocallabavoidnegative =  m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_AVOIDNEGATIVE");
+    EvLocallabavoidnegative = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_AVOIDNEGATIVE");
     const bool showtooltip = App::get().options().showtooltip;
 
-//    pack_start(*hishow_);
+    //    pack_start(*hishow_);
 
     Gtk::Box* const ctboxprevmethod = Gtk::manage(new Gtk::Box());
     prevMethod_->append(M("TP_LOCALLAB_PREVHIDE"));
     prevMethod_->append(M("TP_LOCALLAB_PREVSHOW"));
     prevMethod_->set_active(0);
     prevMethodconn_ = prevMethod_->signal_changed().connect(
-                          sigc::mem_fun(
-                              *this, &ControlSpotPanel::prevMethodChanged));
+        sigc::mem_fun(*this, &ControlSpotPanel::prevMethodChanged));
 
-//    ctboxprevmethod->pack_start(*prevMethod_);
+    //    ctboxprevmethod->pack_start(*prevMethod_);
     pack_start(*ctboxprevmethod);
-
 
     Gtk::Box* const hbox1_ = Gtk::manage(new Gtk::Box());
     hbox1_->set_spacing(4);
     hbox1_->set_homogeneous(true);
     buttonaddconn_ = button_add_->signal_clicked().connect(
-                         sigc::mem_fun(*this, &ControlSpotPanel::on_button_add));
+        sigc::mem_fun(*this, &ControlSpotPanel::on_button_add));
     buttondeleteconn_ = button_delete_->signal_clicked().connect(
-                            sigc::mem_fun(*this, &ControlSpotPanel::on_button_delete));
+        sigc::mem_fun(*this, &ControlSpotPanel::on_button_delete));
     buttonduplicateconn_ = button_duplicate_->signal_clicked().connect(
-                               sigc::mem_fun(*this, &ControlSpotPanel::on_button_duplicate));
+        sigc::mem_fun(*this, &ControlSpotPanel::on_button_duplicate));
 
     hbox1_->pack_start(*button_add_);
     hbox1_->pack_start(*button_delete_);
@@ -153,10 +187,9 @@ ControlSpotPanel::ControlSpotPanel():
     hbox2_->set_spacing(4);
     hbox2_->set_homogeneous(true);
     buttonrenameconn_ = button_rename_->signal_clicked().connect(
-                            sigc::mem_fun(*this, &ControlSpotPanel::on_button_rename));
+        sigc::mem_fun(*this, &ControlSpotPanel::on_button_rename));
     buttonvisibilityconn_ = button_visibility_->signal_button_release_event().connect(
-                                sigc::mem_fun(*this, &ControlSpotPanel::on_button_visibility));
-
+        sigc::mem_fun(*this, &ControlSpotPanel::on_button_visibility));
 
     if (showtooltip) {
         button_visibility_->set_tooltip_markup(M("TP_LOCALLAB_VIS_TOOLTIP"));
@@ -169,29 +202,25 @@ ControlSpotPanel::ControlSpotPanel():
     treemodel_ = Gtk::ListStore::create(spots_);
     treeview_->set_model(treemodel_);
     treeviewconn_ = treeview_->get_selection()->signal_changed().connect(
-                        sigc::mem_fun(
-                            *this, &ControlSpotPanel::controlspotChanged));
+        sigc::mem_fun(*this, &ControlSpotPanel::controlspotChanged));
     treeview_->set_grid_lines(Gtk::TREE_VIEW_GRID_LINES_VERTICAL);
 
     // Disable search to prevent hijacking keyboard shortcuts #5265
     treeview_->set_enable_search(false);
     treeview_->signal_key_press_event().connect(
-        sigc::mem_fun(
-            *this, &ControlSpotPanel::blockTreeviewSearch), false);
+        sigc::mem_fun(*this, &ControlSpotPanel::blockTreeviewSearch), false);
 
     // Avoid situation where no spot is selected (Ctrl+click on treeview)
     treeview_->signal_button_press_event().connect(
-        sigc::mem_fun(
-            *this, &ControlSpotPanel::onSpotSelectionEvent), false);
+        sigc::mem_fun(*this, &ControlSpotPanel::onSpotSelectionEvent), false);
 
     auto cell = Gtk::manage(new Gtk::CellRendererText());
     int cols_count = treeview_->append_column(M("TP_LOCALLAB_COL_NAME"), *cell);
     auto col = treeview_->get_column(cols_count - 1);
 
     if (col) {
-        col->set_cell_data_func(
-            *cell, sigc::mem_fun(
-                *this, &ControlSpotPanel::render_name));
+        col->set_cell_data_func(*cell,
+                                sigc::mem_fun(*this, &ControlSpotPanel::render_name));
     }
 
     cell = Gtk::manage(new Gtk::CellRendererText());
@@ -200,8 +229,7 @@ ControlSpotPanel::ControlSpotPanel():
 
     if (col) {
         col->set_cell_data_func(
-            *cell, sigc::mem_fun(
-                *this, &ControlSpotPanel::render_isvisible));
+            *cell, sigc::mem_fun(*this, &ControlSpotPanel::render_isvisible));
     }
 
     scrolledwindow_->add(*treeview_);
@@ -210,25 +238,26 @@ ControlSpotPanel::ControlSpotPanel():
     pack_start(*scrolledwindow_);
     pack_start(*hishow_);
 
-   // Gtk::Box* const ctboxactivmethod = Gtk::manage(new Gtk::Box());
+    // Gtk::Box* const ctboxactivmethod = Gtk::manage(new Gtk::Box());
     ctboxactivmethod->pack_start(*activ_);
     pack_start(*ctboxactivmethod);
 
-    Gtk::Label* const labelshape = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_SHAPETYPE") + ":"));
+    Gtk::Label* const labelshape =
+        Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_SHAPETYPE") + ":"));
     ctboxshape->pack_start(*labelshape, Gtk::PACK_SHRINK, 4);
     shape_->append(M("TP_LOCALLAB_ELI"));
     shape_->append(M("TP_LOCALLAB_RECT"));
     shape_->set_active(0);
     shapeconn_ = shape_->signal_changed().connect(
-                     sigc::mem_fun(
-                         *this, &ControlSpotPanel::shapeChanged));
+        sigc::mem_fun(*this, &ControlSpotPanel::shapeChanged));
     ctboxshape->pack_start(*shape_);
     pack_start(*ctboxshape);
     if (showtooltip) {
         shape_->set_tooltip_text(M("TP_LOCALLAB_SHAPE_TOOLTIP"));
     }
 
-    Gtk::Label* const labelspotmethod = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_EXCLUTYPE") + ":"));
+    Gtk::Label* const labelspotmethod =
+        Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_EXCLUTYPE") + ":"));
     ctboxspotmethod->pack_start(*labelspotmethod, Gtk::PACK_SHRINK, 4);
 
     if (showtooltip) {
@@ -238,14 +267,12 @@ ControlSpotPanel::ControlSpotPanel():
     spotMethod_->append(M("TP_LOCALLAB_EXNORM"));
     spotMethod_->append(M("TP_LOCALLAB_EXECLU"));
     spotMethod_->append(M("TP_LOCALLAB_EXFULL"));
-    spotMethod_->append(M("TP_LOCALLAB_EXMAIN"));//new choice Global
+    spotMethod_->append(M("TP_LOCALLAB_EXMAIN"));  // new choice Global
     spotMethod_->set_active(0);
     spotMethodconn_ = spotMethod_->signal_changed().connect(
-                          sigc::mem_fun(
-                              *this, &ControlSpotPanel::spotMethodChanged));
+        sigc::mem_fun(*this, &ControlSpotPanel::spotMethodChanged));
     ctboxspotmethod->pack_start(*spotMethod_);
     pack_start(*ctboxspotmethod);
-
 
     excluFrame->set_label_align(0.025, 0.5);
 
@@ -268,8 +295,8 @@ ControlSpotPanel::ControlSpotPanel():
     excluFrame->add(*excluBox);
     pack_start(*excluFrame);
 
-
-    Gtk::Label* const labelshapemethod = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_STYPE") + ":"));
+    Gtk::Label* const labelshapemethod =
+        Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_STYPE") + ":"));
     ctboxshapemethod->pack_start(*labelshapemethod, Gtk::PACK_SHRINK, 4);
 
     if (showtooltip) {
@@ -282,10 +309,9 @@ ControlSpotPanel::ControlSpotPanel():
     shapeMethod_->append(M("TP_LOCALLAB_SYMSL"));
     shapeMethod_->set_active(0);
     shapeMethodconn_ = shapeMethod_->signal_changed().connect(
-                           sigc::mem_fun(
-                               *this, &ControlSpotPanel::shapeMethodChanged));
+        sigc::mem_fun(*this, &ControlSpotPanel::shapeMethodChanged));
     ctboxshapemethod->pack_start(*shapeMethod_);
-//    pack_start(*ctboxshapemethod);
+    //    pack_start(*ctboxshapemethod);
 
     pack_start(*locX_);
     locX_->setAdjusterListener(this);
@@ -313,7 +339,8 @@ ControlSpotPanel::ControlSpotPanel():
     }
 
     Gtk::Box* const ctboxqualitymethod = Gtk::manage(new Gtk::Box());
-    Gtk::Label* const labelqualitymethod = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_QUAL_METHOD") + ":"));
+    Gtk::Label* const labelqualitymethod =
+        Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_QUAL_METHOD") + ":"));
     ctboxqualitymethod->pack_start(*labelqualitymethod, Gtk::PACK_SHRINK, 4);
 
     if (showtooltip) {
@@ -324,8 +351,7 @@ ControlSpotPanel::ControlSpotPanel():
     qualityMethod_->append(M("TP_LOCALLAB_ENHDEN"));
     qualityMethod_->set_active(1);
     qualityMethodconn_ = qualityMethod_->signal_changed().connect(
-                             sigc::mem_fun(
-                                 *this, &ControlSpotPanel::qualityMethodChanged));
+        sigc::mem_fun(*this, &ControlSpotPanel::qualityMethodChanged));
     ctboxqualitymethod->pack_start(*qualityMethod_);
 
     if (showtooltip) {
@@ -352,7 +378,7 @@ ControlSpotPanel::ControlSpotPanel():
     transitBox->pack_start(*transit_);
     transitBox->pack_start(*transitweak_);
     transitBox->pack_start(*transitgrad_);
-    //transitBox->pack_start(*feather_);
+    // transitBox->pack_start(*feather_);
     expTransGrad_->add(*transitBox, false);
     pack_start(*expTransGrad_, false, false);
 
@@ -372,8 +398,7 @@ ControlSpotPanel::ControlSpotPanel():
 
     preview_->set_active(false);
     previewConn_ = preview_->signal_clicked().connect(
-                       sigc::mem_fun(
-                           *this, &ControlSpotPanel::previewChanged));
+        sigc::mem_fun(*this, &ControlSpotPanel::previewChanged));
 
     if (showtooltip) {
         balan_->set_tooltip_text(M("TP_LOCALLAB_BALAN_TOOLTIP"));
@@ -383,7 +408,7 @@ ControlSpotPanel::ControlSpotPanel():
         preview_->set_tooltip_text(M("TP_LOCALLAB_COLORDEPREV_TOOLTIP"));
     }
 
-//    artifBox->pack_start(*struc_);
+    //    artifBox->pack_start(*struc_);
     artifBox->pack_start(*thresh_);
     artifBox->pack_start(*iter_);
     artifBox->pack_start(*balan_);
@@ -391,21 +416,23 @@ ControlSpotPanel::ControlSpotPanel():
     artifBox->pack_start(*colorde_);
     expShapeDetect_->add(*artifBox, false);
     pack_start(*expShapeDetect_, false, false);
-//    ToolParamBlock* const artifBox2 = Gtk::manage(new ToolParamBlock());
+    //    ToolParamBlock* const artifBox2 = Gtk::manage(new ToolParamBlock());
 
     artifBox2->pack_start(*preview_);
-    artifBox2->pack_start(*colorscope_);//unused with contrlspotpanel since 17 / 01 : 2024 but data used in color, vibrance, sh
+    artifBox2->pack_start(*colorscope_);  // unused with contrlspotpanel since 17 / 01 :
+                                          // 2024 but data used in color, vibrance, sh
     colorscope_->hide();
     pack_start(*artifBox2);
     ToolParamBlock* const specCaseBox = Gtk::manage(new ToolParamBlock());
 
-    hishowconn_  = hishow_->signal_toggled().connect(
-                      sigc::mem_fun(*this, &ControlSpotPanel::hishowChanged));
+    hishowconn_ = hishow_->signal_toggled().connect(
+        sigc::mem_fun(*this, &ControlSpotPanel::hishowChanged));
 
-    activConn_  = activ_->signal_toggled().connect(
-                     sigc::mem_fun(*this, &ControlSpotPanel::activChanged));
+    activConn_ = activ_->signal_toggled().connect(
+        sigc::mem_fun(*this, &ControlSpotPanel::activChanged));
 
-    Gtk::Label* const labelgamut = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_AVOID") + ":"));
+    Gtk::Label* const labelgamut =
+        Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_AVOID") + ":"));
     ctboxgamut->pack_start(*labelgamut, Gtk::PACK_SHRINK, 4);
     avoidgamutMethod_->append(M("TP_LOCALLAB_GAMUTNON"));
     avoidgamutMethod_->append(M("TP_LOCALLAB_GAMUTLABRELA"));
@@ -414,14 +441,13 @@ ControlSpotPanel::ControlSpotPanel():
     avoidgamutMethod_->append(M("TP_LOCALLAB_GAMUTMUNSELL"));
     avoidgamutMethod_->set_active(4);
     avoidgamutconn_ = avoidgamutMethod_->signal_changed().connect(
-                     sigc::mem_fun(
-                         *this, &ControlSpotPanel::avoidgamutMethodChanged));
+        sigc::mem_fun(*this, &ControlSpotPanel::avoidgamutMethodChanged));
     ctboxgamut->pack_start(*avoidgamutMethod_);
     if (showtooltip) {
         ctboxgamut->set_tooltip_text(M("TP_LOCALLAB_AVOIDCOLORSHIFT_TOOLTIP"));
     }
 
- Gtk::Frame* const avFrame = Gtk::manage(new Gtk::Frame());
+    Gtk::Frame* const avFrame = Gtk::manage(new Gtk::Frame());
     ToolParamBlock* const avbox = Gtk::manage(new ToolParamBlock());
     avFrame->set_label_align(0.025, 0.5);
     avbox->pack_start(*ctboxgamut);
@@ -429,11 +455,11 @@ ControlSpotPanel::ControlSpotPanel():
     avFrame->add(*avbox);
     specCaseBox->pack_start(*avFrame);
 
-    avoidnegConn_  = avoidneg_->signal_toggled().connect(
-                     sigc::mem_fun(*this, &ControlSpotPanel::avoidnegChanged));
+    avoidnegConn_ = avoidneg_->signal_toggled().connect(
+        sigc::mem_fun(*this, &ControlSpotPanel::avoidnegChanged));
 
-    blwhConn_  = blwh_->signal_toggled().connect(
-                     sigc::mem_fun(*this, &ControlSpotPanel::blwhChanged));
+    blwhConn_ = blwh_->signal_toggled().connect(
+        sigc::mem_fun(*this, &ControlSpotPanel::blwhChanged));
 
     if (showtooltip) {
         blwh_->set_tooltip_text(M("TP_LOCALLAB_BLWH_TOOLTIP"));
@@ -442,8 +468,8 @@ ControlSpotPanel::ControlSpotPanel():
     specCaseBox->pack_start(*blwh_);
     specCaseBox->pack_start(*avoidneg_);
 
-    recursConn_  = recurs_->signal_toggled().connect(
-                       sigc::mem_fun(*this, &ControlSpotPanel::recursChanged));
+    recursConn_ = recurs_->signal_toggled().connect(
+        sigc::mem_fun(*this, &ControlSpotPanel::recursChanged));
 
     if (showtooltip) {
         recurs_->set_tooltip_text(M("TP_LOCALLAB_RECURS_TOOLTIP"));
@@ -453,7 +479,8 @@ ControlSpotPanel::ControlSpotPanel():
     specCaseBox->pack_start(*ctboxshapemethod);
 
     Gtk::Box* const ctboxwavmethod = Gtk::manage(new Gtk::Box());
-    Gtk::Label* const labelwavmethod = Gtk::manage(new Gtk::Label(M("TP_WAVELET_DAUBLOCAL") + ":"));
+    Gtk::Label* const labelwavmethod =
+        Gtk::manage(new Gtk::Label(M("TP_WAVELET_DAUBLOCAL") + ":"));
     ctboxwavmethod->pack_start(*labelwavmethod, Gtk::PACK_SHRINK, 4);
 
     if (showtooltip) {
@@ -468,11 +495,9 @@ ControlSpotPanel::ControlSpotPanel():
     wavMethod_->append(M("TP_WAVELET_DAUB20"));
     wavMethod_->set_active(1);
     wavMethodconn_ = wavMethod_->signal_changed().connect(
-                         sigc::mem_fun(
-                             *this, &ControlSpotPanel::wavMethodChanged));
+        sigc::mem_fun(*this, &ControlSpotPanel::wavMethodChanged));
     ctboxwavmethod->pack_start(*wavMethod_);
     specCaseBox->pack_start(*ctboxwavmethod);
-
 
     expSpecCases_->add(*specCaseBox, false);
     pack_start(*expSpecCases_, false, false);
@@ -482,28 +507,28 @@ ControlSpotPanel::ControlSpotPanel():
     }
 
     ToolParamBlock* const maskBox = Gtk::manage(new ToolParamBlock());
-    laplacConn_  = laplac_->signal_toggled().connect(
-                       sigc::mem_fun(*this, &ControlSpotPanel::laplacChanged));
-    deltaeConn_  = deltae_->signal_toggled().connect(
-                       sigc::mem_fun(*this, &ControlSpotPanel::deltaeChanged));
-    shortcConn_  = shortc_->signal_toggled().connect(
-                       sigc::mem_fun(*this, &ControlSpotPanel::shortcChanged));
+    laplacConn_ = laplac_->signal_toggled().connect(
+        sigc::mem_fun(*this, &ControlSpotPanel::laplacChanged));
+    deltaeConn_ = deltae_->signal_toggled().connect(
+        sigc::mem_fun(*this, &ControlSpotPanel::deltaeChanged));
+    shortcConn_ = shortc_->signal_toggled().connect(
+        sigc::mem_fun(*this, &ControlSpotPanel::shortcChanged));
 
     if (showtooltip) {
         shortc_->set_tooltip_text(M("TP_LOCALLAB_SHORTCMASK_TOOLTIP"));
     }
 
     lumask_->setAdjusterListener(this);
-    //savrestConn_  = savrest_->signal_toggled().connect(
-    //                    sigc::mem_fun(*this, &ControlSpotPanel::savrestChanged));
+    // savrestConn_  = savrest_->signal_toggled().connect(
+    //                     sigc::mem_fun(*this, &ControlSpotPanel::savrestChanged));
 
     if (showtooltip) {
-        //savrest_->set_tooltip_text(M("TP_LOCALLAB_SAVREST_TOOLTIP"));
+        // savrest_->set_tooltip_text(M("TP_LOCALLAB_SAVREST_TOOLTIP"));
         lumask_->set_tooltip_text(M("TP_LOCALLAB_LUMASK_TOOLTIP"));
         laplac_->set_tooltip_text(M("TP_LOCALLAB_LAP_MASK_TOOLTIP"));
     }
 
-//    maskBox->pack_start(*laplac_);
+    //    maskBox->pack_start(*laplac_);
     maskBox->pack_start(*deltae_);
     maskBox->pack_start(*scopemask_);
     maskBox->pack_start(*denoichmask_);
@@ -514,52 +539,55 @@ ControlSpotPanel::ControlSpotPanel():
     expMaskMerge_->add(*maskBox, false);
     pack_start(*expMaskMerge_, false, false);
 
-    Gtk::Separator *separatormet = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
+    Gtk::Separator* separatormet =
+        Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL));
     pack_start(*separatormet, Gtk::PACK_SHRINK, 2);
 
-    //Gtk::Box* const ctboxcomplexmethod = Gtk::manage(new Gtk::Box());
+    // Gtk::Box* const ctboxcomplexmethod = Gtk::manage(new Gtk::Box());
 
-    //if (showtooltip) {
-    //    ctboxcomplexmethod->set_tooltip_markup(M("TP_LOCALLAB_COMPLEXMETHOD_TOOLTIP"));
-    //}
+    // if (showtooltip) {
+    //     ctboxcomplexmethod->set_tooltip_markup(M("TP_LOCALLAB_COMPLEXMETHOD_TOOLTIP"));
+    // }
 
-    //Gtk::Label* const labelcomplexmethod = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_COMPLEX_METHOD") + ":"));
-    //ctboxcomplexmethod->pack_start(*labelcomplexmethod, Gtk::PACK_SHRINK, 4);
+    // Gtk::Label* const labelcomplexmethod = Gtk::manage(new
+    // Gtk::Label(M("TP_LOCALLAB_COMPLEX_METHOD") + ":"));
+    // ctboxcomplexmethod->pack_start(*labelcomplexmethod, Gtk::PACK_SHRINK, 4);
 
-    //if (showtooltip) {
-    //    complexMethod_->set_tooltip_markup(M("TP_LOCALLAB_COMPLEX_TOOLTIP"));
-    //}
+    // if (showtooltip) {
+    //     complexMethod_->set_tooltip_markup(M("TP_LOCALLAB_COMPLEX_TOOLTIP"));
+    // }
 
-    //complexMethod_->append(M("TP_LOCALLAB_SIM"));
-    //complexMethod_->append(M("TP_LOCALLAB_MED"));
-    //complexMethod_->append(M("TP_LOCALLAB_ALL"));
-    //complexMethod_->set_active(1);
-    //complexMethodconn_ = complexMethod_->signal_changed().connect(
-    //                         sigc::mem_fun(
-    //                             *this, &ControlSpotPanel::complexMethodChanged));
-    //ctboxcomplexmethod->pack_start(*complexMethod_);
-    // pack_start(*ctboxcomplexmethod);
-/*
-    Gtk::Box* const ctboxwavmethod = Gtk::manage(new Gtk::Box());
-    Gtk::Label* const labelwavmethod = Gtk::manage(new Gtk::Label(M("TP_WAVELET_DAUBLOCAL") + ":"));
-    ctboxwavmethod->pack_start(*labelwavmethod, Gtk::PACK_SHRINK, 4);
+    // complexMethod_->append(M("TP_LOCALLAB_SIM"));
+    // complexMethod_->append(M("TP_LOCALLAB_MED"));
+    // complexMethod_->append(M("TP_LOCALLAB_ALL"));
+    // complexMethod_->set_active(1);
+    // complexMethodconn_ = complexMethod_->signal_changed().connect(
+    //                          sigc::mem_fun(
+    //                              *this, &ControlSpotPanel::complexMethodChanged));
+    // ctboxcomplexmethod->pack_start(*complexMethod_);
+    //  pack_start(*ctboxcomplexmethod);
+    /*
+        Gtk::Box* const ctboxwavmethod = Gtk::manage(new Gtk::Box());
+        Gtk::Label* const labelwavmethod = Gtk::manage(new
+       Gtk::Label(M("TP_WAVELET_DAUBLOCAL") + ":"));
+        ctboxwavmethod->pack_start(*labelwavmethod, Gtk::PACK_SHRINK, 4);
 
-    if (showtooltip) {
-        ctboxwavmethod->set_tooltip_markup(M("TP_WAVELET_DAUB_TOOLTIP"));
-    }
+        if (showtooltip) {
+            ctboxwavmethod->set_tooltip_markup(M("TP_WAVELET_DAUB_TOOLTIP"));
+        }
 
-    wavMethod_->append(M("TP_WAVELET_DAUB2"));
-    wavMethod_->append(M("TP_WAVELET_DAUB4"));
-    wavMethod_->append(M("TP_WAVELET_DAUB6"));
-    wavMethod_->append(M("TP_WAVELET_DAUB10"));
-    wavMethod_->append(M("TP_WAVELET_DAUB14"));
-    wavMethod_->set_active(1);
-    wavMethodconn_ = wavMethod_->signal_changed().connect(
-                         sigc::mem_fun(
-                             *this, &ControlSpotPanel::wavMethodChanged));
-    ctboxwavmethod->pack_start(*wavMethod_);
-    pack_start(*ctboxwavmethod);
-*/
+        wavMethod_->append(M("TP_WAVELET_DAUB2"));
+        wavMethod_->append(M("TP_WAVELET_DAUB4"));
+        wavMethod_->append(M("TP_WAVELET_DAUB6"));
+        wavMethod_->append(M("TP_WAVELET_DAUB10"));
+        wavMethod_->append(M("TP_WAVELET_DAUB14"));
+        wavMethod_->set_active(1);
+        wavMethodconn_ = wavMethod_->signal_changed().connect(
+                             sigc::mem_fun(
+                                 *this, &ControlSpotPanel::wavMethodChanged));
+        ctboxwavmethod->pack_start(*wavMethod_);
+        pack_start(*ctboxwavmethod);
+    */
     show_all();
     // Define row background color
     // Mouseovered spot (opaque orange)
@@ -583,12 +611,16 @@ ControlSpotPanel::ControlSpotPanel():
 ControlSpotPanel::~ControlSpotPanel()
 {
     // visibleGeometry
-    for (auto i = EditSubscriber::visibleGeometry.begin(); i != EditSubscriber::visibleGeometry.end(); ++i) {
+    for (auto i = EditSubscriber::visibleGeometry.begin();
+         i != EditSubscriber::visibleGeometry.end(); ++i)
+    {
         delete *i;
     }
 
     // mouseOverGeometry
-    for (auto i = EditSubscriber::mouseOverGeometry.begin(); i != EditSubscriber::mouseOverGeometry.end(); ++i) {
+    for (auto i = EditSubscriber::mouseOverGeometry.begin();
+         i != EditSubscriber::mouseOverGeometry.end(); ++i)
+    {
         delete *i;
     }
 }
@@ -598,11 +630,11 @@ void ControlSpotPanel::setEditProvider(EditDataProvider* provider)
     EditSubscriber::setEditProvider(provider);
 }
 
-void ControlSpotPanel::render_name(
-    Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter)
+void ControlSpotPanel::render_name(Gtk::CellRenderer* cell,
+                                   const Gtk::TreeModel::iterator& iter)
 {
     auto row = *iter;
-    Gtk::CellRendererText *ct = static_cast<Gtk::CellRendererText *>(cell);
+    Gtk::CellRendererText* ct = static_cast<Gtk::CellRendererText*>(cell);
 
     // Render cell text
     ct->property_text() = row[spots_.name];
@@ -615,11 +647,11 @@ void ControlSpotPanel::render_name(
     }
 }
 
-void ControlSpotPanel::render_isvisible(
-    Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter)
+void ControlSpotPanel::render_isvisible(Gtk::CellRenderer* cell,
+                                        const Gtk::TreeModel::iterator& iter)
 {
     auto row = *iter;
-    Gtk::CellRendererText *ct = static_cast<Gtk::CellRendererText *>(cell);
+    Gtk::CellRendererText* ct = static_cast<Gtk::CellRendererText*>(cell);
 
     // Render cell text
     if (row[spots_.isvisible]) {
@@ -662,7 +694,7 @@ void ControlSpotPanel::on_button_delete()
     // Raise event
     const int selIndex = getSelectedSpot();
 
-    if (selIndex == -1) { // No selected spot to remove
+    if (selIndex == -1) {  // No selected spot to remove
         return;
     }
 
@@ -684,7 +716,7 @@ void ControlSpotPanel::on_button_duplicate()
     // Raise event
     const int selIndex = getSelectedSpot();
 
-    if (selIndex == -1) { // No selected spot to duplicate
+    if (selIndex == -1) {  // No selected spot to duplicate
         return;
     }
 
@@ -692,8 +724,8 @@ void ControlSpotPanel::on_button_duplicate()
     selSpotChanged_ = true;
     eventType = SpotDuplication;
     const std::unique_ptr<SpotRow> duplSpotRow = getSpot(selIndex);
-    listener->panelChanged(EvLocallabSpotCreated, M("TP_LOCALLAB_EV_DUPL") + " "
-                           + duplSpotRow->name);
+    listener->panelChanged(EvLocallabSpotCreated,
+                           M("TP_LOCALLAB_EV_DUPL") + " " + duplSpotRow->name);
 }
 
 void ControlSpotPanel::on_button_rename()
@@ -716,15 +748,14 @@ void ControlSpotPanel::on_button_rename()
     const Glib::ustring actualname = row[spots_.name];
 
     // Launch windows to update spot name
-    RenameDialog d(actualname,
-                   static_cast<Gtk::Window &>(*get_toplevel()));
+    RenameDialog d(actualname, static_cast<Gtk::Window&>(*get_toplevel()));
     int status = d.run();
 
     // Update actual name and raise event
     if (status == RenameDialog::OkButton) {
         const Glib::ustring newname = d.get_new_name();
 
-        if (newname != actualname) { // Event is only raised if name is updated
+        if (newname != actualname) {  // Event is only raised if name is updated
             nameChanged_ = true;
             row[spots_.name] = newname;
             treeview_->columns_autosize();
@@ -756,8 +787,8 @@ bool ControlSpotPanel::on_button_visibility(GdkEventButton* event)
 
     const int ctrl = event->state & GDK_CONTROL_MASK;
 
-    if (event->button == 1) { // Left click on button
-        if (ctrl) { // Ctrl+click case: all spots are shown/hidden
+    if (event->button == 1) {  // Left click on button
+        if (ctrl) {            // Ctrl+click case: all spots are shown/hidden
             // Get visibility of selected spot
             const bool selVisibility = row[spots_.isvisible];
 
@@ -775,13 +806,15 @@ bool ControlSpotPanel::on_button_visibility(GdkEventButton* event)
             eventType = SpotAllVisibilityChanged;
 
             if (!selVisibility) {
-                listener->panelChanged(EvLocallabSpotVisibility, M("TP_LOCALLAB_EV_VIS_ALL"));
+                listener->panelChanged(EvLocallabSpotVisibility,
+                                       M("TP_LOCALLAB_EV_VIS_ALL"));
             } else {
-                listener->panelChanged(EvLocallabSpotVisibility, M("TP_LOCALLAB_EV_NVIS_ALL"));
+                listener->panelChanged(EvLocallabSpotVisibility,
+                                       M("TP_LOCALLAB_EV_NVIS_ALL"));
             }
 
             return true;
-        } else { // Click case: only selected spot is shown/hidden
+        } else {  // Click case: only selected spot is shown/hidden
             // Update visibility for selected spot only
             row[spots_.isvisible] = !row[spots_.isvisible];
             updateControlSpotCurve(row);
@@ -791,9 +824,13 @@ bool ControlSpotPanel::on_button_visibility(GdkEventButton* event)
             const std::unique_ptr<SpotRow> spotRow = getSpot(getSelectedSpot());
 
             if (row[spots_.isvisible]) {
-                listener->panelChanged(EvLocallabSpotVisibility, M("TP_LOCALLAB_EV_VIS") + " (" + spotRow->name + ")");
+                listener->panelChanged(EvLocallabSpotVisibility,
+                                       M("TP_LOCALLAB_EV_VIS") + " (" + spotRow->name
+                                           + ")");
             } else {
-                listener->panelChanged(EvLocallabSpotVisibility, M("TP_LOCALLAB_EV_NVIS") + " (" + spotRow->name + ")");
+                listener->panelChanged(EvLocallabSpotVisibility,
+                                       M("TP_LOCALLAB_EV_NVIS") + " (" + spotRow->name
+                                           + ")");
             }
 
             return true;
@@ -803,12 +840,11 @@ bool ControlSpotPanel::on_button_visibility(GdkEventButton* event)
     return false;
 }
 
-
 bool ControlSpotPanel::blockTreeviewSearch(GdkEventKey* event)
 {
     // printf("blockTreeviewSearch\n");
 
-    if (event->state & Gdk::CONTROL_MASK) { // Ctrl
+    if (event->state & Gdk::CONTROL_MASK) {  // Ctrl
         if (event->keyval == GDK_KEY_f || event->keyval == GDK_KEY_F) {
             // No action is performed to avoid activating treeview search
             return true;
@@ -821,7 +857,7 @@ bool ControlSpotPanel::blockTreeviewSearch(GdkEventKey* event)
 
 bool ControlSpotPanel::onSpotSelectionEvent(GdkEventButton* event)
 {
-    if (event->state & Gdk::CONTROL_MASK) { // Ctrl
+    if (event->state & Gdk::CONTROL_MASK) {  // Ctrl
         // No action is performed to avoid a situation where no spot is selected
         return true;
     }
@@ -866,12 +902,11 @@ void ControlSpotPanel::load_ControlSpot_param()
     struc_->setValue((double)row[spots_.struc]);
     thresh_->setValue((double)row[spots_.thresh]);
 
-    iter_->setValue((double)row[spots_.iter]);    
+    iter_->setValue((double)row[spots_.iter]);
     balan_->setValue((double)row[spots_.balan]);
     balanh_->setValue((double)row[spots_.balanh]);
     colorde_->setValue((double)row[spots_.colorde]);
 
-    
     colorscope_->setValue((double)row[spots_.colorscope]);
     avoidrad_->setValue((double)row[spots_.avoidrad]);
     hishow_->set_active(row[spots_.hishow]);
@@ -879,18 +914,17 @@ void ControlSpotPanel::load_ControlSpot_param()
     avoidneg_->set_active(row[spots_.avoidneg]);
     blwh_->set_active(row[spots_.blwh]);
     recurs_->set_active(row[spots_.recurs]);
-   // laplac_->set_active(row[spots_.laplac]);
+    // laplac_->set_active(row[spots_.laplac]);
     laplac_->set_active(true);
     deltae_->set_active(row[spots_.deltae]);
     scopemask_->setValue((double)row[spots_.scopemask]);
     denoichmask_->setValue(row[spots_.denoichmask]);
     shortc_->set_active(row[spots_.shortc]);
     lumask_->setValue((double)row[spots_.lumask]);
-    //savrest_->set_active(row[spots_.savrest]);
-    //complexMethod_->set_active(row[spots_.complexMethod]);
+    // savrest_->set_active(row[spots_.savrest]);
+    // complexMethod_->set_active(row[spots_.complexMethod]);
     wavMethod_->set_active(row[spots_.wavMethod]);
-	avoidgamutMethod_->set_active(row[spots_.avoidgamutMethod]);
-
+    avoidgamutMethod_->set_active(row[spots_.avoidgamutMethod]);
 }
 
 void ControlSpotPanel::controlspotChanged()
@@ -904,7 +938,7 @@ void ControlSpotPanel::controlspotChanged()
     // Raise event
     const int selIndex = getSelectedSpot();
 
-    if (selIndex == -1) { // No selected spot
+    if (selIndex == -1) {  // No selected spot
         return;
     }
 
@@ -912,7 +946,8 @@ void ControlSpotPanel::controlspotChanged()
     eventType = SpotSelection;
     const std::unique_ptr<SpotRow> spotRow = getSpot(selIndex);
 
-    // Image area shall be regenerated if mask or deltaE preview was active when switching spot
+    // Image area shall be regenerated if mask or deltaE preview was active when switching
+    // spot
     if (maskPrevActive || preview_->get_active()) {
         listener->panelChanged(EvLocallabSpotSelectedWithMask, spotRow->name);
     } else {
@@ -958,45 +993,44 @@ void ControlSpotPanel::prevMethodChanged()
     Gtk::TreeModel::Row row = *iter;
 
     row[spots_.prevMethod] = prevMethod_->get_active_row_number();
-/*
-    // Update Control Spot GUI according to spotMethod_ combobox state (to be compliant with updateParamVisibility function)
-    if (multiImage && prevMethod_->get_active_text() == M("GENERAL_UNCHANGED")) {
-        expTransGrad_->show();
-        expShapeDetect_->show();
-        expSpecCases_->show();
-        expMaskMerge_->show();
-        circrad_->show();
-        ctboxshape->show();
-    } else if (prevMethod_->get_active_row_number() == 0) { // Normal case
-        expTransGrad_->hide();
-        expShapeDetect_->hide();
-        expSpecCases_->hide();
-        expMaskMerge_->hide();
-        circrad_->hide();
-        ctboxshape->hide();
-        shapeMethod_->set_active(0);
+    /*
+        // Update Control Spot GUI according to spotMethod_ combobox state (to be
+       compliant with updateParamVisibility function) if (multiImage &&
+       prevMethod_->get_active_text() == M("GENERAL_UNCHANGED")) { expTransGrad_->show();
+            expShapeDetect_->show();
+            expSpecCases_->show();
+            expMaskMerge_->show();
+            circrad_->show();
+            ctboxshape->show();
+        } else if (prevMethod_->get_active_row_number() == 0) { // Normal case
+            expTransGrad_->hide();
+            expShapeDetect_->hide();
+            expSpecCases_->hide();
+            expMaskMerge_->hide();
+            circrad_->hide();
+            ctboxshape->hide();
+            shapeMethod_->set_active(0);
 
-    } else { // Excluding case
-        expTransGrad_->show();
-        expShapeDetect_->show();
-        expSpecCases_->show();
-        expMaskMerge_->show();
-        circrad_->show();
-        ctboxshape->show();
-    }
-*/
+        } else { // Excluding case
+            expTransGrad_->show();
+            expShapeDetect_->show();
+            expSpecCases_->show();
+            expMaskMerge_->show();
+            circrad_->show();
+            ctboxshape->show();
+        }
+    */
     // Raise event
     if (listener) {
-//        listener->panelChanged(EvLocallabSpotprevMethod, prevMethod_->get_active_text());
+        //        listener->panelChanged(EvLocallabSpotprevMethod,
+        //        prevMethod_->get_active_text());
     }
 }
 
-
-
 void ControlSpotPanel::spotMethodChanged()
 {
-    //01 2024 take into account new problems linked to Global spotmethod
-    // Get selected control spot
+    // 01 2024 take into account new problems linked to Global spotmethod
+    //  Get selected control spot
     const auto s = treeview_->get_selection();
 
     if (!s->count_selected_rows()) {
@@ -1008,20 +1042,21 @@ void ControlSpotPanel::spotMethodChanged()
 
     const int oldSpotMethod = row[spots_.spotMethod];
     row[spots_.spotMethod] = spotMethod_->get_active_row_number();
-    //ctboxspotmethod->show();
+    // ctboxspotmethod->show();
     hishow_->show();
     ctboxshape->show();
     artifBox2->show();
     colorscope_->hide();
 
-    // Update Control Spot GUI according to spotMethod_ combobox state (to be compliant with updateParamVisibility function)
+    // Update Control Spot GUI according to spotMethod_ combobox state (to be compliant
+    // with updateParamVisibility function)
     if (multiImage && spotMethod_->get_active_text() == M("GENERAL_UNCHANGED")) {
         excluFrame->show();
 
-    } else if (spotMethod_->get_active_row_number() == 0) { // Normal case
+    } else if (spotMethod_->get_active_row_number() == 0) {  // Normal case
         excluFrame->hide();
         // Reset spot shape only if previous spotMethod is Full image or Global
-        if (oldSpotMethod == 2  || oldSpotMethod == 3) {
+        if (oldSpotMethod == 2 || oldSpotMethod == 3) {
             disableParamlistener(true);
             locX_->setValue(150.);
             row[spots_.locX] = locX_->getIntValue();
@@ -1038,7 +1073,7 @@ void ControlSpotPanel::spotMethodChanged()
             disableParamlistener(false);
             updateControlSpotCurve(row);
         }
-    } else if (spotMethod_->get_active_row_number() == 1) { // Excluding case
+    } else if (spotMethod_->get_active_row_number() == 1) {  // Excluding case
         excluFrame->show();
 
         // Reset spot shape only if previous spotMethod is Full image or Global
@@ -1059,7 +1094,9 @@ void ControlSpotPanel::spotMethodChanged()
             disableParamlistener(false);
             updateControlSpotCurve(row);
         }
-    } else if (spotMethod_->get_active_row_number() == 2  || spotMethod_->get_active_row_number() == 3) { // Full image or Global case
+    } else if (spotMethod_->get_active_row_number() == 2
+               || spotMethod_->get_active_row_number() == 3)
+    {  // Full image or Global case
         excluFrame->hide();
         shape_->set_active(0);
 
@@ -1075,8 +1112,8 @@ void ControlSpotPanel::spotMethodChanged()
         row[spots_.shape] = shape_->get_active_row_number();
         transit_->setValue(100.);
         row[spots_.transit] = transit_->getValue();
-        
-        if(spotMethod_->get_active_row_number() == 3) { //global
+
+        if (spotMethod_->get_active_row_number() == 3) {  // global
             ctboxshape->hide();
             artifBox2->hide();
             hishow_->hide();
@@ -1088,12 +1125,12 @@ void ControlSpotPanel::spotMethodChanged()
             ctboxshape->hide();
         } else {
             ctboxshape->show();
-            circrad_->show();    
+            circrad_->show();
             artifBox2->show();
             colorscope_->hide();
-           
+
             hishow_->show();
-            if(hishow_->get_active()) {
+            if (hishow_->get_active()) {
                 expTransGrad_->show();
                 expShapeDetect_->show();
                 expSpecCases_->show();
@@ -1120,7 +1157,7 @@ void ControlSpotPanel::avoidgamutMethodChanged()
     const int meth = avoidgamutMethod_->get_active_row_number();
     avoidrad_->show();
 
-    if(meth == 2 || meth == 3 || meth == 4) {
+    if (meth == 2 || meth == 3 || meth == 4) {
         avoidrad_->hide();
     }
 
@@ -1131,9 +1168,9 @@ void ControlSpotPanel::avoidgamutMethodChanged()
 
     // Raise event
     if (listener) {
-        listener->panelChanged(EvLocallabavoidgamutMethod, avoidgamutMethod_->get_active_text());
+        listener->panelChanged(EvLocallabavoidgamutMethod,
+                               avoidgamutMethod_->get_active_text());
     }
-
 }
 
 void ControlSpotPanel::shapeMethodChanged()
@@ -1152,7 +1189,7 @@ void ControlSpotPanel::shapeMethodChanged()
     const auto iter = s->get_selected();
     Gtk::TreeModel::Row row = *iter;
 
-    if (!batchMode && (method == 1 || method == 3)) { // Symmetrical cases
+    if (!batchMode && (method == 1 || method == 3)) {  // Symmetrical cases
         disableParamlistener(true);
         locXL_->setValue(locX_->getValue());
         locYT_->setValue(locY_->getValue());
@@ -1163,36 +1200,37 @@ void ControlSpotPanel::shapeMethodChanged()
         row[spots_.locYT] = locY_->getIntValue();
 
         updateControlSpotCurve(row);
-    } else { // In batch mode, sliders are always independent
+    } else {  // In batch mode, sliders are always independent
         row[spots_.shapeMethod] = shapeMethod_->get_active_row_number();
     }
 
-    // Update Control Spot GUI according to shapeMethod_ combobox state (to be compliant with updateParamVisibility function)
+    // Update Control Spot GUI according to shapeMethod_ combobox state (to be compliant
+    // with updateParamVisibility function)
     if (!batchMode) {
-        if (method == 1 || method == 3) { // Symmetrical cases
+        if (method == 1 || method == 3) {  // Symmetrical cases
             locXL_->hide();
             locYT_->hide();
 
-            if (method == 1) { // 1 = Symmetrical (mouse)
+            if (method == 1) {  // 1 = Symmetrical (mouse)
                 locX_->hide();
                 locY_->hide();
                 centerX_->hide();
                 centerY_->hide();
-            } else { // 3 = Symmetrical (mouse + sliders)
+            } else {  // 3 = Symmetrical (mouse + sliders)
                 locX_->show();
                 locY_->show();
                 centerX_->show();
                 centerY_->show();
             }
-        } else { // Independent cases
-            if (method == 0) { // 0 = Independent (mouse)
+        } else {                // Independent cases
+            if (method == 0) {  // 0 = Independent (mouse)
                 locX_->hide();
                 locXL_->hide();
                 locY_->hide();
                 locYT_->hide();
                 centerX_->hide();
                 centerY_->hide();
-            } else { // 2 = Independent (mouse + sliders)
+            } else {  // 2 = Independent (mouse + sliders)
                 locX_->show();
                 locXL_->show();
                 locY_->show();
@@ -1201,7 +1239,7 @@ void ControlSpotPanel::shapeMethodChanged()
                 centerY_->show();
             }
         }
-    } else { // In batch mode, sliders are necessary shown
+    } else {  // In batch mode, sliders are necessary shown
         locX_->show();
         locXL_->show();
         locY_->show();
@@ -1212,7 +1250,8 @@ void ControlSpotPanel::shapeMethodChanged()
 
     // Raise event
     if (listener) {
-        listener->panelChanged(EvLocallabSpotShapeMethod, shapeMethod_->get_active_text());
+        listener->panelChanged(EvLocallabSpotShapeMethod,
+                               shapeMethod_->get_active_text());
     }
 }
 
@@ -1234,41 +1273,43 @@ void ControlSpotPanel::qualityMethodChanged()
 
     // Raise event
     if (listener) {
-        listener->panelChanged(EvLocallabSpotQualityMethod, qualityMethod_->get_active_text());
+        listener->panelChanged(EvLocallabSpotQualityMethod,
+                               qualityMethod_->get_active_text());
     }
 }
 
-//void ControlSpotPanel::complexMethodChanged()
+// void ControlSpotPanel::complexMethodChanged()
 //{
-//    // printf("qualityMethodChanged\n");
+//     // printf("qualityMethodChanged\n");
 //
-//    // Get selected control spot
-//    const auto s = treeview_->get_selection();
+//     // Get selected control spot
+//     const auto s = treeview_->get_selection();
 //
-//    if (!s->count_selected_rows()) {
-//        return;
-//    }
+//     if (!s->count_selected_rows()) {
+//         return;
+//     }
 //
-//    const auto iter = s->get_selected();
-//    Gtk::TreeModel::Row row = *iter;
+//     const auto iter = s->get_selected();
+//     Gtk::TreeModel::Row row = *iter;
 //
-//    row[spots_.complexMethod] = complexMethod_->get_active_row_number();
+//     row[spots_.complexMethod] = complexMethod_->get_active_row_number();
 //
-//    if (multiImage && complexMethod_->get_active_text() == M("GENERAL_UNCHANGED")) {
-//        // excluFrame->show();
-//    } else if (complexMethod_->get_active_row_number() == 0) { //sim
-//        // excluFrame->hide();
-//    } else if (complexMethod_->get_active_row_number() == 1) { // mod
-//        // excluFrame->show();
-//    } else if (complexMethod_->get_active_row_number() == 2) { // all
-//        // excluFrame->show();
-//    }
+//     if (multiImage && complexMethod_->get_active_text() == M("GENERAL_UNCHANGED")) {
+//         // excluFrame->show();
+//     } else if (complexMethod_->get_active_row_number() == 0) { //sim
+//         // excluFrame->hide();
+//     } else if (complexMethod_->get_active_row_number() == 1) { // mod
+//         // excluFrame->show();
+//     } else if (complexMethod_->get_active_row_number() == 2) { // all
+//         // excluFrame->show();
+//     }
 //
-//    // Raise event
-//    if (listener) {
-//        listener->panelChanged(EvLocallabSpotcomplexMethod, complexMethod_->get_active_text());
-//    }
-//}
+//     // Raise event
+//     if (listener) {
+//         listener->panelChanged(EvLocallabSpotcomplexMethod,
+//         complexMethod_->get_active_text());
+//     }
+// }
 
 void ControlSpotPanel::wavMethodChanged()
 {
@@ -1296,35 +1337,36 @@ void ControlSpotPanel::updateParamVisibility()
 {
     // printf("updateParamVisibility\n");
 
-    // Update Control Spot GUI according to shapeMethod_ combobox state (to be compliant with shapeMethodChanged function)
+    // Update Control Spot GUI according to shapeMethod_ combobox state (to be compliant
+    // with shapeMethodChanged function)
     const int method = shapeMethod_->get_active_row_number();
     const int meth = avoidgamutMethod_->get_active_row_number();
 
     if (!batchMode) {
-        if (method == 1 || method == 3) { // Symmetrical cases
+        if (method == 1 || method == 3) {  // Symmetrical cases
             locXL_->hide();
             locYT_->hide();
 
-            if (method == 1) { // 1 = Symmetrical (mouse)
+            if (method == 1) {  // 1 = Symmetrical (mouse)
                 locX_->hide();
                 locY_->hide();
                 centerX_->hide();
                 centerY_->hide();
-            } else { // 3 = Symmetrical (mouse + sliders)
+            } else {  // 3 = Symmetrical (mouse + sliders)
                 locX_->show();
                 locY_->show();
                 centerX_->show();
                 centerY_->show();
             }
-        } else { // Independent cases
-            if (method == 0) { // 0 = Independent (mouse)
+        } else {                // Independent cases
+            if (method == 0) {  // 0 = Independent (mouse)
                 locX_->hide();
                 locXL_->hide();
                 locY_->hide();
                 locYT_->hide();
                 centerX_->hide();
                 centerY_->hide();
-            } else { // 2 = Independent (mouse + sliders)
+            } else {  // 2 = Independent (mouse + sliders)
                 locX_->show();
                 locXL_->show();
                 locY_->show();
@@ -1333,7 +1375,7 @@ void ControlSpotPanel::updateParamVisibility()
                 centerY_->show();
             }
         }
-    } else { // In batch mode, sliders are necessary shown
+    } else {  // In batch mode, sliders are necessary shown
         locX_->show();
         locXL_->show();
         locY_->show();
@@ -1342,31 +1384,34 @@ void ControlSpotPanel::updateParamVisibility()
         centerY_->show();
     }
 
-    if(meth == 1) {
+    if (meth == 1) {
         avoidrad_->show();
     } else {
         avoidrad_->hide();
-}
-   // ctboxspotmethod->show();
+    }
+    // ctboxspotmethod->show();
     hishow_->show();
     artifBox2->show();
     ctboxshape->show();
     colorscope_->hide();
-    
-    // Update Control Spot GUI according to spotMethod_ combobox state (to be compliant with spotMethodChanged function)
+
+    // Update Control Spot GUI according to spotMethod_ combobox state (to be compliant
+    // with spotMethodChanged function)
     if (multiImage && spotMethod_->get_active_text() == M("GENERAL_UNCHANGED")) {
         excluFrame->show();
-    } else if (spotMethod_->get_active_row_number() == 0) { // Normal case
+    } else if (spotMethod_->get_active_row_number() == 0) {  // Normal case
         excluFrame->hide();
-    } else if (spotMethod_->get_active_row_number() == 1) { // Excluding case
+    } else if (spotMethod_->get_active_row_number() == 1) {  // Excluding case
         excluFrame->show();
-    } else if (spotMethod_->get_active_row_number() == 2 || spotMethod_->get_active_row_number() == 3) {//full image or global
+    } else if (spotMethod_->get_active_row_number() == 2
+               || spotMethod_->get_active_row_number() == 3)
+    {  // full image or global
         excluFrame->hide();
-        
-        if(spotMethod_->get_active_row_number() == 3) {        
+
+        if (spotMethod_->get_active_row_number() == 3) {
             artifBox2->hide();
             hishow_->hide();
-            hishow_->set_active(false);           
+            hishow_->set_active(false);
             ctboxshape->hide();
             circrad_->hide();
             expTransGrad_->hide();
@@ -1380,38 +1425,37 @@ void ControlSpotPanel::updateParamVisibility()
             hishow_->show();
             ctboxshape->show();
             circrad_->show();
-            if(hishow_->get_active()) {
+            if (hishow_->get_active()) {
                 expTransGrad_->show();
                 expShapeDetect_->show();
                 expSpecCases_->show();
                 expMaskMerge_->show();
             }
-            
-        }    
-
+        }
     }
 
-/*
-    if (multiImage && prevMethod_->get_active_text() == M("GENERAL_UNCHANGED")) {
-        expTransGrad_->show();
-        expShapeDetect_->show();
-        expSpecCases_->show();
-        expMaskMerge_->show();
-        circrad_->show();
-        ctboxshape->show();
-    } else if (prevMethod_->get_active_row_number() == 0) { // Normal case
-    */
-    //ctboxshape->show();
-   // artifBox2->show();
-   
-    if (!hishow_->get_active()  || spotMethod_->get_active_row_number() == 3) { // Normal case or Global 
+    /*
+        if (multiImage && prevMethod_->get_active_text() == M("GENERAL_UNCHANGED")) {
+            expTransGrad_->show();
+            expShapeDetect_->show();
+            expSpecCases_->show();
+            expMaskMerge_->show();
+            circrad_->show();
+            ctboxshape->show();
+        } else if (prevMethod_->get_active_row_number() == 0) { // Normal case
+        */
+    // ctboxshape->show();
+    // artifBox2->show();
+
+    if (!hishow_->get_active() || spotMethod_->get_active_row_number() == 3)
+    {  // Normal case or Global
         expTransGrad_->hide();
         expShapeDetect_->hide();
         expSpecCases_->hide();
         expMaskMerge_->hide();
         circrad_->hide();
         ctboxshape->hide();
-        if(spotMethod_->get_active_row_number() == 3) {
+        if (spotMethod_->get_active_row_number() == 3) {
             artifBox2->hide();
             hishow_->hide();
             ctboxshape->hide();
@@ -1420,7 +1464,7 @@ void ControlSpotPanel::updateParamVisibility()
             expShapeDetect_->hide();
             expSpecCases_->hide();
             expMaskMerge_->hide();
-            
+
         } else {
             hishow_->show();
             artifBox2->show();
@@ -1429,8 +1473,8 @@ void ControlSpotPanel::updateParamVisibility()
             ctboxshape->show();
             circrad_->show();
         }
-        
-    } else { // Excluding case
+
+    } else {  // Excluding case
         expTransGrad_->show();
         expShapeDetect_->show();
         expSpecCases_->show();
@@ -1438,10 +1482,7 @@ void ControlSpotPanel::updateParamVisibility()
         circrad_->show();
         ctboxshape->show();
         hishow_->show();
-        
     }
-
-
 }
 
 void ControlSpotPanel::adjusterChanged(Adjuster* a, double newval)
@@ -1479,7 +1520,8 @@ void ControlSpotPanel::adjusterChanged(Adjuster* a, double newval)
     if (a == locX_) {
         row[spots_.locX] = locX_->getIntValue();
 
-        if (!batchMode && (method == 1 || method == 3)) { // Symmetrical cases (in batch mode, sliders are always independent)
+        if (!batchMode && (method == 1 || method == 3))
+        {  // Symmetrical cases (in batch mode, sliders are always independent)
             disableParamlistener(true);
             locXL_->setValue(locX_->getValue());
             disableParamlistener(false);
@@ -1496,7 +1538,8 @@ void ControlSpotPanel::adjusterChanged(Adjuster* a, double newval)
     if (a == locXL_) {
         row[spots_.locXL] = locXL_->getIntValue();
 
-        if (!batchMode && (method == 1 || method == 3)) { // Symmetrical cases (in batch mode, sliders are always independent)
+        if (!batchMode && (method == 1 || method == 3))
+        {  // Symmetrical cases (in batch mode, sliders are always independent)
             disableParamlistener(true);
             locX_->setValue(locXL_->getValue());
             disableParamlistener(false);
@@ -1513,7 +1556,8 @@ void ControlSpotPanel::adjusterChanged(Adjuster* a, double newval)
     if (a == locY_) {
         row[spots_.locY] = locY_->getIntValue();
 
-        if (!batchMode && (method == 1 || method == 3)) { // Symmetrical cases (in batch mode, sliders are always independent)
+        if (!batchMode && (method == 1 || method == 3))
+        {  // Symmetrical cases (in batch mode, sliders are always independent)
             disableParamlistener(true);
             locYT_->setValue(locY_->getValue());
             disableParamlistener(false);
@@ -1530,7 +1574,8 @@ void ControlSpotPanel::adjusterChanged(Adjuster* a, double newval)
     if (a == locYT_) {
         row[spots_.locYT] = locYT_->getIntValue();
 
-        if (!batchMode && (method == 1 || method == 3)) { // Symmetrical cases (in batch mode, sliders are always independent)
+        if (!batchMode && (method == 1 || method == 3))
+        {  // Symmetrical cases (in batch mode, sliders are always independent)
             disableParamlistener(true);
             locY_->setValue(locYT_->getValue());
             disableParamlistener(false);
@@ -1551,7 +1596,9 @@ void ControlSpotPanel::adjusterChanged(Adjuster* a, double newval)
         updateControlSpotCurve(row);
 
         if (listener) {
-            listener->panelChanged(EvLocallabSpotCenter, "X=" + centerX_->getTextValue() + ", Y=" + centerY_->getTextValue());
+            listener->panelChanged(EvLocallabSpotCenter,
+                                   "X=" + centerX_->getTextValue()
+                                       + ", Y=" + centerY_->getTextValue());
         }
     }
 
@@ -1577,7 +1624,8 @@ void ControlSpotPanel::adjusterChanged(Adjuster* a, double newval)
         row[spots_.transitweak] = transitweak_->getValue();
 
         if (listener) {
-            listener->panelChanged(EvLocallabSpotTransitweak, transitweak_->getTextValue());
+            listener->panelChanged(EvLocallabSpotTransitweak,
+                                   transitweak_->getTextValue());
         }
     }
 
@@ -1585,7 +1633,8 @@ void ControlSpotPanel::adjusterChanged(Adjuster* a, double newval)
         row[spots_.transitgrad] = transitgrad_->getValue();
 
         if (listener) {
-            listener->panelChanged(EvLocallabSpotTransitgrad, transitgrad_->getTextValue());
+            listener->panelChanged(EvLocallabSpotTransitgrad,
+                                   transitgrad_->getTextValue());
         }
     }
 
@@ -1673,7 +1722,8 @@ void ControlSpotPanel::adjusterChanged(Adjuster* a, double newval)
         row[spots_.denoichmask] = denoichmask_->getValue();
 
         if (listener) {
-            listener->panelChanged(EvLocallabSpotdenoichmask, denoichmask_->getTextValue());
+            listener->panelChanged(EvLocallabSpotdenoichmask,
+                                   denoichmask_->getTextValue());
         }
     }
 
@@ -1701,10 +1751,10 @@ void ControlSpotPanel::hishowChanged()
     Gtk::TreeModel::Row row = *iter;
     row[spots_.hishow] = hishow_->get_active();
 
-
     ctboxshape->show();
 
-    if (!hishow_->get_active()  || spotMethod_->get_active_row_number() == 3) { // Normal case or Global
+    if (!hishow_->get_active() || spotMethod_->get_active_row_number() == 3)
+    {  // Normal case or Global
         expTransGrad_->hide();
         expShapeDetect_->hide();
         expSpecCases_->hide();
@@ -1712,22 +1762,21 @@ void ControlSpotPanel::hishowChanged()
         circrad_->hide();
         ctboxshape->hide();
         shapeMethod_->set_active(0);
-        if(spotMethod_->get_active_row_number() == 3) {
+        if (spotMethod_->get_active_row_number() == 3) {
             hishow_->hide();
-            hishow_->set_active(false);           
+            hishow_->set_active(false);
             circrad_->hide();
             expTransGrad_->hide();
             expShapeDetect_->hide();
             expSpecCases_->hide();
             expMaskMerge_->hide();
-            
+
         } else {
             hishow_->show();
             circrad_->show();
-            
         }
 
-    } else { // Excluding case
+    } else {  // Excluding case
         expTransGrad_->show();
         expShapeDetect_->show();
         expSpecCases_->show();
@@ -1735,8 +1784,7 @@ void ControlSpotPanel::hishowChanged()
         circrad_->show();
         ctboxshape->show();
         hishow_->show();
-        
-   }
+    }
 
     // Raise event
     if (listener) {
@@ -1747,7 +1795,6 @@ void ControlSpotPanel::hishowChanged()
         }
     }
 }
-
 
 void ControlSpotPanel::activChanged()
 {
@@ -1797,8 +1844,6 @@ void ControlSpotPanel::avoidnegChanged()
         }
     }
 }
-
-
 
 void ControlSpotPanel::blwhChanged()
 {
@@ -1850,7 +1895,6 @@ void ControlSpotPanel::recursChanged()
     }
 }
 
-
 void ControlSpotPanel::laplacChanged()
 {
     // Get selected control spot
@@ -1873,7 +1917,6 @@ void ControlSpotPanel::laplacChanged()
         }
     }
 }
-
 
 void ControlSpotPanel::deltaeChanged()
 {
@@ -1921,28 +1964,28 @@ void ControlSpotPanel::shortcChanged()
     }
 }
 
-//void ControlSpotPanel::savrestChanged()
+// void ControlSpotPanel::savrestChanged()
 //{
-//    // Get selected control spot
-//    const auto s = treeview_->get_selection();
+//     // Get selected control spot
+//     const auto s = treeview_->get_selection();
 //
-//    if (!s->count_selected_rows()) {
-//        return;
-//    }
+//     if (!s->count_selected_rows()) {
+//         return;
+//     }
 //
-//    const auto iter = s->get_selected();
-//    Gtk::TreeModel::Row row = *iter;
-//    row[spots_.savrest] = savrest_->get_active();
+//     const auto iter = s->get_selected();
+//     Gtk::TreeModel::Row row = *iter;
+//     row[spots_.savrest] = savrest_->get_active();
 //
-//    // Raise event
-//    if (listener) {
-//        if (savrest_->get_active()) {
-//            listener->panelChanged(Evlocallabsavrest, M("GENERAL_ENABLED"));
-//        } else {
-//            listener->panelChanged(Evlocallabsavrest, M("GENERAL_DISABLED"));
-//        }
-//    }
-//}
+//     // Raise event
+//     if (listener) {
+//         if (savrest_->get_active()) {
+//             listener->panelChanged(Evlocallabsavrest, M("GENERAL_ENABLED"));
+//         } else {
+//             listener->panelChanged(Evlocallabsavrest, M("GENERAL_DISABLED"));
+//         }
+//     }
+// }
 
 void ControlSpotPanel::previewChanged()
 {
@@ -2003,11 +2046,10 @@ void ControlSpotPanel::disableParamlistener(bool cond)
     denoichmask_->block(cond);
     shortcConn_.block(cond);
     lumask_->block(cond);
-    //savrestConn_.block(cond);
-    //complexMethodconn_.block(cond);
+    // savrestConn_.block(cond);
+    // complexMethodconn_.block(cond);
     wavMethodconn_.block(cond);
-	avoidgamutconn_.block(cond);
-
+    avoidgamutconn_.block(cond);
 }
 
 void ControlSpotPanel::setParamEditable(bool cond)
@@ -2051,8 +2093,8 @@ void ControlSpotPanel::setParamEditable(bool cond)
     denoichmask_->set_sensitive(cond);
     shortc_->set_sensitive(cond);
     lumask_->set_sensitive(cond);
-    //savrest_->set_sensitive(cond);
-    //complexMethod_->set_sensitive(cond);
+    // savrest_->set_sensitive(cond);
+    // complexMethod_->set_sensitive(cond);
     wavMethod_->set_sensitive(cond);
     preview_->set_sensitive(cond);
     avoidgamutMethod_->set_sensitive(cond);
@@ -2066,7 +2108,7 @@ void ControlSpotPanel::setParamEditable(bool cond)
         circrad_->hide();
         ctboxshape->hide();
         excluFrame->hide();
-//        ctboxshapemethod->hide();
+        //        ctboxshapemethod->hide();
         locX_->hide();
         locXL_->hide();
         locY_->hide();
@@ -2088,7 +2130,7 @@ void ControlSpotPanel::addControlSpotCurve(Gtk::TreeModel::Row& row)
 {
     // printf("addControlSpotCurve\n");
 
-    if (row[spots_.curveid] > 0) { // Row has already an associated curve
+    if (row[spots_.curveid] > 0) {  // Row has already an associated curve
         return;
     }
 
@@ -2124,13 +2166,13 @@ void ControlSpotPanel::addControlSpotCurve(Gtk::TreeModel::Row& row)
     EditRectangle* shape_rectangle;
     shape_rectangle = new EditRectangle();
     shape_rectangle->datum = Geometry::IMAGE;
-    EditSubscriber::visibleGeometry.push_back(centerCircle); // (curveid - 1) * 7
-    EditSubscriber::visibleGeometry.push_back(shape_ellipse); // (curveid - 1) * 7 + 1
-    EditSubscriber::visibleGeometry.push_back(shape_rectangle); // (curveid - 1) * 7 + 2
-    EditSubscriber::visibleGeometry.push_back(cirX); // (curveid - 1) * 7 + 3
-    EditSubscriber::visibleGeometry.push_back(cirXL); // (curveid - 1) * 7 + 4
-    EditSubscriber::visibleGeometry.push_back(cirY); // (curveid - 1) * 7 + 5
-    EditSubscriber::visibleGeometry.push_back(cirYT); // (curveid - 1) * 7 + 6
+    EditSubscriber::visibleGeometry.push_back(centerCircle);     // (curveid - 1) * 7
+    EditSubscriber::visibleGeometry.push_back(shape_ellipse);    // (curveid - 1) * 7 + 1
+    EditSubscriber::visibleGeometry.push_back(shape_rectangle);  // (curveid - 1) * 7 + 2
+    EditSubscriber::visibleGeometry.push_back(cirX);             // (curveid - 1) * 7 + 3
+    EditSubscriber::visibleGeometry.push_back(cirXL);            // (curveid - 1) * 7 + 4
+    EditSubscriber::visibleGeometry.push_back(cirY);             // (curveid - 1) * 7 + 5
+    EditSubscriber::visibleGeometry.push_back(cirYT);            // (curveid - 1) * 7 + 6
 
     // Creation of mouseOverGeometry
     cirX = new Circle();
@@ -2158,12 +2200,13 @@ void ControlSpotPanel::addControlSpotCurve(Gtk::TreeModel::Row& row)
     shape_ellipse->radiusInImageSpace = true;
     shape_rectangle = new EditRectangle();
     shape_rectangle->datum = Geometry::IMAGE;
-    EditSubscriber::mouseOverGeometry.push_back(centerCircle);  // (curveid - 1) * 7
+    EditSubscriber::mouseOverGeometry.push_back(centerCircle);   // (curveid - 1) * 7
     EditSubscriber::mouseOverGeometry.push_back(shape_ellipse);  // (curveid - 1) * 7 + 1
-    EditSubscriber::mouseOverGeometry.push_back(shape_rectangle);  // (curveid - 1) * 7 + 2
-    EditSubscriber::mouseOverGeometry.push_back(cirX);  // (curveid - 1) * 7 + 3
+    EditSubscriber::mouseOverGeometry.push_back(
+        shape_rectangle);                                // (curveid - 1) * 7 + 2
+    EditSubscriber::mouseOverGeometry.push_back(cirX);   // (curveid - 1) * 7 + 3
     EditSubscriber::mouseOverGeometry.push_back(cirXL);  // (curveid - 1) * 7 + 4
-    EditSubscriber::mouseOverGeometry.push_back(cirY);  // (curveid - 1) * 7 + 5
+    EditSubscriber::mouseOverGeometry.push_back(cirY);   // (curveid - 1) * 7 + 5
     EditSubscriber::mouseOverGeometry.push_back(cirYT);  // (curveid - 1) * 7 + 6
 
     row[spots_.curveid] = EditSubscriber::visibleGeometry.size() / 7;
@@ -2176,7 +2219,8 @@ void ControlSpotPanel::updateControlSpotCurve(const Gtk::TreeModel::Row& row)
 
     // printf("updateControlSpotCurve: %d\n", curveid_);
 
-    if (curveid_ == 0 || !dataProvider) { // Row has no associated curve or there is no EditProvider
+    if (curveid_ == 0 || !dataProvider)
+    {  // Row has no associated curve or there is no EditProvider
         return;
     }
 
@@ -2184,7 +2228,7 @@ void ControlSpotPanel::updateControlSpotCurve(const Gtk::TreeModel::Row& row)
     int imH = 0;
     dataProvider->getImageSize(imW, imH);
 
-    if (!imW || !imH) { // No image loaded
+    if (!imW || !imH) {  // No image loaded
         return;
     }
 
@@ -2202,21 +2246,24 @@ void ControlSpotPanel::updateControlSpotCurve(const Gtk::TreeModel::Row& row)
     const int decayXL = (double)locXL_ * (double)imW / 2000.;
     const int decayY = (double)locY_ * (double)imH / 2000.;
     const int decayYT = (double)locYT_ * (double)imH / 2000.;
-    const rtengine::Coord origin((double)imW / 2. + (double)centerX_ * (double)imW / 2000., (double)imH / 2. + (double)centerY_ * (double)imH / 2000.);
+    const rtengine::Coord origin(
+        (double)imW / 2. + (double)centerX_ * (double)imW / 2000.,
+        (double)imH / 2. + (double)centerY_ * (double)imH / 2000.);
 
-    const auto updateSelectionCircle = [&](Geometry * geometry, const int offsetX, const int offsetY) {
+    const auto updateSelectionCircle = [&](Geometry* geometry, const int offsetX,
+                                           const int offsetY) {
         const auto cir = static_cast<Circle*>(geometry);
         cir->center.x = origin.x + offsetX;
         cir->center.y = origin.y + offsetY;
     };
 
-    const auto updateCenterCircle = [&](Geometry * geometry) {
+    const auto updateCenterCircle = [&](Geometry* geometry) {
         const auto circle = static_cast<Circle*>(geometry);
         circle->center = origin;
         circle->radius = circrad_;
     };
 
-    const auto updateEllipse = [&](Geometry * geometry) {
+    const auto updateEllipse = [&](Geometry* geometry) {
         const auto ellipse = static_cast<Ellipse*>(geometry);
         ellipse->center = origin;
         ellipse->radX = decayX;
@@ -2225,7 +2272,7 @@ void ControlSpotPanel::updateControlSpotCurve(const Gtk::TreeModel::Row& row)
         ellipse->radYT = decayYT;
     };
 
-    const auto updateRectangle = [&](Geometry * geometry) {
+    const auto updateRectangle = [&](Geometry* geometry) {
         const auto rectangle = static_cast<EditRectangle*>(geometry);
         rectangle->bottomRight.x = origin.x + decayX;
         rectangle->bottomRight.y = origin.y + decayY;
@@ -2256,47 +2303,79 @@ void ControlSpotPanel::updateControlSpotCurve(const Gtk::TreeModel::Row& row)
 
     // Update Arcellipse/Rectangle visibility according to shape and visibility
     if (isvisible_) {
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7)->setActive(true); // centerCircle
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 3)->setActive(true); // cirX
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 4)->setActive(true); // cirXL
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 5)->setActive(true); // cirY
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 6)->setActive(true); // cirYT
+        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7)
+            ->setActive(true);  // centerCircle
+        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 3)
+            ->setActive(true);  // cirX
+        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 4)
+            ->setActive(true);  // cirXL
+        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 5)
+            ->setActive(true);  // cirY
+        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 6)
+            ->setActive(true);  // cirYT
 
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7)->setActive(true); // centerCircle
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 3)->setActive(true); // cirX
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 4)->setActive(true); // cirXL
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 5)->setActive(true); // cirY
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 6)->setActive(true); // cirYT
+        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7)
+            ->setActive(true);  // centerCircle
+        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 3)
+            ->setActive(true);  // cirX
+        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 4)
+            ->setActive(true);  // cirXL
+        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 5)
+            ->setActive(true);  // cirY
+        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 6)
+            ->setActive(true);  // cirYT
 
-        if (shape_ == 0) { // 0 = Ellipse
-            EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 1)->setActive(true); // shape_ellipse
-            EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 2)->setActive(false); // shape_rectangle
+        if (shape_ == 0) {  // 0 = Ellipse
+            EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 1)
+                ->setActive(true);  // shape_ellipse
+            EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 2)
+                ->setActive(false);  // shape_rectangle
 
-            EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 1)->setActive(true); // shape_ellipse
-            EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 2)->setActive(false); // shape_rectangle
-        } else { // 1 = Rectangle
-            EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 1)->setActive(false); // shape_ellipse
-            EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 2)->setActive(true); // shape_rectangle
+            EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 1)
+                ->setActive(true);  // shape_ellipse
+            EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 2)
+                ->setActive(false);  // shape_rectangle
+        } else {                     // 1 = Rectangle
+            EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 1)
+                ->setActive(false);  // shape_ellipse
+            EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 2)
+                ->setActive(true);  // shape_rectangle
 
-            EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 1)->setActive(false); // shape_ellipse
-            EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 2)->setActive(true); // shape_rectangle
+            EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 1)
+                ->setActive(false);  // shape_ellipse
+            EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 2)
+                ->setActive(true);  // shape_rectangle
         }
     } else {
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7)->setActive(false); // centerCircle
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 1)->setActive(false); // shape_ellipse
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 2)->setActive(false); // shape_rectangle
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 3)->setActive(false); // cirX
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 4)->setActive(false); // cirXL
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 5)->setActive(false); // cirY
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 6)->setActive(false); // cirYT
+        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7)
+            ->setActive(false);  // centerCircle
+        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 1)
+            ->setActive(false);  // shape_ellipse
+        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 2)
+            ->setActive(false);  // shape_rectangle
+        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 3)
+            ->setActive(false);  // cirX
+        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 4)
+            ->setActive(false);  // cirXL
+        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 5)
+            ->setActive(false);  // cirY
+        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 6)
+            ->setActive(false);  // cirYT
 
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7)->setActive(false); // centerCircle
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 1)->setActive(false); // shape_ellipse
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 2)->setActive(false); // shape_rectangle
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 3)->setActive(false); // cirX
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 4)->setActive(false); // cirXL
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 5)->setActive(false); // cirY
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 6)->setActive(false); // cirYT
+        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7)
+            ->setActive(false);  // centerCircle
+        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 1)
+            ->setActive(false);  // shape_ellipse
+        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 2)
+            ->setActive(false);  // shape_rectangle
+        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 3)
+            ->setActive(false);  // cirX
+        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 4)
+            ->setActive(false);  // cirXL
+        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 5)
+            ->setActive(false);  // cirY
+        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 6)
+            ->setActive(false);  // cirYT
     }
 }
 
@@ -2306,23 +2385,25 @@ void ControlSpotPanel::deleteControlSpotCurve(Gtk::TreeModel::Row& row)
 
     // printf("deleteControlSpotCurve: %d\n", curveid_);
 
-    if (curveid_ == 0) { // Row has no associated curve
+    if (curveid_ == 0) {  // Row has no associated curve
         return;
     }
 
     // visibleGeometry
     for (int i = 6; i >= 0; i--) {
         delete *(EditSubscriber::visibleGeometry.begin() + (curveid_ - 1) * 7 + i);
-        EditSubscriber::visibleGeometry.erase(EditSubscriber::visibleGeometry.begin() + (curveid_ - 1) * 7 + i);
+        EditSubscriber::visibleGeometry.erase(EditSubscriber::visibleGeometry.begin()
+                                              + (curveid_ - 1) * 7 + i);
     }
 
     // mouseOverGeometry
     for (int i = 6; i >= 0; i--) {
         delete *(EditSubscriber::mouseOverGeometry.begin() + (curveid_ - 1) * 7 + i);
-        EditSubscriber::mouseOverGeometry.erase(EditSubscriber::mouseOverGeometry.begin() + (curveid_ - 1) * 7 + i);
+        EditSubscriber::mouseOverGeometry.erase(EditSubscriber::mouseOverGeometry.begin()
+                                                + (curveid_ - 1) * 7 + i);
     }
 
-    row[spots_.curveid] = 0; // Reset associated curve id
+    row[spots_.curveid] = 0;  // Reset associated curve id
 
     // Reordering curve id
     const Gtk::TreeModel::Children children = treemodel_->children();
@@ -2342,12 +2423,13 @@ void ControlSpotPanel::updateCurveOpacity(const Gtk::TreeModel::Row& selectedRow
 
     // printf("updateCurveOpacity: %d\n", curveid_);
 
-    if (curveid_ == 0) { // Row has no associated curve
+    if (curveid_ == 0) {  // Row has no associated curve
         return;
     }
 
-    for (int it_ = 0; it_ < (int) EditSubscriber::visibleGeometry.size(); it_++) {
-        if ((it_ < ((curveid_ - 1) * 7)) || (it_ > ((curveid_ - 1) * 7) + 6)) { // it_ does not belong to selected curve
+    for (int it_ = 0; it_ < (int)EditSubscriber::visibleGeometry.size(); it_++) {
+        if ((it_ < ((curveid_ - 1) * 7)) || (it_ > ((curveid_ - 1) * 7) + 6))
+        {  // it_ does not belong to selected curve
             EditSubscriber::visibleGeometry.at(it_)->opacity = 25.;
         } else {
             EditSubscriber::visibleGeometry.at(it_)->opacity = 75.;
@@ -2359,7 +2441,8 @@ CursorShape ControlSpotPanel::getCursor(int objectID, int xPos, int yPos) const
 {
     // printf("Object ID: %d\n", objectID);
 
-    // When there is no control spot (i.e. no selected row), objectID can unexpectedly be different from -1 and produced not desired behavior
+    // When there is no control spot (i.e. no selected row), objectID can unexpectedly be
+    // different from -1 and produced not desired behavior
     const auto s = treeview_->get_selection();
 
     if (!s->count_selected_rows()) {
@@ -2369,29 +2452,29 @@ CursorShape ControlSpotPanel::getCursor(int objectID, int xPos, int yPos) const
     const int rem_ = objectID % 7;
 
     switch (rem_) {
-        case (0): // centerCircle: (curveid_ - 1) * 7
-            return CSMove2D;
+    case (0):  // centerCircle: (curveid_ - 1) * 7
+        return CSMove2D;
 
-        case (1): // shape_ellipse: (curveid_ - 1) * 7 + 1
-            return CSMove2D;
+    case (1):  // shape_ellipse: (curveid_ - 1) * 7 + 1
+        return CSMove2D;
 
-        case (2): // shape_rectangle: (curveid_ - 1) * 7 + 2
-            return CSMove2D;
+    case (2):  // shape_rectangle: (curveid_ - 1) * 7 + 2
+        return CSMove2D;
 
-        case (3): // cirX: (curveid_ - 1) * 7 + 3
-            return CSMove1DH;
+    case (3):  // cirX: (curveid_ - 1) * 7 + 3
+        return CSMove1DH;
 
-        case (4): // cirXL: (curveid_ - 1) * 7 + 4
-            return CSMove1DH;
+    case (4):  // cirXL: (curveid_ - 1) * 7 + 4
+        return CSMove1DH;
 
-        case (5): // cirY: (curveid_ - 1) * 7 + 5
-            return CSMove1DV;
+    case (5):  // cirY: (curveid_ - 1) * 7 + 5
+        return CSMove1DV;
 
-        case (6): // cirYT: (curveid_ - 1) * 7 + 6
-            return CSMove1DV;
+    case (6):  // cirYT: (curveid_ - 1) * 7 + 6
+        return CSMove1DV;
 
-        default:
-            return CSHandOpen;
+    default:
+        return CSHandOpen;
     }
 }
 
@@ -2400,7 +2483,9 @@ bool ControlSpotPanel::mouseOver(int modifierKey)
     EditDataProvider* editProvider_ = getEditProvider();
     const auto s = treeview_->get_selection();
 
-    if (!editProvider_ || !s->count_selected_rows()) { // When there is no control spot (i.e. no selected row), objectID can unexpectedly be different from -1 and produced not desired behavior
+    if (!editProvider_ || !s->count_selected_rows())
+    {  // When there is no control spot (i.e. no selected row), objectID can unexpectedly
+       // be different from -1 and produced not desired behavior
         return false;
     }
 
@@ -2446,8 +2531,9 @@ bool ControlSpotPanel::mouseOver(int modifierKey)
             }
         }
 
-        for (int it_ = 0; it_ < (int) EditSubscriber::visibleGeometry.size(); it_++) {
-            if ((it_ < ((curveId_ - 1) * 7)) || (it_ > ((curveId_ - 1) * 7) + 6)) { // it_ does not belong to cursor pointed curve
+        for (int it_ = 0; it_ < (int)EditSubscriber::visibleGeometry.size(); it_++) {
+            if ((it_ < ((curveId_ - 1) * 7)) || (it_ > ((curveId_ - 1) * 7) + 6))
+            {  // it_ does not belong to cursor pointed curve
                 EditSubscriber::visibleGeometry.at(it_)->state = Geometry::NORMAL;
             }
         }
@@ -2456,56 +2542,78 @@ bool ControlSpotPanel::mouseOver(int modifierKey)
 
         // Circle, Arcellipses and Rectangle
         if (rem >= 0 && rem < 3) {
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7)->state = Geometry::PRELIGHT;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 1)->state = Geometry::PRELIGHT;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 2)->state = Geometry::PRELIGHT;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 3)->state = Geometry::PRELIGHT;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 4)->state = Geometry::PRELIGHT;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 5)->state = Geometry::PRELIGHT;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 6)->state = Geometry::PRELIGHT;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7)->state =
+                Geometry::PRELIGHT;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 1)->state =
+                Geometry::PRELIGHT;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 2)->state =
+                Geometry::PRELIGHT;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 3)->state =
+                Geometry::PRELIGHT;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 4)->state =
+                Geometry::PRELIGHT;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 5)->state =
+                Geometry::PRELIGHT;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 6)->state =
+                Geometry::PRELIGHT;
         } else {
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7)->state = Geometry::NORMAL;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 2)->state = Geometry::NORMAL;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 3)->state = Geometry::NORMAL;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 4)->state = Geometry::NORMAL;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 4)->state = Geometry::NORMAL;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 5)->state = Geometry::NORMAL;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 6)->state = Geometry::NORMAL;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7)->state =
+                Geometry::NORMAL;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 2)->state =
+                Geometry::NORMAL;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 3)->state =
+                Geometry::NORMAL;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 4)->state =
+                Geometry::NORMAL;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 4)->state =
+                Geometry::NORMAL;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 5)->state =
+                Geometry::NORMAL;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 6)->state =
+                Geometry::NORMAL;
         }
 
         // cirX
         if (rem == 3) {
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 3)->state = Geometry::PRELIGHT;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 3)->state =
+                Geometry::PRELIGHT;
 
-            if (method == 1 || method == 3) { // Symmetrical cases
-                EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 4)->state = Geometry::PRELIGHT;
+            if (method == 1 || method == 3) {  // Symmetrical cases
+                EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 4)->state =
+                    Geometry::PRELIGHT;
             }
         }
 
         // cirXL
         if (rem == 4) {
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 4)->state = Geometry::PRELIGHT;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 4)->state =
+                Geometry::PRELIGHT;
 
-            if (method == 1 || method == 3) { // Symmetrical cases
-                EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 3)->state = Geometry::PRELIGHT;
+            if (method == 1 || method == 3) {  // Symmetrical cases
+                EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 3)->state =
+                    Geometry::PRELIGHT;
             }
         }
 
         // cirY
         if (rem == 5) {
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 5)->state = Geometry::PRELIGHT;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 5)->state =
+                Geometry::PRELIGHT;
 
-            if (method == 1 || method == 3) { // Symmetrical cases
-                EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 6)->state = Geometry::PRELIGHT;
+            if (method == 1 || method == 3) {  // Symmetrical cases
+                EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 6)->state =
+                    Geometry::PRELIGHT;
             }
         }
 
         // cirYT
         if (rem == 6) {
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 6)->state = Geometry::PRELIGHT;
+            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 6)->state =
+                Geometry::PRELIGHT;
 
-            if (method == 1 || method == 3) { // Symmetrical cases
-                EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 5)->state = Geometry::PRELIGHT;
+            if (method == 1 || method == 3) {  // Symmetrical cases
+                EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 5)->state =
+                    Geometry::PRELIGHT;
             }
         }
 
@@ -2520,10 +2628,12 @@ bool ControlSpotPanel::button1Pressed(int modifierKey)
 {
     // printf("button1Pressed\n");
 
-    EditDataProvider *provider = getEditProvider();
+    EditDataProvider* provider = getEditProvider();
     const auto s = treeview_->get_selection();
 
-    if (!provider || lastObject_ == -1 || !s->count_selected_rows()) { // When there is no control spot (i.e. no selected row), objectID can unexpectedly be different from -1 and produced not desired behavior
+    if (!provider || lastObject_ == -1 || !s->count_selected_rows())
+    {  // When there is no control spot (i.e. no selected row), objectID can unexpectedly
+       // be different from -1 and produced not desired behavior
         return false;
     }
 
@@ -2540,7 +2650,8 @@ bool ControlSpotPanel::button1Pressed(int modifierKey)
         }
     }
 
-    lastCoord_.set(provider->posImage.x + provider->deltaImage.x, provider->posImage.y + provider->deltaImage.y);
+    lastCoord_.set(provider->posImage.x + provider->deltaImage.x,
+                   provider->posImage.y + provider->deltaImage.y);
     EditSubscriber::action = EditSubscriber::Action::DRAGGING;
     return true;
 }
@@ -2556,10 +2667,12 @@ bool ControlSpotPanel::drag1(int modifierKey)
 {
     // printf("drag1\n");
 
-    EditDataProvider *provider = getEditProvider();
+    EditDataProvider* provider = getEditProvider();
     const auto s = treeview_->get_selection();
 
-    if (!provider || lastObject_ == -1 || !s->count_selected_rows()) { // When there is no control spot (i.e. no selected row), objectID can unexpectedly be different from -1 and produced not desired behavior
+    if (!provider || lastObject_ == -1 || !s->count_selected_rows())
+    {  // When there is no control spot (i.e. no selected row), objectID can unexpectedly
+       // be different from -1 and produced not desired behavior
         return false;
     }
 
@@ -2570,12 +2683,13 @@ bool ControlSpotPanel::drag1(int modifierKey)
     provider->getImageSize(imW, imH);
     const int rem = lastObject_ % 7;
     const int method = shapeMethod_->get_active_row_number();
-    Coord newCoord = Coord(provider->posImage.x + provider->deltaImage.x, provider->posImage.y + provider->deltaImage.y);
+    Coord newCoord = Coord(provider->posImage.x + provider->deltaImage.x,
+                           provider->posImage.y + provider->deltaImage.y);
 
     // Circle, Ellipses and Rectangle
     if (rem >= 0 && rem < 3) {
-        double deltaX = (double (newCoord.x) - double (lastCoord_.x)) * 2000. / double (imW);
-        double deltaY = (double (newCoord.y) - double (lastCoord_.y)) * 2000. / double (imH);
+        double deltaX = (double(newCoord.x) - double(lastCoord_.x)) * 2000. / double(imW);
+        double deltaY = (double(newCoord.y) - double(lastCoord_.y)) * 2000. / double(imH);
         centerX_->setValue(centerX_->getValue() + deltaX);
         centerY_->setValue(centerY_->getValue() + deltaY);
         row[spots_.centerX] = centerX_->getIntValue();
@@ -2584,17 +2698,19 @@ bool ControlSpotPanel::drag1(int modifierKey)
         updateControlSpotCurve(row);
 
         if (listener) {
-            listener->panelChanged(EvLocallabSpotCenter, "X=" + centerX_->getTextValue() + ", Y=" + centerY_->getTextValue());
+            listener->panelChanged(EvLocallabSpotCenter,
+                                   "X=" + centerX_->getTextValue()
+                                       + ", Y=" + centerY_->getTextValue());
         }
     }
 
     // cirX
     if (rem == 3) {
-        double deltaX = (double (newCoord.x) - double (lastCoord_.x)) * 2000. / double (imW);
+        double deltaX = (double(newCoord.x) - double(lastCoord_.x)) * 2000. / double(imW);
         locX_->setValue(locX_->getValue() + deltaX);
         row[spots_.locX] = locX_->getIntValue();
 
-        if (method == 1 || method == 3) { // Symmetrical cases
+        if (method == 1 || method == 3) {  // Symmetrical cases
             disableParamlistener(true);
             locXL_->setValue(locX_->getValue());
             disableParamlistener(false);
@@ -2610,11 +2726,12 @@ bool ControlSpotPanel::drag1(int modifierKey)
 
     // cirXL
     if (rem == 4) {
-        double deltaXL = (double (lastCoord_.x) - double (newCoord.x)) * 2000. / double (imW);
+        double deltaXL =
+            (double(lastCoord_.x) - double(newCoord.x)) * 2000. / double(imW);
         locXL_->setValue(locXL_->getValue() + deltaXL);
         row[spots_.locXL] = locXL_->getIntValue();
 
-        if (method == 1 || method == 3) { // Symmetrical cases
+        if (method == 1 || method == 3) {  // Symmetrical cases
             disableParamlistener(true);
             locX_->setValue(locXL_->getValue());
             disableParamlistener(false);
@@ -2630,11 +2747,11 @@ bool ControlSpotPanel::drag1(int modifierKey)
 
     // cirY
     if (rem == 5) {
-        double deltaY = (double (newCoord.y) - double (lastCoord_.y)) * 2000. / double (imH);
+        double deltaY = (double(newCoord.y) - double(lastCoord_.y)) * 2000. / double(imH);
         locY_->setValue(locY_->getValue() + deltaY);
         row[spots_.locY] = locY_->getIntValue();
 
-        if (method == 1 || method == 3) { // Symmetrical cases
+        if (method == 1 || method == 3) {  // Symmetrical cases
             disableParamlistener(true);
             locYT_->setValue(locY_->getValue());
             disableParamlistener(false);
@@ -2650,11 +2767,12 @@ bool ControlSpotPanel::drag1(int modifierKey)
 
     // cirYT
     if (rem == 6) {
-        double deltaYT = (double (lastCoord_.y) - double (newCoord.y)) * 2000. / double (imH);
+        double deltaYT =
+            (double(lastCoord_.y) - double(newCoord.y)) * 2000. / double(imH);
         locYT_->setValue(locYT_->getValue() + deltaYT);
         row[spots_.locYT] = locYT_->getIntValue();
 
-        if (method == 1 || method == 3) { // Symmetrical cases
+        if (method == 1 || method == 3) {  // Symmetrical cases
             disableParamlistener(true);
             locY_->setValue(locYT_->getValue());
             disableParamlistener(false);
@@ -2675,7 +2793,7 @@ bool ControlSpotPanel::drag1(int modifierKey)
 int ControlSpotPanel::getEventType()
 {
     const int tmp = eventType;
-    eventType = None; // Re-initialization at "None" if event type gotten
+    eventType = None;  // Re-initialization at "None" if event type gotten
     return tmp;
 }
 
@@ -2692,7 +2810,7 @@ std::unique_ptr<ControlSpotPanel::SpotRow> ControlSpotPanel::getSpot(const int i
 
     int i = -1;
 
-    for (auto &row : treemodel_->children()) {
+    for (auto& row : treemodel_->children()) {
         i++;
 
         if (i == index) {
@@ -2701,7 +2819,7 @@ std::unique_ptr<ControlSpotPanel::SpotRow> ControlSpotPanel::getSpot(const int i
             r->prevMethod = row[spots_.prevMethod];
             r->shape = row[spots_.shape];
             r->spotMethod = row[spots_.spotMethod];
-//           r->mergeMethod = row[spots_.mergeMethod];
+            //           r->mergeMethod = row[spots_.mergeMethod];
             r->sensiexclu = row[spots_.sensiexclu];
             r->structexclu = row[spots_.structexclu];
             r->struc = row[spots_.struc];
@@ -2737,7 +2855,7 @@ std::unique_ptr<ControlSpotPanel::SpotRow> ControlSpotPanel::getSpot(const int i
             r->laplac = row[spots_.laplac];
             r->deltae = row[spots_.deltae];
             r->shortc = row[spots_.shortc];
-            //r->savrest = row[spots_.savrest];
+            // r->savrest = row[spots_.savrest];
             r->wavMethod = row[spots_.wavMethod];
             r->avoidgamutMethod = row[spots_.avoidgamutMethod];
 
@@ -2792,7 +2910,7 @@ bool ControlSpotPanel::setSelectedSpot(const int index)
 
     int i = -1;
 
-    for (auto &row : treemodel_->children()) {
+    for (auto& row : treemodel_->children()) {
         i++;
 
         if (i == index) {
@@ -2824,7 +2942,7 @@ void ControlSpotPanel::resetDeltaEPreview()
     previewConn_.block(false);
 }
 
-void ControlSpotPanel::addControlSpot(const SpotRow &newSpot)
+void ControlSpotPanel::addControlSpot(const SpotRow& newSpot)
 {
     // printf("addControlSpot: %d\n", newSpot.name);
 
@@ -2835,7 +2953,7 @@ void ControlSpotPanel::addControlSpot(const SpotRow &newSpot)
     row[spots_.mouseover] = false;
     row[spots_.name] = newSpot.name;
     row[spots_.isvisible] = newSpot.isvisible;
-    row[spots_.curveid] = 0; // No associated curve
+    row[spots_.curveid] = 0;  // No associated curve
     row[spots_.prevMethod] = newSpot.prevMethod;
     row[spots_.shape] = newSpot.shape;
     row[spots_.spotMethod] = newSpot.spotMethod;
@@ -2873,7 +2991,7 @@ void ControlSpotPanel::addControlSpot(const SpotRow &newSpot)
     row[spots_.denoichmask] = newSpot.denoichmask;
     row[spots_.shortc] = newSpot.shortc;
     row[spots_.lumask] = newSpot.lumask;
-    //row[spots_.savrest] = newSpot.savrest;
+    // row[spots_.savrest] = newSpot.savrest;
     row[spots_.complexMethod] = newSpot.complexMethod;
     row[spots_.wavMethod] = newSpot.wavMethod;
     row[spots_.avoidgamutMethod] = newSpot.avoidgamutMethod;
@@ -2909,57 +3027,71 @@ void ControlSpotPanel::deleteControlSpot(const int index)
     disableParamlistener(false);
 }
 
-//new function linked to Global and options 
-void ControlSpotPanel::updateguiset(int spottype, bool iscolor, bool issh, bool isvib, bool isexpos, bool issoft, bool isblur, bool istom, bool isret, bool issharp, bool iscont, bool iscbdl, bool islog, bool ismas, bool isci)
+// new function linked to Global and options
+void ControlSpotPanel::updateguiset(int spottype,
+                                    bool iscolor,
+                                    bool issh,
+                                    bool isvib,
+                                    bool isexpos,
+                                    bool issoft,
+                                    bool isblur,
+                                    bool istom,
+                                    bool isret,
+                                    bool issharp,
+                                    bool iscont,
+                                    bool iscbdl,
+                                    bool islog,
+                                    bool ismas,
+                                    bool isci)
 {
-    {  //with this function we can 1) activate Settings SpotMethod
+    {  // with this function we can 1) activate Settings SpotMethod
         // also if need GUI for mask ,  todo...
-        idle_register.add(
-        [this, spottype, iscolor, issh , isvib, isexpos, issoft, isblur, istom, isret, issharp, iscont, iscbdl, islog, ismas, isci]() -> bool {
-            GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
+        idle_register.add([this, spottype, iscolor, issh, isvib, isexpos, issoft, isblur,
+                           istom, isret, issharp, iscont, iscbdl, islog, ismas,
+                           isci]() -> bool {
+            GThreadLock lock;  // All GUI access from idle_add callbacks or separate
+                               // thread HAVE to be protected
 
             // Update GUI fullimage or main
             disableListener();
-            if(spottype >= 2  && App::get().options().spotmet >= 2) {//optimize update
+            if (spottype >= 2 && App::get().options().spotmet >= 2) {  // optimize update
                 spotMethodChanged();
             }
-            
-            if((iscolor || issh || isvib || isexpos || istom || iscont || islog || ismas || isci)
-                && !issharp && !issoft && !isret && !isblur  & !iscbdl) {
-                preview_->hide();               
+
+            if ((iscolor || issh || isvib || isexpos || istom || iscont || islog || ismas
+                 || isci)
+                && !issharp && !issoft && !isret && !isblur & !iscbdl)
+            {
+                preview_->hide();
             } else if (issoft || isblur || isret || issharp || iscbdl) {
-                preview_->show(); 
+                preview_->show();
             }
             enableListener();
 
-        return false;
-        }
-        );
+            return false;
+        });
     }
-   
 }
-//new function linked to change scope
+// new function linked to change scope
 void ControlSpotPanel::updateguiscopeset(int scope)
 {
-    {  //with this function we can disabled old values scope 
-        idle_register.add(
-        [this, scope]() -> bool {
-            GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
+    {  // with this function we can disabled old values scope
+        idle_register.add([this, scope]() -> bool {
+            GThreadLock lock;  // All GUI access from idle_add callbacks or separate
+                               // thread HAVE to be protected
 
             disableListener();
             colorscope_->setValue(scope);
             adjusterChanged(colorscope_, 0.);
             enableListener();
 
-        return false;
-        }
-        );
+            return false;
+        });
     }
-   
 }
 
-
-void ControlSpotPanel::setDefaults(const rtengine::procparams::ProcParams * defParams, const ParamsEdited * pedited)
+void ControlSpotPanel::setDefaults(const rtengine::procparams::ProcParams* defParams,
+                                   const ParamsEdited* pedited)
 {
     const int index = defParams->locallab.selspot;
 
@@ -3043,24 +3175,26 @@ ControlSpotPanel::ControlSpots::ControlSpots()
     add(denoichmask);
     add(shortc);
     add(lumask);
-    //add(savrest);
+    // add(savrest);
     add(complexMethod);
     add(wavMethod);
-	add(avoidgamutMethod);
+    add(avoidgamutMethod);
 }
 
 //-----------------------------------------------------------------------------
 // RenameDialog
 //-----------------------------------------------------------------------------
 
-ControlSpotPanel::RenameDialog::RenameDialog(const Glib::ustring &actualname, Gtk::Window &parent):
-    Gtk::Dialog(M("TP_LOCALLAB_REN_DIALOG_NAME"), parent),
+ControlSpotPanel::RenameDialog::RenameDialog(const Glib::ustring& actualname,
+                                             Gtk::Window& parent)
+    : Gtk::Dialog(M("TP_LOCALLAB_REN_DIALOG_NAME"), parent),
 
-    newname_(Gtk::manage(new Gtk::Entry()))
+      newname_(Gtk::manage(new Gtk::Entry()))
 {
     // Entry widget
     Gtk::Box* const hb = Gtk::manage(new Gtk::Box());
-    hb->pack_start(*Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_REN_DIALOG_LAB"))), false, false, 4);
+    hb->pack_start(*Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_REN_DIALOG_LAB"))), false,
+                   false, 4);
     newname_->set_text(actualname);
     hb->pack_start(*newname_);
     get_content_area()->pack_start(*hb, Gtk::PACK_SHRINK, 4);

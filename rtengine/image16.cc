@@ -20,14 +20,17 @@
 
 #include "colortemp.h"
 #include "image16.h"
-#include "imagefloat.h"
 #include "image8.h"
+#include "imagefloat.h"
 #include "rt_math.h"
 
-namespace
-{
+namespace {
 
-void getScanline8(const uint16_t *red, const uint16_t *green, const uint16_t *blue, int width, unsigned char* buffer)
+void getScanline8(const uint16_t* red,
+                  const uint16_t* green,
+                  const uint16_t* blue,
+                  int width,
+                  unsigned char* buffer)
 {
     for (int i = 0, ix = 0; i < width; i++) {
         buffer[ix++] = rtengine::uint16ToUint8Rounded(red[i]);
@@ -36,7 +39,11 @@ void getScanline8(const uint16_t *red, const uint16_t *green, const uint16_t *bl
     }
 }
 
-void getScanline16(const uint16_t *red, const uint16_t *green, const uint16_t *blue, int width, unsigned short* buffer)
+void getScanline16(const uint16_t* red,
+                   const uint16_t* green,
+                   const uint16_t* blue,
+                   int width,
+                   unsigned short* buffer)
 {
     for (int i = 0, ix = 0; i < width; i++) {
         buffer[ix++] = red[i];
@@ -45,22 +52,18 @@ void getScanline16(const uint16_t *red, const uint16_t *green, const uint16_t *b
     }
 }
 
-}
+}  // namespace
 
 using namespace rtengine;
 
-Image16::Image16()
-{
-}
+Image16::Image16() {}
 
 Image16::Image16(int w, int h)
 {
     allocate(w, h);
 }
 
-Image16::~Image16()
-{
-}
+Image16::~Image16() {}
 
 void Image16::getScanline(int row, unsigned char* buffer, int bps, bool isFloat) const
 {
@@ -76,7 +79,10 @@ void Image16::getScanline(int row, unsigned char* buffer, int bps, bool isFloat)
     }
 }
 
-void Image16::setScanline(int row, const unsigned char* buffer, int bps, unsigned int numSamples)
+void Image16::setScanline(int row,
+                          const unsigned char* buffer,
+                          int bps,
+                          unsigned int numSamples)
 {
 
     if (data == nullptr) {
@@ -84,40 +90,43 @@ void Image16::setScanline(int row, const unsigned char* buffer, int bps, unsigne
     }
 
     switch (sampleFormat) {
-        case (IIOSF_UNSIGNED_CHAR): {
-            int ix = 0;
+    case (IIOSF_UNSIGNED_CHAR):
+    {
+        int ix = 0;
 
-            if (numSamples == 1) {
-                for (int i = 0; i < width; ++i) {
-                    r(row, i) = g(row, i) = b(row, i) = static_cast<unsigned short>(buffer[ix++]) * 257;
-                }
-            } else {
-                for (int i = 0; i < width; ++i) {
-                    r(row, i) = static_cast<unsigned short>(buffer[ix++]) * 257;
-                    g(row, i) = static_cast<unsigned short>(buffer[ix++]) * 257;
-                    b(row, i) = static_cast<unsigned short>(buffer[ix++]) * 257;
-                }
-            }
-
-            break;
-        }
-
-        case (IIOSF_UNSIGNED_SHORT): {
-            const unsigned short* sbuffer = (const unsigned short*) buffer;
-            int ix = 0;
-
+        if (numSamples == 1) {
             for (int i = 0; i < width; ++i) {
-                r(row, i) = sbuffer[ix++];
-                g(row, i) = sbuffer[ix++];
-                b(row, i) = sbuffer[ix++];
+                r(row, i) = g(row, i) = b(row, i) =
+                    static_cast<unsigned short>(buffer[ix++]) * 257;
             }
-
-            break;
+        } else {
+            for (int i = 0; i < width; ++i) {
+                r(row, i) = static_cast<unsigned short>(buffer[ix++]) * 257;
+                g(row, i) = static_cast<unsigned short>(buffer[ix++]) * 257;
+                b(row, i) = static_cast<unsigned short>(buffer[ix++]) * 257;
+            }
         }
 
-        default:
-            // Other types are ignored, but could be implemented if necessary
-            break;
+        break;
+    }
+
+    case (IIOSF_UNSIGNED_SHORT):
+    {
+        const unsigned short* sbuffer = (const unsigned short*)buffer;
+        int ix = 0;
+
+        for (int i = 0; i < width; ++i) {
+            r(row, i) = sbuffer[ix++];
+            g(row, i) = sbuffer[ix++];
+            b(row, i) = sbuffer[ix++];
+        }
+
+        break;
+    }
+
+    default:
+        // Other types are ignored, but could be implemented if necessary
+        break;
     }
 
     /*
@@ -134,21 +143,24 @@ Image16* Image16::copy() const
     return cp;
 }
 
-Image16* Image16::copySubRegion (int x, int y, int width, int height)
+Image16* Image16::copySubRegion(int x, int y, int width, int height)
 {
     Image16* cp = NULL;
-    int realWidth  = LIM<int>(x + width,  0, this->width)  - x;
+    int realWidth = LIM<int>(x + width, 0, this->width) - x;
     int realHeight = LIM<int>(y + height, 0, this->height) - y;
 
     if (realWidth > 0 && realHeight > 0) {
-        cp = new Image16 (realWidth, realHeight);
+        cp = new Image16(realWidth, realHeight);
         copyData(cp, x, y, realWidth, realHeight);
     }
 
     return cp;
 }
 
-void Image16::getStdImage(const ColorTemp &ctemp, int tran, Imagefloat* image, const PreviewProps &pp) const
+void Image16::getStdImage(const ColorTemp& ctemp,
+                          int tran,
+                          Imagefloat* image,
+                          const PreviewProps& pp) const
 {
 
     // compute channel multipliers
@@ -174,8 +186,8 @@ void Image16::getStdImage(const ColorTemp &ctemp, int tran, Imagefloat* image, c
 
     transform(pp, tran, sx1, sy1, sx2, sy2);
 
-    int imwidth = image->getWidth(); // Destination image
-    int imheight = image->getHeight(); // Destination image
+    int imwidth = image->getWidth();    // Destination image
+    int imheight = image->getHeight();  // Destination image
 
     if (((tran & TR_ROT) == TR_R90) || ((tran & TR_ROT) == TR_R270)) {
         int swap = imwidth;
@@ -183,12 +195,13 @@ void Image16::getStdImage(const ColorTemp &ctemp, int tran, Imagefloat* image, c
         imheight = swap;
     }
 
-    int maxx = width; // Source image
-    int maxy = height; // Source image
+    int maxx = width;   // Source image
+    int maxy = height;  // Source image
     int mtran = tran & TR_ROT;
     int skip = pp.getSkip();
 
-    //if ((sx1 + skip*imwidth)>maxx) imwidth -- ; // we have a boundary condition that can cause errors
+    // if ((sx1 + skip*imwidth)>maxx) imwidth -- ; // we have a boundary condition that
+    // can cause errors
 
     // improve speed by integrating the area division into the multipliers
     // switched to using ints for the red/green/blue channel buffer.
@@ -202,18 +215,18 @@ void Image16::getStdImage(const ColorTemp &ctemp, int tran, Imagefloat* image, c
     bm /= area;
 
 #ifdef _OPENMP
-    #pragma omp parallel
+#pragma omp parallel
     {
 #endif
         AlignedBuffer<float> abR(imwidth);
         AlignedBuffer<float> abG(imwidth);
         AlignedBuffer<float> abB(imwidth);
-        float *lineR  = abR.data;
-        float *lineG  = abG.data;
-        float *lineB =  abB.data;
+        float* lineR = abR.data;
+        float* lineG = abG.data;
+        float* lineB = abB.data;
 
 #ifdef _OPENMP
-        #pragma omp for
+#pragma omp for
 #endif
 
         // Iterating all the rows of the destination image
@@ -246,7 +259,8 @@ void Image16::getStdImage(const ColorTemp &ctemp, int tran, Imagefloat* image, c
                     continue;
                 }
 
-                for (int dst_x = 0, src_x = sx1; dst_x < imwidth; dst_x++, src_x += skip) {
+                for (int dst_x = 0, src_x = sx1; dst_x < imwidth; dst_x++, src_x += skip)
+                {
                     if (src_x >= maxx) {
                         continue;
                     }
@@ -254,7 +268,7 @@ void Image16::getStdImage(const ColorTemp &ctemp, int tran, Imagefloat* image, c
                     int src_sub_width = MIN(maxx - src_x, skip);
                     int src_sub_height = MIN(maxy - src_y, skip);
 
-                    float rtot, gtot, btot; // RGB accumulators
+                    float rtot, gtot, btot;  // RGB accumulators
                     rtot = gtot = btot = 0.;
 
                     for (int src_sub_y = 0; src_sub_y < src_sub_height; src_sub_y++)
@@ -281,22 +295,28 @@ void Image16::getStdImage(const ColorTemp &ctemp, int tran, Imagefloat* image, c
             }
 
             if (mtran == TR_NONE)
-                for (int dst_x = 0, src_x = sx1; dst_x < imwidth; dst_x++, src_x += skip) {
+                for (int dst_x = 0, src_x = sx1; dst_x < imwidth; dst_x++, src_x += skip)
+                {
                     image->r(iy, dst_x) = lineR[dst_x];
                     image->g(iy, dst_x) = lineG[dst_x];
                     image->b(iy, dst_x) = lineB[dst_x];
-                } else if (mtran == TR_R180)
+                }
+            else if (mtran == TR_R180)
                 for (int dst_x = 0; dst_x < imwidth; dst_x++) {
                     image->r(imheight - 1 - iy, imwidth - 1 - dst_x) = lineR[dst_x];
                     image->g(imheight - 1 - iy, imwidth - 1 - dst_x) = lineG[dst_x];
                     image->b(imheight - 1 - iy, imwidth - 1 - dst_x) = lineB[dst_x];
-                } else if (mtran == TR_R90)
-                for (int dst_x = 0, src_x = sx1; dst_x < imwidth; dst_x++, src_x += skip) {
+                }
+            else if (mtran == TR_R90)
+                for (int dst_x = 0, src_x = sx1; dst_x < imwidth; dst_x++, src_x += skip)
+                {
                     image->r(dst_x, imheight - 1 - iy) = lineR[dst_x];
                     image->g(dst_x, imheight - 1 - iy) = lineG[dst_x];
                     image->b(dst_x, imheight - 1 - iy) = lineB[dst_x];
-                } else if (mtran == TR_R270)
-                for (int dst_x = 0, src_x = sx1; dst_x < imwidth; dst_x++, src_x += skip) {
+                }
+            else if (mtran == TR_R270)
+                for (int dst_x = 0, src_x = sx1; dst_x < imwidth; dst_x++, src_x += skip)
+                {
                     image->r(imwidth - 1 - dst_x, iy) = lineR[dst_x];
                     image->g(imwidth - 1 - dst_x, iy) = lineG[dst_x];
                     image->b(imwidth - 1 - dst_x, iy) = lineB[dst_x];
@@ -312,22 +332,22 @@ void Image16::getStdImage(const ColorTemp &ctemp, int tran, Imagefloat* image, c
 // Parallelized transformation; create transform with cmsFLAGS_NOCACHE!
 void Image16::ExecCMSTransform(cmsHTRANSFORM hTransform)
 {
-    //cmsDoTransform(hTransform, data, data, planestride);
+    // cmsDoTransform(hTransform, data, data, planestride);
 
-    // LittleCMS cannot parallelize planar setups -- Hombre: LCMS2.4 can! But it we use this new feature, memory allocation have to be modified too
-    // so build temporary buffers to allow multi processor execution
+    // LittleCMS cannot parallelize planar setups -- Hombre: LCMS2.4 can! But it we use
+    // this new feature, memory allocation have to be modified too so build temporary
+    // buffers to allow multi processor execution
 #ifdef _OPENMP
-    #pragma omp parallel
+#pragma omp parallel
 #endif
     {
         AlignedBuffer<unsigned short> buffer(width * 3);
 
 #ifdef _OPENMP
-        #pragma omp for schedule(static)
+#pragma omp for schedule(static)
 #endif
 
-        for (int y = 0; y < height; y++)
-        {
+        for (int y = 0; y < height; y++) {
             unsigned short *p = buffer.data, *pR = r(y), *pG = g(y), *pB = b(y);
 
             for (int x = 0; x < width; x++) {
@@ -348,12 +368,13 @@ void Image16::ExecCMSTransform(cmsHTRANSFORM hTransform)
                 *(pG++) = *(p++);
                 *(pB++) = *(p++);
             }
-        } // End of parallelization
+        }  // End of parallelization
     }
 }
 
 // // Parallelized transformation; create transform with cmsFLAGS_NOCACHE!
-// void Image16::ExecCMSTransform(cmsHTRANSFORM hTransform, const LabImage &labImage, int cx, int cy)
+// void Image16::ExecCMSTransform(cmsHTRANSFORM hTransform, const LabImage &labImage, int
+// cx, int cy)
 // {
 //     // LittleCMS cannot parallelize planar Lab float images
 //     // so build temporary buffers to allow multi processor execution

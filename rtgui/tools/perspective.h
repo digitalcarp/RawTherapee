@@ -93,45 +93,48 @@ protected:
     PerspCorrectionPanelListener* panel_listener;
     const rtengine::FramesMetaData* metadata;
 
-    void applyControlLines (void);
-    void tweakParams(rtengine::procparams::ProcParams &pparams) override;
-    void setCamBasedEventsActive (bool active = true);
-    void setFocalLengthValue (const rtengine::procparams::ProcParams* pparams, const rtengine::FramesMetaData* metadata);
+    void applyControlLines(void);
+    void tweakParams(rtengine::procparams::ProcParams& pparams) override;
+    void setCamBasedEventsActive(bool active = true);
+    void setFocalLengthValue(const rtengine::procparams::ProcParams* pparams,
+                             const rtengine::FramesMetaData* metadata);
     void updateApplyDeleteButtons();
 
 public:
-
     /** Minimum number of horizontal lines for horizontal/full correction. */
     static constexpr std::size_t MIN_HORIZ_LINES = 2;
     /** Minimum number of vertical lines for vertical/full correction. */
     static constexpr std::size_t MIN_VERT_LINES = 2;
     static const Glib::ustring TOOL_NAME;
 
-    PerspCorrection ();
+    PerspCorrection();
 
-    void read           (const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited = nullptr) override;
-    void write          (rtengine::procparams::ProcParams* pp, ParamsEdited* pedited = nullptr) override;
-    void setDefaults    (const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited = nullptr) override;
-    void setBatchMode   (bool batchMode) override;
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
+    void setBatchMode(bool batchMode) override;
 
-    void adjusterChanged (Adjuster* a, double newval) override;
-    void autoCorrectionPressed (Gtk::Button* b);
-    void lineChanged (void);
-    void linesApplyButtonPressed (void);
-    void linesEditButtonPressed (void);
-    void linesEraseButtonPressed (void);
-    void methodChanged (void);
+    void adjusterChanged(Adjuster* a, double newval) override;
+    void autoCorrectionPressed(Gtk::Button* b);
+    void lineChanged(void);
+    void linesApplyButtonPressed(void);
+    void linesEditButtonPressed(void);
+    void linesEraseButtonPressed(void);
+    void methodChanged(void);
     void requestApplyControlLines(void);
-    void setAdjusterBehavior (bool badd,
-        bool camera_focal_length_add,
-        bool camera_shift_add,
-        bool camera_angle_add,
-        bool projection_angle_add,
-        bool projection_shift_add,
-        bool projection_rotate_add);
+    void setAdjusterBehavior(bool badd,
+                             bool camera_focal_length_add,
+                             bool camera_shift_add,
+                             bool camera_angle_add,
+                             bool projection_angle_add,
+                             bool projection_shift_add,
+                             bool projection_rotate_add);
     void setControlLineEditMode(bool active);
-    void setEditProvider (EditDataProvider* provider) override;
-    void setLensGeomListener (LensGeomListener* listener)
+    void setEditProvider(EditDataProvider* provider) override;
+    void setLensGeomListener(LensGeomListener* listener)
     {
         lens_geom_listener = listener;
     }
@@ -139,18 +142,18 @@ public:
     {
         panel_listener = listener;
     }
-    void setMetadata (const rtengine::FramesMetaData* metadata);
-    void switchOffEditMode (void);
-    void trimValues          (rtengine::procparams::ProcParams* pp) override;
+    void setMetadata(const rtengine::FramesMetaData* metadata);
+    void switchOffEditMode(void);
+    void trimValues(rtengine::procparams::ProcParams* pp) override;
 };
 
-class LinesCallbacks: public ControlLineManager::Callbacks
+class LinesCallbacks : public ControlLineManager::Callbacks
 {
 protected:
     PerspCorrection* tool;
 
 public:
     explicit LinesCallbacks(PerspCorrection* tool);
-    void lineChanged (void) override;
-    void switchOffEditMode (void) override;
+    void lineChanged(void) override;
+    void switchOffEditMode(void) override;
 };

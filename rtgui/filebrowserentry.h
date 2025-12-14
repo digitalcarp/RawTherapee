@@ -37,14 +37,16 @@ class FileBrowserEntry;
 class Thumbnail;
 class RTSurface;
 
-struct FileBrowserEntryIdleHelper {
+struct FileBrowserEntryIdleHelper
+{
     FileBrowserEntry* fbentry;
     bool destroyed;
     std::atomic<int> pending;
 };
 
 class FileThumbnailButtonSet;
-class FileBrowserEntry final : public ThumbBrowserEntryBase,
+class FileBrowserEntry final :
+    public ThumbBrowserEntryBase,
     public ThumbnailListener,
     public ThumbImageUpdateListener,
     public rtengine::NonCopyable
@@ -65,47 +67,44 @@ class FileBrowserEntry final : public ThumbBrowserEntryBase,
 
     IdleRegister idle_register;
 
-    bool onArea (CursorArea a, int x, int y);
-    void updateCursor (int x, int y);
-    void drawStraightenGuide (Cairo::RefPtr<Cairo::Context> c);
-    void customBackBufferUpdate (Cairo::RefPtr<Cairo::Context> c) override;
+    bool onArea(CursorArea a, int x, int y);
+    void updateCursor(int x, int y);
+    void drawStraightenGuide(Cairo::RefPtr<Cairo::Context> c);
+    void customBackBufferUpdate(Cairo::RefPtr<Cairo::Context> c) override;
     void refreshThumbnailImage(bool upgradeHint);
 
 public:
-
     static std::shared_ptr<RTSurface> editedIcon;
     static std::shared_ptr<RTSurface> recentlySavedIcon;
     static std::shared_ptr<RTSurface> enqueuedIcon;
     static std::shared_ptr<RTSurface> hdr;
     static std::shared_ptr<RTSurface> ps;
 
-    FileBrowserEntry (Thumbnail* thm, const Glib::ustring& fname);
-    ~FileBrowserEntry () override;
-    static void init ();
-    void draw (Cairo::RefPtr<Cairo::Context> cc) override;
+    FileBrowserEntry(Thumbnail* thm, const Glib::ustring& fname);
+    ~FileBrowserEntry() override;
+    static void init();
+    void draw(Cairo::RefPtr<Cairo::Context> cc) override;
 
-    void setImageAreaToolListener (ImageAreaToolListener* l)
-    {
-        iatlistener = l;
-    }
+    void setImageAreaToolListener(ImageAreaToolListener* l) { iatlistener = l; }
 
-    FileThumbnailButtonSet* getThumbButtonSet ();
+    FileThumbnailButtonSet* getThumbButtonSet();
 
-    void refreshThumbnailImage () override;
-    void refreshQuickThumbnailImage () override;
-    void calcThumbnailSize () override;
+    void refreshThumbnailImage() override;
+    void refreshQuickThumbnailImage() override;
+    void calcThumbnailSize() override;
 
-    std::vector<std::shared_ptr<RTSurface>> getIconsOnImageArea () override;
-    std::vector<std::shared_ptr<RTSurface>> getSpecificityIconsOnImageArea () override;
-    void getIconSize (int& w, int& h) const override;
+    std::vector<std::shared_ptr<RTSurface>> getIconsOnImageArea() override;
+    std::vector<std::shared_ptr<RTSurface>> getSpecificityIconsOnImageArea() override;
+    void getIconSize(int& w, int& h) const override;
 
     // thumbnaillistener interface
-    void procParamsChanged (Thumbnail* thm, int whoChangedIt, bool upgradeHint) override;
+    void procParamsChanged(Thumbnail* thm, int whoChangedIt, bool upgradeHint) override;
     // thumbimageupdatelistener interface
     void updateImage(const ThumbImageUpdateListener::ImageUpdate& update) override;
-    void _updateImage(const ThumbImageUpdateListener::ImageUpdate& update); // inside gtk thread
+    void _updateImage(
+        const ThumbImageUpdateListener::ImageUpdate& update);  // inside gtk thread
 
-    bool    motionNotify  (int x, int y) override;
-    bool    pressNotify   (int button, int type, int bstate, int x, int y) override;
-    bool    releaseNotify (int button, int type, int bstate, int x, int y) override;
+    bool motionNotify(int x, int y) override;
+    bool pressNotify(int button, int type, int bstate, int x, int y) override;
+    bool releaseNotify(int button, int type, int bstate, int x, int y) override;
 };

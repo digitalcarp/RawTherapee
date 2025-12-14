@@ -20,12 +20,12 @@
 
 #pragma once
 
-#include <glibmm.h>
+#include "cache.h"
+#include "procparams.h"
 #include <exiv2/exiv2.hpp>
+#include <glibmm.h>
 #include <memory>
 #include <unordered_set>
-#include "procparams.h"
-#include "cache.h"
 
 namespace rtengine {
 
@@ -37,13 +37,13 @@ public:
     Exiv2Metadata(const Glib::ustring& path, bool merge_xmp_sidecar);
 
     void load() const;
-    
+
     Exiv2::ExifData& exifData();
     const Exiv2::ExifData& exifData() const;
-    
+
     Exiv2::IptcData& iptcData();
     const Exiv2::IptcData& iptcData() const;
-    
+
     Exiv2::XmpData& xmpData();
     const Exiv2::XmpData& xmpData() const;
 
@@ -52,13 +52,13 @@ public:
     const rtengine::procparams::IPTCPairs& iptc() const;
     void setExif(const rtengine::procparams::ExifPairs& exif);
     void setIptc(const rtengine::procparams::IPTCPairs& iptc);
-    
+
     void saveToImage(const Glib::ustring& path, bool preserve_all_tags) const;
     void saveToXmp(const Glib::ustring& path) const;
 
-    void setExifKeys(const std::vector<std::string> *keys);
+    void setExifKeys(const std::vector<std::string>* keys);
 
-    void getDimensions(int &w, int &h) const;
+    void getDimensions(int& w, int& h) const;
 
     Exiv2::ExifData getOutputExifData() const;
 
@@ -67,13 +67,13 @@ public:
 
     static void init();
     static void cleanup();
-   
+
 private:
     void do_merge_xmp(Exiv2::Image* dst, bool keep_all) const;
     void import_exif_pairs(Exiv2::ExifData& out) const;
     void import_iptc_pairs(Exiv2::IptcData& out) const;
     void remove_unwanted(Exiv2::ExifData& dst) const;
-    
+
     Glib::ustring src_;
     bool merge_xmp_;
     mutable std::shared_ptr<Exiv2::Image> image_;
@@ -85,30 +85,30 @@ private:
 
     std::shared_ptr<std::unordered_set<std::string>> exif_keys_;
 
-    struct CacheVal {
+    struct CacheVal
+    {
         std::shared_ptr<Exiv2::Image> image;
         Glib::TimeVal image_mtime;
         Glib::TimeVal xmp_mtime;
         bool use_xmp;
-        CacheVal(): image(nullptr), image_mtime(), xmp_mtime(), use_xmp(false) {}
+        CacheVal() : image(nullptr), image_mtime(), xmp_mtime(), use_xmp(false) {}
     };
-    //typedef std::pair<std::shared_ptr<Exiv2::Image>, Glib::TimeVal> CacheVal;
+    // typedef std::pair<std::shared_ptr<Exiv2::Image>, Glib::TimeVal> CacheVal;
     typedef Cache<Glib::ustring, CacheVal> ImageCache;
     static std::unique_ptr<ImageCache> cache_;
 };
 
 template <typename Iterator, typename Integer = std::size_t>
-auto to_long(const Iterator &iter, Integer n = Integer{0}) -> decltype(
-#if EXIV2_TEST_VERSION(0,28,0)
-    iter->toInt64()
-) {
+auto to_long(const Iterator& iter, Integer n = Integer{ 0 }) -> decltype(
+#if EXIV2_TEST_VERSION(0, 28, 0)
+                                                                 iter->toInt64())
+{
     return iter->toInt64(n);
 #else
-    iter->toLong()
-) {
+                                                                 iter->toLong())
+{
     return iter->toLong(n);
 #endif
 }
 
-
-} // namespace rtengine
+}  // namespace rtengine

@@ -1,51 +1,45 @@
 /*
-*  This file is part of RawTherapee.
-*
-*  Copyright (c) 2012 Oliver Duis <www.oliverduis.de>
-*
-*  RawTherapee is free software: you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation, either version 3 of the License, or
-*  (at your option) any later version.
-*
-*  RawTherapee is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ *  This file is part of RawTherapee.
+ *
+ *  Copyright (c) 2012 Oliver Duis <www.oliverduis.de>
+ *
+ *  RawTherapee is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  RawTherapee is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #pragma once
 
 #include <array>
 #include <memory>
-#include <string>
 #include <sstream>
+#include <string>
 
-#include <glibmm/ustring.h>
 #include <expat.h>
+#include <glibmm/ustring.h>
 
 #include "cache.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
-namespace procparams
-{
+namespace procparams {
 
 class ProcParams;
 
 struct CoarseTransformParams;
 
-}
+}  // namespace procparams
 
-enum class LCPCorrectionMode {
-    VIGNETTE,
-    DISTORTION,
-    CA
-};
+enum class LCPCorrectionMode { VIGNETTE, DISTORTION, CA };
 
 // Perspective model common data, also used for Vignette and Fisheye
 class LCPModelCommon final
@@ -55,18 +49,16 @@ public:
 
     bool empty() const;  // is it empty
     void merge(const LCPModelCommon& a, const LCPModelCommon& b, float facA);
-    void prepareParams(
-        int fullWidth,
-        int fullHeight,
-        float focalLength,
-        float focalLength35mm,
-        float sensorFormatFactor,
-        bool swapXY,
-        bool mirrorX,
-        bool mirrorY
-    );
+    void prepareParams(int fullWidth,
+                       int fullHeight,
+                       float focalLength,
+                       float focalLength35mm,
+                       float sensorFormatFactor,
+                       bool swapXY,
+                       bool mirrorX,
+                       bool mirrorY);
 
-//private:
+    // private:
     using Param = std::array<float, 5>;
     using VignParam = std::array<float, 4>;
 
@@ -74,7 +66,7 @@ public:
     float foc_len_y;
     float img_center_x;
     float img_center_y;
-    Param param;  // k1..k5, resp. alpha1..5
+    Param param;         // k1..k5, resp. alpha1..5
     float scale_factor;  // alpha0
     double mean_error;
     bool bad_error;
@@ -102,12 +94,10 @@ public:
         float aperture,
         LCPModelCommon* pCorr1,
         LCPModelCommon* pCorr2,
-        LCPModelCommon *pCorr3
-    ) const; // Interpolates between the persModels frames
+        LCPModelCommon* pCorr3) const;  // Interpolates between the persModels frames
 
-
-//private:
-    // Common data
+    // private:
+    //  Common data
     Glib::ustring profileName;
     Glib::ustring lensPrettyName;
     Glib::ustring cameraPrettyName;
@@ -125,7 +115,9 @@ private:
 
     void handle_text(const std::string& text);
 
-    static void XMLCALL XmlStartHandler(void* pLCPProfile, const char* el, const char** attr);
+    static void XMLCALL XmlStartHandler(void* pLCPProfile,
+                                        const char* el,
+                                        const char** attr);
     static void XMLCALL XmlTextHandler(void* pLCPProfile, const XML_Char* s, int len);
     static void XMLCALL XmlEndHandler(void* pLCPProfile, const char* el);
 
@@ -144,7 +136,8 @@ private:
 
     // The correction frames
     static constexpr int MaxPersModelCount = 3000;
-    LCPPersModel* aPersModel[MaxPersModelCount];  // Do NOT use std::list or something, it's buggy in GCC!
+    LCPPersModel* aPersModel[MaxPersModelCount];  // Do NOT use std::list or something,
+                                                  // it's buggy in GCC!
 };
 
 class LCPStore
@@ -163,7 +156,8 @@ private:
     mutable Cache<Glib::ustring, std::shared_ptr<LCPProfile>> cache;
 };
 
-class LensCorrection {
+class LensCorrection
+{
 public:
     virtual ~LensCorrection() {}
 
@@ -171,46 +165,48 @@ public:
     virtual bool hasCACorrection() const = 0;
     virtual bool hasVignettingCorrection() const = 0;
 
-    virtual void correctDistortionAndCA(double &x, double &y, int cx, int cy, int channel) const = 0;
-    virtual void correctDistortion(double &x, double &y, int cx, int cy) const = 0;
-    virtual void correctCA(double &x, double &y, int cx, int cy, int channel) const = 0;
+    virtual void
+    correctDistortionAndCA(double& x, double& y, int cx, int cy, int channel) const = 0;
+    virtual void correctDistortion(double& x, double& y, int cx, int cy) const = 0;
+    virtual void correctCA(double& x, double& y, int cx, int cy, int channel) const = 0;
     virtual void processVignette(int width, int height, float** rawData) const = 0;
-    virtual void processVignette3Channels(int width, int height, float** rawData) const = 0;
+    virtual void
+    processVignette3Channels(int width, int height, float** rawData) const = 0;
 };
 
-
 // Once precalculated class to correct a point
-class LCPMapper: public LensCorrection
+class LCPMapper : public LensCorrection
 {
 public:
     // Precalculates the mapper
-    LCPMapper(
-        const std::shared_ptr<LCPProfile>& pProf,
-        float focalLength,
-        float focalLength35mm,
-        float focusDist,
-        float aperture,
-        bool vignette,
-        bool useCADistP,
-        int fullWidth,
-        int fullHeight,
-        const procparams::CoarseTransformParams& coarse,
-        int rawRotationDeg
-    );
-
+    LCPMapper(const std::shared_ptr<LCPProfile>& pProf,
+              float focalLength,
+              float focalLength35mm,
+              float focusDist,
+              float aperture,
+              bool vignette,
+              bool useCADistP,
+              int fullWidth,
+              int fullHeight,
+              const procparams::CoarseTransformParams& coarse,
+              int rawRotationDeg);
 
     bool hasDistortionCorrection() const override;
     bool hasCACorrection() const override;
     bool hasVignettingCorrection() const override;
 
-    void correctDistortionAndCA(double &x, double &y, int cx, int cy, int channel) const override;
-    void correctDistortion(double &x, double &y, int cx, int cy) const override;
+    void correctDistortionAndCA(double& x,
+                                double& y,
+                                int cx,
+                                int cy,
+                                int channel) const override;
+    void correctDistortion(double& x, double& y, int cx, int cy) const override;
     void correctCA(double& x, double& y, int cx, int cy, int channel) const override;
     void processVignette(int width, int height, float** rawData) const override;
     void processVignette3Channels(int width, int height, float** rawData) const override;
 
 private:
-    bool enableCA;  // is the mapper capable if CA correction?
+    bool enableCA;   // is the mapper capable if CA correction?
     bool useCADist;  // should the distortion in the CA info be used?
     bool swapXY;
     LCPModelCommon mc;
@@ -221,4 +217,4 @@ private:
     void processVignetteLine3Channels(int width, int y, float* line) const;
 };
 
-}
+}  // namespace rtengine

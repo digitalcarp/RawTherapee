@@ -21,38 +21,37 @@
 #include <glibmm/ustring.h>
 #include <vector>
 
-namespace rtengine
-{
-    class FramesMetaData;
+namespace rtengine {
+class FramesMetaData;
 }
 
 class DynamicProfileRule
 {
 public:
-    template <class T>
-    struct Range {
+    template <class T> struct Range
+    {
         T min;
         T max;
-        explicit Range (T l = T(), T u = T()): min (l), max (u) {}
+        explicit Range(T l = T(), T u = T()) : min(l), max(u) {}
 
-        bool operator() (T val) const
-        {
-            return val >= min && val <= max;
-        }
+        bool operator()(T val) const { return val >= min && val <= max; }
     };
 
-    struct Optional {
+    struct Optional
+    {
         Glib::ustring value;
         bool enabled;
-        explicit Optional (const Glib::ustring v = "", bool e = false):
-            value (v), enabled (e) {}
+        explicit Optional(const Glib::ustring v = "", bool e = false)
+            : value(v), enabled(e)
+        {
+        }
 
-        bool operator() (const Glib::ustring &val) const;
+        bool operator()(const Glib::ustring& val) const;
     };
 
     DynamicProfileRule();
-    bool matches (const rtengine::FramesMetaData *im,  const Glib::ustring& filename) const;
-    bool operator< (const DynamicProfileRule &other) const;
+    bool matches(const rtengine::FramesMetaData* im, const Glib::ustring& filename) const;
+    bool operator<(const DynamicProfileRule& other) const;
 
     int serial_number;
     Range<int> iso;
@@ -77,6 +76,6 @@ protected:
 public:
     bool loadRules();
     bool storeRules();
-    const std::vector<DynamicProfileRule> &getRules();
-    void setRules (const std::vector<DynamicProfileRule> &r);
+    const std::vector<DynamicProfileRule>& getRules();
+    void setRules(const std::vector<DynamicProfileRule>& r);
 };

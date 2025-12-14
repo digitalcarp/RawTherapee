@@ -26,33 +26,31 @@
 #include "rtengine/imageformat.h"
 #include "rtengine/rtengine.h"
 
-class CacheImageData :
-    public rtengine::FramesMetaData
+class CacheImageData : public rtengine::FramesMetaData
 {
 public:
-
     // basic information
-    Glib::ustring  md5;
-    Glib::ustring  version;
-    bool  supported;
-    ThFileType  format;
-    char  rankOld; // old implementation of rank
-    bool  inTrashOld; // old implementation of inTrash
-    bool  recentlySaved;
+    Glib::ustring md5;
+    Glib::ustring version;
+    bool supported;
+    ThFileType format;
+    char rankOld;     // old implementation of rank
+    bool inTrashOld;  // old implementation of inTrash
+    bool recentlySaved;
 
     // XMP sidecar info.
     Glib::ustring xmpSidecarMd5;
 
     // time/date info
-    bool  timeValid;
+    bool timeValid;
     short year;
-    char  month;
-    char  day;
-    char  hour;
-    char  min;
-    char  sec;
+    char month;
+    char day;
+    char hour;
+    char min;
+    char sec;
     // exif info
-    bool  exifValid;
+    bool exifValid;
     unsigned short frameCount;
     double fnumber;
     double shutter;
@@ -72,14 +70,14 @@ public:
     Glib::ustring filetype;
     Glib::ustring expcomp;
 
-    // store a copy of the autoWB's multipliers computed in Thumbnail::_generateThumbnailImage
-    // they are not stored in the cache file by this class, but by rtengine::Thumbnail
-    // -1 = Unknown
+    // store a copy of the autoWB's multipliers computed in
+    // Thumbnail::_generateThumbnailImage they are not stored in the cache file by this
+    // class, but by rtengine::Thumbnail -1 = Unknown
     double redAWBMul, greenAWBMul, blueAWBMul;
 
     // additional info on raw images
-    int   rotate;
-    int   thumbImgType;
+    int rotate;
+    int thumbImgType;
 
     enum {
         FULL_THUMBNAIL = 0,  // was the thumbnail generated from whole file
@@ -89,17 +87,17 @@ public:
     int width;
     int height;
 
-    CacheImageData ();
+    CacheImageData();
 
-    int load (const Glib::ustring& fname);
-    int save (const Glib::ustring& fname);
+    int load(const Glib::ustring& fname);
+    int save(const Glib::ustring& fname);
 
     //-------------------------------------------------------------------------
     // FramesMetaData interface
     //-------------------------------------------------------------------------
 
-    unsigned int getFrameCount () const override { return frameCount; }
-    bool hasExif() const override  { return false; }
+    unsigned int getFrameCount() const override { return frameCount; }
+    bool hasExif() const override { return false; }
     tm getDateTime() const override { return tm{}; }
     time_t getDateTimeAsTS() const override { return time_t(-1); }
     int getISOSpeed() const override { return iso; }
@@ -112,19 +110,22 @@ public:
     std::string getMake() const override { return camMake; }
     std::string getModel() const override { return camModel; }
     std::string getLens() const override { return lens; }
-    std::string getOrientation() const override { return ""; } // TODO
+    std::string getOrientation() const override { return ""; }  // TODO
     Glib::ustring getFileName() const override { return ""; }
-    int getRating () const override { return rating; } // FIXME-piotr : missing rating
+    int getRating() const override { return rating; }  // FIXME-piotr : missing rating
     int getColorLabel() const override { return colorLabel; }
-    bool getPixelShift () const override { return isPixelShift; }
+    bool getPixelShift() const override { return isPixelShift; }
     bool getHDR() const override { return isHDR; }
     bool getDNG() const override { return isDNG; }
-    std::string getImageType() const override { return isPixelShift ? "PS" : isHDR ? "HDR" : "STD"; }
+    std::string getImageType() const override
+    {
+        return isPixelShift ? "PS" : isHDR ? "HDR" : "STD";
+    }
     rtengine::IIOSampleFormat getSampleFormat() const override { return sampleFormat; }
     std::uint32_t getFixBadPixelsConstant() const override;
     bool hasFixBadPixelsConstant() const override;
     std::vector<GainMap> getGainMaps() const override;
-    void getDimensions(int &w, int &h) const override
+    void getDimensions(int& w, int& h) const override
     {
         w = width;
         h = height;

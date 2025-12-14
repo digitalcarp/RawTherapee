@@ -28,142 +28,142 @@
 
 #ifdef _WIN32
 #include "rtengine/leanwindows.h"
-#endif // _WIN32
+#endif  // _WIN32
 
-FilePanel::FilePanel () : parent(nullptr), error(0)
+FilePanel::FilePanel() : parent(nullptr), error(0)
 {
     const auto& options = App::get().options();
 
-    // Contains everything except for the batch Tool Panel and tabs (Fast Export, Inspect, etc)
-    dirpaned = Gtk::manage ( new Gtk::Paned () );
-    dirpaned->set_position (options.dirBrowserWidth);
+    // Contains everything except for the batch Tool Panel and tabs (Fast Export, Inspect,
+    // etc)
+    dirpaned = Gtk::manage(new Gtk::Paned());
+    dirpaned->set_position(options.dirBrowserWidth);
 
     // The directory tree
-    dirBrowser = Gtk::manage ( new DirBrowser () );
+    dirBrowser = Gtk::manage(new DirBrowser());
     // Places
-    placesBrowser = Gtk::manage ( new PlacesBrowser () );
+    placesBrowser = Gtk::manage(new PlacesBrowser());
     // Recent Folders
-    recentBrowser = Gtk::manage ( new RecentBrowser () );
+    recentBrowser = Gtk::manage(new RecentBrowser());
 
     // The whole left panel. Contains Places, Recent Folders and Folders.
-    placespaned = Gtk::manage ( new Gtk::Paned (Gtk::ORIENTATION_VERTICAL) );
-    placespaned->set_name ("PlacesPaned");
+    placespaned = Gtk::manage(new Gtk::Paned(Gtk::ORIENTATION_VERTICAL));
+    placespaned->set_name("PlacesPaned");
     placespaned->set_size_request(250, 100);
-    placespaned->set_position (options.dirBrowserHeight);
+    placespaned->set_position(options.dirBrowserHeight);
 
-    Gtk::Box* obox = Gtk::manage (new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
-    obox->get_style_context()->add_class ("plainback");
-    obox->pack_start (*recentBrowser, Gtk::PACK_SHRINK, 4);
-    obox->pack_start (*dirBrowser);
+    Gtk::Box* obox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    obox->get_style_context()->add_class("plainback");
+    obox->pack_start(*recentBrowser, Gtk::PACK_SHRINK, 4);
+    obox->pack_start(*dirBrowser);
 
-    placespaned->pack1 (*placesBrowser, false, true);
-    placespaned->pack2 (*obox, true, true);
+    placespaned->pack1(*placesBrowser, false, true);
+    placespaned->pack2(*obox, true, true);
 
-    dirpaned->pack1 (*placespaned, false, false);
+    dirpaned->pack1(*placespaned, false, false);
 
-    tpc = new BatchToolPanelCoordinator (this);
+    tpc = new BatchToolPanelCoordinator(this);
     // Location bar
-    fileCatalog = Gtk::manage ( new FileCatalog (tpc->coarse, tpc->getToolBar(), this) );
+    fileCatalog = Gtk::manage(new FileCatalog(tpc->coarse, tpc->getToolBar(), this));
     // Holds the location bar and thumbnails
-    ribbonPane = Gtk::manage ( new Gtk::Paned() );
+    ribbonPane = Gtk::manage(new Gtk::Paned());
     ribbonPane->add(*fileCatalog);
     ribbonPane->set_size_request(50, 150);
-    dirpaned->pack2 (*ribbonPane, true, true);
+    dirpaned->pack2(*ribbonPane, true, true);
 
-    DirBrowser::DirSelectionSignal dirSelected = dirBrowser->dirSelected ();
-    dirSelected.connect (sigc::mem_fun (fileCatalog, &FileCatalog::dirSelected));
-    dirSelected.connect (sigc::mem_fun (recentBrowser, &RecentBrowser::dirSelected));
-    dirSelected.connect (sigc::mem_fun (placesBrowser, &PlacesBrowser::dirSelected));
-    dirSelected.connect (sigc::mem_fun (tpc, &BatchToolPanelCoordinator::dirSelected));
-    fileCatalog->setDirSelector (sigc::mem_fun (dirBrowser, &DirBrowser::selectDir));
-    placesBrowser->setDirSelector (sigc::mem_fun (dirBrowser, &DirBrowser::selectDir));
-    recentBrowser->setDirSelector (sigc::mem_fun (dirBrowser, &DirBrowser::selectDir));
-    fileCatalog->setFileSelectionListener (this);
+    DirBrowser::DirSelectionSignal dirSelected = dirBrowser->dirSelected();
+    dirSelected.connect(sigc::mem_fun(fileCatalog, &FileCatalog::dirSelected));
+    dirSelected.connect(sigc::mem_fun(recentBrowser, &RecentBrowser::dirSelected));
+    dirSelected.connect(sigc::mem_fun(placesBrowser, &PlacesBrowser::dirSelected));
+    dirSelected.connect(sigc::mem_fun(tpc, &BatchToolPanelCoordinator::dirSelected));
+    fileCatalog->setDirSelector(sigc::mem_fun(dirBrowser, &DirBrowser::selectDir));
+    placesBrowser->setDirSelector(sigc::mem_fun(dirBrowser, &DirBrowser::selectDir));
+    recentBrowser->setDirSelector(sigc::mem_fun(dirBrowser, &DirBrowser::selectDir));
+    fileCatalog->setFileSelectionListener(this);
 
-    rightBox = Gtk::manage ( new Gtk::Box () );
+    rightBox = Gtk::manage(new Gtk::Box());
     rightBox->set_size_request(350, 100);
-    rightNotebook = Gtk::manage ( new Gtk::Notebook () );
-    rightNotebookSwitchConn = rightNotebook->signal_switch_page().connect_notify( sigc::mem_fun(*this, &FilePanel::on_NB_switch_page) );
-    //Gtk::Box* taggingBox = Gtk::manage ( new Gtk::Box(Gtk::ORIENTATION_VERTICAL) );
+    rightNotebook = Gtk::manage(new Gtk::Notebook());
+    rightNotebookSwitchConn = rightNotebook->signal_switch_page().connect_notify(
+        sigc::mem_fun(*this, &FilePanel::on_NB_switch_page));
+    // Gtk::Box* taggingBox = Gtk::manage ( new Gtk::Box(Gtk::ORIENTATION_VERTICAL) );
 
-    history = Gtk::manage ( new History (false) );
+    history = Gtk::manage(new History(false));
 
-    tpc->addPParamsChangeListener (history);
-    history->setProfileChangeListener (tpc);
+    tpc->addPParamsChangeListener(history);
+    history->setProfileChangeListener(tpc);
     history->set_size_request(-1, 50);
 
-    Gtk::ScrolledWindow* sFilterPanel = Gtk::manage ( new Gtk::ScrolledWindow() );
-    filterPanel = Gtk::manage ( new FilterPanel () );
-    sFilterPanel->add (*filterPanel);
+    Gtk::ScrolledWindow* sFilterPanel = Gtk::manage(new Gtk::ScrolledWindow());
+    filterPanel = Gtk::manage(new FilterPanel());
+    sFilterPanel->add(*filterPanel);
 
     inspectorPanel = new Inspector();
     fileCatalog->setInspector(inspectorPanel);
 
-    Gtk::ScrolledWindow* sExportPanel = Gtk::manage ( new Gtk::ScrolledWindow() );
-    exportPanel = Gtk::manage ( new ExportPanel () );
-    sExportPanel->add (*exportPanel);
+    Gtk::ScrolledWindow* sExportPanel = Gtk::manage(new Gtk::ScrolledWindow());
+    exportPanel = Gtk::manage(new ExportPanel());
+    sExportPanel->add(*exportPanel);
     sExportPanel->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 
-    fileCatalog->setFilterPanel (filterPanel);
-    fileCatalog->setExportPanel (exportPanel);
-    fileCatalog->setImageAreaToolListener (tpc);
-    fileCatalog->fileBrowser->setBatchPParamsChangeListener (tpc);
+    fileCatalog->setFilterPanel(filterPanel);
+    fileCatalog->setExportPanel(exportPanel);
+    fileCatalog->setImageAreaToolListener(tpc);
+    fileCatalog->fileBrowser->setBatchPParamsChangeListener(tpc);
 
     //------------------
 
-    rightNotebook->set_tab_pos (Gtk::POS_LEFT);
+    rightNotebook->set_tab_pos(Gtk::POS_LEFT);
 
-    Gtk::Label* devLab = Gtk::manage ( new Gtk::Label (M("MAIN_TAB_DEVELOP")) );
-    devLab->set_name ("LabelRightNotebook");
-    devLab->set_angle (90);
+    Gtk::Label* devLab = Gtk::manage(new Gtk::Label(M("MAIN_TAB_DEVELOP")));
+    devLab->set_name("LabelRightNotebook");
+    devLab->set_angle(90);
     Gtk::Label* inspectLab = nullptr;
     if (!options.inspectorWindow) {
-        inspectLab = Gtk::manage ( new Gtk::Label (M("MAIN_TAB_INSPECT")) );
-        inspectLab->set_name ("LabelRightNotebook");
-        inspectLab->set_angle (90);
+        inspectLab = Gtk::manage(new Gtk::Label(M("MAIN_TAB_INSPECT")));
+        inspectLab->set_name("LabelRightNotebook");
+        inspectLab->set_angle(90);
     }
-    Gtk::Label* filtLab = Gtk::manage ( new Gtk::Label (M("MAIN_TAB_FILTER")) );
-    filtLab->set_name ("LabelRightNotebook");
-    filtLab->set_angle (90);
-    //Gtk::Label* tagLab = Gtk::manage ( new Gtk::Label (M("MAIN_TAB_TAGGING")) );
-    //tagLab->set_angle (90);
-    Gtk::Label* exportLab = Gtk::manage ( new Gtk::Label (M("MAIN_TAB_EXPORT")) );
-    exportLab->set_name ("LabelRightNotebook");
-    exportLab->set_angle (90);
+    Gtk::Label* filtLab = Gtk::manage(new Gtk::Label(M("MAIN_TAB_FILTER")));
+    filtLab->set_name("LabelRightNotebook");
+    filtLab->set_angle(90);
+    // Gtk::Label* tagLab = Gtk::manage ( new Gtk::Label (M("MAIN_TAB_TAGGING")) );
+    // tagLab->set_angle (90);
+    Gtk::Label* exportLab = Gtk::manage(new Gtk::Label(M("MAIN_TAB_EXPORT")));
+    exportLab->set_name("LabelRightNotebook");
+    exportLab->set_angle(90);
 
-    tpcPaned = Gtk::manage ( new Gtk::Paned (Gtk::ORIENTATION_VERTICAL) );
-    tpcPaned->pack1 (*tpc->toolPanelNotebook, false, true);
-    tpcPaned->pack2 (*history, true, false);
+    tpcPaned = Gtk::manage(new Gtk::Paned(Gtk::ORIENTATION_VERTICAL));
+    tpcPaned->pack1(*tpc->toolPanelNotebook, false, true);
+    tpcPaned->pack2(*history, true, false);
 
-    rightNotebook->append_page (*sFilterPanel, *filtLab);
+    rightNotebook->append_page(*sFilterPanel, *filtLab);
     if (!options.inspectorWindow)
-        rightNotebook->append_page (*inspectorPanel, *inspectLab);
-    rightNotebook->append_page (*tpcPaned, *devLab);
-    //rightNotebook->append_page (*taggingBox, *tagLab); commented out: currently the tab is empty ...
-    rightNotebook->append_page (*sExportPanel, *exportLab);
-    rightNotebook->set_name ("RightNotebook");
+        rightNotebook->append_page(*inspectorPanel, *inspectLab);
+    rightNotebook->append_page(*tpcPaned, *devLab);
+    // rightNotebook->append_page (*taggingBox, *tagLab); commented out: currently the tab
+    // is empty ...
+    rightNotebook->append_page(*sExportPanel, *exportLab);
+    rightNotebook->set_name("RightNotebook");
 
-    rightBox->pack_start (*rightNotebook);
+    rightBox->pack_start(*rightNotebook);
 
     pack1(*dirpaned, true, true);
     pack2(*rightBox, false, false);
 
-    fileCatalog->setFileSelectionChangeListener (tpc);
+    fileCatalog->setFileSelectionChangeListener(tpc);
 
-    fileCatalog->setFileSelectionListener (this);
+    fileCatalog->setFileSelectionListener(this);
 
-    idle_register.add(
-        [this]() -> bool
-        {
-            init();
-            return false;
-        }
-    );
+    idle_register.add([this]() -> bool {
+        init();
+        return false;
+    });
 
-    show_all ();
+    show_all();
 }
 
-FilePanel::~FilePanel ()
+FilePanel::~FilePanel()
 {
     idle_register.destroy();
 
@@ -176,14 +176,13 @@ FilePanel::~FilePanel ()
     delete tpc;
 }
 
-void FilePanel::on_realize ()
+void FilePanel::on_realize()
 {
-    Gtk::Paned::on_realize ();
+    Gtk::Paned::on_realize();
     tpc->closeAllTools();
 }
 
-
-void FilePanel::setAspect ()
+void FilePanel::setAspect()
 {
     int winW, winH;
     parent->get_size(winW, winH);
@@ -202,13 +201,15 @@ void FilePanel::setAspect ()
     }
 }
 
-void FilePanel::init ()
+void FilePanel::init()
 {
 
-    dirBrowser->fillDirTree ();
-    placesBrowser->refreshPlacesList ();
+    dirBrowser->fillDirTree();
+    placesBrowser->refreshPlacesList();
 
-    if (!App::get().argv1().empty() && Glib::file_test (App::get().argv1(), Glib::FILE_TEST_EXISTS)) {
+    if (!App::get().argv1().empty()
+        && Glib::file_test(App::get().argv1(), Glib::FILE_TEST_EXISTS))
+    {
         Glib::ustring d(App::get().argv1());
         if (!Glib::file_test(d, Glib::FILE_TEST_IS_DIR)) {
             d = Glib::path_get_dirname(d);
@@ -217,15 +218,20 @@ void FilePanel::init ()
     } else {
         const auto& options = App::get().options();
         if (options.startupDir == STARTUPDIR_HOME) {
-            dirBrowser->open (PlacesBrowser::userPicturesDir ());
+            dirBrowser->open(PlacesBrowser::userPicturesDir());
         } else if (options.startupDir == STARTUPDIR_CURRENT) {
-            dirBrowser->open (App::get().argv0());
-        } else if (options.startupDir == STARTUPDIR_CUSTOM || options.startupDir == STARTUPDIR_LAST) {
-            if (options.startupPath.length() && Glib::file_test(options.startupPath, Glib::FILE_TEST_EXISTS) && Glib::file_test(options.startupPath, Glib::FILE_TEST_IS_DIR)) {
-                dirBrowser->open (options.startupPath);
+            dirBrowser->open(App::get().argv0());
+        } else if (options.startupDir == STARTUPDIR_CUSTOM
+                   || options.startupDir == STARTUPDIR_LAST)
+        {
+            if (options.startupPath.length()
+                && Glib::file_test(options.startupPath, Glib::FILE_TEST_EXISTS)
+                && Glib::file_test(options.startupPath, Glib::FILE_TEST_IS_DIR))
+            {
+                dirBrowser->open(options.startupPath);
             } else {
                 // Fallback option if the path is empty or the folder doesn't exist
-                dirBrowser->open (PlacesBrowser::userPicturesDir ());
+                dirBrowser->open(PlacesBrowser::userPicturesDir());
             }
         }
     }
@@ -242,7 +248,7 @@ void FilePanel::on_NB_switch_page(Gtk::Widget* page, guint page_num)
     }
 }
 
-bool FilePanel::fileSelected (Thumbnail* thm)
+bool FilePanel::fileSelected(Thumbnail* thm)
 {
     if (!parent) {
         return false;
@@ -254,36 +260,40 @@ bool FilePanel::fileSelected (Thumbnail* thm)
     }
 
     // try to open the file
-    bool loading = thm->imageLoad( true );
+    bool loading = thm->imageLoad(true);
 
-    if( !loading ) {
+    if (!loading) {
         return false;
     }
 
     pendingLoadMutex.lock();
-    pendingLoad *pl = new pendingLoad();
+    pendingLoad* pl = new pendingLoad();
     pl->complete = false;
     pl->pc = nullptr;
     pl->thm = thm;
     pendingLoads.push_back(pl);
     pendingLoadMutex.unlock();
 
-    ProgressConnector<rtengine::InitialImage*> *ld = new ProgressConnector<rtengine::InitialImage*>();
-    ld->startFunc (sigc::bind(sigc::ptr_fun(&rtengine::InitialImage::load), thm->getFileName (), thm->getType() == FT_Raw, &error, parent->getProgressListener()),
-                   sigc::bind(sigc::mem_fun(*this, &FilePanel::imageLoaded), thm, ld) );
+    ProgressConnector<rtengine::InitialImage*>* ld =
+        new ProgressConnector<rtengine::InitialImage*>();
+    ld->startFunc(sigc::bind(sigc::ptr_fun(&rtengine::InitialImage::load),
+                             thm->getFileName(), thm->getType() == FT_Raw, &error,
+                             parent->getProgressListener()),
+                  sigc::bind(sigc::mem_fun(*this, &FilePanel::imageLoaded), thm, ld));
     return true;
 }
 
 bool FilePanel::addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries)
 {
     if (parent) {
-        parent->addBatchQueueJobs (entries);
+        parent->addBatchQueueJobs(entries);
     }
 
     return true;
 }
 
-bool FilePanel::imageLoaded( Thumbnail* thm, ProgressConnector<rtengine::InitialImage*> *pc )
+bool FilePanel::imageLoaded(Thumbnail* thm,
+                            ProgressConnector<rtengine::InitialImage*>* pc)
 {
 
     pendingLoadMutex.lock();
@@ -299,58 +309,76 @@ bool FilePanel::imageLoaded( Thumbnail* thm, ProgressConnector<rtengine::Initial
 
     const auto& options = App::get().options();
 
-    // The purpose of the pendingLoads vector is to open tabs in the same order as the loads where initiated. It has no effect on single editor mode.
+    // The purpose of the pendingLoads vector is to open tabs in the same order as the
+    // loads where initiated. It has no effect on single editor mode.
     while (pendingLoads.size() > 0 && pendingLoads.front()->complete) {
-        pendingLoad *pl = pendingLoads.front();
+        pendingLoad* pl = pendingLoads.front();
 
         if (pl->pc->returnValue()) {
             if (options.tabbedUI) {
                 EditorPanel* epanel;
                 {
 #ifdef _WIN32
-                    int winGdiHandles = GetGuiResources( GetCurrentProcess(), GR_GDIOBJECTS);
-                    if(winGdiHandles > 0 && winGdiHandles <= 6500) //(old settings 8500) 0 means we don't have the rights to access the function, 8500 because the limit is 10000 and we need about 1500 free handles
-                    //J.Desmis october 2021 I change 8500 to 6500..Why ? because without while increasing size GUI system crash in multieditor
+                    int winGdiHandles =
+                        GetGuiResources(GetCurrentProcess(), GR_GDIOBJECTS);
+                    if (winGdiHandles > 0
+                        && winGdiHandles
+                               <= 6500)  //(old settings 8500) 0 means we don't have the
+                                         //rights to access the function, 8500 because the
+                                         //limit is 10000 and we need about 1500 free
+                                         //handles
+                    // J.Desmis october 2021 I change 8500 to 6500..Why ? because without
+                    // while increasing size GUI system crash in multieditor
 #endif
                     {
-                    GThreadLock lock; // Acquiring the GUI... not sure that it's necessary, but it shouldn't harm
-                    epanel = Gtk::manage (new EditorPanel ());
-                    parent->addEditorPanel (epanel, pl->thm->getFileName());
+                        GThreadLock lock;  // Acquiring the GUI... not sure that it's
+                                           // necessary, but it shouldn't harm
+                        epanel = Gtk::manage(new EditorPanel());
+                        parent->addEditorPanel(epanel, pl->thm->getFileName());
                     }
 #ifdef _WIN32
-                    else {
-                        Glib::ustring msg_ = Glib::ustring("<b>") + M("MAIN_MSG_CANNOTLOAD") + " \"" + escapeHtmlChars(thm->getFileName()) + "\" .\n" + M("MAIN_MSG_TOOMANYOPENEDITORS") + "</b>";
-                        Gtk::MessageDialog msgd (*parent, msg_, true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
-                        msgd.run ();
+                    else
+                    {
+                        Glib::ustring msg_ =
+                            Glib::ustring("<b>") + M("MAIN_MSG_CANNOTLOAD") + " \""
+                            + escapeHtmlChars(thm->getFileName()) + "\" .\n"
+                            + M("MAIN_MSG_TOOMANYOPENEDITORS") + "</b>";
+                        Gtk::MessageDialog msgd(*parent, msg_, true, Gtk::MESSAGE_ERROR,
+                                                Gtk::BUTTONS_OK, true);
+                        msgd.run();
                         goto MAXGDIHANDLESREACHED;
                     }
 #endif
                 }
-                epanel->open(pl->thm, pl->pc->returnValue() );
+                epanel->open(pl->thm, pl->pc->returnValue());
 
                 if (!(options.multiDisplayMode > 0)) {
                     parent->set_title_decorated(pl->thm->getFileName());
                 }
             } else {
                 {
-                    GThreadLock lock; // Acquiring the GUI... not sure that it's necessary, but it shouldn't harm
+                    GThreadLock lock;  // Acquiring the GUI... not sure that it's
+                                       // necessary, but it shouldn't harm
                     parent->SetEditorCurrent();
                 }
-                parent->epanel->open(pl->thm, pl->pc->returnValue() );
+                parent->epanel->open(pl->thm, pl->pc->returnValue());
                 parent->set_title_decorated(pl->thm->getFileName());
             }
         } else {
-            Glib::ustring msg_ = Glib::ustring("<b>") + M("MAIN_MSG_CANNOTLOAD") + " \"" + escapeHtmlChars(thm->getFileName()) + "\" .\n</b>";
-            Gtk::MessageDialog msgd (*parent, msg_, true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
-            msgd.run ();
+            Glib::ustring msg_ = Glib::ustring("<b>") + M("MAIN_MSG_CANNOTLOAD") + " \""
+                                 + escapeHtmlChars(thm->getFileName()) + "\" .\n</b>";
+            Gtk::MessageDialog msgd(*parent, msg_, true, Gtk::MESSAGE_ERROR,
+                                    Gtk::BUTTONS_OK, true);
+            msgd.run();
         }
 #ifdef _WIN32
-MAXGDIHANDLESREACHED:
+    MAXGDIHANDLESREACHED:
 #endif
         delete pl->pc;
 
         {
-            GThreadLock lock; // Acquiring the GUI... not sure that it's necessary, but it shouldn't harm
+            GThreadLock lock;  // Acquiring the GUI... not sure that it's necessary, but
+                               // it shouldn't harm
             parent->setProgress(0.);
             parent->setProgressStr("");
         }
@@ -361,67 +389,68 @@ MAXGDIHANDLESREACHED:
 
     pendingLoadMutex.unlock();
 
-    thm->imageLoad( false );
+    thm->imageLoad(false);
 
-    return false; // MUST return false from idle function
+    return false;  // MUST return false from idle function
 }
 
-void FilePanel::saveOptions ()
+void FilePanel::saveOptions()
 {
     auto& options = App::get().mut_options();
 
     int winW, winH;
     parent->get_size(winW, winH);
-    options.dirBrowserWidth = dirpaned->get_position ();
-    options.dirBrowserHeight = placespaned->get_position ();
+    options.dirBrowserWidth = dirpaned->get_position();
+    options.dirBrowserHeight = placespaned->get_position();
     options.browserToolPanelWidth = winW - get_position();
-    options.browserToolPanelHeight = tpcPaned->get_position ();
+    options.browserToolPanelHeight = tpcPaned->get_position();
 
-    if (options.startupDir == STARTUPDIR_LAST && !fileCatalog->lastSelectedDir().empty()) {
-        options.startupPath = fileCatalog->lastSelectedDir ();
+    if (options.startupDir == STARTUPDIR_LAST && !fileCatalog->lastSelectedDir().empty())
+    {
+        options.startupPath = fileCatalog->lastSelectedDir();
     }
 
-    fileCatalog->closeDir ();
+    fileCatalog->closeDir();
 }
 
-void FilePanel::open (const Glib::ustring& d)
+void FilePanel::open(const Glib::ustring& d)
 {
 
-    if (Glib::file_test (d, Glib::FILE_TEST_IS_DIR)) {
-        dirBrowser->open (d.c_str());
-    } else if (Glib::file_test (d, Glib::FILE_TEST_EXISTS)) {
-        dirBrowser->open (Glib::path_get_dirname(d), Glib::path_get_basename(d));
+    if (Glib::file_test(d, Glib::FILE_TEST_IS_DIR)) {
+        dirBrowser->open(d.c_str());
+    } else if (Glib::file_test(d, Glib::FILE_TEST_EXISTS)) {
+        dirBrowser->open(Glib::path_get_dirname(d), Glib::path_get_basename(d));
     }
 }
 
-void FilePanel::optionsChanged ()
+void FilePanel::optionsChanged()
 {
 
-    tpc->optionsChanged ();
-    fileCatalog->refreshThumbImages ();
+    tpc->optionsChanged();
+    fileCatalog->refreshThumbImages();
 }
 
-bool FilePanel::handleShortcutKey (GdkEventKey* event)
+bool FilePanel::handleShortcutKey(GdkEventKey* event)
 {
 
-    if(tpc->getToolBar() && tpc->getToolBar()->handleShortcutKey(event)) {
+    if (tpc->getToolBar() && tpc->getToolBar()->handleShortcutKey(event)) {
         return true;
     }
 
-    if(tpc->handleShortcutKey(event)) {
+    if (tpc->handleShortcutKey(event)) {
         return true;
     }
 
-    if(fileCatalog->handleShortcutKey(event)) {
+    if (fileCatalog->handleShortcutKey(event)) {
         return true;
     }
 
     return false;
 }
 
-bool FilePanel::handleShortcutKeyRelease(GdkEventKey *event)
+bool FilePanel::handleShortcutKeyRelease(GdkEventKey* event)
 {
-    if(fileCatalog->handleShortcutKeyRelease(event)) {
+    if (fileCatalog->handleShortcutKeyRelease(event)) {
         return true;
     }
 
@@ -430,22 +459,23 @@ bool FilePanel::handleShortcutKeyRelease(GdkEventKey *event)
 
 void FilePanel::loadingThumbs(Glib::ustring str, double rate)
 {
-    GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
+    GThreadLock lock;  // All GUI access from idle_add callbacks or separate thread HAVE
+                       // to be protected
 
-    if( !str.empty()) {
+    if (!str.empty()) {
         parent->setProgressStr(str);
     }
 
-    parent->setProgress( rate );
+    parent->setProgress(rate);
 }
 
-void FilePanel::updateTPVScrollbar (bool hide)
+void FilePanel::updateTPVScrollbar(bool hide)
 {
-    tpc->updateTPVScrollbar (hide);
+    tpc->updateTPVScrollbar(hide);
 }
 
-void FilePanel::updateToolPanelToolLocations(
-        const std::vector<Glib::ustring> &favorites, bool cloneFavoriteTools)
+void FilePanel::updateToolPanelToolLocations(const std::vector<Glib::ustring>& favorites,
+                                             bool cloneFavoriteTools)
 {
     if (tpc) {
         tpc->updateToolLocations(favorites, cloneFavoriteTools);

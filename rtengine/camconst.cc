@@ -4,10 +4,10 @@
 #include "camconst.h"
 
 #include <algorithm>
+#include <cassert>
+#include <cerrno>
 #include <cstdio>
 #include <cstring>
-#include <cerrno>
-#include <cassert>
 #include <memory>
 #include <vector>
 
@@ -15,15 +15,15 @@
 #include <glibmm/miscutils.h>
 #include <glibmm/ustring.h>
 
-#include "settings.h"
 #include "rt_math.h"
+#include "settings.h"
 
-// cJSON is a very minimal JSON parser lib in C, not for threaded stuff etc, so if we're going to use JSON more than just
-// here we should probably replace cJSON with something beefier.
+// cJSON is a very minimal JSON parser lib in C, not for threaded stuff etc, so if we're
+// going to use JSON more than just here we should probably replace cJSON with something
+// beefier.
 #include "cJSON.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
 CameraConst::CameraConst() : pdafOffset(0)
 {
@@ -32,10 +32,9 @@ CameraConst::CameraConst() : pdafOffset(0)
     globalGreenEquilibration = -1;
 }
 
-
-bool CameraConst::parseApertureScaling(CameraConst *cc, const void *ji_)
+bool CameraConst::parseApertureScaling(CameraConst* cc, const void* ji_)
 {
-    const cJSON *ji = static_cast<const cJSON *>(ji_);
+    const cJSON* ji = static_cast<const cJSON*>(ji_);
 
     if (ji->type != cJSON_Array) {
         fprintf(stderr, "\"ranges\":\"aperture_scaling\" must be an array\n");
@@ -43,15 +42,18 @@ bool CameraConst::parseApertureScaling(CameraConst *cc, const void *ji_)
     }
 
     for (ji = ji->child; ji; ji = ji->next) {
-        const cJSON *js = cJSON_GetObjectItem(ji, "aperture");
+        const cJSON* js = cJSON_GetObjectItem(ji, "aperture");
 
         if (!js) {
-            fprintf(stderr, "missing \"ranges\":\"aperture_scaling\":\"aperture\" object item.\n");
+            fprintf(
+                stderr,
+                "missing \"ranges\":\"aperture_scaling\":\"aperture\" object item.\n");
             return false;
         }
 
         if (js->type != cJSON_Number) {
-            fprintf(stderr, "\"ranges\":\"aperture_scaling\":\"aperture\" must be a number.\n");
+            fprintf(stderr,
+                    "\"ranges\":\"aperture_scaling\":\"aperture\" must be a number.\n");
             return false;
         }
 
@@ -59,12 +61,16 @@ bool CameraConst::parseApertureScaling(CameraConst *cc, const void *ji_)
         js = cJSON_GetObjectItem(ji, "scale_factor");
 
         if (!js) {
-            fprintf(stderr, "missing \"ranges\":\"aperture_scaling\":\"scale_factor\" object item.\n");
+            fprintf(
+                stderr,
+                "missing \"ranges\":\"aperture_scaling\":\"scale_factor\" object item.\n");
             return false;
         }
 
         if (js->type != cJSON_Number) {
-            fprintf(stderr, "\"ranges\":\"aperture_scaling\":\"scale_factor\" must be a number.\n");
+            fprintf(
+                stderr,
+                "\"ranges\":\"aperture_scaling\":\"scale_factor\" must be a number.\n");
             return false;
         }
 
@@ -75,9 +81,9 @@ bool CameraConst::parseApertureScaling(CameraConst *cc, const void *ji_)
     return true;
 }
 
-bool CameraConst::parseLevels(CameraConst *cc, int bw, const void *ji_)
+bool CameraConst::parseLevels(CameraConst* cc, int bw, const void* ji_)
 {
-    const cJSON *ji = static_cast<const cJSON *>(ji_);
+    const cJSON* ji = static_cast<const cJSON*>(ji_);
 
     if (ji->type == cJSON_Number) {
         camera_const_levels lvl;
@@ -87,25 +93,27 @@ bool CameraConst::parseLevels(CameraConst *cc, int bw, const void *ji_)
     }
 
     if (ji->type != cJSON_Array) {
-        fprintf(stderr, "\"ranges\":\"%s\" must be a number or an array\n", bw ? "white" : "black");
+        fprintf(stderr, "\"ranges\":\"%s\" must be a number or an array\n",
+                bw ? "white" : "black");
         return false;
     }
 
     if (ji->child->type == cJSON_Number) {
         camera_const_levels lvl;
         int i;
-        const cJSON *js;
+        const cJSON* js;
 
         for (js = ji->child, i = 0; js && i < 4; js = js->next, i++) {
             lvl.levels[i] = js->valueint;
         }
 
         if (i == 3) {
-            lvl.levels[3] = lvl.levels[1]; // G2 = G1
+            lvl.levels[3] = lvl.levels[1];  // G2 = G1
         } else if (i == 1) {
             lvl.levels[3] = lvl.levels[2] = lvl.levels[1] = lvl.levels[0];
         } else if (i != 4 || js) {
-            fprintf(stderr, "\"ranges\":\"%s\" array must have 1, 3 or 4 numbers.\n", bw ? "white" : "black");
+            fprintf(stderr, "\"ranges\":\"%s\" array must have 1, 3 or 4 numbers.\n",
+                    bw ? "white" : "black");
             return false;
         }
 
@@ -114,10 +122,11 @@ bool CameraConst::parseLevels(CameraConst *cc, int bw, const void *ji_)
     }
 
     for (ji = ji->child; ji; ji = ji->next) {
-        const cJSON *js = cJSON_GetObjectItem(ji, "iso");
+        const cJSON* js = cJSON_GetObjectItem(ji, "iso");
 
         if (!js) {
-            fprintf(stderr, "missing \"ranges\":\"%s\":\"iso\" object item.\n", bw ? "white" : "black");
+            fprintf(stderr, "missing \"ranges\":\"%s\":\"iso\" object item.\n",
+                    bw ? "white" : "black");
             return false;
         }
 
@@ -128,21 +137,26 @@ bool CameraConst::parseLevels(CameraConst *cc, int bw, const void *ji_)
         } else if (js->type == cJSON_Array) {
             for (js = js->child; js; js = js->next) {
                 if (js->type != cJSON_Number) {
-                    fprintf(stderr, "\"ranges\":\"%s\":\"iso\" must be a number or an array of numbers.\n", bw ? "white" : "black");
+                    fprintf(
+                        stderr,
+                        "\"ranges\":\"%s\":\"iso\" must be a number or an array of numbers.\n",
+                        bw ? "white" : "black");
                     return false;
                 }
 
                 isos.push_back(js->valueint);
             }
         } else {
-            fprintf(stderr, "\"ranges\":\"%s\":\"iso\" must be an array or a number.\n", bw ? "white" : "black");
+            fprintf(stderr, "\"ranges\":\"%s\":\"iso\" must be an array or a number.\n",
+                    bw ? "white" : "black");
             return false;
         }
 
         js = cJSON_GetObjectItem(ji, "levels");
 
         if (!js) {
-            fprintf(stderr, "missing \"ranges\":\"%s\":\"levels\".\n", bw ? "white" : "black");
+            fprintf(stderr, "missing \"ranges\":\"%s\":\"levels\".\n",
+                    bw ? "white" : "black");
             return false;
         }
 
@@ -155,7 +169,10 @@ bool CameraConst::parseLevels(CameraConst *cc, int bw, const void *ji_)
 
             for (js = js->child, i = 0; js && i < 4; js = js->next, i++) {
                 if (js->type != cJSON_Number) {
-                    fprintf(stderr, "\"ranges\":\"%s\":\"levels\" must be a number or an array of numbers.\n", bw ? "white" : "black");
+                    fprintf(
+                        stderr,
+                        "\"ranges\":\"%s\":\"levels\" must be a number or an array of numbers.\n",
+                        bw ? "white" : "black");
                     return false;
                 }
 
@@ -163,15 +180,21 @@ bool CameraConst::parseLevels(CameraConst *cc, int bw, const void *ji_)
             }
 
             if (i == 3) {
-                lvl.levels[3] = lvl.levels[1]; // G2 = G1
+                lvl.levels[3] = lvl.levels[1];  // G2 = G1
             } else if (i == 1) {
                 lvl.levels[3] = lvl.levels[2] = lvl.levels[1] = lvl.levels[0];
             } else if (i != 4 || js) {
-                fprintf(stderr, "\"ranges\":\"%s\":\"levels\" array must have 1, 3 or 4 numbers.\n", bw ? "white" : "black");
+                fprintf(
+                    stderr,
+                    "\"ranges\":\"%s\":\"levels\" array must have 1, 3 or 4 numbers.\n",
+                    bw ? "white" : "black");
                 return false;
             }
         } else {
-            fprintf(stderr, "\"ranges\":\"%s\":\"levels\" must be a number or an array of numbers.\n", bw ? "white" : "black");
+            fprintf(
+                stderr,
+                "\"ranges\":\"%s\":\"levels\" must be a number or an array of numbers.\n",
+                bw ? "white" : "black");
             return false;
         }
 
@@ -183,76 +206,73 @@ bool CameraConst::parseLevels(CameraConst *cc, int bw, const void *ji_)
     return true;
 }
 
-CameraConst* CameraConst::parseEntry(const void *cJSON_, const char *make_model)
+CameraConst* CameraConst::parseEntry(const void* cJSON_, const char* make_model)
 {
-    const cJSON *js = static_cast<const cJSON*>(cJSON_);
+    const cJSON* js = static_cast<const cJSON*>(cJSON_);
 
     std::unique_ptr<CameraConst> cc(new CameraConst);
     cc->make_model = make_model;
 
-    const auto get_raw_crop =
-        [](int w, int h, const cJSON *ji, CameraConst *cc) -> bool
-        {
-            std::array<int, 4> rc;
+    const auto get_raw_crop = [](int w, int h, const cJSON* ji, CameraConst* cc) -> bool {
+        std::array<int, 4> rc;
 
-            if (ji->type != cJSON_Array) {
-                //fprintf(stderr, "\"raw_crop\" must be an array\n");
+        if (ji->type != cJSON_Array) {
+            // fprintf(stderr, "\"raw_crop\" must be an array\n");
+            return false;
+        }
+
+        int i;
+
+        for (i = 0, ji = ji->child; i < 4 && ji != nullptr; i++, ji = ji->next) {
+            if (ji->type != cJSON_Number) {
+                // fprintf(stderr, "\"raw_crop\" array must contain numbers\n");
                 return false;
             }
 
-            int i;
+            // cc->raw_crop[i] = ji->valueint;
+            rc[i] = ji->valueint;
+        }
 
-            for (i = 0, ji = ji->child; i < 4 && ji != nullptr; i++, ji = ji->next) {
-                if (ji->type != cJSON_Number) {
-                    //fprintf(stderr, "\"raw_crop\" array must contain numbers\n");
-                    return false;
-                }
+        if (i != 4 || ji != nullptr) {
+            // fprintf(stderr, "\"raw_crop\" must contain 4 numbers\n");
+            return false;
+        }
 
-                //cc->raw_crop[i] = ji->valueint;
-                rc[i] = ji->valueint;
-            }
+        cc->raw_crop[std::make_pair(w, h)] = rc;
+        return true;
+    };
 
-            if (i != 4 || ji != nullptr) {
-                //fprintf(stderr, "\"raw_crop\" must contain 4 numbers\n");
+    const auto get_masked_areas = [](int w, int h, const cJSON* ji,
+                                     CameraConst* cc) -> bool {
+        std::array<std::array<int, 4>, 2> rm = {};
+
+        if (ji->type != cJSON_Array) {
+            // fprintf(stderr, "\"masked_areas\" must be an array\n");
+            return false;
+        }
+
+        int i;
+
+        for (i = 0, ji = ji->child; i < 2 * 4 && ji != nullptr; i++, ji = ji->next) {
+            if (ji->type != cJSON_Number) {
+                // fprintf(stderr, "\"masked_areas\" array must contain numbers\n");
                 return false;
             }
 
-            cc->raw_crop[std::make_pair(w, h)] = rc;
-            return true;
-        };
+            // cc->raw_mask[i / 4][i % 4] = ji->valueint;
+            rm[i / 4][i % 4] = ji->valueint;
+        }
 
-    const auto get_masked_areas =
-        [](int w, int h, const cJSON *ji, CameraConst *cc) -> bool
-        {
-            std::array<std::array<int, 4>, 2> rm = {};
+        if (i % 4 != 0) {
+            // fprintf(stderr, "\"masked_areas\" array length must be divisable by 4\n");
+            return false;
+        }
 
-            if (ji->type != cJSON_Array) {
-                //fprintf(stderr, "\"masked_areas\" must be an array\n");
-                return false;
-            }
+        cc->raw_mask[std::make_pair(w, h)] = rm;
+        return true;
+    };
 
-            int i;
-
-            for (i = 0, ji = ji->child; i < 2 * 4 && ji != nullptr; i++, ji = ji->next) {
-                if (ji->type != cJSON_Number) {
-                    //fprintf(stderr, "\"masked_areas\" array must contain numbers\n");
-                    return false;
-                }
-
-                //cc->raw_mask[i / 4][i % 4] = ji->valueint;
-                rm[i / 4][i % 4] = ji->valueint;
-            }
-
-            if (i % 4 != 0) {
-                //fprintf(stderr, "\"masked_areas\" array length must be divisable by 4\n");
-                return false;
-            }
-
-            cc->raw_mask[std::make_pair(w, h)] = rm;
-            return true;
-        };
-
-    const cJSON *ji = cJSON_GetObjectItem(js, "dcraw_matrix");
+    const cJSON* ji = cJSON_GetObjectItem(js, "dcraw_matrix");
 
     if (ji) {
         if (ji->type != cJSON_Array) {
@@ -279,17 +299,18 @@ CameraConst* CameraConst::parseEntry(const void *cJSON_, const char *make_model)
             fprintf(stderr, "invalid entry for raw_crop.\n");
             return nullptr;
         } else if (!get_raw_crop(0, 0, ji, cc.get())) {
-            cJSON *je;
-            cJSON_ArrayForEach(je, ji) {
+            cJSON* je;
+            cJSON_ArrayForEach(je, ji)
+            {
                 if (!cJSON_IsObject(je)) {
                     fprintf(stderr, "invalid entry for raw_crop.\n");
                     return nullptr;
                 } else {
                     auto js = cJSON_GetObjectItem(je, "frame");
-                    if (!js || js->type != cJSON_Array ||
-                        cJSON_GetArraySize(js) != 2 ||
-                        !cJSON_IsNumber(cJSON_GetArrayItem(js, 0)) ||
-                        !cJSON_IsNumber(cJSON_GetArrayItem(js, 1))) {
+                    if (!js || js->type != cJSON_Array || cJSON_GetArraySize(js) != 2
+                        || !cJSON_IsNumber(cJSON_GetArrayItem(js, 0))
+                        || !cJSON_IsNumber(cJSON_GetArrayItem(js, 1)))
+                    {
                         fprintf(stderr, "invalid entry for raw_crop.\n");
                         return nullptr;
                     }
@@ -312,17 +333,18 @@ CameraConst* CameraConst::parseEntry(const void *cJSON_, const char *make_model)
             fprintf(stderr, "invalid entry for masked_areas.\n");
             return nullptr;
         } else if (!get_masked_areas(0, 0, ji, cc.get())) {
-            cJSON *je;
-            cJSON_ArrayForEach(je, ji) {
+            cJSON* je;
+            cJSON_ArrayForEach(je, ji)
+            {
                 if (!cJSON_IsObject(je)) {
                     fprintf(stderr, "invalid entry for masked_areas.\n");
                     return nullptr;
                 } else {
                     auto js = cJSON_GetObjectItem(je, "frame");
-                    if (!js || js->type != cJSON_Array ||
-                        cJSON_GetArraySize(js) != 2 ||
-                        !cJSON_IsNumber(cJSON_GetArrayItem(js, 0)) ||
-                        !cJSON_IsNumber(cJSON_GetArrayItem(js, 1))) {
+                    if (!js || js->type != cJSON_Array || cJSON_GetArraySize(js) != 2
+                        || !cJSON_IsNumber(cJSON_GetArrayItem(js, 0))
+                        || !cJSON_IsNumber(cJSON_GetArrayItem(js, 1)))
+                    {
                         fprintf(stderr, "invalid entry for masked_areas.\n");
                         return nullptr;
                     }
@@ -338,7 +360,7 @@ CameraConst* CameraConst::parseEntry(const void *cJSON_, const char *make_model)
         }
     }
 
-    const cJSON *jranges = cJSON_GetObjectItem(js, "ranges");
+    const cJSON* jranges = cJSON_GetObjectItem(js, "ranges");
 
     if (jranges) {
         ji = cJSON_GetObjectItem(jranges, "black");
@@ -423,7 +445,7 @@ CameraConst* CameraConst::parseEntry(const void *cJSON_, const char *make_model)
 
         cc->globalGreenEquilibration = (ji->type == cJSON_True);
     }
-    
+
     return cc.release();
 }
 
@@ -432,7 +454,7 @@ bool CameraConst::has_dcrawMatrix() const
     return dcraw_matrix[0] != 0;
 }
 
-void CameraConst::update_dcrawMatrix(const short *other)
+void CameraConst::update_dcrawMatrix(const short* other)
 {
     if (!other) {
         return;
@@ -457,7 +479,7 @@ const std::vector<int>& CameraConst::get_pdafPattern() const
     return pdafPattern;
 }
 
-void CameraConst::update_pdafPattern(const std::vector<int> &other)
+void CameraConst::update_pdafPattern(const std::vector<int>& other)
 {
     if (other.empty()) {
         return;
@@ -475,14 +497,18 @@ void CameraConst::update_pdafOffset(int other)
     pdafOffset = other;
 }
 
-
 bool CameraConst::has_rawCrop(int raw_width, int raw_height) const
 {
-    return raw_crop.find(std::make_pair(raw_width, raw_height)) != raw_crop.end() || raw_crop.find(std::make_pair(0, 0)) != raw_crop.end();
+    return raw_crop.find(std::make_pair(raw_width, raw_height)) != raw_crop.end()
+           || raw_crop.find(std::make_pair(0, 0)) != raw_crop.end();
 }
 
-
-void CameraConst::get_rawCrop(int raw_width, int raw_height, int &left_margin, int &top_margin, int &width, int &height) const
+void CameraConst::get_rawCrop(int raw_width,
+                              int raw_height,
+                              int& left_margin,
+                              int& top_margin,
+                              int& width,
+                              int& height) const
 {
     auto it = raw_crop.find(std::make_pair(raw_width, raw_height));
     if (it == raw_crop.end()) {
@@ -498,7 +524,6 @@ void CameraConst::get_rawCrop(int raw_width, int raw_height, int &left_margin, i
     }
 }
 
-
 bool CameraConst::has_rawMask(int raw_width, int raw_height, int idx) const
 {
     if (idx < 0 || idx > 1) {
@@ -510,14 +535,21 @@ bool CameraConst::has_rawMask(int raw_width, int raw_height, int idx) const
         it = raw_mask.find(std::make_pair(0, 0));
     }
     if (it != raw_mask.end()) {
-        return (it->second[idx][0] | it->second[idx][1] | it->second[idx][2] | it->second[idx][3]) != 0;
+        return (it->second[idx][0] | it->second[idx][1] | it->second[idx][2]
+                | it->second[idx][3])
+               != 0;
     } else {
         return false;
     }
 }
 
-
-void CameraConst::get_rawMask(int raw_width, int raw_height, int idx, int &top, int &left, int &bottom, int &right) const
+void CameraConst::get_rawMask(int raw_width,
+                              int raw_height,
+                              int idx,
+                              int& top,
+                              int& left,
+                              int& bottom,
+                              int& right) const
 {
     top = left = bottom = right = 0;
 
@@ -538,7 +570,7 @@ void CameraConst::get_rawMask(int raw_width, int raw_height, int idx, int &top, 
     }
 }
 
-void CameraConst::update_Levels(const CameraConst *other)
+void CameraConst::update_Levels(const CameraConst* other)
 {
     if (!other) {
         return;
@@ -561,7 +593,7 @@ void CameraConst::update_Levels(const CameraConst *other)
     }
 }
 
-void CameraConst::update_Crop(CameraConst *other)
+void CameraConst::update_Crop(CameraConst* other)
 {
     if (!other) {
         return;
@@ -570,7 +602,10 @@ void CameraConst::update_Crop(CameraConst *other)
     raw_crop.insert(other->raw_crop.begin(), other->raw_crop.end());
 }
 
-bool CameraConst::get_Levels(camera_const_levels & lvl, int bw, int iso, float fnumber) const
+bool CameraConst::get_Levels(camera_const_levels& lvl,
+                             int bw,
+                             int iso,
+                             float fnumber) const
 {
     std::map<int, camera_const_levels>::const_iterator it = mLevels[bw].find(iso);
 
@@ -600,20 +635,16 @@ bool CameraConst::get_Levels(camera_const_levels & lvl, int bw, int iso, float f
         std::map<float, float>::const_iterator scaleIt = mApertureScaling.find(fnumber);
 
         if (scaleIt == mApertureScaling.end()) {
-            // fnumber may be an exact aperture, eg 1.414, or a rounded eg 1.4. In our map we
-            // should have rounded numbers so we translate and retry the lookup
+            // fnumber may be an exact aperture, eg 1.414, or a rounded eg 1.4. In our map
+            // we should have rounded numbers so we translate and retry the lookup
 
-            // table with traditional 1/3 stop f-number rounding used by most cameras, we only
-            // have in the range 0.7 - 10.0, but aperture scaling rarely happen past f/4.0
+            // table with traditional 1/3 stop f-number rounding used by most cameras, we
+            // only have in the range 0.7 - 10.0, but aperture scaling rarely happen past
+            // f/4.0
             constexpr float fn_tab[8][3] = {
-                { 0.7f, 0.8f, 0.9f },
-                { 1.f, 1.1f, 1.2f },
-                { 1.4f, 1.6f, 1.8f },
-                { 2.f, 2.2f, 2.5f },
-                { 2.8f, 3.2f, 3.5f },
-                { 4.f, 4.5f, 5.f },
-                { 5.6f, 6.3f, 7.1f },
-                { 8.f, 9.f, 10.f },
+                { 0.7f, 0.8f, 0.9f }, { 1.f, 1.1f, 1.2f },  { 1.4f, 1.6f, 1.8f },
+                { 2.f, 2.2f, 2.5f },  { 2.8f, 3.2f, 3.5f }, { 4.f, 4.5f, 5.f },
+                { 5.6f, 6.3f, 7.1f }, { 8.f, 9.f, 10.f },
             };
 
             for (int avh = 0; avh < 8; avh++) {
@@ -634,7 +665,9 @@ bool CameraConst::get_Levels(camera_const_levels & lvl, int bw, int iso, float f
         float scaling = 1.f;
 
         if (scaleIt == mApertureScaling.end()) {
-            for (auto entry = mApertureScaling.crbegin(); entry != mApertureScaling.crend(); ++entry) {
+            for (auto entry = mApertureScaling.crbegin();
+                 entry != mApertureScaling.crend(); ++entry)
+            {
                 if (entry->first > fnumber) {
                     scaling = entry->second;
                 } else {
@@ -671,7 +704,9 @@ int CameraConst::get_BlackLevel(const int idx, const int iso_speed) const
     return lvl.levels[idx];
 }
 
-int CameraConst::get_WhiteLevel(const int idx, const int iso_speed, const float fnumber) const
+int CameraConst::get_WhiteLevel(const int idx,
+                                const int iso_speed,
+                                const float fnumber) const
 {
     assert(idx >= 0 && idx <= 3);
     camera_const_levels lvl;
@@ -701,36 +736,38 @@ void CameraConst::update_globalGreenEquilibration(bool other)
 bool CameraConstantsStore::parse_camera_constants_file(const Glib::ustring& filename_)
 {
     // read the file into a single long string
-    const char *filename = filename_.c_str();
-    FILE *stream = fopen(filename, "rt");
+    const char* filename = filename_.c_str();
+    FILE* stream = fopen(filename, "rt");
 
     if (!stream) {
-        fprintf(stderr, "Could not open camera constants file \"%s\": %s\n", filename, strerror(errno));
+        fprintf(stderr, "Could not open camera constants file \"%s\": %s\n", filename,
+                strerror(errno));
         return false;
     }
 
     size_t bufsize = 262144;
     size_t increment = bufsize;
     size_t datasize = 0, ret;
-    char *buf = (char *)malloc(bufsize);
+    char* buf = (char*)malloc(bufsize);
 
     while ((ret = fread(&buf[datasize], 1, bufsize - datasize - 1, stream)) != 0) {
         datasize += ret;
 
-        if (datasize == bufsize - 1) { // we need more memory
+        if (datasize == bufsize - 1) {  // we need more memory
             bufsize += increment;
-            void *temp = realloc(buf, bufsize); // try to realloc buffer with new size
-            if (!temp) { // realloc failed
-                temp = malloc(bufsize); // alloc now buffer
-                if (temp) { // alloc worked
-                    memcpy(temp, buf, bufsize - increment); // copy old buffer content to new buffer
-                    free(buf); // free old buffer
-                } else { // alloc didn't work, break
+            void* temp = realloc(buf, bufsize);  // try to realloc buffer with new size
+            if (!temp) {                         // realloc failed
+                temp = malloc(bufsize);          // alloc now buffer
+                if (temp) {                      // alloc worked
+                    memcpy(temp, buf,
+                           bufsize - increment);  // copy old buffer content to new buffer
+                    free(buf);                    // free old buffer
+                } else {                          // alloc didn't work, break
                     break;
                 }
             }
-            buf = (char *)temp; // assign new buffer
-            increment *= 2; // double increment
+            buf = (char*)temp;  // assign new buffer
+            increment *= 2;     // double increment
         }
     }
 
@@ -753,7 +790,7 @@ bool CameraConstantsStore::parse_camera_constants_file(const Glib::ustring& file
 
     if (!jsroot) {
         char str[128];
-        const char *ep = cJSON_GetErrorPtr() - 10;
+        const char* ep = cJSON_GetErrorPtr() - 10;
 
         if ((uintptr_t)ep < (uintptr_t)buf) {
             ep = buf;
@@ -768,7 +805,7 @@ bool CameraConstantsStore::parse_camera_constants_file(const Glib::ustring& file
 
     free(buf);
 
-    const cJSON *js = cJSON_GetObjectItem(jsroot, "camera_constants");
+    const cJSON* js = cJSON_GetObjectItem(jsroot, "camera_constants");
 
     if (!js) {
         fprintf(stderr, "missing \"camera_constants\" object item\n");
@@ -776,7 +813,7 @@ bool CameraConstantsStore::parse_camera_constants_file(const Glib::ustring& file
     }
 
     for (js = js->child; js; js = js->next) {
-        const cJSON *ji = cJSON_GetObjectItem(js, "make_model");
+        const cJSON* ji = cJSON_GetObjectItem(js, "make_model");
 
         if (!ji) {
             fprintf(stderr, "missing \"make_model\" object item\n");
@@ -792,27 +829,31 @@ bool CameraConstantsStore::parse_camera_constants_file(const Glib::ustring& file
 
         while (ji) {
             if (ji->type != cJSON_String) {
-                fprintf(stderr, "\"make_model\" must be a string or an array of strings\n");
+                fprintf(stderr,
+                        "\"make_model\" must be a string or an array of strings\n");
                 goto parse_error;
             }
 
-            CameraConst* const cc = CameraConst::parseEntry((const void *)js, ji->valuestring);
+            CameraConst* const cc =
+                CameraConst::parseEntry((const void*)js, ji->valuestring);
 
             if (!cc) {
                 goto parse_error;
             }
 
             std::string make_model(ji->valuestring);
-            std::transform(make_model.begin(), make_model.end(), make_model.begin(), ::toupper);            
+            std::transform(make_model.begin(), make_model.end(), make_model.begin(),
+                           ::toupper);
 
             const auto entry = mCameraConstants.emplace(make_model, cc);
 
-            if (entry.second) { // entry inserted into map
+            if (entry.second) {  // entry inserted into map
                 if (settings->verbose) {
                     printf("Add camera constants for \"%s\"\n", make_model.c_str());
                 }
             } else {
-                // The CameraConst already exist for this camera make/model -> we merge the values
+                // The CameraConst already exist for this camera make/model -> we merge
+                // the values
                 CameraConst* const existingcc = entry.first->second;
 
                 // updating the dcraw matrix
@@ -823,7 +864,8 @@ bool CameraConstantsStore::parse_camera_constants_file(const Glib::ustring& file
                 existingcc->update_pdafPattern(cc->get_pdafPattern());
                 existingcc->update_pdafOffset(cc->get_pdafOffset());
                 if (cc->has_globalGreenEquilibration()) {
-                    existingcc->update_globalGreenEquilibration(cc->get_globalGreenEquilibration());
+                    existingcc->update_globalGreenEquilibration(
+                        cc->get_globalGreenEquilibration());
                 }
 
                 if (settings->verbose) {
@@ -849,19 +891,17 @@ parse_error:
     return false;
 }
 
-CameraConstantsStore::CameraConstantsStore()
-{
-}
-
+CameraConstantsStore::CameraConstantsStore() {}
 
 CameraConstantsStore::~CameraConstantsStore()
 {
-    for (auto &p : mCameraConstants) {
+    for (auto& p : mCameraConstants) {
         delete p.second;
     }
 }
 
-void CameraConstantsStore::init(const Glib::ustring& baseDir, const Glib::ustring& userSettingsDir)
+void CameraConstantsStore::init(const Glib::ustring& baseDir,
+                                const Glib::ustring& userSettingsDir)
 {
     // list of built-in files with camera constants. Besides camconst.json, we
     // now have 3 more locations where camera matrices are stored:
@@ -874,13 +914,9 @@ void CameraConstantsStore::init(const Glib::ustring& baseDir, const Glib::ustrin
     // to store all the new matrices in cammatrices.json
     //
     // note that the order is relevant, later files ones override earlier ones
-    static const char *builtin_files[] = {
-        "dcraw.json",
-        "rt.json",
-        "camconst.json",
-        "cammatrices.json"
-    };
-    for (size_t i = 0; i < sizeof(builtin_files)/sizeof(const char *); ++i) {
+    static const char* builtin_files[] = { "dcraw.json", "rt.json", "camconst.json",
+                                           "cammatrices.json" };
+    for (size_t i = 0; i < sizeof(builtin_files) / sizeof(const char*); ++i) {
         Glib::ustring f(Glib::build_filename(baseDir, builtin_files[i]));
         if (Glib::file_test(f, Glib::FILE_TEST_EXISTS)) {
             parse_camera_constants_file(f);
@@ -915,4 +951,4 @@ const CameraConst* CameraConstantsStore::get(const char make[], const char model
     return it->second;
 }
 
-} // namespace rtengine
+}  // namespace rtengine

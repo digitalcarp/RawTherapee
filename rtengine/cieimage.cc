@@ -1,11 +1,10 @@
 #include "cieimage.h"
 
-#include <new>
 #include <cstring>
-namespace rtengine
-{
+#include <new>
+namespace rtengine {
 
-CieImage::CieImage (int w, int h) : fromImage(false), W(w), H(h)
+CieImage::CieImage(int w, int h) : fromImage(false), W(w), H(h)
 {
     J_p = new float*[H];
     Q_p = new float*[H];
@@ -20,10 +19,10 @@ CieImage::CieImage (int w, int h) : fromImage(false), W(w), H(h)
     }
 
     // Trying to allocate all in one block
-    data[0] = new (std::nothrow) float [W * H * 6];
+    data[0] = new (std::nothrow) float[W * H * 6];
 
     if (data[0]) {
-        float * index = data[0];
+        float* index = data[0];
 
         for (int i = 0; i < H; i++) {
             J_p[i] = index + i * W;
@@ -64,7 +63,7 @@ CieImage::CieImage (int w, int h) : fromImage(false), W(w), H(h)
     } else {
         // Allocating each plane separately
         for (unsigned int c = 0; c < 6; ++c) {
-            data[c] = new float [W * H];
+            data[c] = new float[W * H];
         }
 
         unsigned int c = 0;
@@ -105,29 +104,29 @@ CieImage::CieImage (int w, int h) : fromImage(false), W(w), H(h)
     }
 }
 
-CieImage::~CieImage ()
+CieImage::~CieImage()
 {
 
     if (!fromImage) {
-        delete [] J_p;
-        delete [] Q_p;
-        delete [] M_p;
-        delete [] C_p;
-        delete [] sh_p;
-//      delete [] ch_p;
-        delete [] h_p;
+        delete[] J_p;
+        delete[] Q_p;
+        delete[] M_p;
+        delete[] C_p;
+        delete[] sh_p;
+        //      delete [] ch_p;
+        delete[] h_p;
 
         for (unsigned int c = 0; c < 6; ++c)
             if (data[c]) {
-                delete [] data[c];
+                delete[] data[c];
             }
     }
 }
 
-void CieImage::CopyFrom(CieImage *Img)
+void CieImage::CopyFrom(CieImage* Img)
 {
-    if (!data [1])
-        // Only one allocated block
+    if (!data[1])
+    // Only one allocated block
     {
         memcpy(data, Img->data, W * H * 6 * sizeof(float));
     } else
@@ -138,4 +137,4 @@ void CieImage::CopyFrom(CieImage *Img)
         }
 }
 
-}
+}  // namespace rtengine

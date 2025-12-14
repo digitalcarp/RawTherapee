@@ -28,13 +28,13 @@
 #include "procparams.h"
 #include "sleef.h"
 
-//#define BENCHMARK
+// #define BENCHMARK
 #include "StopWatch.h"
 
 namespace {
 
 #ifdef __SSE2__
-void fastlin2log(float *x, float factor, float base, int w)
+void fastlin2log(float* x, float factor, float base, int w)
 {
     float baseLog = 1.f / xlogf(base);
     vfloat baseLogv = F2V(baseLog);
@@ -51,17 +51,16 @@ void fastlin2log(float *x, float factor, float base, int w)
 }
 #endif
 
-}
+}  // namespace
 
-namespace rtengine
-{
+namespace rtengine {
 
-void ImProcFunctions::labColorCorrectionRegions(LabImage *lab)
+void ImProcFunctions::labColorCorrectionRegions(LabImage* lab)
 {
     if (!params->colorToning.enabled || params->colorToning.method != "LabRegions") {
         return;
     }
-BENCHFUN
+    BENCHFUN
     int n = params->colorToning.labregions.size();
     int show_mask_idx = params->colorToning.labregionsShowMask;
     if (show_mask_idx >= n) {
@@ -72,10 +71,10 @@ BENCHFUN
     std::vector<std::unique_ptr<FlatCurve>> lmask(n);
 
     const int begin_idx = max(show_mask_idx, 0);
-    const int end_idx = (show_mask_idx < 0 ? n : show_mask_idx+1);
+    const int end_idx = (show_mask_idx < 0 ? n : show_mask_idx + 1);
 
     for (int i = begin_idx; i < end_idx; ++i) {
-        auto &r = params->colorToning.labregions[i];
+        auto& r = params->colorToning.labregions[i];
         if (!r.hueMask.empty() && r.hueMask[0] != FCT_Linear) {
             hmask[i].reset(new FlatCurve(r.hueMask, true));
         }
@@ -96,11 +95,13 @@ BENCHFUN
 
     array2D<float> guide(lab->W, lab->H);
 
-    // magic constant c_factor: normally chromaticity is in [0; 42000] (see color.h), but here we use the constant to match how the chromaticity pipette works (see improcfun.cc lines 4705-4706 and color.cc line 1930
+    // magic constant c_factor: normally chromaticity is in [0; 42000] (see color.h), but
+    // here we use the constant to match how the chromaticity pipette works (see
+    // improcfun.cc lines 4705-4706 and color.cc line 1930
     constexpr float c_factor = 327.68f / 48000.f;
 
 #ifdef _OPENMP
-    #pragma omp parallel if (multiThread)
+#pragma omp parallel if (multiThread)
 #endif
     {
 #ifdef __SSE2__
@@ -108,7 +109,7 @@ BENCHFUN
         float hBuffer[lab->W];
 #endif
 #ifdef _OPENMP
-        #pragma omp for schedule(dynamic, 16)
+#pragma omp for schedule(dynamic, 16)
 #endif
         for (int y = 0; y < lab->H; ++y) {
 #ifdef __SSE2__
@@ -129,17 +130,20 @@ BENCHFUN
                 c = xlin2log(c * c_factor, 10.f);
 #endif
                 h = Color::huelab_to_huehsv2(h);
-                h += 1.f/6.f; // offset the hue because we start from purple instead of red
+                h += 1.f
+                     / 6.f;  // offset the hue because we start from purple instead of red
                 if (h > 1.f) {
                     h -= 1.f;
                 }
                 h = xlin2log(h, 3.f);
 
                 for (int i = begin_idx; i < end_idx; ++i) {
-                    auto &hm = hmask[i];
-                    auto &cm = cmask[i];
-                    auto &lm = lmask[i];
-                    float blend = LIM01((hm ? hm->getVal(h) : 1.0) * (cm ? cm->getVal(c) : 1.0) * (lm ? lm->getVal(l) : 1.0));
+                    auto& hm = hmask[i];
+                    auto& cm = cmask[i];
+                    auto& lm = lmask[i];
+                    float blend =
+                        LIM01((hm ? hm->getVal(h) : 1.0) * (cm ? cm->getVal(c) : 1.0)
+                              * (lm ? lm->getVal(l) : 1.0));
                     Lmask[i][y][x] = abmask[i][y][x] = blend;
                 }
             }
@@ -157,7 +161,7 @@ BENCHFUN
 
     if (show_mask_idx >= 0) {
 #ifdef _OPENMP
-        #pragma omp parallel for if (multiThread)
+#pragma omp parallel for if (multiThread)
 #endif
         for (int y = 0; y < lab->H; ++y) {
             for (int x = 0; x < lab->W; ++x) {
@@ -171,11 +175,9 @@ BENCHFUN
         return;
     }
 
-    const auto abcoord =
-        [](float x) -> float
-        {
-            return /*12000.f **/ SGN(x) * xlog2lin(std::abs(x), 4.f);
-        };
+    const auto abcoord = [](float x) -> float {
+        return /*12000.f **/ SGN(x) * xlog2lin(std::abs(x), 4.f);
+    };
 
     float abca[n];
     float abcb[n];
@@ -185,7 +187,7 @@ BENCHFUN
     float power[n];
     int channel[n];
     for (int i = 0; i < n; ++i) {
-        auto &r = params->colorToning.labregions[i];
+        auto& r = params->colorToning.labregions[i];
         abca[i] = abcoord(r.a);
         abcb[i] = abcoord(r.b);
         rs[i] = 1.0 + r.saturation / (SGN(r.saturation) > 0 ? 50.0 : 100.0);
@@ -196,95 +198,93 @@ BENCHFUN
     }
 
     TMatrix ws = ICCStore::getInstance()->workingSpaceMatrix(params->icm.workingProfile);
-    TMatrix iws = ICCStore::getInstance()->workingSpaceInverseMatrix(params->icm.workingProfile);
+    TMatrix iws =
+        ICCStore::getInstance()->workingSpaceInverseMatrix(params->icm.workingProfile);
 
-    const auto CDL =
-        [=](float &l, float &a, float &b, float slope, float offset, float power, float saturation) -> void
-        {
-            if (slope != 1.f || offset != 0.f || power != 1.f || saturation != 1.f) {
-                float rgb[3];
-                float x, y, z;
-                Color::Lab2XYZ(l, a, b, x, y, z);
-                Color::xyz2rgb(x, y, z, rgb[0], rgb[1], rgb[2], iws);
+    const auto CDL = [=](float& l, float& a, float& b, float slope, float offset,
+                         float power, float saturation) -> void {
+        if (slope != 1.f || offset != 0.f || power != 1.f || saturation != 1.f) {
+            float rgb[3];
+            float x, y, z;
+            Color::Lab2XYZ(l, a, b, x, y, z);
+            Color::xyz2rgb(x, y, z, rgb[0], rgb[1], rgb[2], iws);
+            for (int i = 0; i < 3; ++i) {
+                rgb[i] = (pow_F(max((rgb[i] / 65535.f) * slope + offset, 0.f), power))
+                         * 65535.f;
+            }
+            if (saturation != 1.f) {
+                float Y = Color::rgbLuminance(rgb[0], rgb[1], rgb[2], ws);
                 for (int i = 0; i < 3; ++i) {
-                    rgb[i] = (pow_F(max((rgb[i] / 65535.f) * slope + offset, 0.f), power)) * 65535.f;
+                    rgb[i] = max(Y + saturation * (rgb[i] - Y), 0.f);
                 }
-                if (saturation != 1.f) {
-                    float Y = Color::rgbLuminance(rgb[0], rgb[1], rgb[2], ws);
-                    for (int i = 0; i < 3; ++i) {
-                        rgb[i] = max(Y + saturation * (rgb[i] - Y), 0.f);
-                    }
-                }
-                Color::rgbxyz(rgb[0], rgb[1], rgb[2], x, y, z, ws);
-                Color::XYZ2Lab(x, y, z, l, a, b);
             }
-        };
+            Color::rgbxyz(rgb[0], rgb[1], rgb[2], x, y, z, ws);
+            Color::XYZ2Lab(x, y, z, l, a, b);
+        }
+    };
 
-    const auto chan =
-        [=](float prev_l, float prev_a, float prev_b, float &l, float &a, float &b, int channel) -> void
-        {
-            if (channel >= 0) {
-                float prev_rgb[3];
-                float rgb[3];
-                float x, y, z;
-                Color::Lab2XYZ(l, a, b, x, y, z);
-                Color::xyz2rgb(x, y, z, rgb[0], rgb[1], rgb[2], iws);
-                Color::Lab2XYZ(prev_l, prev_a, prev_b, x, y, z);
-                Color::xyz2rgb(x, y, z, prev_rgb[0], prev_rgb[1], prev_rgb[2], iws);
-                prev_rgb[channel] = rgb[channel];
-                Color::rgbxyz(prev_rgb[0], prev_rgb[1], prev_rgb[2], x, y, z, ws);
-                Color::XYZ2Lab(x, y, z, l, a, b);
-            }
-        };
+    const auto chan = [=](float prev_l, float prev_a, float prev_b, float& l, float& a,
+                          float& b, int channel) -> void {
+        if (channel >= 0) {
+            float prev_rgb[3];
+            float rgb[3];
+            float x, y, z;
+            Color::Lab2XYZ(l, a, b, x, y, z);
+            Color::xyz2rgb(x, y, z, rgb[0], rgb[1], rgb[2], iws);
+            Color::Lab2XYZ(prev_l, prev_a, prev_b, x, y, z);
+            Color::xyz2rgb(x, y, z, prev_rgb[0], prev_rgb[1], prev_rgb[2], iws);
+            prev_rgb[channel] = rgb[channel];
+            Color::rgbxyz(prev_rgb[0], prev_rgb[1], prev_rgb[2], x, y, z, ws);
+            Color::XYZ2Lab(x, y, z, l, a, b);
+        }
+    };
 
 #ifdef __SSE2__
-    const auto CDL_v =
-        [=](vfloat &l, vfloat &a, vfloat &b, float slope, float offset, float power, float saturation) -> void
-        {
-            if (slope != 1.f || offset != 0.f || power != 1.f || saturation != 1.f) {
-                float ll[4];
-                float aa[4];
-                float bb[4];
-                STVFU(ll[0], l);
-                STVFU(aa[0], a);
-                STVFU(bb[0], b);
-                for (int i = 0; i < 4; ++i) {
-                    CDL(ll[i], aa[i], bb[i], slope, offset, power, saturation);
-                }
-                l = LVFU(ll[0]);
-                a = LVFU(aa[0]);
-                b = LVFU(bb[0]);
+    const auto CDL_v = [=](vfloat& l, vfloat& a, vfloat& b, float slope, float offset,
+                           float power, float saturation) -> void {
+        if (slope != 1.f || offset != 0.f || power != 1.f || saturation != 1.f) {
+            float ll[4];
+            float aa[4];
+            float bb[4];
+            STVFU(ll[0], l);
+            STVFU(aa[0], a);
+            STVFU(bb[0], b);
+            for (int i = 0; i < 4; ++i) {
+                CDL(ll[i], aa[i], bb[i], slope, offset, power, saturation);
             }
-        };
+            l = LVFU(ll[0]);
+            a = LVFU(aa[0]);
+            b = LVFU(bb[0]);
+        }
+    };
 
-    const auto chan_v =
-        [=](vfloat prev_l, vfloat prev_a, vfloat prev_b, vfloat &l, vfloat &a, vfloat &b, int channel) -> void
-        {
-            if (channel >= 0) {
-                float ll[4];
-                float aa[4];
-                float bb[4];
-                STVFU(ll[0], l);
-                STVFU(aa[0], a);
-                STVFU(bb[0], b);
-                float prev_ll[4];
-                float prev_aa[4];
-                float prev_bb[4];
-                STVFU(prev_ll[0], prev_l);
-                STVFU(prev_aa[0], prev_a);
-                STVFU(prev_bb[0], prev_b);
-                for (int i = 0; i < 4; ++i) {
-                    chan(prev_ll[i], prev_aa[i], prev_bb[i], ll[i], aa[i], bb[i], channel);
-                }
-                l = LVFU(ll[0]);
-                a = LVFU(aa[0]);
-                b = LVFU(bb[0]);
+    const auto chan_v = [=](vfloat prev_l, vfloat prev_a, vfloat prev_b, vfloat& l,
+                            vfloat& a, vfloat& b, int channel) -> void {
+        if (channel >= 0) {
+            float ll[4];
+            float aa[4];
+            float bb[4];
+            STVFU(ll[0], l);
+            STVFU(aa[0], a);
+            STVFU(bb[0], b);
+            float prev_ll[4];
+            float prev_aa[4];
+            float prev_bb[4];
+            STVFU(prev_ll[0], prev_l);
+            STVFU(prev_aa[0], prev_a);
+            STVFU(prev_bb[0], prev_b);
+            for (int i = 0; i < 4; ++i) {
+                chan(prev_ll[i], prev_aa[i], prev_bb[i], ll[i], aa[i], bb[i], channel);
             }
-        };
+            l = LVFU(ll[0]);
+            a = LVFU(aa[0]);
+            b = LVFU(bb[0]);
+        }
+    };
 #endif
 
 #ifdef _OPENMP
-    #pragma omp parallel if (multiThread)
+#pragma omp parallel if (multiThread)
 #endif
     {
 #ifdef __SSE2__
@@ -292,7 +292,7 @@ BENCHFUN
         vfloat cm42000v = F2V(-42000.f);
 #endif
 #ifdef _OPENMP
-        #pragma omp for
+#pragma omp for
 #endif
         for (int y = 0; y < lab->H; ++y) {
             int x = 0;
@@ -344,4 +344,4 @@ BENCHFUN
     }
 }
 
-} // namespace rtengine
+}  // namespace rtengine

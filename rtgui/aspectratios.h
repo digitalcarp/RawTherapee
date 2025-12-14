@@ -25,7 +25,8 @@
 
 #include <vector>
 
-struct AspectRatio {
+struct AspectRatio
+{
     Glib::ustring label;
     double value;
 };

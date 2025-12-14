@@ -17,8 +17,8 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "rtscalable.h"
 #include "hidpi.h"
+#include "rtscalable.h"
 
 #include <cairomm/pattern.h>
 #include <cairomm/surface.h>
@@ -28,37 +28,44 @@
 
 namespace hidpi {
 
-DeviceCoord LogicalCoord::scaleToDevice(int device_scale) const {
+DeviceCoord LogicalCoord::scaleToDevice(int device_scale) const
+{
     DeviceCoord device = {};
     device.x = x * device_scale;
     device.y = y * device_scale;
     return device;
 }
 
-LogicalCoord LogicalCoord::operator+(const LogicalCoord& other) const {
+LogicalCoord LogicalCoord::operator+(const LogicalCoord& other) const
+{
     return LogicalCoord(x + other.x, y + other.y);
 }
 
-LogicalCoord LogicalCoord::operator-(const LogicalCoord& other) const {
+LogicalCoord LogicalCoord::operator-(const LogicalCoord& other) const
+{
     return LogicalCoord(x - other.x, y - other.y);
 }
 
-DeviceCoord DeviceCoord::operator+(const DeviceSize& other) const {
+DeviceCoord DeviceCoord::operator+(const DeviceSize& other) const
+{
     return DeviceCoord(x + other.width, y + other.height);
 }
 
-DeviceCoord DeviceCoord::operator-(const DeviceSize& other) const {
+DeviceCoord DeviceCoord::operator-(const DeviceSize& other) const
+{
     return DeviceCoord(x - other.width, y - other.height);
 }
 
-LogicalSize LogicalSize::forWidget(const Gtk::Widget* widget) {
+LogicalSize LogicalSize::forWidget(const Gtk::Widget* widget)
+{
     LogicalSize result = {};
     result.width = widget->get_width();
     result.height = widget->get_height();
     return result;
 }
 
-ScaledDeviceSize LogicalSize::scaleToDevice(int device_scale) const {
+ScaledDeviceSize LogicalSize::scaleToDevice(int device_scale) const
+{
     ScaledDeviceSize result = {};
     result.width = width * device_scale;
     result.height = height * device_scale;
@@ -66,7 +73,8 @@ ScaledDeviceSize LogicalSize::scaleToDevice(int device_scale) const {
     return result;
 }
 
-ScaledDeviceSize ScaledDeviceSize::forWidget(const Gtk::Widget* widget) {
+ScaledDeviceSize ScaledDeviceSize::forWidget(const Gtk::Widget* widget)
+{
     int scale = RTScalable::getScaleForWidget(widget);
 
     ScaledDeviceSize result = {};
@@ -79,25 +87,35 @@ ScaledDeviceSize ScaledDeviceSize::forWidget(const Gtk::Widget* widget) {
 DevicePixbuf::DevicePixbuf() : m_device_scale(1) {}
 
 DevicePixbuf::DevicePixbuf(const Glib::RefPtr<Gdk::Pixbuf>& ptr, int device_scale)
-        : m_pixbuf(ptr), m_device_scale(device_scale) {}
+    : m_pixbuf(ptr), m_device_scale(device_scale)
+{
+}
 
 DevicePixbuf::DevicePixbuf(const DevicePixbuf& other)
-        : m_pixbuf(other.m_pixbuf), m_device_scale(other.m_device_scale) {}
+    : m_pixbuf(other.m_pixbuf), m_device_scale(other.m_device_scale)
+{
+}
 
-DevicePixbuf& DevicePixbuf::operator=(const DevicePixbuf& other) {
+DevicePixbuf& DevicePixbuf::operator=(const DevicePixbuf& other)
+{
     m_pixbuf = other.m_pixbuf;
     m_device_scale = other.m_device_scale;
     return *this;
 }
 
-DevicePixbuf::DevicePixbuf(DevicePixbuf&& other) : m_device_scale(1) { swap(*this, other); }
+DevicePixbuf::DevicePixbuf(DevicePixbuf&& other) : m_device_scale(1)
+{
+    swap(*this, other);
+}
 
-DevicePixbuf& DevicePixbuf::operator=(DevicePixbuf&& other) {
+DevicePixbuf& DevicePixbuf::operator=(DevicePixbuf&& other)
+{
     swap(*this, other);
     return *this;
 }
 
-ScaledDeviceSize DevicePixbuf::size() const {
+ScaledDeviceSize DevicePixbuf::size() const
+{
     ScaledDeviceSize size = {};
     if (m_pixbuf) {
         size.width = m_pixbuf->get_width();
@@ -110,14 +128,16 @@ ScaledDeviceSize DevicePixbuf::size() const {
     return size;
 }
 
-void swap(DevicePixbuf& lhs, DevicePixbuf& rhs) {
+void swap(DevicePixbuf& lhs, DevicePixbuf& rhs)
+{
     using std::swap;
     swap(lhs.m_pixbuf, rhs.m_pixbuf);
     swap(lhs.m_device_scale, rhs.m_device_scale);
 }
 
 Cairo::RefPtr<Cairo::SurfacePattern>
-getSourceForSurface(const Cairo::RefPtr<Cairo::Context>& context) {
+getSourceForSurface(const Cairo::RefPtr<Cairo::Context>& context)
+{
     Cairo::RefPtr<Cairo::SurfacePattern> result;
 
     Cairo::RefPtr<Cairo::Pattern> src = context->get_source();
@@ -131,25 +151,33 @@ getSourceForSurface(const Cairo::RefPtr<Cairo::Context>& context) {
 }
 
 void getDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,
-                    double& x_scale, double& y_scale) {
+                    double& x_scale,
+                    double& y_scale)
+{
     cairo_surface_t* cobj = surface->cobj();
     cairo_surface_get_device_scale(cobj, &x_scale, &y_scale);
 }
 
 void setDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,
-                    int x_scale, int y_scale) {
+                    int x_scale,
+                    int y_scale)
+{
     cairo_surface_t* cobj = surface->cobj();
     cairo_surface_set_device_scale(cobj, x_scale, y_scale);
 }
 
 void getDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface,
-                    double& x_scale, double& y_scale) {
+                    double& x_scale,
+                    double& y_scale)
+{
     cairo_surface_t* cobj = surface->cobj();
     cairo_surface_get_device_scale(cobj, &x_scale, &y_scale);
 }
 
 void setDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface,
-                    int x_scale, int y_scale) {
+                    int x_scale,
+                    int y_scale)
+{
     cairo_surface_t* cobj = surface->cobj();
     cairo_surface_set_device_scale(cobj, x_scale, y_scale);
 }

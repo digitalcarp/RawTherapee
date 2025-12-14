@@ -16,23 +16,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include "rt_math.h"
 #include <cmath>
-#include <cstring>
 #include <cstdio>
+#include <cstring>
 #include <fstream>
 #include <glibmm/convert.h>
-#include "rt_math.h"
 
 #include "utils.h"
 
 using namespace std;
 
-namespace rtengine
-{
+namespace rtengine {
 
 void poke255_uc(unsigned char*& dest, unsigned char r, unsigned char g, unsigned char b)
 {
-#if __BYTE_ORDER__==__ORDER_LITTLE_ENDIAN__
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
     *(dest++) = b;
     *(dest++) = g;
     *(dest++) = r;
@@ -47,7 +46,7 @@ void poke255_uc(unsigned char*& dest, unsigned char r, unsigned char g, unsigned
 
 void poke01_d(unsigned char*& dest, double r, double g, double b)
 {
-#if __BYTE_ORDER__==__ORDER_LITTLE_ENDIAN__
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
     *(dest++) = (unsigned char)(b * 255.);
     *(dest++) = (unsigned char)(g * 255.);
     *(dest++) = (unsigned char)(r * 255.);
@@ -62,7 +61,7 @@ void poke01_d(unsigned char*& dest, double r, double g, double b)
 
 void poke01_f(unsigned char*& dest, float r, float g, float b)
 {
-#if __BYTE_ORDER__==__ORDER_LITTLE_ENDIAN__
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
     *(dest++) = (unsigned char)(b * 255.f);
     *(dest++) = (unsigned char)(g * 255.f);
     *(dest++) = (unsigned char)(r * 255.f);
@@ -75,7 +74,12 @@ void poke01_f(unsigned char*& dest, float r, float g, float b)
 #endif
 }
 
-void bilinearInterp(const unsigned char* src, int sw, int sh, unsigned char* dst, int dw, int dh)
+void bilinearInterp(const unsigned char* src,
+                    int sw,
+                    int sh,
+                    unsigned char* dst,
+                    int dw,
+                    int dh)
 {
     int ix = 0;
 
@@ -114,25 +118,34 @@ void bilinearInterp(const unsigned char* src, int sw, int sh, unsigned char* dst
             int ofs12 = or1 + 3 * nx;
             int ofs21 = or2 + 3 * sx;
             int ofs22 = or2 + 3 * nx;
-            unsigned int val = src[ofs11] * (1 - dx) * (1 - dy) + src[ofs12] * dx * (1 - dy) + src[ofs21] * (1 - dx) * dy + src[ofs22] * dx * dy;
+            unsigned int val = src[ofs11] * (1 - dx) * (1 - dy)
+                               + src[ofs12] * dx * (1 - dy) + src[ofs21] * (1 - dx) * dy
+                               + src[ofs22] * dx * dy;
             dst[ix++] = val;
             ofs11++;
             ofs12++;
             ofs21++;
             ofs22++;
-            val = src[ofs11] * (1 - dx) * (1 - dy) + src[ofs12] * dx * (1 - dy) + src[ofs21] * (1 - dx) * dy + src[ofs22] * dx * dy;
+            val = src[ofs11] * (1 - dx) * (1 - dy) + src[ofs12] * dx * (1 - dy)
+                  + src[ofs21] * (1 - dx) * dy + src[ofs22] * dx * dy;
             dst[ix++] = val;
             ofs11++;
             ofs12++;
             ofs21++;
             ofs22++;
-            val = src[ofs11] * (1 - dx) * (1 - dy) + src[ofs12] * dx * (1 - dy) + src[ofs21] * (1 - dx) * dy + src[ofs22] * dx * dy;
+            val = src[ofs11] * (1 - dx) * (1 - dy) + src[ofs12] * dx * (1 - dy)
+                  + src[ofs21] * (1 - dx) * dy + src[ofs22] * dx * dy;
             dst[ix++] = val;
         }
     }
 }
 
-void nearestInterp(const unsigned char* src, int sw, int sh, unsigned char* dst, int dw, int dh)
+void nearestInterp(const unsigned char* src,
+                   int sw,
+                   int sh,
+                   unsigned char* dst,
+                   int dw,
+                   int dh)
 {
     int ix = 0;
 
@@ -166,7 +179,7 @@ void rotate(unsigned char* img, int& w, int& h, int deg)
                 rotated[3 * (j * h + h - i - 1) + 2] = img[ix++];
             }
 
-        std::swap(w,h);
+        std::swap(w, h);
     } else if (deg == 270) {
         for (int i = 0; i < h; i++)
             for (int j = 0; j < w; j++) {
@@ -175,7 +188,7 @@ void rotate(unsigned char* img, int& w, int& h, int deg)
                 rotated[3 * (h * (w - j - 1) + i) + 2] = img[ix++];
             }
 
-        std::swap(w,h);
+        std::swap(w, h);
     } else /*if (deg == 180) */
         for (int i = 0; i < h; i++)
             for (int j = 0; j < w; j++) {
@@ -190,7 +203,7 @@ void rotate(unsigned char* img, int& w, int& h, int deg)
 
 void hflip(unsigned char* img, int w, int h)
 {
-    if(w > 0 && h > 0) {
+    if (w > 0 && h > 0) {
         unsigned char* flipped = new unsigned char[3 * w * h];
         int ix = 0;
 
@@ -208,7 +221,7 @@ void hflip(unsigned char* img, int w, int h)
 
 void vflip(unsigned char* img, int w, int h)
 {
-    if(w > 0 && h > 0) {
+    if (w > 0 && h > 0) {
         unsigned char* flipped = new unsigned char[3 * w * h];
         int ix = 0;
 
@@ -224,15 +237,14 @@ void vflip(unsigned char* img, int w, int h)
     }
 }
 
-std::vector<std::uint8_t> getFileData(const Glib::ustring &filename)
+std::vector<std::uint8_t> getFileData(const Glib::ustring& filename)
 {
     try {
         const std::string fn = Glib::filename_from_utf8(filename);
         std::ifstream instream(fn, std::ios::in | std::ios::binary);
 
-        std::vector<std::uint8_t> contents(
-            (std::istreambuf_iterator<char>(instream)),
-            std::istreambuf_iterator<char>());
+        std::vector<std::uint8_t> contents((std::istreambuf_iterator<char>(instream)),
+                                           std::istreambuf_iterator<char>());
 
         instream.close();
         return contents;
@@ -244,34 +256,33 @@ std::vector<std::uint8_t> getFileData(const Glib::ustring &filename)
 Glib::ustring getFileExtension(const Glib::ustring& filename)
 {
     const Glib::ustring::size_type lastdot_pos = filename.find_last_of('.');
-    return
-        lastdot_pos != Glib::ustring::npos
-            ? filename.substr(lastdot_pos + 1).lowercase()
-            : Glib::ustring();
+    return lastdot_pos != Glib::ustring::npos
+               ? filename.substr(lastdot_pos + 1).lowercase()
+               : Glib::ustring();
 }
 
 bool hasJpegExtension(const Glib::ustring& filename)
 {
-   const Glib::ustring extension = getFileExtension(filename);
-   return extension == "jpg" || extension == "jpeg";
+    const Glib::ustring extension = getFileExtension(filename);
+    return extension == "jpg" || extension == "jpeg";
 }
 
 #ifdef LIBJXL
 bool hasJxlExtension(const Glib::ustring& filename)
 {
-   return getFileExtension(filename) == "jxl";
+    return getFileExtension(filename) == "jxl";
 }
 #endif
 
 bool hasTiffExtension(const Glib::ustring& filename)
 {
-   const Glib::ustring extension = getFileExtension(filename);
-   return extension == "tif" || extension == "tiff";
+    const Glib::ustring extension = getFileExtension(filename);
+    return extension == "tif" || extension == "tiff";
 }
 
 bool hasPngExtension(const Glib::ustring& filename)
 {
-   return getFileExtension(filename) == "png";
+    return getFileExtension(filename) == "png";
 }
 
 void swab(const void* from, void* to, ssize_t n)
@@ -289,22 +300,22 @@ void swab(const void* from, void* to, ssize_t n)
     }
 }
 
-}
+}  // namespace rtengine
 
 #if __SIZEOF_WCHAR_T__ == 4
 Glib::ustring utf32_to_utf8(wchar_t* UTF32Buffer, size_t sizeOfUTF32Buffer)
 {
-    char *buffer2 = new char[sizeOfUTF32Buffer];
-    char *pBuffer2 = buffer2;
+    char* buffer2 = new char[sizeOfUTF32Buffer];
+    char* pBuffer2 = buffer2;
     gchar a[6];
-    for (size_t i=0; i < sizeOfUTF32Buffer/4; ++i) {
+    for (size_t i = 0; i < sizeOfUTF32Buffer / 4; ++i) {
         gint bytesWritten = g_unichar_to_utf8((gunichar)UTF32Buffer[i], a);
-        for (gint j=0; j < bytesWritten; ++j) {
+        for (gint j = 0; j < bytesWritten; ++j) {
             *(pBuffer2++) = a[j];
         }
     }
     Glib::ustring modelDesc(buffer2);
-    delete [] buffer2;
+    delete[] buffer2;
     return modelDesc;
 }
 #endif

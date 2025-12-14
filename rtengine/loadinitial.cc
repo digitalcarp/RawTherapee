@@ -16,27 +16,29 @@
  *  You should have received a copy of the GNU General Public License
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include "rawimagesource.h"
 #include "rtengine.h"
 #include "stdimagesource.h"
-#include "rawimagesource.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
-InitialImage* InitialImage::load (const Glib::ustring& fname, bool isRaw, int* errorCode, ProgressListener* pl)
+InitialImage* InitialImage::load(const Glib::ustring& fname,
+                                 bool isRaw,
+                                 int* errorCode,
+                                 ProgressListener* pl)
 {
 
     ImageSource* isrc;
 
     if (!isRaw) {
-        isrc = new StdImageSource ();
+        isrc = new StdImageSource();
     } else {
-        isrc = new RawImageSource ();
+        isrc = new RawImageSource();
     }
 
-    isrc->setProgressListener (pl);
+    isrc->setProgressListener(pl);
 
-    *errorCode = isrc->load (fname);
+    *errorCode = isrc->load(fname);
 
     if (*errorCode) {
         delete isrc;
@@ -45,5 +47,4 @@ InitialImage* InitialImage::load (const Glib::ustring& fname, bool isRaw, int* e
 
     return isrc;
 }
-}
-
+}  // namespace rtengine

@@ -25,18 +25,18 @@
 
 #include "opthelper.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
 class ProgressListener;
 
-struct IMFILE {
+struct IMFILE
+{
     int fd;
     ssize_t pos;
     ssize_t size;
     char* data;
     bool eof;
-    rtengine::ProgressListener *plistener;
+    rtengine::ProgressListener* plistener;
     double progress_range;
     ssize_t progress_next;
     ssize_t progress_current;
@@ -44,27 +44,29 @@ struct IMFILE {
 
 /*
   Functions for progress bar updates
-  Note: progress bar is not intended to be exact, eg if you read same data over and over again progress
-  will potentially reach 100% before you're finished.
+  Note: progress bar is not intended to be exact, eg if you read same data over and over
+  again progress will potentially reach 100% before you're finished.
  */
-void imfile_set_plistener(IMFILE *f, rtengine::ProgressListener *plistener, double progress_range);
-void imfile_update_progress(IMFILE *f);
+void imfile_set_plistener(IMFILE* f,
+                          rtengine::ProgressListener* plistener,
+                          double progress_range);
+void imfile_update_progress(IMFILE* f);
 
-IMFILE* fopen (const char* fname);
-IMFILE* gfopen (const char* fname);
-IMFILE* fopen (unsigned* buf, int size);
-void fclose (IMFILE* f);
-inline long ftell (IMFILE* f)
+IMFILE* fopen(const char* fname);
+IMFILE* gfopen(const char* fname);
+IMFILE* fopen(unsigned* buf, int size);
+void fclose(IMFILE* f);
+inline long ftell(IMFILE* f)
 {
     return f->pos;
 }
 
-inline int feof (IMFILE* f)
+inline int feof(IMFILE* f)
 {
     return f->eof;
 }
 
-inline void fseek (IMFILE* f, long p, int how)
+inline void fseek(IMFILE* f, long p, int how)
 {
     ssize_t fpos = f->pos;
 
@@ -79,12 +81,12 @@ inline void fseek (IMFILE* f, long p, int how)
         return;
     }
 
-    if (f->pos < 0  || f->pos > f->size) {
+    if (f->pos < 0 || f->pos > f->size) {
         f->pos = fpos;
     }
 }
 
-inline int fgetc (IMFILE* f)
+inline int fgetc(IMFILE* f)
 {
 
     if (LIKELY(f->pos < f->size)) {
@@ -99,20 +101,20 @@ inline int fgetc (IMFILE* f)
     return EOF;
 }
 
-inline int getc (IMFILE* f)
+inline int getc(IMFILE* f)
 {
 
     return fgetc(f);
 }
 
-inline int fread (void* dst, size_t es, size_t count, IMFILE* f)
+inline int fread(void* dst, size_t es, size_t count, IMFILE* f)
 {
 
     size_t s = es * count;
     size_t avail = static_cast<size_t>(f->size) - static_cast<size_t>(f->pos);
 
     if (static_cast<ssize_t>(s) <= static_cast<ssize_t>(avail)) {
-        memcpy (dst, f->data + f->pos, s);
+        memcpy(dst, f->data + f->pos, s);
         f->pos += s;
 
         if (f->plistener) {
@@ -125,7 +127,7 @@ inline int fread (void* dst, size_t es, size_t count, IMFILE* f)
 
         return count;
     } else {
-        memcpy (dst, f->data + f->pos, avail);
+        memcpy(dst, f->data + f->pos, avail);
         f->pos += avail;
         f->eof = true;
         return avail / es;
@@ -137,7 +139,7 @@ inline unsigned char* fdata(int offset, IMFILE* f)
     return (unsigned char*)f->data + offset;
 }
 
-int fscanf (IMFILE* f, const char* s ...);
-char* fgets (char* s, int n, IMFILE* f);
+int fscanf(IMFILE* f, const char* s...);
+char* fgets(char* s, int n, IMFILE* f);
 
-}
+}  // namespace rtengine

@@ -19,15 +19,16 @@
 
 #include "editcallbacks.h"
 
-EditSubscriber::EditSubscriber (EditType editType) :
-    ID(EUID_None),
-    editingType(editType),
-    bufferType(BT_SINGLEPLANE_FLOAT),
-    provider(nullptr),
-    action(EditSubscriber::Action::NONE)
-{}
+EditSubscriber::EditSubscriber(EditType editType)
+    : ID(EUID_None),
+      editingType(editType),
+      bufferType(BT_SINGLEPLANE_FLOAT),
+      provider(nullptr),
+      action(EditSubscriber::Action::NONE)
+{
+}
 
-void EditSubscriber::setEditProvider(EditDataProvider *provider)
+void EditSubscriber::setEditProvider(EditDataProvider* provider)
 {
     this->provider = provider;
 }
@@ -40,8 +41,8 @@ void EditSubscriber::setEditID(EditUniqueID ID, BufferType buffType)
 
 bool EditSubscriber::isCurrentSubscriber() const
 {
-    //if (provider && provider->getCurrSubscriber())
-    //  return provider->getCurrSubscriber()->getEditID() == ID;
+    // if (provider && provider->getCurrSubscriber())
+    //   return provider->getCurrSubscriber()->getEditID() == ID;
 
     if (provider) {
         return provider->getCurrSubscriber() == this;
@@ -96,23 +97,23 @@ bool EditSubscriber::isPicking() const
 
 //--------------------------------------------------------------------------------------------------
 
+EditDataProvider::EditDataProvider()
+    : currSubscriber(nullptr),
+      //    object(0),
+      pipetteVal1(0.f),
+      pipetteVal2(0.f),
+      pipetteVal3(0.f),
+      object(0),
+      posScreen(-1, -1),
+      posImage(-1, -1),
+      deltaScreen(0, 0),
+      deltaImage(0, 0),
+      deltaPrevScreen(0, 0),
+      deltaPrevImage(0, 0)
+{
+}
 
-EditDataProvider::EditDataProvider() :
-    currSubscriber(nullptr),
-//    object(0),
-    pipetteVal1(0.f),
-    pipetteVal2(0.f),
-    pipetteVal3(0.f),
-    object(0),
-    posScreen(-1, -1),
-    posImage(-1, -1),
-    deltaScreen(0, 0),
-    deltaImage(0, 0),
-    deltaPrevScreen(0, 0),
-    deltaPrevImage(0, 0)
-{}
-
-void EditDataProvider::subscribe(EditSubscriber *subscriber)
+void EditDataProvider::subscribe(EditSubscriber* subscriber)
 {
     if (currSubscriber) {
         currSubscriber->switchOffEditMode();
@@ -129,7 +130,7 @@ void EditDataProvider::unsubscribe()
 void EditDataProvider::switchOffEditMode()
 {
     if (currSubscriber) {
-        currSubscriber->switchOffEditMode ();
+        currSubscriber->switchOffEditMode();
     }
 }
 
@@ -274,5 +275,5 @@ const std::vector<Geometry*>& EditSubscriber::getMouseOverGeometry()
 
 int EditDataProvider::getPipetteRectSize() const
 {
-    return 8; // TODO: make a GUI
+    return 8;  // TODO: make a GUI
 }

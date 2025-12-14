@@ -31,11 +31,11 @@ class Distortion final :
 {
 
 protected:
-    Gtk::Button*   autoDistor;
+    Gtk::Button* autoDistor;
     Adjuster* distor;
     Adjuster* focal_length;
-    sigc::connection    idConn;
-    LensGeomListener * rlistener;
+    sigc::connection idConn;
+    LensGeomListener* rlistener;
     Gtk::CheckButton* defish;
 
 public:
@@ -49,22 +49,22 @@ public:
 
     static const Glib::ustring TOOL_NAME;
 
-    Distortion ();
+    Distortion();
 
-    void read           (const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited = nullptr) override;
-    void write          (rtengine::procparams::ProcParams* pp, ParamsEdited* pedited = nullptr) override;
-    void setDefaults    (const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited = nullptr) override;
-    void setBatchMode   (bool batchMode) override;
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
+    void setBatchMode(bool batchMode) override;
 
-    void adjusterChanged     (Adjuster* a, double newval) override;
-    void setAdjusterBehavior (bool vadd, bool focal_length_add);
-    void trimValues          (rtengine::procparams::ProcParams* pp) override;
-    void idPressed           ();
-    void setLensGeomListener (LensGeomListener* l)
-    {
-        rlistener = l;
-    }
-    void defishChanged (void);
+    void adjusterChanged(Adjuster* a, double newval) override;
+    void setAdjusterBehavior(bool vadd, bool focal_length_add);
+    void trimValues(rtengine::procparams::ProcParams* pp) override;
+    void idPressed();
+    void setLensGeomListener(LensGeomListener* l) { rlistener = l; }
+    void defishChanged(void);
 
     void setCamBasedEventsActive(bool active = true);
 };

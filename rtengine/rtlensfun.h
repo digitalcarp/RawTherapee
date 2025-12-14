@@ -31,22 +31,18 @@
 #include "lcp.h"
 #include "noncopyable.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
 class FramesMetaData;
 
-namespace procparams
-{
+namespace procparams {
 
 struct CoarseTransformParams;
 struct LensProfParams;
 
-}
+}  // namespace procparams
 
-class LFModifier final :
-    public LensCorrection,
-    public NonCopyable
+class LFModifier final : public LensCorrection, public NonCopyable
 {
 public:
     ~LFModifier() override;
@@ -57,19 +53,23 @@ public:
     bool hasCACorrection() const override;
     bool hasVignettingCorrection() const override;
 
-    void correctDistortionAndCA(double &x, double &y, int cx, int cy, int channel) const override;
-    void correctDistortion(double &x, double &y, int cx, int cy) const override;
-    void correctCA(double &x, double &y, int cx, int cy, int channel) const override;
+    void correctDistortionAndCA(double& x,
+                                double& y,
+                                int cx,
+                                int cy,
+                                int channel) const override;
+    void correctDistortion(double& x, double& y, int cx, int cy) const override;
+    void correctCA(double& x, double& y, int cx, int cy, int channel) const override;
     void processVignette(int width, int height, float** rawData) const override;
     void processVignette3Channels(int width, int height, float** rawData) const override;
 
     Glib::ustring getDisplayString() const;
 
 private:
-    LFModifier(lfModifier *m, bool swap_xy, int flags);
+    LFModifier(lfModifier* m, bool swap_xy, int flags);
 
     friend class LFDatabase;
-    lfModifier *data_;
+    lfModifier* data_;
     bool swap_xy_;
     int flags_;
 };
@@ -90,7 +90,7 @@ public:
 
 private:
     friend class LFDatabase;
-    const lfCamera *data_;
+    const lfCamera* data_;
 };
 
 class LFLens final
@@ -110,42 +110,49 @@ public:
 
 private:
     friend class LFDatabase;
-    const lfLens *data_;
+    const lfLens* data_;
 };
 
-class LFDatabase final :
-    public NonCopyable
+class LFDatabase final : public NonCopyable
 {
 public:
-    static bool init(const Glib::ustring &dbdir);
-    static const LFDatabase *getInstance();
+    static bool init(const Glib::ustring& dbdir);
+    static const LFDatabase* getInstance();
 
     ~LFDatabase();
 
     std::vector<LFCamera> getCameras() const;
     std::vector<LFLens> getLenses() const;
-    LFCamera findCamera(const Glib::ustring &make, const Glib::ustring &model, bool autoMatch) const;
-    LFLens findLens(const LFCamera &camera, const Glib::ustring &name, bool autoMatch) const;
+    LFCamera findCamera(const Glib::ustring& make,
+                        const Glib::ustring& model,
+                        bool autoMatch) const;
+    LFLens
+    findLens(const LFCamera& camera, const Glib::ustring& name, bool autoMatch) const;
 
-    std::unique_ptr<LFModifier> findModifier(
-        const procparams::LensProfParams &lensProf,
-        const FramesMetaData *idata,
-        int width, int height,
-        const procparams::CoarseTransformParams &coarse,
-        int rawRotationDeg
-    ) const;
+    std::unique_ptr<LFModifier>
+    findModifier(const procparams::LensProfParams& lensProf,
+                 const FramesMetaData* idata,
+                 int width,
+                 int height,
+                 const procparams::CoarseTransformParams& coarse,
+                 int rawRotationDeg) const;
 
 private:
-    std::unique_ptr<LFModifier> getModifier(const LFCamera &camera, const LFLens &lens,
-                                            float focalLen, float aperture, float focusDist,
-                                            int width, int height, bool swap_xy) const;
+    std::unique_ptr<LFModifier> getModifier(const LFCamera& camera,
+                                            const LFLens& lens,
+                                            float focalLen,
+                                            float aperture,
+                                            float focusDist,
+                                            int width,
+                                            int height,
+                                            bool swap_xy) const;
     LFDatabase();
-    bool LoadDirectory(const char *dirname);
+    bool LoadDirectory(const char* dirname);
 
     mutable MyMutex lfDBMutex;
     static LFDatabase instance_;
-    lfDatabase *data_;
+    lfDatabase* data_;
     mutable std::set<std::string> notFound;
 };
 
-} // namespace rtengine
+}  // namespace rtengine

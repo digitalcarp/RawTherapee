@@ -42,39 +42,37 @@
 // Thanks to Marcus for his support when implementing part of the ShiftN functionality
 // to darktable.
 
-
 #include "perspectivecorrection.h"
 #include "improcfun.h"
 #include "procparams.h"
 #include "rt_math.h"
-#include <string.h>
-#include <math.h>
 #include <assert.h>
 #include <inttypes.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "rtgui/threadutils.h"
 #include "colortemp.h"
 #include "imagefloat.h"
+#include "rtgui/threadutils.h"
 #include "settings.h"
 
-namespace rtengine { extern const Settings *settings; }
+namespace rtengine {
+extern const Settings* settings;
+}
 
 #define _(msg) (msg)
-#define dt_control_log(msg) \
+#define dt_control_log(msg)  \
     if (settings->verbose) { \
-        printf("%s\n", msg);       \
-        fflush(stdout);            \
+        printf("%s\n", msg); \
+        fflush(stdout);      \
     }
-
 
 namespace rtengine {
 
 namespace {
 
-inline int mat3inv(float *const dst, const float *const src)
+inline int mat3inv(float* const dst, const float* const src)
 {
     std::array<std::array<float, 3>, 3> tmpsrc;
     std::array<std::array<float, 3>, 3> tmpdst;
@@ -95,13 +93,10 @@ inline int mat3inv(float *const dst, const float *const src)
     }
 }
 
-
 // the darktable ashift iop (adapted to RT), which does most of the work
 #include "ashift_dt.c"
 
-
-} // namespace
-
+}  // namespace
 
 namespace {
 
@@ -121,28 +116,27 @@ std::vector<Coord2D> get_corners(int w, int h)
 }
 */
 
-void init_dt_structures(dt_iop_ashift_params_t *p, dt_iop_ashift_gui_data_t *g,
-                        const procparams::PerspectiveParams *params)
+void init_dt_structures(dt_iop_ashift_params_t* p,
+                        dt_iop_ashift_gui_data_t* g,
+                        const procparams::PerspectiveParams* params)
 {
-    dt_iop_ashift_params_t dp = {
-        0.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        DEFAULT_F_LENGTH,
-        1.f,
-        0.0f,
-        1.0f,
-        ASHIFT_MODE_SPECIFIC,
-        0,
-        ASHIFT_CROP_OFF,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        0.0f
-    };
+    dt_iop_ashift_params_t dp = { 0.0f,
+                                  0.0f,
+                                  0.0f,
+                                  0.0f,
+                                  DEFAULT_F_LENGTH,
+                                  1.f,
+                                  0.0f,
+                                  1.0f,
+                                  ASHIFT_MODE_SPECIFIC,
+                                  0,
+                                  ASHIFT_CROP_OFF,
+                                  0.0f,
+                                  1.0f,
+                                  0.0f,
+                                  1.0f,
+                                  0.0f,
+                                  0.0f };
     *p = dp;
 
     g->buf = NULL;
@@ -156,7 +150,7 @@ void init_dt_structures(dt_iop_ashift_params_t *p, dt_iop_ashift_gui_data_t *g,
     g->lastfit = ASHIFT_FIT_NONE;
     g->fitting = 0;
     g->lines = NULL;
-    g->lines_count =0;
+    g->lines_count = 0;
     g->horizontal_count = 0;
     g->vertical_count = 0;
     g->grid_hash = 0;
@@ -196,9 +190,9 @@ void init_dt_structures(dt_iop_ashift_params_t *p, dt_iop_ashift_gui_data_t *g,
     }
 }
 
-
 /*
-void get_view_size(int w, int h, const procparams::PerspectiveParams &params, double &cw, double &ch)
+void get_view_size(int w, int h, const procparams::PerspectiveParams &params, double &cw,
+double &ch)
 {
     double min_x = RT_INFINITY, max_x = -RT_INFINITY;
     double min_y = RT_INFINITY, max_y = -RT_INFINITY;
@@ -206,8 +200,10 @@ void get_view_size(int w, int h, const procparams::PerspectiveParams &params, do
     auto corners = get_corners(w, h);
 
     float homo[3][3];
-    homography((float *)homo, params.angle, params.vertical / 100.0, -params.horizontal / 100.0, params.shear / 100.0, params.flength * params.cropfactor, 100.f, params.aspect, w, h, ASHIFT_HOMOGRAPH_FORWARD);
-    
+    homography((float *)homo, params.angle, params.vertical / 100.0, -params.horizontal /
+100.0, params.shear / 100.0, params.flength * params.cropfactor, 100.f, params.aspect, w,
+h, ASHIFT_HOMOGRAPH_FORWARD);
+
     for (auto &c : corners) {
         float pin[3] = { float(c.x), float(c.y), 1.f };
         float pout[3];
@@ -222,16 +218,18 @@ void get_view_size(int w, int h, const procparams::PerspectiveParams &params, do
 
     cw = max_x - min_x;
     ch = max_y - min_y;
-}    
+}
 */
 
 /**
  * Allocates a new array and populates it with ashift lines corresponding to the
  * provided control lines.
  */
-std::unique_ptr<dt_iop_ashift_line_t[]> toAshiftLines(const std::vector<ControlLine> *lines)
+std::unique_ptr<dt_iop_ashift_line_t[]>
+toAshiftLines(const std::vector<ControlLine>* lines)
 {
-    std::unique_ptr<dt_iop_ashift_line_t[]> retval(new dt_iop_ashift_line_t[lines->size()]);
+    std::unique_ptr<dt_iop_ashift_line_t[]> retval(
+        new dt_iop_ashift_line_t[lines->size()]);
 
     for (size_t i = 0; i < lines->size(); i++) {
         const float x1 = (*lines)[i].x1;
@@ -259,10 +257,15 @@ std::unique_ptr<dt_iop_ashift_line_t[]> toAshiftLines(const std::vector<ControlL
     return retval;
 }
 
-} // namespace
+}  // namespace
 
-
-PerspectiveCorrection::Params PerspectiveCorrection::autocompute(ImageSource *src, bool corr_pitch, bool corr_yaw, const procparams::ProcParams *pparams, const FramesMetaData *metadata, const std::vector<ControlLine> *control_lines)
+PerspectiveCorrection::Params
+PerspectiveCorrection::autocompute(ImageSource* src,
+                                   bool corr_pitch,
+                                   bool corr_yaw,
+                                   const procparams::ProcParams* pparams,
+                                   const FramesMetaData* metadata,
+                                   const std::vector<ControlLine>* control_lines)
 {
     auto pcp = procparams::PerspectiveParams(pparams->perspective);
     procparams::PerspectiveParams dflt;
@@ -275,7 +278,7 @@ PerspectiveCorrection::Params PerspectiveCorrection::autocompute(ImageSource *sr
     pcp.camera_pitch = dflt.camera_pitch;
     pcp.camera_roll = dflt.camera_roll;
     pcp.camera_yaw = dflt.camera_yaw;
-    
+
     dt_iop_ashift_params_t p;
     dt_iop_ashift_gui_data_t g;
     init_dt_structures(&p, &g, &pparams->perspective);
@@ -294,47 +297,50 @@ PerspectiveCorrection::Params PerspectiveCorrection::autocompute(ImageSource *sr
         std::unique_ptr<Imagefloat> img(new Imagefloat(w, h));
 
         ProcParams neutral;
-        neutral.raw.bayersensor.method = RAWParams::BayerSensor::getMethodString(RAWParams::BayerSensor::Method::FAST);
-        neutral.raw.xtranssensor.method = RAWParams::XTransSensor::getMethodString(RAWParams::XTransSensor::Method::FAST);
-        neutral.icm.outputProfile = ColorManagementParams::NoICMString;    
+        neutral.raw.bayersensor.method =
+            RAWParams::BayerSensor::getMethodString(RAWParams::BayerSensor::Method::FAST);
+        neutral.raw.xtranssensor.method = RAWParams::XTransSensor::getMethodString(
+            RAWParams::XTransSensor::Method::FAST);
+        neutral.icm.outputProfile = ColorManagementParams::NoICMString;
         src->getImage(src->getWB(), tr, img.get(), pp, neutral.toneCurve, neutral.raw);
         src->convertColorSpace(img.get(), pparams->icm, src->getWB());
 
-        neutral.commonTrans.autofill = false; // Ensures crop factor is correct.
+        neutral.commonTrans.autofill = false;  // Ensures crop factor is correct.
         // TODO: Ensure image borders of rotated image do not get detected as lines.
         neutral.rotate = pparams->rotate;
         neutral.distortion = pparams->distortion;
         neutral.distortion.defish = pparams->distortion.defish;
         neutral.distortion.focal_length = pparams->distortion.focal_length;
-        neutral.perspective.camera_focal_length = pparams->perspective.camera_focal_length;
+        neutral.perspective.camera_focal_length =
+            pparams->perspective.camera_focal_length;
         neutral.perspective.camera_crop_factor = pparams->perspective.camera_crop_factor;
         neutral.perspective.method = pparams->perspective.method;
         neutral.lensProf = pparams->lensProf;
         ImProcFunctions ipf(&neutral, true);
         if (ipf.needsTransform(w, h, src->getRotateDegree(), src->getMetaData())) {
-            Imagefloat *tmp = new Imagefloat(w, h);
-            ipf.transform(img.get(), tmp, 0, 0, 0, 0, w, h, w, h,
-                    src->getMetaData(), src->getRotateDegree(), false);
+            Imagefloat* tmp = new Imagefloat(w, h);
+            ipf.transform(img.get(), tmp, 0, 0, 0, 0, w, h, w, h, src->getMetaData(),
+                          src->getRotateDegree(), false);
             img.reset(tmp);
         }
 
         // allocate the gui buffer
-        g.buf = static_cast<float *>(malloc(sizeof(float) * w * h * 4));
+        g.buf = static_cast<float*>(malloc(sizeof(float) * w * h * 4));
         g.buf_width = w;
         g.buf_height = h;
 
         img->normalizeFloatTo1();
 
 #ifdef _OPENMP
-#   pragma omp parallel for
+#pragma omp parallel for
 #endif
         for (int y = 0; y < h; ++y) {
             for (int x = 0; x < w; ++x) {
                 int i = (y * w + x) * 4;
                 g.buf[i] = img->r(y, x);
-                g.buf[i+1] = img->g(y, x);
-                g.buf[i+2] = img->b(y, x);
-                g.buf[i+3] = 1.f;
+                g.buf[i + 1] = img->g(y, x);
+                g.buf[i + 2] = img->b(y, x);
+                g.buf[i + 3] = 1.f;
             }
         }
     }
@@ -351,26 +357,25 @@ PerspectiveCorrection::Params PerspectiveCorrection::autocompute(ImageSource *sr
     // reset the pseudo-random seed for repeatability -- ashift_dt uses rand()
     // internally!
     srand(1);
-    
+
     bool res;
     if (control_lines == nullptr) {
-        res = do_get_structure(&module, &p, ASHIFT_ENHANCE_EDGES) && do_fit(&module, &p, fitaxis);
+        res = do_get_structure(&module, &p, ASHIFT_ENHANCE_EDGES)
+              && do_fit(&module, &p, fitaxis);
     } else {
-        std::unique_ptr<dt_iop_ashift_line_t[]> ashift_lines = toAshiftLines(control_lines);
-        dt_iop_ashift_gui_data_t *g = module.gui_data;
+        std::unique_ptr<dt_iop_ashift_line_t[]> ashift_lines =
+            toAshiftLines(control_lines);
+        dt_iop_ashift_gui_data_t* g = module.gui_data;
         g->lines_count = control_lines->size();
         g->lines = ashift_lines.get();
         g->lines_in_height = fh;
         g->lines_in_width = fw;
-        update_lines_count(g->lines, g->lines_count, &(g->vertical_count), &(g->horizontal_count));
+        update_lines_count(g->lines, g->lines_count, &(g->vertical_count),
+                           &(g->horizontal_count));
         res = do_fit(&module, &p, fitaxis, 2);
         g->lines = nullptr;
     }
-    Params retval = {
-        .angle = p.rotation,
-        .pitch = p.camera_pitch,
-        .yaw = p.camera_yaw
-    };
+    Params retval = { .angle = p.rotation, .pitch = p.camera_pitch, .yaw = p.camera_yaw };
 
     // cleanup the gui
     if (g.lines) free(g.lines);
@@ -386,9 +391,10 @@ PerspectiveCorrection::Params PerspectiveCorrection::autocompute(ImageSource *sr
     return retval;
 }
 
-
 /*
-void PerspectiveCorrection::autocrop(int width, int height, bool fixratio, const procparams::PerspectiveParams &params, const FramesMetaData *metadata, int &x, int &y, int &w, int &h)
+void PerspectiveCorrection::autocrop(int width, int height, bool fixratio, const
+procparams::PerspectiveParams &params, const FramesMetaData *metadata, int &x, int &y, int
+&w, int &h)
 {
     auto pp = import_meta(params, metadata);
     double cw, ch;
@@ -413,4 +419,4 @@ void PerspectiveCorrection::autocrop(int width, int height, bool fixratio, const
 }
 */
 
-} // namespace rtengine
+}  // namespace rtengine

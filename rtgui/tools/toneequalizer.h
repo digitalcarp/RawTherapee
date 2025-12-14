@@ -27,31 +27,39 @@
 
 #include <gtkmm.h>
 
-class ToneEqualizer: public ToolParamBlock, public AdjusterListener, public FoldableToolPanel, public CheckBoxListener {
+class ToneEqualizer :
+    public ToolParamBlock,
+    public AdjusterListener,
+    public FoldableToolPanel,
+    public CheckBoxListener
+{
 public:
     static const Glib::ustring TOOL_NAME;
 
     ToneEqualizer();
 
-    void read(const rtengine::procparams::ProcParams *pp, const ParamsEdited* pedited = nullptr) override;
-    void write(rtengine::procparams::ProcParams *pp, ParamsEdited* pedited = nullptr) override;
-    void setDefaults(const rtengine::procparams::ProcParams *defParams, const ParamsEdited* pedited = nullptr) override;
-    void adjusterChanged(Adjuster *a, double newval) override;
-    void adjusterAutoToggled(Adjuster *a, bool newval) override;
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
+    void adjusterChanged(Adjuster* a, double newval) override;
+    void adjusterAutoToggled(Adjuster* a, bool newval) override;
     void enabledChanged() override;
     void setBatchMode(bool batchMode) override;
     void setAdjusterBehavior(bool bands_add, bool regularization_add, bool pivot_add);
     void checkBoxToggled(CheckBox* c, CheckValue newval) override;
 
-    void trimValues(rtengine::procparams::ProcParams *pp) override;
+    void trimValues(rtengine::procparams::ProcParams* pp) override;
 
 private:
     void colormapToggled();
 
-    std::array<Adjuster *, 5> bands;
-    Adjuster *regularization;
-    Adjuster *pivot;
-    CheckBox *show_colormap;
+    std::array<Adjuster*, 5> bands;
+    Adjuster* regularization;
+    Adjuster* pivot;
+    CheckBox* show_colormap;
 
     rtengine::ProcEvent EvEnabled;
     rtengine::ProcEvent EvBands;

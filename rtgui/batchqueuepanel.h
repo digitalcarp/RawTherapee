@@ -30,7 +30,8 @@ class RTWindow;
 class FileCatalog;
 class Thumbnail;
 
-class BatchQueuePanel : public Gtk::Box,
+class BatchQueuePanel :
+    public Gtk::Box,
     public BatchQueueListener,
     public FormatChangeListener
 {
@@ -64,31 +65,37 @@ class BatchQueuePanel : public Gtk::Box,
     IdleRegister idle_register;
 
 public:
-    explicit BatchQueuePanel (FileCatalog* aFileCatalog);
+    explicit BatchQueuePanel(FileCatalog* aFileCatalog);
     ~BatchQueuePanel() override;
 
-    void init (RTWindow* parent);
+    void init(RTWindow* parent);
 
-    void addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries , bool head = false);
-    void saveOptions ();
+    void addBatchQueueJobs(const std::vector<BatchQueueEntry*>& entries,
+                           bool head = false);
+    void saveOptions();
 
-    bool handleShortcutKey (GdkEventKey* event);
+    bool handleShortcutKey(GdkEventKey* event);
 
     // batchqueuelistener interface
-    void queueSizeChanged(int qsize, bool queueRunning, bool queueError, const Glib::ustring& queueErrorMessage) override;
+    void queueSizeChanged(int qsize,
+                          bool queueRunning,
+                          bool queueError,
+                          const Glib::ustring& queueErrorMessage) override;
     bool canStartNext() override;
     void setDestinationPreviewText(const Glib::ustring& destinationPath) override;
 
 private:
-    void startBatchProc ();
-    void stopBatchProc ();
+    void startBatchProc();
+    void stopBatchProc();
     void startOrStopBatchProc();
     void setGuiFromBatchState(bool queueRunning, int qsize);
     void templateHelpButtonToggled();
     void populateTemplateHelpBuffer(Glib::RefPtr<Gtk::TextBuffer> buffer);
 
-    void pathFolderChanged ();
-    void pathFolderButtonPressed ();
+    void pathFolderChanged();
+    void pathFolderButtonPressed();
     void formatChanged(const Glib::ustring& format) override;
-    void updateTab (int qsize, int forceOrientation = 0); // forceOrientation=0: base on options / 1: horizontal / 2: vertical
+    void updateTab(int qsize,
+                   int forceOrientation = 0);  // forceOrientation=0: base on options / 1:
+                                               // horizontal / 2: vertical
 };

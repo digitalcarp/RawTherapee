@@ -39,46 +39,46 @@ protected:
 
     MyFlatCurve* CPointsCurve;
 
-    CoordinateAdjuster *CPointsCoordAdjuster;
+    CoordinateAdjuster* CPointsCoordAdjuster;
 
-    Gtk::Button*       saveCPoints;
-    Gtk::Button*       loadCPoints;
-    Gtk::Button*       copyCPoints;
-    Gtk::Button*       pasteCPoints;
+    Gtk::Button* saveCPoints;
+    Gtk::Button* loadCPoints;
+    Gtk::Button* copyCPoints;
+    Gtk::Button* pasteCPoints;
     Gtk::ToggleButton* editPointCPoints;
     Gtk::ToggleButton* editCPoints;
-    sigc::connection   editCPointsConn, editPointCPointsConn;
+    sigc::connection editCPointsConn, editPointCPointsConn;
 
 public:
     FlatCurveEditorSubGroup(CurveEditorGroup* prt, Glib::ustring& curveDir);
     ~FlatCurveEditorSubGroup() override;
 
     FlatCurveEditor* addCurve(Glib::ustring curveLabel = "", bool periodic = true);
-    //virtual void updateBackgroundHistogram (CurveEditor* ce);
-    void updateLocallabBackground(CurveEditor* ce) override;    
+    // virtual void updateBackgroundHistogram (CurveEditor* ce);
+    void updateLocallabBackground(CurveEditor* ce) override;
     void switchGUI() override;
-    void refresh(CurveEditor *curveToRefresh) override;
+    void refresh(CurveEditor* curveToRefresh) override;
     void editModeSwitchedOff() override;
-    void pipetteMouseOver(EditDataProvider *provider, int modifierKey) override;
-    bool pipetteButton1Pressed(EditDataProvider *provider, int modifierKey) override;
-    void pipetteButton1Released(EditDataProvider *provider) override;
-    void pipetteDrag(EditDataProvider *provider, int modifierKey) override;
-    void showCoordinateAdjuster(CoordinateProvider *provider) override;
+    void pipetteMouseOver(EditDataProvider* provider, int modifierKey) override;
+    bool pipetteButton1Pressed(EditDataProvider* provider, int modifierKey) override;
+    void pipetteButton1Released(EditDataProvider* provider) override;
+    void pipetteDrag(EditDataProvider* provider, int modifierKey) override;
+    void showCoordinateAdjuster(CoordinateProvider* provider) override;
     void stopNumericalAdjustment() override;
 
-    bool curveReset (CurveEditor *ce) override;
+    bool curveReset(CurveEditor* ce) override;
 
 protected:
-    void storeCurveValues (CurveEditor* ce, const std::vector<double>& p) override;
-    void storeDisplayedCurve () override;
-    void restoreDisplayedHistogram () override;
+    void storeCurveValues(CurveEditor* ce, const std::vector<double>& p) override;
+    void storeDisplayedCurve() override;
+    void restoreDisplayedHistogram() override;
     void restoreLocallabBackground() override;
-    void savePressed ();
-    void loadPressed ();
-    void copyPressed ();
-    void pastePressed ();
-    void removeEditor () override;
-    const std::vector<double> getCurveFromGUI (int type) override;
-    void editPointToggled(Gtk::ToggleButton *button);
-    void editToggled (Gtk::ToggleButton *button);
+    void savePressed();
+    void loadPressed();
+    void copyPressed();
+    void pastePressed();
+    void removeEditor() override;
+    const std::vector<double> getCurveFromGUI(int type) override;
+    void editPointToggled(Gtk::ToggleButton* button);
+    void editToggled(Gtk::ToggleButton* button);
 };

@@ -1,41 +1,32 @@
+#include "StopWatch.h"
 #include "color.h"
 #include "guidedfilter.h"
 #include "iccstore.h"
 #include "imagefloat.h"
 #include "improcfun.h"
 #include "sleef.h"
-#include "StopWatch.h"
 
-
-namespace
-{
+namespace {
 
 const std::vector<std::array<float, 3>> colormap = {
-    {0.5f, 0.f, 0.5f},
-    {0.5f, 0.f, 0.5f},
-    {0.5f, 0.f, 0.5f},
-    {0.5f, 0.f, 0.5f},
-    {0.5f, 0.f, 0.5f}, // blacks
-    {0.f, 0.f, 1.f}, // shadows
-    {0.5f, 0.5f, 0.5f}, // midtones
-    {1.f, 1.f, 0.f}, // highlights
-    {1.f, 0.f, 0.f}, // whites
-    {1.f, 0.f, 0.f},
-    {1.f, 0.f, 0.f},
-    {1.f, 0.f, 0.f},
-    {1.f, 0.f, 0.f},
-    {1.f, 0.f, 0.f},
-    {1.f, 0.f, 0.f},
+    { 0.5f, 0.f, 0.5f },  { 0.5f, 0.f, 0.5f }, { 0.5f, 0.f, 0.5f },
+    { 0.5f, 0.f, 0.5f },  { 0.5f, 0.f, 0.5f },  // blacks
+    { 0.f, 0.f, 1.f },                          // shadows
+    { 0.5f, 0.5f, 0.5f },                       // midtones
+    { 1.f, 1.f, 0.f },                          // highlights
+    { 1.f, 0.f, 0.f },                          // whites
+    { 1.f, 0.f, 0.f },    { 1.f, 0.f, 0.f },   { 1.f, 0.f, 0.f },
+    { 1.f, 0.f, 0.f },    { 1.f, 0.f, 0.f },   { 1.f, 0.f, 0.f },
 
 };
 
-
-void toneEqualizer(
-    array2D<float> &R, array2D<float> &G, array2D<float> &B,
-    const rtengine::ToneEqualizerParams &params,
-    const Glib::ustring &workingProfile,
-    double scale,
-    bool multithread)
+void toneEqualizer(array2D<float>& R,
+                   array2D<float>& G,
+                   array2D<float>& B,
+                   const rtengine::ToneEqualizerParams& params,
+                   const Glib::ustring& workingProfile,
+                   double scale,
+                   bool multithread)
 // adapted from the tone equalizer of darktable
 /*
     Copyright 2019 Alberto Griggio <alberto.griggio@gmail.com>
@@ -58,57 +49,59 @@ void toneEqualizer(
 */
 
 {
-   // BENCHFUN
+    // BENCHFUN
 
     const int W = R.getWidth();
     const int H = R.getHeight();
     array2D<float> Y(W, H);
 
-    const auto log2 =
-    [](float x) -> float {
+    const auto log2 = [](float x) -> float {
         static const float l2 = xlogf(2);
         return xlogf(x) / l2;
     };
 
-    const auto exp2 =
-    [](float x) -> float {
-        return pow_F(2.f, x);
-    };
+    const auto exp2 = [](float x) -> float { return pow_F(2.f, x); };
     // Build the luma channels: band-pass filters with gaussian windows of
     // std 2 EV, spaced by 2 EV
-    const float centers[15] = {
-        -16.0f, -14.0f, -12.0f, -10.0f, -8.0f, -6.0f,
-        -4.0f, -2.0f, 0.0f, 2.0f, 4.0f, 6.0f, 8.0f, 10.0f, 12.0f
-    };
+    const float centers[15] = { -16.0f, -14.0f, -12.0f, -10.0f, -8.0f,
+                                -6.0f,  -4.0f,  -2.0f,  0.0f,   2.0f,
+                                4.0f,   6.0f,   8.0f,   10.0f,  12.0f };
 
     const auto conv = [&](int v, float lo, float hi) -> float {
         const float f = v < 0 ? lo : hi;
         return exp2(float(v) / 100.f * f);
     };
     const float factors[15] = {
-        conv(params.bands[0], 2.f, 3.f), // -16 EV
-        conv(params.bands[0], 2.f, 3.f), // -14 EV
-        conv(params.bands[0], 2.f, 3.f), // -12 EV
-        conv(params.bands[0], 2.f, 3.f), // -10 EV
-        conv(params.bands[0], 2.f, 3.f), //  -8 EV
-        conv(params.bands[1], 2.f, 3.f), //  -6 EV
-        conv(params.bands[2], 2.5f, 2.5f), //  -4 EV
-        conv(params.bands[3], 3.f, 2.f), //  -2 EV
-        conv(params.bands[4], 3.f, 2.f), //   0 EV
-        conv(params.bands[4], 3.f, 2.f), //   2 EV
-        conv(params.bands[4], 3.f, 2.f), //   4 EV
-        conv(params.bands[4], 3.f, 2.f),  //   6 EV
-        // this settings under are very rarely used...images with very high DR - I add a slider, but it's not the goal: the goal is white distribution (in very rare case)
-        // I have not change "main" Tone Equalizer.
-        conv(params.bands[5], 3.f, 2.f),  //   8 EV  Added for white distribution (Cam16 and Log encode) and images with very high DR
-        conv(params.bands[5], 3.f, 2.f),  //   10 EV Added for white distribution(Cam16 and Log encode) and images with very high DR
-        conv(params.bands[5], 3.f, 2.f)  //   12 EV Added for white distribution(Cam16 and Log encode) and images with very high DR
+        conv(params.bands[0], 2.f, 3.f),    // -16 EV
+        conv(params.bands[0], 2.f, 3.f),    // -14 EV
+        conv(params.bands[0], 2.f, 3.f),    // -12 EV
+        conv(params.bands[0], 2.f, 3.f),    // -10 EV
+        conv(params.bands[0], 2.f, 3.f),    //  -8 EV
+        conv(params.bands[1], 2.f, 3.f),    //  -6 EV
+        conv(params.bands[2], 2.5f, 2.5f),  //  -4 EV
+        conv(params.bands[3], 3.f, 2.f),    //  -2 EV
+        conv(params.bands[4], 3.f, 2.f),    //   0 EV
+        conv(params.bands[4], 3.f, 2.f),    //   2 EV
+        conv(params.bands[4], 3.f, 2.f),    //   4 EV
+        conv(params.bands[4], 3.f, 2.f),    //   6 EV
+        // this settings under are very rarely used...images with very high DR - I add a
+        // slider, but it's not the goal: the goal is white distribution (in very rare
+        // case) I have not change "main" Tone Equalizer.
+        conv(params.bands[5], 3.f,
+             2.f),  //   8 EV  Added for white distribution (Cam16 and Log encode) and
+                    //   images with very high DR
+        conv(params.bands[5], 3.f,
+             2.f),  //   10 EV Added for white distribution(Cam16 and Log encode) and
+                    //   images with very high DR
+        conv(params.bands[5], 3.f, 2.f)  //   12 EV Added for white distribution(Cam16 and
+                                         //   Log encode) and images with very high DR
     };
 
-    rtengine::TMatrix ws = rtengine::ICCStore::getInstance()->workingSpaceMatrix(workingProfile);
+    rtengine::TMatrix ws =
+        rtengine::ICCStore::getInstance()->workingSpaceMatrix(workingProfile);
 
 #ifdef _OPENMP
-    #pragma omp parallel for if (multithread)
+#pragma omp parallel for if (multithread)
 #endif
     for (int y = 0; y < H; ++y) {
         for (int x = 0; x < W; ++x) {
@@ -130,11 +123,12 @@ void toneEqualizer(
         constexpr float base_posterization = 5.f;
 
 #ifdef _OPENMP
-        #pragma omp parallel for if (multithread)
+#pragma omp parallel for if (multithread)
 #endif
         for (int y = 0; y < H; ++y) {
             for (int x = 0; x < W; ++x) {
-                float l = rtengine::LIM(log2(rtengine::max(Y[y][x], 1e-9f)), centers[0], centers[13]);
+                float l = rtengine::LIM(log2(rtengine::max(Y[y][x], 1e-9f)), centers[0],
+                                        centers[13]);
                 float ll = round(l * base_posterization) / base_posterization;
                 Y2[y][x] = Y[y][x];
                 Y[y][x] = exp2(ll);
@@ -146,8 +140,7 @@ void toneEqualizer(
         rtengine::guidedFilter(Y2, Y, Y, radius, epsilon2, multithread);
     }
 
-    const auto gauss =
-    [](float b, float x) -> float {
+    const auto gauss = [](float b, float x) -> float {
         return xexpf((-rtengine::SQR(x - b) / 4.0f));
     };
 
@@ -161,8 +154,7 @@ void toneEqualizer(
     constexpr float luma_lo = -14.f;
     constexpr float luma_hi = 6.f;
 
-    const auto process_pixel =
-    [&](float y) -> float {
+    const auto process_pixel = [&](float y) -> float {
         // convert to log space
         const float luma = rtengine::LIM(log2(rtengine::max(y, 0.f)), luma_lo, luma_hi);
 
@@ -170,8 +162,7 @@ void toneEqualizer(
         // luminance channel to current pixel
         float correction = 0.0f;
 
-        for (int c = 0; c < 15; ++c)
-        {
+        for (int c = 0; c < 15; ++c) {
             correction += gauss(centers[c], luma) * factors[c];
         }
 
@@ -185,41 +176,40 @@ void toneEqualizer(
         rtengine::lcmsMutex->lock();
         cmsHPROFILE in = rtengine::ICCStore::getInstance()->getsRGBProfile();
         cmsHPROFILE out = rtengine::ICCStore::getInstance()->workingSpace(workingProfile);
-        cmsHTRANSFORM xform = cmsCreateTransform(in, TYPE_RGB_FLT, out, TYPE_RGB_FLT, INTENT_RELATIVE_COLORIMETRIC, cmsFLAGS_NOOPTIMIZE | cmsFLAGS_NOCACHE);
+        cmsHTRANSFORM xform = cmsCreateTransform(in, TYPE_RGB_FLT, out, TYPE_RGB_FLT,
+                                                 INTENT_RELATIVE_COLORIMETRIC,
+                                                 cmsFLAGS_NOOPTIMIZE | cmsFLAGS_NOCACHE);
         rtengine::lcmsMutex->unlock();
 
-        for (auto &c : colormap) {
+        for (auto& c : colormap) {
             cur_colormap.push_back(c);
-            auto &cc = cur_colormap.back();
+            auto& cc = cur_colormap.back();
             cmsDoTransform(xform, &cc[0], &cc[0], 1);
         }
 
         cmsDeleteTransform(xform);
     }
 
-    const auto process_colormap =
-        [&](float y) -> std::array<float, 3>
-        {
-            std::array<float, 3> ret = { 0.f, 0.f, 0.f };
+    const auto process_colormap = [&](float y) -> std::array<float, 3> {
+        std::array<float, 3> ret = { 0.f, 0.f, 0.f };
 
-            // convert to log space
-            const float luma = rtengine::LIM(log2(rtengine::max(y, 0.f)), luma_lo, luma_hi);
+        // convert to log space
+        const float luma = rtengine::LIM(log2(rtengine::max(y, 0.f)), luma_lo, luma_hi);
 
-            // build the correction as the sum of the contribution of each
-            // luminance channel to current pixel
-            for (int c = 0; c < 15; ++c) {
-                float w = gauss(centers[c], luma);
-                for (int i = 0; i < 3; ++i) {
-                    ret[i] += w * cur_colormap[c][i];
-                }
-            }
+        // build the correction as the sum of the contribution of each
+        // luminance channel to current pixel
+        for (int c = 0; c < 15; ++c) {
+            float w = gauss(centers[c], luma);
             for (int i = 0; i < 3; ++i) {
-                ret[i] = rtengine::LIM01(ret[i] / w_sum);
+                ret[i] += w * cur_colormap[c][i];
             }
+        }
+        for (int i = 0; i < 3; ++i) {
+            ret[i] = rtengine::LIM01(ret[i] / w_sum);
+        }
 
-            return ret;
-        };
-
+        return ret;
+    };
 
 #ifdef __SSE2__
     vfloat vfactors[15];
@@ -230,8 +220,7 @@ void toneEqualizer(
         vcenters[i] = F2V(centers[i]);
     }
 
-    const auto vgauss =
-    [](vfloat b, vfloat x) -> vfloat {
+    const auto vgauss = [](vfloat b, vfloat x) -> vfloat {
         static const vfloat fourv = F2V(4.f);
         return xexpf((-rtengine::SQR(x - b) / fourv));
     };
@@ -243,14 +232,13 @@ void toneEqualizer(
     const vfloat vluma_hi = F2V(luma_hi);
     const vfloat xlog2v = F2V(xlogf(2.f));
 
-    const auto vprocess_pixel =
-    [&](vfloat y) -> vfloat {
-        const vfloat luma = vminf(vmaxf(xlogf(vmaxf(y, zerov)) / xlog2v, vluma_lo), vluma_hi);
+    const auto vprocess_pixel = [&](vfloat y) -> vfloat {
+        const vfloat luma =
+            vminf(vmaxf(xlogf(vmaxf(y, zerov)) / xlog2v, vluma_lo), vluma_hi);
 
         vfloat correction = zerov;
 
-        for (int c = 0; c < 15; ++c)
-        {
+        for (int c = 0; c < 15; ++c) {
             correction += vgauss(vcenters[c], luma) * vfactors[c];
         }
 
@@ -259,16 +247,14 @@ void toneEqualizer(
         return correction;
     };
 
-
     vfloat v1 = F2V(1.f);
     vfloat v65535 = F2V(65535.f);
-#endif // __SSE2__
-
+#endif  // __SSE2__
 
     if (params.show_colormap) {
         LUTf lut_r(65537), lut_g(65537), lut_b(65537);
         for (int i = 0; i < 65536; ++i) {
-            float y = float(i)/65535.f;
+            float y = float(i) / 65535.f;
             auto rgb = process_colormap(y);
             lut_r[i] = rgb[0];
             lut_g[i] = rgb[1];
@@ -279,7 +265,7 @@ void toneEqualizer(
         lut_b[65536] = cur_colormap.back()[2];
 
 #ifdef _OPENMP
-#       pragma omp parallel for if (multithread)
+#pragma omp parallel for if (multithread)
 #endif
         for (int y = 0; y < H; ++y) {
             for (int x = 0; x < W; ++x) {
@@ -292,7 +278,6 @@ void toneEqualizer(
         return;
     }
 
-
     LUTf lut(65536);
 
     for (int i = 0; i < 65536; ++i) {
@@ -302,11 +287,10 @@ void toneEqualizer(
     }
 
 #ifdef _OPENMP
-    #pragma omp parallel for if (multithread)
+#pragma omp parallel for if (multithread)
 #endif
     for (int y = 0; y < H; ++y) {
         int x = 0;
-
 
 #ifdef __SSE2__
 
@@ -326,7 +310,7 @@ void toneEqualizer(
             STVF(B[y][x], LVF(B[y][x]) * corr);
         }
 
-#endif // __SSE2__
+#endif  // __SSE2__
 
         for (; x < W; ++x) {
             float cY = Y[y][x];
@@ -336,21 +320,17 @@ void toneEqualizer(
             B[y][x] *= corr;
         }
     }
-
 }
 
-}
+}  // namespace
 
+namespace rtengine {
 
-namespace rtengine
-{
-
-void ImProcFunctions::toneEqualizer(
-    Imagefloat *rgb,
-    const ToneEqualizerParams &params,
-    const Glib::ustring &workingProfile,
-    double scale,
-    bool multiThread)
+void ImProcFunctions::toneEqualizer(Imagefloat* rgb,
+                                    const ToneEqualizerParams& params,
+                                    const Glib::ustring& workingProfile,
+                                    double scale,
+                                    bool multiThread)
 {
     if (!params.enabled) {
         return;
@@ -371,12 +351,13 @@ void ImProcFunctions::toneEqualizer(
 
     ::toneEqualizer(R, G, B, params, workingProfile, scale, multiThread);
 
-    rgb->multiply(params.show_colormap ? 65535.f : 1.f/gain, multiThread);
+    rgb->multiply(params.show_colormap ? 65535.f : 1.f / gain, multiThread);
 }
 
-void ImProcFunctions::toneEqualizer(Imagefloat *rgb)
+void ImProcFunctions::toneEqualizer(Imagefloat* rgb)
 {
-    toneEqualizer(rgb, params->toneEqualizer, params->icm.workingProfile, scale, multiThread);
+    toneEqualizer(rgb, params->toneEqualizer, params->icm.workingProfile, scale,
+                  multiThread);
 }
 
-}
+}  // namespace rtengine

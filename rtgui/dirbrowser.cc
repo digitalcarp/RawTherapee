@@ -18,92 +18,93 @@
  */
 #include "dirbrowser.h"
 
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
 #include "guiutils.h"
-#include "rtsurface.h"
 #include "multilangmgr.h"
 #include "options.h"
+#include "rtsurface.h"
 
 #ifdef _WIN32
 #include "rtengine/leanwindows.h"
-#endif // _WIN32
+#endif  // _WIN32
 
-namespace
-{
+namespace {
 
-std::vector<Glib::ustring> listSubDirs (const Glib::RefPtr<Gio::File>& dir, bool addHidden)
+std::vector<Glib::ustring> listSubDirs(const Glib::RefPtr<Gio::File>& dir, bool addHidden)
 {
     std::vector<Glib::ustring> subDirs;
 
     try {
 
         // CD-ROM with no disc inserted are reported, but do not exist.
-        if (!Glib::file_test (dir->get_path (), Glib::FILE_TEST_EXISTS)) {
+        if (!Glib::file_test(dir->get_path(), Glib::FILE_TEST_EXISTS)) {
             return subDirs;
         }
 
-        auto enumerator = dir->enumerate_children ("standard::name,standard::type,standard::is-hidden");
+        auto enumerator =
+            dir->enumerate_children("standard::name,standard::type,standard::is-hidden");
 
         while (true) {
             try {
-                auto file = enumerator->next_file ();
+                auto file = enumerator->next_file();
                 if (!file) {
                     break;
                 }
-                if (file->get_file_type () != Gio::FILE_TYPE_DIRECTORY) {
+                if (file->get_file_type() != Gio::FILE_TYPE_DIRECTORY) {
                     continue;
                 }
-                if (!addHidden && file->is_hidden ()) {
+                if (!addHidden && file->is_hidden()) {
                     continue;
                 }
-                subDirs.push_back (file->get_name ());
+                subDirs.push_back(file->get_name());
             } catch (const Glib::Exception& exception) {
 
                 if (rtengine::settings->verbose) {
                     std::cerr << exception.what().c_str() << std::endl;
                 }
-
             }
         }
 
     } catch (const Glib::Exception& exception) {
 
         if (rtengine::settings->verbose) {
-            std::cerr << "Failed to list subdirectories of \"" << dir->get_parse_name() << "\": " << exception.what () << std::endl;
+            std::cerr << "Failed to list subdirectories of \"" << dir->get_parse_name()
+                      << "\": " << exception.what() << std::endl;
         }
-
     }
 
     return subDirs;
 }
 
-}
+}  // namespace
 
-DirBrowser::DirBrowser () : dirTreeModel(),
-    dtColumns(),
-    tvc(M("DIRBROWSER_FOLDERS")),
+DirBrowser::DirBrowser()
+    : dirTreeModel(),
+      dtColumns(),
+      tvc(M("DIRBROWSER_FOLDERS")),
 
-    openfolder("folder-open-small"),
-    closedfolder("folder-closed-small"),
-    icdrom("device-optical"),
-    ifloppy("device-floppy"),
-    ihdd("device-hdd"),
-    inetwork("device-network"),
-    iremovable("device-usb"),
+      openfolder("folder-open-small"),
+      closedfolder("folder-closed-small"),
+      icdrom("device-optical"),
+      ifloppy("device-floppy"),
+      ihdd("device-hdd"),
+      inetwork("device-network"),
+      iremovable("device-usb"),
 
-    expandSuccess(false)
+      expandSuccess(false)
 #ifdef _WIN32
-    , volumes(0)
+      ,
+      volumes(0)
 #endif
 {
     set_orientation(Gtk::ORIENTATION_VERTICAL);
-    dirtree = Gtk::manage ( new Gtk::TreeView() );
-    scrolledwindow4 = Gtk::manage ( new Gtk::ScrolledWindow() );
+    dirtree = Gtk::manage(new Gtk::TreeView());
+    scrolledwindow4 = Gtk::manage(new Gtk::ScrolledWindow());
     crt.property_ellipsize() = Pango::ELLIPSIZE_END;
 
-//   dirtree->set_flags(Gtk::CAN_FOCUS);
+    //   dirtree->set_flags(Gtk::CAN_FOCUS);
     dirtree->set_headers_visible();
     dirtree->set_headers_clickable();
     dirtree->set_rules_hint(false);
@@ -115,9 +116,9 @@ DirBrowser::DirBrowser () : dirTreeModel(),
     scrolledwindow4->property_window_placement().set_value(Gtk::CORNER_TOP_LEFT);
     scrolledwindow4->add(*dirtree);
 
-    pack_start (*scrolledwindow4);
-    dirtree->show ();
-    scrolledwindow4->show ();
+    pack_start(*scrolledwindow4);
+    dirtree->show();
+    scrolledwindow4->show();
 }
 
 DirBrowser::~DirBrowser()
@@ -125,19 +126,19 @@ DirBrowser::~DirBrowser()
     idle_register.destroy();
 }
 
-void DirBrowser::fillDirTree ()
+void DirBrowser::fillDirTree()
 {
-    //Create the Tree model:
+    // Create the Tree model:
     dirTreeModel = Gtk::TreeStore::create(dtColumns);
-    dirtree->set_model (dirTreeModel);
+    dirtree->set_model(dirTreeModel);
 
-    fillRoot ();
+    fillRoot();
 
-    Gtk::CellRendererPixbuf* render_pb = Gtk::manage ( new Gtk::CellRendererPixbuf () );
+    Gtk::CellRendererPixbuf* render_pb = Gtk::manage(new Gtk::CellRendererPixbuf());
     render_pb->property_stock_size() = Gtk::ICON_SIZE_SMALL_TOOLBAR;
-    tvc.pack_start (*render_pb, false);
+    tvc.pack_start(*render_pb, false);
     tvc.add_attribute(*render_pb, "icon-name", dtColumns.icon_name);
-    tvc.pack_start (crt);
+    tvc.pack_start(crt);
     tvc.add_attribute(crt, "text", dtColumns.filename);
 
     dirtree->append_column(tvc);
@@ -153,108 +154,118 @@ void DirBrowser::fillDirTree ()
     crt.property_ypad() = 0;
     render_pb->property_ypad() = 0;
 
-    dirtree->signal_row_expanded().connect(sigc::mem_fun(*this, &DirBrowser::row_expanded));
-    dirtree->signal_row_collapsed().connect(sigc::mem_fun(*this, &DirBrowser::row_collapsed));
-    dirtree->signal_row_activated().connect(sigc::mem_fun(*this, &DirBrowser::row_activated));
-    dirTreeModel->signal_sort_column_changed().connect(sigc::mem_fun(*this, &DirBrowser::on_sort_column_changed));
+    dirtree->signal_row_expanded().connect(
+        sigc::mem_fun(*this, &DirBrowser::row_expanded));
+    dirtree->signal_row_collapsed().connect(
+        sigc::mem_fun(*this, &DirBrowser::row_collapsed));
+    dirtree->signal_row_activated().connect(
+        sigc::mem_fun(*this, &DirBrowser::row_activated));
+    dirTreeModel->signal_sort_column_changed().connect(
+        sigc::mem_fun(*this, &DirBrowser::on_sort_column_changed));
 }
 
 #ifdef _WIN32
-void DirBrowser::addRoot (char letter)
+void DirBrowser::addRoot(char letter)
 {
 
     char volume[4];
     volume[0] = letter;
-    strcpy (volume + 1, ":\\");
+    strcpy(volume + 1, ":\\");
 
     Gtk::TreeModel::iterator root = dirTreeModel->append();
-    root->set_value (dtColumns.filename, Glib::ustring(volume));
-    root->set_value (dtColumns.dirname, Glib::ustring(volume));
+    root->set_value(dtColumns.filename, Glib::ustring(volume));
+    root->set_value(dtColumns.dirname, Glib::ustring(volume));
 
-    int type = GetDriveType (volume);
+    int type = GetDriveType(volume);
 
     if (type == DRIVE_CDROM) {
-        root->set_value (dtColumns.icon_name, icdrom);
+        root->set_value(dtColumns.icon_name, icdrom);
     } else if (type == DRIVE_REMOVABLE) {
         if (letter - 'A' < 2) {
-            root->set_value (dtColumns.icon_name, ifloppy);
+            root->set_value(dtColumns.icon_name, ifloppy);
         } else {
-            root->set_value (dtColumns.icon_name, iremovable);
+            root->set_value(dtColumns.icon_name, iremovable);
         }
     } else if (type == DRIVE_REMOTE) {
-        root->set_value (dtColumns.icon_name, inetwork);
+        root->set_value(dtColumns.icon_name, inetwork);
     } else if (type == DRIVE_FIXED) {
-        root->set_value (dtColumns.icon_name, ihdd);
+        root->set_value(dtColumns.icon_name, ihdd);
     }
 
-    Gtk::TreeModel::iterator child = dirTreeModel->append (root->children());
-    child->set_value (dtColumns.filename, Glib::ustring("foo"));
+    Gtk::TreeModel::iterator child = dirTreeModel->append(root->children());
+    child->set_value(dtColumns.filename, Glib::ustring("foo"));
 }
 
-void DirBrowser::updateDirTreeRoot ()
+void DirBrowser::updateDirTreeRoot()
 {
 
-    for (Gtk::TreeModel::iterator i = dirTreeModel->children().begin(); i != dirTreeModel->children().end(); ++i) {
-        updateDirTree (i);
+    for (Gtk::TreeModel::iterator i = dirTreeModel->children().begin();
+         i != dirTreeModel->children().end(); ++i)
+    {
+        updateDirTree(i);
     }
 }
 
-void DirBrowser::updateDirTree (const Gtk::TreeModel::iterator& iter)
+void DirBrowser::updateDirTree(const Gtk::TreeModel::iterator& iter)
 {
 
-    if (dirtree->row_expanded (dirTreeModel->get_path (iter))) {
-        updateDir (iter);
+    if (dirtree->row_expanded(dirTreeModel->get_path(iter))) {
+        updateDir(iter);
 
-        for (Gtk::TreeModel::iterator i = iter->children().begin(); i != iter->children().end(); ++i) {
-            updateDirTree (i);
+        for (Gtk::TreeModel::iterator i = iter->children().begin();
+             i != iter->children().end(); ++i)
+        {
+            updateDirTree(i);
         }
     }
 }
 
-void DirBrowser::updateVolumes ()
+void DirBrowser::updateVolumes()
 {
 
-    unsigned int nvolumes = GetLogicalDrives ();
+    unsigned int nvolumes = GetLogicalDrives();
 
     if (nvolumes != volumes) {
         GThreadLock lock;
 
         for (int i = 0; i < 32; i++)
-            if (((volumes >> i) & 1) && !((nvolumes >> i) & 1)) { // volume i has been deleted
-                for (Gtk::TreeModel::iterator iter = dirTreeModel->children().begin(); iter != dirTreeModel->children().end(); ++iter)
-                    if (iter->get_value (dtColumns.filename).c_str()[0] - 'A' == i) {
-                        dirTreeModel->erase (iter);
+            if (((volumes >> i) & 1) && !((nvolumes >> i) & 1))
+            {  // volume i has been deleted
+                for (Gtk::TreeModel::iterator iter = dirTreeModel->children().begin();
+                     iter != dirTreeModel->children().end(); ++iter)
+                    if (iter->get_value(dtColumns.filename).c_str()[0] - 'A' == i) {
+                        dirTreeModel->erase(iter);
                         break;
                     }
             } else if (!((volumes >> i) & 1) && ((nvolumes >> i) & 1)) {
-                addRoot ('A' + i);    // volume i has been added
+                addRoot('A' + i);  // volume i has been added
             }
 
         volumes = nvolumes;
     }
 }
 
-int updateVolumesUI (void* br)
+int updateVolumesUI(void* br)
 {
-    (static_cast<DirBrowser*>(br))->updateVolumes ();
+    (static_cast<DirBrowser*>(br))->updateVolumes();
     return 1;
 }
 
 #endif
 
-void DirBrowser::fillRoot ()
+void DirBrowser::fillRoot()
 {
 
 #ifdef _WIN32
-    volumes = GetLogicalDrives ();
+    volumes = GetLogicalDrives();
 
     for (int i = 0; i < 32; i++)
         if ((volumes >> i) & 1) {
-            addRoot ('A' + i);
+            addRoot('A' + i);
         }
 
     // since sigc++ is not thread safe, we have to use the glib function
-    g_timeout_add (5000, updateVolumesUI, this);
+    g_timeout_add(5000, updateVolumesUI, this);
 #else
     Gtk::TreeModel::Row rootRow = *(dirTreeModel->append());
     rootRow[dtColumns.filename] = "/";
@@ -270,7 +281,8 @@ void DirBrowser::on_sort_column_changed() const
     options.dirBrowserSortType = tvc.get_sort_order();
 }
 
-void DirBrowser::row_expanded (const Gtk::TreeModel::iterator& iter, const Gtk::TreeModel::Path& path)
+void DirBrowser::row_expanded(const Gtk::TreeModel::iterator& iter,
+                              const Gtk::TreeModel::Path& path)
 {
 
     expandSuccess = false;
@@ -283,25 +295,26 @@ void DirBrowser::row_expanded (const Gtk::TreeModel::iterator& iter, const Gtk::
     int prevSortColumn;
     Gtk::SortType prevSortType;
     dirTreeModel->get_sort_column_id(prevSortColumn, prevSortType);
-    dirTreeModel->set_sort_column(Gtk::TreeSortable::DEFAULT_UNSORTED_COLUMN_ID, Gtk::SORT_ASCENDING);
+    dirTreeModel->set_sort_column(Gtk::TreeSortable::DEFAULT_UNSORTED_COLUMN_ID,
+                                  Gtk::SORT_ASCENDING);
 
     const auto& options = App::get().options();
-    auto dir = Gio::File::create_for_path (iter->get_value (dtColumns.dirname));
-    auto subDirs = listSubDirs (dir, options.fbShowHidden);
+    auto dir = Gio::File::create_for_path(iter->get_value(dtColumns.dirname));
+    auto subDirs = listSubDirs(dir, options.fbShowHidden);
 
     Gtk::TreeNodeChildren children = iter->children();
     std::list<Gtk::TreeIter> forErase(children.begin(), children.end());
 
-    std::sort (subDirs.begin (), subDirs.end (), [&](const Glib::ustring& firstDir, const Glib::ustring& secondDir)
-    {
-        switch (options.dirBrowserSortType) {
-        default:
-        case Gtk::SORT_ASCENDING:
-            return firstDir < secondDir;
-        case Gtk::SORT_DESCENDING:
-            return firstDir > secondDir;
-        }
-    });
+    std::sort(subDirs.begin(), subDirs.end(),
+              [&](const Glib::ustring& firstDir, const Glib::ustring& secondDir) {
+                  switch (options.dirBrowserSortType) {
+                  default:
+                  case Gtk::SORT_ASCENDING:
+                      return firstDir < secondDir;
+                  case Gtk::SORT_DESCENDING:
+                      return firstDir > secondDir;
+                  }
+              });
 
     for (auto it = subDirs.begin(), end = subDirs.end(); it != end; ++it) {
         addDir(iter, *it);
@@ -316,16 +329,21 @@ void DirBrowser::row_expanded (const Gtk::TreeModel::iterator& iter, const Gtk::
     expandSuccess = true;
 
     // Update row icon (only if row icon is not a volume one or is empty)
-    if (iter->get_value(dtColumns.icon_name) == closedfolder || iter->get_value(dtColumns.icon_name) == "") {
+    if (iter->get_value(dtColumns.icon_name) == closedfolder
+        || iter->get_value(dtColumns.icon_name) == "")
+    {
         iter->set_value(dtColumns.icon_name, openfolder);
     }
 
-    Glib::RefPtr<Gio::FileMonitor> monitor = dir->monitor_directory(Gio::FileMonitorFlags::FILE_MONITOR_WATCH_MOVES);
-    iter->set_value (dtColumns.monitor, monitor);
-    monitor->signal_changed().connect (sigc::bind(sigc::mem_fun(*this, &DirBrowser::file_changed), iter, dir->get_parse_name()));
+    Glib::RefPtr<Gio::FileMonitor> monitor =
+        dir->monitor_directory(Gio::FileMonitorFlags::FILE_MONITOR_WATCH_MOVES);
+    iter->set_value(dtColumns.monitor, monitor);
+    monitor->signal_changed().connect(sigc::bind(
+        sigc::mem_fun(*this, &DirBrowser::file_changed), iter, dir->get_parse_name()));
 }
 
-void DirBrowser::row_collapsed (const Gtk::TreeModel::iterator& iter, const Gtk::TreeModel::Path& path)
+void DirBrowser::row_collapsed(const Gtk::TreeModel::iterator& iter,
+                               const Gtk::TreeModel::Path& path)
 {
     // Update row icon (only if row icon is not a volume one)
     if (iter->get_value(dtColumns.icon_name) == openfolder) {
@@ -333,7 +351,7 @@ void DirBrowser::row_collapsed (const Gtk::TreeModel::iterator& iter, const Gtk:
     }
 }
 
-void DirBrowser::updateDir (const Gtk::TreeModel::iterator& iter)
+void DirBrowser::updateDir(const Gtk::TreeModel::iterator& iter)
 {
 
     // first test if some files are deleted
@@ -342,76 +360,84 @@ void DirBrowser::updateDir (const Gtk::TreeModel::iterator& iter)
     while (change) {
         change = false;
 
-        for (Gtk::TreeModel::iterator it = iter->children().begin(); it != iter->children().end(); ++it)
-            if (!Glib::file_test (it->get_value (dtColumns.dirname), Glib::FILE_TEST_EXISTS)
-                    || !Glib::file_test (it->get_value (dtColumns.dirname), Glib::FILE_TEST_IS_DIR)) {
+        for (Gtk::TreeModel::iterator it = iter->children().begin();
+             it != iter->children().end(); ++it)
+            if (!Glib::file_test(it->get_value(dtColumns.dirname), Glib::FILE_TEST_EXISTS)
+                || !Glib::file_test(it->get_value(dtColumns.dirname),
+                                    Glib::FILE_TEST_IS_DIR))
+            {
                 GThreadLock lock;
-                dirTreeModel->erase (it);
+                dirTreeModel->erase(it);
                 change = true;
                 break;
             }
     }
 
     // test if new files are created
-    auto dir = Gio::File::create_for_path (iter->get_value (dtColumns.dirname));
-    auto subDirs = listSubDirs (dir, App::get().options().fbShowHidden);
+    auto dir = Gio::File::create_for_path(iter->get_value(dtColumns.dirname));
+    auto subDirs = listSubDirs(dir, App::get().options().fbShowHidden);
 
     for (size_t i = 0; i < subDirs.size(); i++) {
         bool found = false;
 
-        for (Gtk::TreeModel::iterator it = iter->children().begin(); it != iter->children().end() && !found ; ++it) {
-            found = (it->get_value (dtColumns.filename) == subDirs[i]);
+        for (Gtk::TreeModel::iterator it = iter->children().begin();
+             it != iter->children().end() && !found; ++it)
+        {
+            found = (it->get_value(dtColumns.filename) == subDirs[i]);
         }
 
         if (!found) {
             GThreadLock lock;
-            addDir (iter, subDirs[i]);
+            addDir(iter, subDirs[i]);
         }
     }
 }
 
-void DirBrowser::addDir (const Gtk::TreeModel::iterator& iter, const Glib::ustring& dirname)
+void DirBrowser::addDir(const Gtk::TreeModel::iterator& iter,
+                        const Glib::ustring& dirname)
 {
 
     Gtk::TreeModel::iterator child = dirTreeModel->append(iter->children());
-    child->set_value (dtColumns.filename, dirname);
-    child->set_value (dtColumns.icon_name, closedfolder);
-    Glib::ustring fullname = Glib::build_filename (iter->get_value (dtColumns.dirname), dirname);
-    child->set_value (dtColumns.dirname, fullname);
+    child->set_value(dtColumns.filename, dirname);
+    child->set_value(dtColumns.icon_name, closedfolder);
+    Glib::ustring fullname =
+        Glib::build_filename(iter->get_value(dtColumns.dirname), dirname);
+    child->set_value(dtColumns.dirname, fullname);
     Gtk::TreeModel::iterator fooRow = dirTreeModel->append(child->children());
-    fooRow->set_value (dtColumns.filename, Glib::ustring("foo"));
+    fooRow->set_value(dtColumns.filename, Glib::ustring("foo"));
 }
 
-void DirBrowser::row_activated (const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column)
+void DirBrowser::row_activated(const Gtk::TreeModel::Path& path,
+                               Gtk::TreeViewColumn* column)
 {
 
-    Glib::ustring dname = dirTreeModel->get_iter (path)->get_value (dtColumns.dirname);
+    Glib::ustring dname = dirTreeModel->get_iter(path)->get_value(dtColumns.dirname);
 
-    if (Glib::file_test (dname, Glib::FILE_TEST_IS_DIR)) {
-        dirSelectionSignal (dname, Glib::ustring());
+    if (Glib::file_test(dname, Glib::FILE_TEST_IS_DIR)) {
+        dirSelectionSignal(dname, Glib::ustring());
         dirtree->expand_row(path, false);
     }
 }
 
-Gtk::TreePath DirBrowser::expandToDir (const Glib::ustring& absDirPath)
+Gtk::TreePath DirBrowser::expandToDir(const Glib::ustring& absDirPath)
 {
 
     Gtk::TreeModel::Path path;
     path.push_back(0);
 
-    char* dcpy = strdup (absDirPath.c_str());
-    char* dir = strtok (dcpy, "/\\");
+    char* dcpy = strdup(absDirPath.c_str());
+    char* dir = strtok(dcpy, "/\\");
 #ifdef _WIN32
     int count = 0;
 #endif
     expandSuccess = true;
 
 #ifndef _WIN32
-    Gtk::TreeModel::iterator j = dirTreeModel->get_iter (path);
-    path.up ();
-    path.push_back (0);
+    Gtk::TreeModel::iterator j = dirTreeModel->get_iter(path);
+    path.up();
+    path.push_back(0);
     row_expanded(j, path);
-    path.push_back (0);
+    path.push_back(0);
 #endif
 
     while (dir) {
@@ -423,7 +449,7 @@ Gtk::TreePath DirBrowser::expandToDir (const Glib::ustring& absDirPath)
         }
 
 #endif
-        Gtk::TreeModel::iterator i = dirTreeModel->get_iter (path);
+        Gtk::TreeModel::iterator i = dirTreeModel->get_iter(path);
         int ix = 0;
 
         while (i && expandSuccess) {
@@ -436,10 +462,10 @@ Gtk::TreePath DirBrowser::expandToDir (const Glib::ustring& absDirPath)
 
             if (str == dirstr) {
 #endif
-                path.up ();
-                path.push_back (ix);
+                path.up();
+                path.push_back(ix);
                 row_expanded(i, path);
-                path.push_back (0);
+                path.push_back(0);
                 break;
             }
 
@@ -454,39 +480,44 @@ Gtk::TreePath DirBrowser::expandToDir (const Glib::ustring& absDirPath)
 
     free(dcpy);
 
-    path.up ();
-    dirtree->expand_to_path (path);
+    path.up();
+    dirtree->expand_to_path(path);
 
     return path;
 }
 
-void DirBrowser::open (const Glib::ustring& dirname, const Glib::ustring& fileName)
+void DirBrowser::open(const Glib::ustring& dirname, const Glib::ustring& fileName)
 {
 
-    dirtree->collapse_all ();
+    dirtree->collapse_all();
 
-    // WARNING & TODO: One should test here if the directory/file has R/W access permission to avoid crash
+    // WARNING & TODO: One should test here if the directory/file has R/W access
+    // permission to avoid crash
 
     Glib::RefPtr<Gio::File> dir = Gio::File::create_for_path(dirname);
 
-    if( !dir->query_exists()) {
+    if (!dir->query_exists()) {
         return;
     }
 
-    Glib::ustring absDirPath = dir->get_parse_name ();
-    Gtk::TreePath path = expandToDir (absDirPath);
-    dirtree->scroll_to_row (path);
-    dirtree->get_selection()->select (path);
+    Glib::ustring absDirPath = dir->get_parse_name();
+    Gtk::TreePath path = expandToDir(absDirPath);
+    dirtree->scroll_to_row(path);
+    dirtree->get_selection()->select(path);
     Glib::ustring absFilePath;
 
     if (!fileName.empty()) {
-        absFilePath = Glib::build_filename (absDirPath, fileName);
+        absFilePath = Glib::build_filename(absDirPath, fileName);
     }
 
-    dirSelectionSignal (absDirPath, absFilePath);
+    dirSelectionSignal(absDirPath, absFilePath);
 }
 
-void DirBrowser::file_changed (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitorEvent event_type, const Gtk::TreeModel::iterator& iter, const Glib::ustring& dirName)
+void DirBrowser::file_changed(const Glib::RefPtr<Gio::File>& file,
+                              const Glib::RefPtr<Gio::File>& other_file,
+                              Gio::FileMonitorEvent event_type,
+                              const Gtk::TreeModel::iterator& iter,
+                              const Glib::ustring& dirName)
 {
     // file is the file that is/was in the monitored directory. other_file is
     // null if only one file is involved (create/delete events), the file that
@@ -494,31 +525,30 @@ void DirBrowser::file_changed (const Glib::RefPtr<Gio::File>& file, const Glib::
     // to inspect the file type of the changed file, so we decide which file to
     // use based on the event type.
     const Glib::RefPtr<Gio::File> current_file =
-        (event_type == Gio::FILE_MONITOR_EVENT_MOVED ||
-            event_type == Gio::FILE_MONITOR_EVENT_RENAMED ||
-            event_type == Gio::FILE_MONITOR_EVENT_MOVED_OUT)
+        (event_type == Gio::FILE_MONITOR_EVENT_MOVED
+         || event_type == Gio::FILE_MONITOR_EVENT_RENAMED
+         || event_type == Gio::FILE_MONITOR_EVENT_MOVED_OUT)
             ? other_file
             : file;
 
     // No need to update the directory if the even type is not rename, move,
     // create, or delete, or if the file is not a directory.
-    if (!current_file ||
-        event_type == Gio::FILE_MONITOR_EVENT_CHANGED ||
-        event_type == Gio::FILE_MONITOR_EVENT_CHANGES_DONE_HINT ||
-        event_type == Gio::FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED ||
-        event_type == Gio::FILE_MONITOR_EVENT_PRE_UNMOUNT ||
-        (event_type != Gio::FILE_MONITOR_EVENT_DELETED &&
-            event_type != Gio::FILE_MONITOR_EVENT_UNMOUNTED &&
-            !Glib::file_test(current_file->get_path(), Glib::FILE_TEST_IS_DIR))) {
+    if (!current_file || event_type == Gio::FILE_MONITOR_EVENT_CHANGED
+        || event_type == Gio::FILE_MONITOR_EVENT_CHANGES_DONE_HINT
+        || event_type == Gio::FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED
+        || event_type == Gio::FILE_MONITOR_EVENT_PRE_UNMOUNT
+        || (event_type != Gio::FILE_MONITOR_EVENT_DELETED
+            && event_type != Gio::FILE_MONITOR_EVENT_UNMOUNTED
+            && !Glib::file_test(current_file->get_path(), Glib::FILE_TEST_IS_DIR)))
+    {
         return;
     }
 
-    updateDir (iter);
+    updateDir(iter);
 }
 
-void DirBrowser::selectDir (Glib::ustring dir)
+void DirBrowser::selectDir(Glib::ustring dir)
 {
 
-    open (dir, "");
+    open(dir, "");
 }
-

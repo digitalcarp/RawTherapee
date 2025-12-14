@@ -22,18 +22,15 @@
 
 #include "rt_math.h"
 
-template<typename T>
-class array2D;
+template <typename T> class array2D;
 
+namespace rtengine {
 
-namespace rtengine
-{
-
-inline float getBilinearValue(const array2D<float> &src, float x, float y)
+inline float getBilinearValue(const array2D<float>& src, float x, float y)
 {
     const int W = src.getWidth();
     const int H = src.getHeight();
-    
+
     // Get integer and fractional parts of numbers
     const int xi = x;
     const int yi = y;
@@ -53,19 +50,19 @@ inline float getBilinearValue(const array2D<float> &src, float x, float y)
     return intp(yf, t, b);
 }
 
-
-inline void rescaleBilinear(const array2D<float> &src, array2D<float> &dst, bool multithread)
+inline void
+rescaleBilinear(const array2D<float>& src, array2D<float>& dst, bool multithread)
 {
     const int Ws = src.getWidth();
     const int Hs = src.getHeight();
     const int Wd = dst.getWidth();
     const int Hd = dst.getHeight();
-    
-    float col_scale = float (Ws) / float (Wd);
-    float row_scale = float (Hs) / float (Hd);
+
+    float col_scale = float(Ws) / float(Wd);
+    float row_scale = float(Hs) / float(Hd);
 
 #ifdef _OPENMP
-    #pragma omp parallel for if (multithread)
+#pragma omp parallel for if (multithread)
 #endif
 
     for (int y = 0; y < Hd; ++y) {
@@ -77,8 +74,8 @@ inline void rescaleBilinear(const array2D<float> &src, array2D<float> &dst, bool
     }
 }
 
-
-inline void rescaleNearest(const array2D<float> &src, array2D<float> &dst, bool multithread)
+inline void
+rescaleNearest(const array2D<float>& src, array2D<float>& dst, bool multithread)
 {
     const int width = src.getWidth();
     const int height = src.getHeight();
@@ -86,7 +83,7 @@ inline void rescaleNearest(const array2D<float> &src, array2D<float> &dst, bool 
     const int nh = dst.getHeight();
 
 #ifdef _OPENMP
-    #pragma omp parallel for if (multithread)
+#pragma omp parallel for if (multithread)
 #endif
 
     for (int y = 0; y < nh; ++y) {
@@ -99,4 +96,4 @@ inline void rescaleNearest(const array2D<float> &src, array2D<float> &dst, bool 
     }
 }
 
-} // namespace rtengine
+}  // namespace rtengine

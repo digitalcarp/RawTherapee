@@ -1,5 +1,5 @@
 /** -*- C++ -*-
- *  
+ *
  *  This file is part of RawTherapee.
  *
  *  Copyright (c) 2017 Alberto Griggio <alberto.griggio@gmail.com>
@@ -31,25 +31,35 @@ using namespace rtengine::procparams;
 
 const Glib::ustring LocalContrast::TOOL_NAME = "localcontrast";
 
-LocalContrast::LocalContrast(): FoldableToolPanel(this, TOOL_NAME, M("TP_LOCALCONTRAST_LABEL"), false, true)
+LocalContrast::LocalContrast()
+    : FoldableToolPanel(this, TOOL_NAME, M("TP_LOCALCONTRAST_LABEL"), false, true)
 {
     auto m = ProcEventMapper::getInstance();
-/*    EvLocalContrastEnabled = m->newEvent(RGBCURVE, "HISTORY_MSG_LOCALCONTRAST_ENABLED");
-    EvLocalContrastRadius = m->newEvent(RGBCURVE, "HISTORY_MSG_LOCALCONTRAST_RADIUS");
-    EvLocalContrastAmount = m->newEvent(RGBCURVE, "HISTORY_MSG_LOCALCONTRAST_AMOUNT");
-    EvLocalContrastDarkness = m->newEvent(RGBCURVE, "HISTORY_MSG_LOCALCONTRAST_DARKNESS");
-    EvLocalContrastLightness = m->newEvent(RGBCURVE, "HISTORY_MSG_LOCALCONTRAST_LIGHTNESS");
-*/
-    EvLocalContrastEnabled = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_LOCALCONTRAST_ENABLED");
-    EvLocalContrastRadius = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_LOCALCONTRAST_RADIUS");
-    EvLocalContrastAmount = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_LOCALCONTRAST_AMOUNT");
-    EvLocalContrastDarkness = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_LOCALCONTRAST_DARKNESS");
-    EvLocalContrastLightness = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_LOCALCONTRAST_LIGHTNESS");
-    
+    /*    EvLocalContrastEnabled = m->newEvent(RGBCURVE,
+       "HISTORY_MSG_LOCALCONTRAST_ENABLED"); EvLocalContrastRadius = m->newEvent(RGBCURVE,
+       "HISTORY_MSG_LOCALCONTRAST_RADIUS"); EvLocalContrastAmount = m->newEvent(RGBCURVE,
+       "HISTORY_MSG_LOCALCONTRAST_AMOUNT"); EvLocalContrastDarkness =
+       m->newEvent(RGBCURVE, "HISTORY_MSG_LOCALCONTRAST_DARKNESS");
+        EvLocalContrastLightness = m->newEvent(RGBCURVE,
+       "HISTORY_MSG_LOCALCONTRAST_LIGHTNESS");
+    */
+    EvLocalContrastEnabled =
+        m->newEvent(LUMINANCECURVE, "HISTORY_MSG_LOCALCONTRAST_ENABLED");
+    EvLocalContrastRadius =
+        m->newEvent(LUMINANCECURVE, "HISTORY_MSG_LOCALCONTRAST_RADIUS");
+    EvLocalContrastAmount =
+        m->newEvent(LUMINANCECURVE, "HISTORY_MSG_LOCALCONTRAST_AMOUNT");
+    EvLocalContrastDarkness =
+        m->newEvent(LUMINANCECURVE, "HISTORY_MSG_LOCALCONTRAST_DARKNESS");
+    EvLocalContrastLightness =
+        m->newEvent(LUMINANCECURVE, "HISTORY_MSG_LOCALCONTRAST_LIGHTNESS");
+
     radius = Gtk::manage(new Adjuster(M("TP_LOCALCONTRAST_RADIUS"), 20., 200., 1., 80.));
     amount = Gtk::manage(new Adjuster(M("TP_LOCALCONTRAST_AMOUNT"), 0., 1., 0.01, 0.2));
-    darkness = Gtk::manage(new Adjuster(M("TP_LOCALCONTRAST_DARKNESS"), 0., 3., 0.01, 1.));
-    lightness = Gtk::manage(new Adjuster(M("TP_LOCALCONTRAST_LIGHTNESS"), 0., 3., 0.01, 1.));
+    darkness =
+        Gtk::manage(new Adjuster(M("TP_LOCALCONTRAST_DARKNESS"), 0., 3., 0.01, 1.));
+    lightness =
+        Gtk::manage(new Adjuster(M("TP_LOCALCONTRAST_LIGHTNESS"), 0., 3., 0.01, 1.));
 
     radius->setAdjusterListener(this);
     amount->setAdjusterListener(this);
@@ -67,8 +77,7 @@ LocalContrast::LocalContrast(): FoldableToolPanel(this, TOOL_NAME, M("TP_LOCALCO
     pack_start(*lightness);
 }
 
-
-void LocalContrast::read(const ProcParams *pp, const ParamsEdited *pedited)
+void LocalContrast::read(const ProcParams* pp, const ParamsEdited* pedited)
 {
     disableListener();
 
@@ -89,8 +98,7 @@ void LocalContrast::read(const ProcParams *pp, const ParamsEdited *pedited)
     enableListener();
 }
 
-
-void LocalContrast::write(ProcParams *pp, ParamsEdited *pedited)
+void LocalContrast::write(ProcParams* pp, ParamsEdited* pedited)
 {
     pp->localContrast.radius = radius->getValue();
     pp->localContrast.amount = amount->getValue();
@@ -107,7 +115,7 @@ void LocalContrast::write(ProcParams *pp, ParamsEdited *pedited)
     }
 }
 
-void LocalContrast::setDefaults(const ProcParams *defParams, const ParamsEdited *pedited)
+void LocalContrast::setDefaults(const ProcParams* defParams, const ParamsEdited* pedited)
 {
     radius->setDefault(defParams->localContrast.radius);
     amount->setDefault(defParams->localContrast.amount);
@@ -117,8 +125,10 @@ void LocalContrast::setDefaults(const ProcParams *defParams, const ParamsEdited 
     if (pedited) {
         radius->setDefaultEditedState(pedited->localContrast.radius ? Edited : UnEdited);
         amount->setDefaultEditedState(pedited->localContrast.amount ? Edited : UnEdited);
-        darkness->setDefaultEditedState(pedited->localContrast.darkness ? Edited : UnEdited);
-        lightness->setDefaultEditedState(pedited->localContrast.lightness ? Edited : UnEdited);
+        darkness->setDefaultEditedState(pedited->localContrast.darkness ? Edited
+                                                                        : UnEdited);
+        lightness->setDefaultEditedState(pedited->localContrast.lightness ? Edited
+                                                                          : UnEdited);
     } else {
         radius->setDefaultEditedState(Irrelevant);
         amount->setDefaultEditedState(Irrelevant);
@@ -142,7 +152,7 @@ void LocalContrast::adjusterChanged(Adjuster* a, double newval)
     }
 }
 
-void LocalContrast::enabledChanged ()
+void LocalContrast::enabledChanged()
 {
     if (listener) {
         if (get_inconsistent()) {
@@ -155,7 +165,6 @@ void LocalContrast::enabledChanged ()
     }
 }
 
-
 void LocalContrast::setBatchMode(bool batchMode)
 {
     ToolPanel::setBatchMode(batchMode);
@@ -166,12 +175,13 @@ void LocalContrast::setBatchMode(bool batchMode)
     lightness->showEditedCB();
 }
 
-
-void LocalContrast::setAdjusterBehavior(bool radiusAdd, bool amountAdd, bool darknessAdd, bool lightnessAdd)
+void LocalContrast::setAdjusterBehavior(bool radiusAdd,
+                                        bool amountAdd,
+                                        bool darknessAdd,
+                                        bool lightnessAdd)
 {
     radius->setAddMode(radiusAdd);
     amount->setAddMode(amountAdd);
     darkness->setAddMode(darknessAdd);
     lightness->setAddMode(lightnessAdd);
 }
-

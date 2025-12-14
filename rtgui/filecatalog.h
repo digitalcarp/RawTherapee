@@ -43,7 +43,8 @@ class ToolBar;
  *   - handling the thumbnail toolbar,
  *   - monitoring the directory (for any change)
  */
-class FileCatalog final : public Gtk::Box,
+class FileCatalog final :
+    public Gtk::Box,
     public PreviewLoaderListener,
     public FilterPanelListener,
     public FileBrowserListener,
@@ -54,9 +55,13 @@ public:
     typedef sigc::slot<void, const Glib::ustring&> DirSelectionSlot;
 
 private:
-    struct FileMonitorInfo {
-        FileMonitorInfo(const Glib::RefPtr<Gio::FileMonitor> &file_monitor, const Glib::ustring &file_path) :
-            fileMonitor(file_monitor), filePath(file_path) {}
+    struct FileMonitorInfo
+    {
+        FileMonitorInfo(const Glib::RefPtr<Gio::FileMonitor>& file_monitor,
+                        const Glib::ustring& file_path)
+            : fileMonitor(file_monitor), filePath(file_path)
+        {
+        }
         Glib::RefPtr<Gio::FileMonitor> fileMonitor;
         Glib::ustring filePath;
     };
@@ -68,7 +73,7 @@ private:
     bool enabled;
     bool inTabMode;  // Tab mode has e.g. different progress bar handling
     Glib::ustring imageToSelect_fname;
-    Glib::ustring refImageForOpen_fname; // Next/previous for Editor's perspective
+    Glib::ustring refImageForOpen_fname;  // Next/previous for Editor's perspective
     eRTNav actionNextPrevious;
 
     FileSelectionListener* listener;
@@ -96,7 +101,7 @@ private:
     Gtk::ToggleButton* bUnRanked;
     Gtk::ToggleButton* bRank[5];
     Gtk::ToggleButton* bUnCLabeled;
-    Gtk::ToggleButton* bCLabel[5];//color label
+    Gtk::ToggleButton* bCLabel[5];  // color label
     Gtk::ToggleButton* bEdited[2];
     Gtk::ToggleButton* bRecentlySaved[2];
     Gtk::ToggleButton* bTrash;
@@ -106,16 +111,17 @@ private:
     Gtk::ToggleButton* categoryButtons[20];
     Gtk::ToggleButton* exifInfo;
     sigc::connection bCateg[20];
-    Gtk::Image* iFilterClear, *igFilterClear;
-    Gtk::Image* iranked[5], *igranked[5], *iUnRanked, *igUnRanked;
-    Gtk::Image* iCLabeled[5], *igCLabeled[5], *iUnCLabeled, *igUnCLabeled;
-    Gtk::Image* iEdited[2], *igEdited[2];
-    Gtk::Image* iRecentlySaved[2], *igRecentlySaved[2];
+    Gtk::Image *iFilterClear, *igFilterClear;
+    Gtk::Image *iranked[5], *igranked[5], *iUnRanked, *igUnRanked;
+    Gtk::Image *iCLabeled[5], *igCLabeled[5], *iUnCLabeled, *igUnCLabeled;
+    Gtk::Image *iEdited[2], *igEdited[2];
+    Gtk::Image *iRecentlySaved[2], *igRecentlySaved[2];
     Gtk::Image *iTrashShowEmpty, *iTrashShowFull;
     Gtk::Image *iNotTrash, *iOriginal;
     Gtk::Image *iRefreshWhite, *iRefreshRed;
-    Gtk::Image *iLeftPanel_1_Show, *iLeftPanel_1_Hide, *iRightPanel_1_Show, *iRightPanel_1_Hide;
-    Gtk::Image *iQueryClear;
+    Gtk::Image *iLeftPanel_1_Show, *iLeftPanel_1_Hide, *iRightPanel_1_Show,
+        *iRightPanel_1_Hide;
+    Gtk::Image* iQueryClear;
 
     Gtk::Entry* BrowsePath;
     Gtk::Button* buttonBrowsePath;
@@ -146,21 +152,22 @@ private:
     int previewsToLoad;
     int previewsLoaded;
 
-
     std::vector<Glib::ustring> fileNameList;
     std::set<Glib::ustring> editedFiles;
-    guint modifierKey; // any modifiers held when rank button was pressed
+    guint modifierKey;  // any modifiers held when rank button was pressed
 
     std::vector<FileMonitorInfo> dirMonitors;
 
     IdleRegister idle_register;
 
-    void addAndOpenFile (const Glib::ustring& fname);
-    void addFile (const Glib::ustring& fName);
-    std::vector<Glib::ustring> getFileList(std::vector<Glib::RefPtr<Gio::File>> *dirs_explored = nullptr);
-    BrowserFilter getFilter ();
-    void refreshDirectoryMonitors(const std::vector<Glib::RefPtr<Gio::File>> &dirs_to_monitor);
-    void trashChanged ();
+    void addAndOpenFile(const Glib::ustring& fname);
+    void addFile(const Glib::ustring& fName);
+    std::vector<Glib::ustring>
+    getFileList(std::vector<Glib::RefPtr<Gio::File>>* dirs_explored = nullptr);
+    BrowserFilter getFilter();
+    void
+    refreshDirectoryMonitors(const std::vector<Glib::RefPtr<Gio::File>>& dirs_to_monitor);
+    void trashChanged();
 
 public:
     // thumbnail browsers
@@ -169,17 +176,17 @@ public:
     CoarsePanel* coarsePanel;
     ToolBar* toolBar;
 
-    FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel);
+    FileCatalog(CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel);
     ~FileCatalog() override;
-    void dirSelected (const Glib::ustring& dirname, const Glib::ustring& openfile);
-    void closeDir    ();
-    void refreshEditedState (const std::set<Glib::ustring>& efiles);
+    void dirSelected(const Glib::ustring& dirname, const Glib::ustring& openfile);
+    void closeDir();
+    void refreshEditedState(const std::set<Glib::ustring>& efiles);
 
     // previewloaderlistener interface
-    void previewReady (int dir_id, FileBrowserEntry* fdn) override;
-    void previewsFinished (int dir_id) override;
-    void previewsFinishedUI ();
-    void _refreshProgressBar ();
+    void previewReady(int dir_id, FileBrowserEntry* fdn) override;
+    void previewsFinished(int dir_id) override;
+    void previewsFinishedUI();
+    void _refreshProgressBar();
 
     void setInspector(Inspector* inspector)
     {
@@ -201,92 +208,84 @@ public:
     }
 
     // filterpanel interface
-    void exifFilterChanged () override;
+    void exifFilterChanged() override;
 
     // exportpanel interface
     void exportRequested() override;
 
-    Glib::ustring lastSelectedDir ()
-    {
-        return selectedDirectory;
-    }
-    void setEnabled (bool e);   // if not enabled, it does not open image
+    Glib::ustring lastSelectedDir() { return selectedDirectory; }
+    void setEnabled(bool e);          // if not enabled, it does not open image
     void enableTabMode(bool enable);  // sets progress bar
 
     // accessors for FileBrowser
-    void redrawAll ();
-    void refreshThumbImages ();
-    void refreshHeight ();
+    void redrawAll();
+    void refreshThumbImages();
+    void refreshHeight();
 
     void filterApplied() override;
     void openRequested(const std::vector<Thumbnail*>& tbe) override;
-    void deleteRequested(const std::vector<FileBrowserEntry*>& tbe, bool inclBatchProcessed, bool onlySelected) override;
-    void copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe, bool moveRequested) override;
-    void developRequested(const std::vector<FileBrowserEntry*>& tbe, bool fastmode) override;
+    void deleteRequested(const std::vector<FileBrowserEntry*>& tbe,
+                         bool inclBatchProcessed,
+                         bool onlySelected) override;
+    void copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe,
+                           bool moveRequested) override;
+    void developRequested(const std::vector<FileBrowserEntry*>& tbe,
+                          bool fastmode) override;
     void renameRequested(const std::vector<FileBrowserEntry*>& tbe) override;
     void selectionChanged(const std::vector<Thumbnail*>& tbe) override;
-    void clearFromCacheRequested(const std::vector<FileBrowserEntry*>& tbe, bool leavenotrace) override;
+    void clearFromCacheRequested(const std::vector<FileBrowserEntry*>& tbe,
+                                 bool leavenotrace) override;
     bool isInTabMode() const override;
 
-    void emptyTrash ();
-    bool trashIsEmpty ();
+    void emptyTrash();
+    bool trashIsEmpty();
 
-    void setFileSelectionListener (FileSelectionListener* l)
-    {
-        listener = l;
-    }
-    void setFileSelectionChangeListener (FileSelectionChangeListener* l)
+    void setFileSelectionListener(FileSelectionListener* l) { listener = l; }
+    void setFileSelectionChangeListener(FileSelectionChangeListener* l)
     {
         fslistener = l;
     }
-    void setImageAreaToolListener (ImageAreaToolListener* l)
-    {
-        iatlistener = l;
-    }
-    void setDirSelector (const DirSelectionSlot& selectDir);
+    void setImageAreaToolListener(ImageAreaToolListener* l) { iatlistener = l; }
+    void setDirSelector(const DirSelectionSlot& selectDir);
 
-    void setFilterPanel (FilterPanel* fpanel);
-    void setExportPanel (ExportPanel* expanel);
+    void setFilterPanel(FilterPanel* fpanel);
+    void setExportPanel(ExportPanel* expanel);
     void exifInfoButtonToggled();
-    void categoryButtonToggled (Gtk::ToggleButton* b, bool isMouseClick);
+    void categoryButtonToggled(Gtk::ToggleButton* b, bool isMouseClick);
     void showRecursiveToggled();
     bool capture_event(GdkEventButton* event);
-    void filterChanged ();
-    void runFilterDialog ();
+    void filterChanged();
+    void runFilterDialog();
 
     void on_realize() override;
-    void reparseDirectory ();
-    void _openImage (const std::vector<Thumbnail*>& tmb);
+    void reparseDirectory();
+    void _openImage(const std::vector<Thumbnail*>& tmb);
 
-    void zoomIn ();
-    void zoomOut ();
+    void zoomIn();
+    void zoomOut();
 
-    void buttonBrowsePathPressed ();
-    bool BrowsePath_key_pressed (GdkEventKey *event);
-    void buttonQueryClearPressed ();
-    void executeQuery ();
-    bool Query_key_pressed(GdkEventKey *event);
-    void updateFBQueryTB (bool singleRow);
-    void updateFBToolBarVisibility (bool showFilmStripToolBar);
+    void buttonBrowsePathPressed();
+    bool BrowsePath_key_pressed(GdkEventKey* event);
+    void buttonQueryClearPressed();
+    void executeQuery();
+    bool Query_key_pressed(GdkEventKey* event);
+    void updateFBQueryTB(bool singleRow);
+    void updateFBToolBarVisibility(bool showFilmStripToolBar);
 
-    void tbLeftPanel_1_toggled ();
-    void tbLeftPanel_1_visible (bool visible);
-    void tbRightPanel_1_toggled ();
-    void tbRightPanel_1_visible (bool visible);
+    void tbLeftPanel_1_toggled();
+    void tbLeftPanel_1_visible(bool visible);
+    void tbRightPanel_1_toggled();
+    void tbRightPanel_1_visible(bool visible);
 
-    void openNextImage ()
-    {
-        fileBrowser->openNextImage();
-    }
-    void openPrevImage ()
-    {
-        fileBrowser->openPrevImage();
-    }
-    void selectImage (Glib::ustring fname, bool clearFilters);
-    void openNextPreviousEditorImage (Glib::ustring fname, bool clearFilters, eRTNav nextPrevious);
+    void openNextImage() { fileBrowser->openNextImage(); }
+    void openPrevImage() { fileBrowser->openPrevImage(); }
+    void selectImage(Glib::ustring fname, bool clearFilters);
+    void openNextPreviousEditorImage(Glib::ustring fname,
+                                     bool clearFilters,
+                                     eRTNav nextPrevious);
 
-    bool handleShortcutKey (GdkEventKey* event);
-    bool handleShortcutKeyRelease(GdkEventKey *event);
+    bool handleShortcutKey(GdkEventKey* event);
+    bool handleShortcutKeyRelease(GdkEventKey* event);
 
     bool CheckSidePanelsVisibility();
     void toggleSidePanels();
@@ -296,11 +295,13 @@ public:
     void showToolBar();
     void hideToolBar();
 
-    void on_dir_changed (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitorEvent event_type, bool internal);
-
+    void on_dir_changed(const Glib::RefPtr<Gio::File>& file,
+                        const Glib::RefPtr<Gio::File>& other_file,
+                        Gio::FileMonitorEvent event_type,
+                        bool internal);
 };
 
-inline void FileCatalog::setDirSelector (const FileCatalog::DirSelectionSlot& selectDir)
+inline void FileCatalog::setDirSelector(const FileCatalog::DirSelectionSlot& selectDir)
 {
     this->selectDir = selectDir;
 }

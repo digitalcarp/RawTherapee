@@ -26,18 +26,15 @@
 #include "imageio.h"
 #include "metadata.h"
 
-namespace Glib
-{
+namespace Glib {
 
 class ustring;
 
 }
 
-namespace rtengine
-{
+namespace rtengine {
 
-class FramesData final :
-    public FramesMetaData
+class FramesData final : public FramesMetaData
 {
 private:
     bool ok_;
@@ -63,7 +60,7 @@ private:
     bool isHDR;
     bool isDNG;
     std::uint32_t fixBadPixelsConstant;
-    bool hasFixBadPixelsConstant_{false};
+    bool hasFixBadPixelsConstant_{ false };
     std::vector<GainMap> gain_maps_;
     int w_;
     int h_;
@@ -99,14 +96,14 @@ public:
     std::uint32_t getFixBadPixelsConstant() const override;
     bool hasFixBadPixelsConstant() const override;
     std::vector<GainMap> getGainMaps() const override;
-    void getDimensions(int &w, int &h) const override;
+    void getDimensions(int& w, int& h) const override;
 
-    void fillBasicTags(Exiv2::ExifData &exif) const;
+    void fillBasicTags(Exiv2::ExifData& exif) const;
 
     void setDimensions(int w, int h);
 
-    static int xmp_label2color(const std::string &label);
+    static int xmp_label2color(const std::string& label);
     static std::string xmp_color2label(int color);
 };
 
-}
+}  // namespace rtengine

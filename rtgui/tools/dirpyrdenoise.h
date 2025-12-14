@@ -44,46 +44,60 @@ class DirPyrDenoise final :
 public:
     static const Glib::ustring TOOL_NAME;
 
-    DirPyrDenoise ();
-    ~DirPyrDenoise () override;
+    DirPyrDenoise();
+    ~DirPyrDenoise() override;
 
-    void read           (const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited = nullptr) override;
-    void write          (rtengine::procparams::ProcParams* pp, ParamsEdited* pedited = nullptr) override;
-    void setDefaults    (const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited = nullptr) override;
-    void setBatchMode   (bool batchMode) override;
-    void curveChanged   (CurveEditor* ce) override;
-    void setEditProvider     (EditDataProvider *provider) override;
-    void autoOpenCurve  () override;
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
+    void setBatchMode(bool batchMode) override;
+    void curveChanged(CurveEditor* ce) override;
+    void setEditProvider(EditDataProvider* provider) override;
+    void autoOpenCurve() override;
 
-    void adjusterChanged (Adjuster* a, double newval) override;
+    void adjusterChanged(Adjuster* a, double newval) override;
     void checkBoxToggled(CheckBox* c, CheckValue newval) override;
-    void enabledChanged  () override;
-    void medianChanged  ();
-    void chromaChanged (double autchroma, double autred, double autblue) override;
-    bool chromaComputed_ ();
-    void noiseChanged (double nresid, double highresid) override;
-    bool noiseComputed_ ();
-    void noiseTilePrev (int tileX, int tileY, int prevX, int prevY, int sizeT, int sizeP) override;
-    bool TilePrevComputed_ ();
+    void enabledChanged() override;
+    void medianChanged();
+    void chromaChanged(double autchroma, double autred, double autblue) override;
+    bool chromaComputed_();
+    void noiseChanged(double nresid, double highresid) override;
+    bool noiseComputed_();
+    void noiseTilePrev(int tileX, int tileY, int prevX, int prevY, int sizeT, int sizeP)
+        override;
+    bool TilePrevComputed_();
 
-//    void perform_toggled  ();
-    void updateNoiseLabel      ();
-    void LmethodChanged      ();
-    void CmethodChanged      ();
-    void C2methodChanged      ();
-    void updateTileLabel      ();
-    void updatePrevLabel      ();
+    //    void perform_toggled  ();
+    void updateNoiseLabel();
+    void LmethodChanged();
+    void CmethodChanged();
+    void C2methodChanged();
+    void updateTileLabel();
+    void updatePrevLabel();
 
-    void dmethodChanged      ();
-    void medmethodChanged      ();
-    void methodmedChanged      ();
-    void rgbmethodChanged      ();
-    void smethodChanged      ();
-    void colorForValue (double valX, double valY, enum ColorCaller::ElemType elemType, int callerId, ColorCaller* caller) override;
+    void dmethodChanged();
+    void medmethodChanged();
+    void methodmedChanged();
+    void rgbmethodChanged();
+    void smethodChanged();
+    void colorForValue(double valX,
+                       double valY,
+                       enum ColorCaller::ElemType elemType,
+                       int callerId,
+                       ColorCaller* caller) override;
 
-    void setAdjusterBehavior (bool lumaadd, bool lumdetadd, bool chromaadd, bool chromaredadd, bool chromablueadd, bool gammaadd, bool passesadd);
-    void trimValues          (rtengine::procparams::ProcParams* pp) override;
-    Glib::ustring getSettingString ();
+    void setAdjusterBehavior(bool lumaadd,
+                             bool lumdetadd,
+                             bool chromaadd,
+                             bool chromaredadd,
+                             bool chromablueadd,
+                             bool gammaadd,
+                             bool passesadd);
+    void trimValues(rtengine::procparams::ProcParams* pp) override;
+    Glib::ustring getSettingString();
 
 private:
     rtengine::ProcEvent EvDPDNGain;
@@ -103,31 +117,31 @@ private:
     sigc::connection medianConn;
     Gtk::CheckButton* median;
     bool lastmedian;
-    Gtk::Label*    NoiseLabels;
-    Gtk::Label*    TileLabels;
-    Gtk::Label*    PrevLabels;
+    Gtk::Label* NoiseLabels;
+    Gtk::Label* TileLabels;
+    Gtk::Label* PrevLabels;
 
-//    Gtk::CheckButton* perform;
-//    bool lastperform;
-//    sigc::connection perfconn;
-    MyComboBoxText*   dmethod;
-    sigc::connection  dmethodconn;
-    MyComboBoxText*   Lmethod;
-    sigc::connection  Lmethodconn;
-    MyComboBoxText*   Cmethod;
-    sigc::connection  Cmethodconn;
-    MyComboBoxText*   C2method;
-    sigc::connection  C2methodconn;
-    MyComboBoxText*   smethod;
-    sigc::connection  smethodconn;
-    MyComboBoxText*   medmethod;
-    sigc::connection  medmethodconn;
+    //    Gtk::CheckButton* perform;
+    //    bool lastperform;
+    //    sigc::connection perfconn;
+    MyComboBoxText* dmethod;
+    sigc::connection dmethodconn;
+    MyComboBoxText* Lmethod;
+    sigc::connection Lmethodconn;
+    MyComboBoxText* Cmethod;
+    sigc::connection Cmethodconn;
+    MyComboBoxText* C2method;
+    sigc::connection C2methodconn;
+    MyComboBoxText* smethod;
+    sigc::connection smethodconn;
+    MyComboBoxText* medmethod;
+    sigc::connection medmethodconn;
     Gtk::Box* ctbox;
-    MyComboBoxText*   methodmed;
-    sigc::connection  methodmedconn;
+    MyComboBoxText* methodmed;
+    sigc::connection methodmedconn;
     Gtk::Box* ctboxm;
-    MyComboBoxText*   rgbmethod;
-    sigc::connection  rgbmethodconn;
+    MyComboBoxText* rgbmethod;
+    sigc::connection rgbmethodconn;
     Gtk::Box* ctboxrgb;
     double nextchroma;
     double nextred;

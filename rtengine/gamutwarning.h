@@ -29,25 +29,28 @@
 
 #include "noncopyable.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
 class Image8;
 
 enum RenderingIntent : int;
 
-class GamutWarning: public NonCopyable {
+class GamutWarning : public NonCopyable
+{
 public:
-    GamutWarning(cmsHPROFILE iprof, cmsHPROFILE gamutprof, RenderingIntent intent, bool bpc);
+    GamutWarning(cmsHPROFILE iprof,
+                 cmsHPROFILE gamutprof,
+                 RenderingIntent intent,
+                 bool bpc);
     ~GamutWarning();
-    void markLine(Image8 *image, int y, float *srcbuf, float *buf1, float *buf2);
-    
+    void markLine(Image8* image, int y, float* srcbuf, float* buf1, float* buf2);
+
 private:
-    void mark(Image8 *image, int i, int j);
-    
+    void mark(Image8* image, int i, int j);
+
     cmsHTRANSFORM lab2ref;
     cmsHTRANSFORM lab2softproof;
     cmsHTRANSFORM softproof2ref;
 };
 
-} // namespace rtengine
+}  // namespace rtengine

@@ -26,11 +26,11 @@
 #include "rtlensfun.h"
 #include "settings.h"
 
+namespace {
 
-namespace
-{
-
-bool isNextLensCropFactorBetter(const lfLens *current_lens, const lfCamera *camera, float next_lens_crop_factor)
+bool isNextLensCropFactorBetter(const lfLens* current_lens,
+                                const lfCamera* camera,
+                                float next_lens_crop_factor)
 {
     if (!current_lens) {
         // No current lens, so next lens's crop factor is
@@ -58,20 +58,24 @@ bool isNextLensCropFactorBetter(const lfLens *current_lens, const lfCamera *came
     // with data from a larger crop factor will be more precise, but
     // also must not be larger than the camera sensor's crop factor
     // to maintain full coverage.
-    return current_lens->CropFactor < next_lens_crop_factor &&
-           next_lens_crop_factor <= camera_crop_factor;
+    return current_lens->CropFactor < next_lens_crop_factor
+           && next_lens_crop_factor <= camera_crop_factor;
 }
 
-bool isNextLensBetter(const lfCamera *camera, const lfLens *current_lens, const lfLens &next_lens, const Glib::ustring &lens_name, const Glib::ustring &next_lens_name)
+bool isNextLensBetter(const lfCamera* camera,
+                      const lfLens* current_lens,
+                      const lfLens& next_lens,
+                      const Glib::ustring& lens_name,
+                      const Glib::ustring& next_lens_name)
 {
-    return isNextLensCropFactorBetter(current_lens, camera, next_lens.CropFactor) &&
-           lens_name == next_lens_name;
+    return isNextLensCropFactorBetter(current_lens, camera, next_lens.CropFactor)
+           && lens_name == next_lens_name;
 }
 
 /**
  * Trims whitespace from around dashes.
  */
-std::string trimDashWhitespace(const std::string &input)
+std::string trimDashWhitespace(const std::string& input)
 {
     enum class SeekStatus {
         /// Start of whitespace-dash unit.
@@ -90,50 +94,49 @@ std::string trimDashWhitespace(const std::string &input)
     for (unsigned i = 0; i < input.size(); i++) {
         const auto cur_char = input[i];
         switch (seek_status) {
-            case SeekStatus::WHITESPACE_DASH:
-                if (std::isspace(cur_char)) {
-                    // Possible beginning of whitespace-dash unit. Start seeking
-                    // dash, but record current index in case there is no dash.
-                    seek_status = SeekStatus::DASH;
-                    whitespace_index = i;
-                } else if (cur_char == '-') {
-                    // Start of a whitespace-dash unit. Add the dash and skip
-                    // all whitespace.
-                    seek_status = SeekStatus::OTHER;
-                    trimmed += cur_char;
-                } else {
-                    // Not a whitespace-dash unit, so just copy the character.
-                    trimmed += cur_char;
-                }
-                break;
-            case SeekStatus::DASH:
-                if (cur_char == '-') {
-                    // Found the dash. Now add the dash and skip all whitespace.
-                    seek_status = SeekStatus::OTHER;
-                    trimmed += cur_char;
-                } else if (!std::isspace(cur_char)) {
-                    // No dash found after whitespace. Copy the whitespace and
-                    // character over and start looking for a whitespace-dash
-                    // unit again.
-                    seek_status = SeekStatus::WHITESPACE_DASH;
-                    trimmed += input.substr(
-                        whitespace_index, i - whitespace_index + 1);
-                }
-                // For whitespace, just continue looking for the dash.
-                break;
-            case SeekStatus::OTHER:
-                if (cur_char == '-') {
-                    // Found a dash. Now add the dash and skip all whitespace.
-                    trimmed += cur_char;
-                } else if (!std::isspace(cur_char)) {
-                    // End of whitespace-dash unit, so add the character and
-                    // start looking for another unit.
-                    seek_status = SeekStatus::WHITESPACE_DASH;
-                    trimmed += cur_char;
-                }
-                // For whitespace, just continue looking for the end of the
-                // unit.
-                break;
+        case SeekStatus::WHITESPACE_DASH:
+            if (std::isspace(cur_char)) {
+                // Possible beginning of whitespace-dash unit. Start seeking
+                // dash, but record current index in case there is no dash.
+                seek_status = SeekStatus::DASH;
+                whitespace_index = i;
+            } else if (cur_char == '-') {
+                // Start of a whitespace-dash unit. Add the dash and skip
+                // all whitespace.
+                seek_status = SeekStatus::OTHER;
+                trimmed += cur_char;
+            } else {
+                // Not a whitespace-dash unit, so just copy the character.
+                trimmed += cur_char;
+            }
+            break;
+        case SeekStatus::DASH:
+            if (cur_char == '-') {
+                // Found the dash. Now add the dash and skip all whitespace.
+                seek_status = SeekStatus::OTHER;
+                trimmed += cur_char;
+            } else if (!std::isspace(cur_char)) {
+                // No dash found after whitespace. Copy the whitespace and
+                // character over and start looking for a whitespace-dash
+                // unit again.
+                seek_status = SeekStatus::WHITESPACE_DASH;
+                trimmed += input.substr(whitespace_index, i - whitespace_index + 1);
+            }
+            // For whitespace, just continue looking for the dash.
+            break;
+        case SeekStatus::OTHER:
+            if (cur_char == '-') {
+                // Found a dash. Now add the dash and skip all whitespace.
+                trimmed += cur_char;
+            } else if (!std::isspace(cur_char)) {
+                // End of whitespace-dash unit, so add the character and
+                // start looking for another unit.
+                seek_status = SeekStatus::WHITESPACE_DASH;
+                trimmed += cur_char;
+            }
+            // For whitespace, just continue looking for the end of the
+            // unit.
+            break;
         }
     }
 
@@ -147,10 +150,9 @@ std::string trimDashWhitespace(const std::string &input)
     return trimmed;
 }
 
-} // namespace
+}  // namespace
 
-namespace rtengine
-{
+namespace rtengine {
 
 //-----------------------------------------------------------------------------
 // LFModifier
@@ -163,12 +165,10 @@ LFModifier::~LFModifier()
     }
 }
 
-
 LFModifier::operator bool() const
 {
     return data_;
 }
-
 
 bool LFModifier::hasDistortionCorrection() const
 {
@@ -185,7 +185,7 @@ bool LFModifier::hasVignettingCorrection() const
     return (flags_ & LF_MODIFY_VIGNETTING);
 }
 
-void LFModifier::correctDistortion(double &x, double &y, int cx, int cy) const
+void LFModifier::correctDistortion(double& x, double& y, int cx, int cy) const
 {
     if (!data_) {
         return;
@@ -208,7 +208,7 @@ void LFModifier::correctDistortion(double &x, double &y, int cx, int cy) const
     }
 }
 
-void LFModifier::correctCA(double &x, double &y, int cx, int cy, int channel) const
+void LFModifier::correctCA(double& x, double& y, int cx, int cy, int channel) const
 {
     assert(channel >= 0 && channel <= 2);
 
@@ -224,8 +224,8 @@ void LFModifier::correctCA(double &x, double &y, int cx, int cy, int channel) co
         std::swap(x, y);
     }
     data_->ApplySubpixelDistortion(x, y, 1, 1, pos);  // This is thread-safe
-    x = pos[2*channel];
-    y = pos[2*channel+1];
+    x = pos[2 * channel];
+    y = pos[2 * channel + 1];
     if (swap_xy_) {
         std::swap(x, y);
     }
@@ -233,7 +233,11 @@ void LFModifier::correctCA(double &x, double &y, int cx, int cy, int channel) co
     y -= cy;
 }
 
-void LFModifier::correctDistortionAndCA(double &x, double &y, int cx, int cy, int channel) const
+void LFModifier::correctDistortionAndCA(double& x,
+                                        double& y,
+                                        int cx,
+                                        int cy,
+                                        int channel) const
 {
     assert(channel >= 0 && channel <= 2);
 
@@ -249,8 +253,8 @@ void LFModifier::correctDistortionAndCA(double &x, double &y, int cx, int cy, in
         std::swap(x, y);
     }
     data_->ApplySubpixelGeometryDistortion(x, y, 1, 1, pos);  // This is thread-safe
-    x = pos[2*channel];
-    y = pos[2*channel+1];
+    x = pos[2 * channel];
+    y = pos[2 * channel + 1];
     if (swap_xy_) {
         std::swap(x, y);
     }
@@ -261,7 +265,7 @@ void LFModifier::correctDistortionAndCA(double &x, double &y, int cx, int cy, in
 #ifdef _OPENMP
 void LFModifier::processVignette(int width, int height, float** rawData) const
 {
-    #pragma omp parallel for schedule(dynamic,16)
+#pragma omp parallel for schedule(dynamic, 16)
 
     for (int y = 0; y < height; ++y) {
         data_->ApplyColorModification(rawData[y], 0, y, width, 1, LF_CR_1(INTENSITY), 0);
@@ -270,7 +274,8 @@ void LFModifier::processVignette(int width, int height, float** rawData) const
 #else
 void LFModifier::processVignette(int width, int height, float** rawData) const
 {
-    data_->ApplyColorModification(rawData[0], 0, 0, width, height, LF_CR_1(INTENSITY), width * sizeof(float));
+    data_->ApplyColorModification(rawData[0], 0, 0, width, height, LF_CR_1(INTENSITY),
+                                  width * sizeof(float));
 }
 
 #endif
@@ -278,16 +283,18 @@ void LFModifier::processVignette(int width, int height, float** rawData) const
 #ifdef _OPENMP
 void LFModifier::processVignette3Channels(int width, int height, float** rawData) const
 {
-    #pragma omp parallel for schedule(dynamic,16)
+#pragma omp parallel for schedule(dynamic, 16)
 
     for (int y = 0; y < height; ++y) {
-        data_->ApplyColorModification(rawData[y], 0, y, width, 1, LF_CR_3(RED, GREEN, BLUE), 0);
+        data_->ApplyColorModification(rawData[y], 0, y, width, 1,
+                                      LF_CR_3(RED, GREEN, BLUE), 0);
     }
 }
 #else
 void LFModifier::processVignette3Channels(int width, int height, float** rawData) const
 {
-    data_->ApplyColorModification(rawData[0], 0, 0, width, height, LF_CR_3(RED, GREEN, BLUE), width * 3 * sizeof(float));
+    data_->ApplyColorModification(rawData[0], 0, 0, width, height,
+                                  LF_CR_3(RED, GREEN, BLUE), width * 3 * sizeof(float));
 }
 
 #endif
@@ -320,30 +327,21 @@ Glib::ustring LFModifier::getDisplayString() const
     }
 }
 
-
-LFModifier::LFModifier(lfModifier *m, bool swap_xy, int flags):
-    data_(m),
-    swap_xy_(swap_xy),
-    flags_(flags)
+LFModifier::LFModifier(lfModifier* m, bool swap_xy, int flags)
+    : data_(m), swap_xy_(swap_xy), flags_(flags)
 {
 }
-
 
 //-----------------------------------------------------------------------------
 // LFCamera
 //-----------------------------------------------------------------------------
 
-LFCamera::LFCamera():
-    data_(nullptr)
-{
-}
-
+LFCamera::LFCamera() : data_(nullptr) {}
 
 LFCamera::operator bool() const
 {
     return data_;
 }
-
 
 Glib::ustring LFCamera::getMake() const
 {
@@ -354,7 +352,6 @@ Glib::ustring LFCamera::getMake() const
     }
 }
 
-
 Glib::ustring LFCamera::getModel() const
 {
     if (data_) {
@@ -363,7 +360,6 @@ Glib::ustring LFCamera::getModel() const
         return "";
     }
 }
-
 
 float LFCamera::getCropFactor() const
 {
@@ -374,7 +370,6 @@ float LFCamera::getCropFactor() const
     }
 }
 
-
 bool LFCamera::isFixedLens() const
 {
     // per lensfun's main developer Torsten Bronger:
@@ -382,7 +377,6 @@ bool LFCamera::isFixedLens() const
     // starts with a lowercase letter"
     return data_ && data_->Mount && std::islower(data_->Mount[0]);
 }
-
 
 Glib::ustring LFCamera::getDisplayString() const
 {
@@ -393,22 +387,16 @@ Glib::ustring LFCamera::getDisplayString() const
     }
 }
 
-
 //-----------------------------------------------------------------------------
 // LFLens
 //-----------------------------------------------------------------------------
 
-LFLens::LFLens():
-    data_(nullptr)
-{
-}
-
+LFLens::LFLens() : data_(nullptr) {}
 
 LFLens::operator bool() const
 {
     return data_;
 }
-
 
 Glib::ustring LFLens::getMake() const
 {
@@ -419,7 +407,6 @@ Glib::ustring LFLens::getMake() const
     }
 }
 
-
 Glib::ustring LFLens::getLens() const
 {
     if (data_) {
@@ -428,7 +415,6 @@ Glib::ustring LFLens::getLens() const
         return "---";
     }
 }
-
 
 float LFLens::getCropFactor() const
 {
@@ -466,15 +452,13 @@ bool LFLens::hasCACorrection() const
     }
 }
 
-
 //-----------------------------------------------------------------------------
 // LFDatabase
 //-----------------------------------------------------------------------------
 
 LFDatabase LFDatabase::instance_;
 
-
-bool LFDatabase::init(const Glib::ustring &dbdir)
+bool LFDatabase::init(const Glib::ustring& dbdir)
 {
     instance_.data_ = lfDatabase::Create();
 
@@ -490,7 +474,7 @@ bool LFDatabase::init(const Glib::ustring &dbdir)
 
     bool ok = false;
     if (dbdir.empty()) {
-        ok = (instance_.data_->Load() ==  LF_NO_ERROR);
+        ok = (instance_.data_->Load() == LF_NO_ERROR);
     } else {
         ok = instance_.LoadDirectory(dbdir.c_str());
     }
@@ -502,8 +486,7 @@ bool LFDatabase::init(const Glib::ustring &dbdir)
     return ok;
 }
 
-
-bool LFDatabase::LoadDirectory(const char *dirname)
+bool LFDatabase::LoadDirectory(const char* dirname)
 {
 #if RT_LENSFUN_HAS_LOAD_DIRECTORY
     return instance_.data_->LoadDirectory(dirname);
@@ -511,40 +494,30 @@ bool LFDatabase::LoadDirectory(const char *dirname)
     // backported from lensfun 0.3.x
     bool database_found = false;
 
-    GDir *dir = g_dir_open (dirname, 0, NULL);
-    if (dir)
-    {
-        GPatternSpec *ps = g_pattern_spec_new ("*.xml");
-        if (ps)
-        {
-            const gchar *fn;
-            while ((fn = g_dir_read_name (dir)))
-            {
-                size_t sl = strlen (fn);
-                if (g_pattern_match (ps, sl, fn, NULL))
-                {
-                    gchar *ffn = g_build_filename (dirname, fn, NULL);
+    GDir* dir = g_dir_open(dirname, 0, NULL);
+    if (dir) {
+        GPatternSpec* ps = g_pattern_spec_new("*.xml");
+        if (ps) {
+            const gchar* fn;
+            while ((fn = g_dir_read_name(dir))) {
+                size_t sl = strlen(fn);
+                if (g_pattern_match(ps, sl, fn, NULL)) {
+                    gchar* ffn = g_build_filename(dirname, fn, NULL);
                     /* Ignore errors */
-                    if (data_->Load (ffn) == LF_NO_ERROR)
-                        database_found = true;
-                    g_free (ffn);
+                    if (data_->Load(ffn) == LF_NO_ERROR) database_found = true;
+                    g_free(ffn);
                 }
             }
-            g_pattern_spec_free (ps);
+            g_pattern_spec_free(ps);
         }
-        g_dir_close (dir);
+        g_dir_close(dir);
     }
 
     return database_found;
 #endif
 }
 
-
-LFDatabase::LFDatabase():
-    data_(nullptr)
-{
-}
-
+LFDatabase::LFDatabase() : data_(nullptr) {}
 
 LFDatabase::~LFDatabase()
 {
@@ -554,12 +527,10 @@ LFDatabase::~LFDatabase()
     }
 }
 
-
-const LFDatabase *LFDatabase::getInstance()
+const LFDatabase* LFDatabase::getInstance()
 {
     return &instance_;
 }
-
 
 std::vector<LFCamera> LFDatabase::getCameras() const
 {
@@ -576,7 +547,6 @@ std::vector<LFCamera> LFDatabase::getCameras() const
     return ret;
 }
 
-
 std::vector<LFLens> LFDatabase::getLenses() const
 {
     std::vector<LFLens> ret;
@@ -592,8 +562,9 @@ std::vector<LFLens> LFDatabase::getLenses() const
     return ret;
 }
 
-
-LFCamera LFDatabase::findCamera(const Glib::ustring &make, const Glib::ustring &model, bool autoMatch) const
+LFCamera LFDatabase::findCamera(const Glib::ustring& make,
+                                const Glib::ustring& model,
+                                bool autoMatch) const
 {
     LFCamera ret;
     if (data_ && !make.empty()) {
@@ -617,8 +588,9 @@ LFCamera LFDatabase::findCamera(const Glib::ustring &make, const Glib::ustring &
     return ret;
 }
 
-
-LFLens LFDatabase::findLens(const LFCamera &camera, const Glib::ustring &name, bool autoMatch) const
+LFLens LFDatabase::findLens(const LFCamera& camera,
+                            const Glib::ustring& name,
+                            bool autoMatch) const
 {
     LFLens ret;
     if (data_ && !name.empty()) {
@@ -630,7 +602,9 @@ LFLens LFDatabase::findLens(const LFCamera &camera, const Glib::ustring &name, b
 
             for (auto lens_list = data_->GetLenses(); lens_list[0]; lens_list++) {
                 candidate.data_ = lens_list[0];
-                if (isNextLensBetter(camera.data_, bestCandidate.data_, *(candidate.data_), name, candidate.getLens())) {
+                if (isNextLensBetter(camera.data_, bestCandidate.data_,
+                                     *(candidate.data_), name, candidate.getLens()))
+                {
                     bestCandidate.data_ = candidate.data_;
                 }
             }
@@ -641,22 +615,24 @@ LFLens LFDatabase::findLens(const LFCamera &camera, const Glib::ustring &name, b
 
         // Tries to find the lens by name, possibly splitting the maker and
         // model from the lens name.
-        const auto find_lens_from_name = [](const lfDatabase *database, const lfCamera *cam, const Glib::ustring &lens_name) {
+        const auto find_lens_from_name = [](const lfDatabase* database,
+                                            const lfCamera* cam,
+                                            const Glib::ustring& lens_name) {
             auto found = database->FindLenses(cam, nullptr, lens_name.c_str());
-            for (size_t pos = 0; !found && pos < lens_name.size(); ) {
+            for (size_t pos = 0; !found && pos < lens_name.size();) {
                 // try to split the maker from the model of the lens -- we have to
                 // guess a bit here, since there are makers with a multi-word name
                 // (e.g. "Leica Camera AG")
                 if (lens_name.find("f/", pos) == 0) {
-                    break; // no need to search further
+                    break;  // no need to search further
                 }
                 Glib::ustring make, model;
                 auto i = lens_name.find(' ', pos);
                 if (i != Glib::ustring::npos) {
                     make = lens_name.substr(0, i);
-                    model = lens_name.substr(i+1);
+                    model = lens_name.substr(i + 1);
                     found = database->FindLenses(cam, make.c_str(), model.c_str());
-                    pos = i+1;
+                    pos = i + 1;
                 } else {
                     break;
                 }
@@ -667,9 +643,9 @@ LFLens LFDatabase::findLens(const LFCamera &camera, const Glib::ustring &name, b
         // Find the lens, starting with the mount, then trying without the mount
         // if no match is found. The latter is necessary for certain adapted
         // lenses.
-        const lfLens **found = nullptr;
+        const lfLens** found = nullptr;
         lfCamera camera_without_mount;
-        std::vector<const lfCamera *> camera_ptrs = {camera.data_};
+        std::vector<const lfCamera*> camera_ptrs = { camera.data_ };
         if (camera.data_ && camera.data_->Mount) {
             camera_without_mount = *(camera.data_);
             camera_without_mount.SetMount(nullptr);
@@ -701,35 +677,41 @@ LFLens LFDatabase::findLens(const LFCamera &camera, const Glib::ustring &name, b
     return ret;
 }
 
-
-std::unique_ptr<LFModifier> LFDatabase::getModifier(const LFCamera &camera, const LFLens &lens,
-                                    float focalLen, float aperture, float focusDist,
-                                    int width, int height, bool swap_xy) const
+std::unique_ptr<LFModifier> LFDatabase::getModifier(const LFCamera& camera,
+                                                    const LFLens& lens,
+                                                    float focalLen,
+                                                    float aperture,
+                                                    float focusDist,
+                                                    int width,
+                                                    int height,
+                                                    bool swap_xy) const
 {
     std::unique_ptr<LFModifier> ret;
     if (data_) {
         MyMutex::MyLock lock(lfDBMutex);
         if (camera && lens) {
-            lfModifier *mod = lfModifier::Create(lens.data_, camera.getCropFactor(), width, height);
+            lfModifier* mod =
+                lfModifier::Create(lens.data_, camera.getCropFactor(), width, height);
             int flags = LF_MODIFY_DISTORTION | LF_MODIFY_SCALE | LF_MODIFY_TCA;
             if (aperture > 0) {
                 flags |= LF_MODIFY_VIGNETTING;
             }
-            flags = mod->Initialize(lens.data_, LF_PF_F32, focalLen, aperture, focusDist > 0 ? focusDist : 1000, 0.0, LF_RECTILINEAR, flags, false);
+            flags = mod->Initialize(lens.data_, LF_PF_F32, focalLen, aperture,
+                                    focusDist > 0 ? focusDist : 1000, 0.0, LF_RECTILINEAR,
+                                    flags, false);
             ret.reset(new LFModifier(mod, swap_xy, flags));
         }
     }
     return ret;
 }
 
-std::unique_ptr<LFModifier> LFDatabase::findModifier(
-    const procparams::LensProfParams &lensProf,
-    const FramesMetaData *idata,
-    int width,
-    int height,
-    const procparams::CoarseTransformParams &coarse,
-    int rawRotationDeg
-) const
+std::unique_ptr<LFModifier>
+LFDatabase::findModifier(const procparams::LensProfParams& lensProf,
+                         const FramesMetaData* idata,
+                         int width,
+                         int height,
+                         const procparams::CoarseTransformParams& coarse,
+                         int rawRotationDeg) const
 {
     const float focallen = idata->getFocalLen();
 
@@ -769,23 +751,15 @@ std::unique_ptr<LFModifier> LFDatabase::findModifier(
         }
     }
 
-    std::unique_ptr<LFModifier> ret = getModifier(
-        c,
-        l,
-        idata->getFocalLen(),
-        idata->getFNumber(),
-        idata->getFocusDist(),
-        width,
-        height,
-        swap_xy
-    );
+    std::unique_ptr<LFModifier> ret =
+        getModifier(c, l, idata->getFocalLen(), idata->getFNumber(),
+                    idata->getFocusDist(), width, height, swap_xy);
 
     if (settings->verbose) {
         std::cout << "LENSFUN:\n"
                   << "  camera: " << c.getDisplayString() << "\n"
                   << "  lens: " << l.getDisplayString() << "\n"
-                  << "  correction: "
-                  << (ret ? ret->getDisplayString() : "NONE")
+                  << "  correction: " << (ret ? ret->getDisplayString() : "NONE")
                   << std::endl;
     }
 
@@ -796,5 +770,4 @@ std::unique_ptr<LFModifier> LFDatabase::findModifier(
     return ret;
 }
 
-
-} // namespace rtengine
+}  // namespace rtengine

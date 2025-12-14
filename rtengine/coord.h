@@ -19,8 +19,7 @@
 
 #pragma once
 
-namespace rtengine
-{
+namespace rtengine {
 
 struct Coord;
 struct PolarCoord;
@@ -31,113 +30,110 @@ struct Coord
     int x = 0;
     int y = 0;
 
-    Coord () = default;
-    Coord (const int x, const int y);
-    Coord (const Coord& other) = default;
-    explicit Coord (const PolarCoord& other);
+    Coord() = default;
+    Coord(const int x, const int y);
+    Coord(const Coord& other) = default;
+    explicit Coord(const PolarCoord& other);
 
-    Coord& operator= (const Coord& other) = default;
-    Coord& operator= (const PolarCoord& other);
+    Coord& operator=(const Coord& other) = default;
+    Coord& operator=(const PolarCoord& other);
 
-    void get (int& x, int& y) const;
-    void set (const int x, const int y);
+    void get(int& x, int& y) const;
+    void set(const int x, const int y);
 
-    bool clip (const int width, const int height);
+    bool clip(const int width, const int height);
 
-    Coord& operator+= (const Coord& other);
-    Coord& operator-= (const Coord& other);
-    Coord& operator*= (const double scale);
-    bool operator< (const Coord& rhs) const;
-    bool operator> (const Coord& rhs) const;
+    Coord& operator+=(const Coord& other);
+    Coord& operator-=(const Coord& other);
+    Coord& operator*=(const double scale);
+    bool operator<(const Coord& rhs) const;
+    bool operator>(const Coord& rhs) const;
     bool operator<=(const Coord& rhs) const;
     bool operator>=(const Coord& rhs) const;
 };
 
-bool operator== (const Coord& lhs, const Coord& rhs);
-bool operator!= (const Coord& lhs, const Coord& rhs);
+bool operator==(const Coord& lhs, const Coord& rhs);
+bool operator!=(const Coord& lhs, const Coord& rhs);
 
-const Coord operator+ (const Coord& lhs, const Coord& rhs);
-const Coord operator- (const Coord& lhs, const Coord& rhs);
-const Coord operator* (const Coord& lhs, const Coord& rhs);
+const Coord operator+(const Coord& lhs, const Coord& rhs);
+const Coord operator-(const Coord& lhs, const Coord& rhs);
+const Coord operator*(const Coord& lhs, const Coord& rhs);
 
 struct PolarCoord
 {
     double radius = 0.0;
     double angle = 0.0;
 
-    PolarCoord () = default;
-    PolarCoord (const double radius, const double angle);
-    PolarCoord (const PolarCoord& other) = default;
-    explicit PolarCoord (const Coord& other);
+    PolarCoord() = default;
+    PolarCoord(const double radius, const double angle);
+    PolarCoord(const PolarCoord& other) = default;
+    explicit PolarCoord(const Coord& other);
 
-    PolarCoord& operator= (const PolarCoord& other) = default;
-    PolarCoord& operator= (const Coord& other);
+    PolarCoord& operator=(const PolarCoord& other) = default;
+    PolarCoord& operator=(const Coord& other);
 
-    void get (double& radius, double& angle) const;
-    void set (const double radius, const double angle);
+    void get(double& radius, double& angle) const;
+    void set(const double radius, const double angle);
 
-    PolarCoord& operator+= (const PolarCoord& other);
-    PolarCoord& operator-= (const PolarCoord& other);
-    PolarCoord& operator*= (const double scale);
-
+    PolarCoord& operator+=(const PolarCoord& other);
+    PolarCoord& operator-=(const PolarCoord& other);
+    PolarCoord& operator*=(const double scale);
 };
 
-bool operator== (const PolarCoord& lhs, const PolarCoord& rhs);
-bool operator!= (const PolarCoord& lhs, const PolarCoord& rhs);
+bool operator==(const PolarCoord& lhs, const PolarCoord& rhs);
+bool operator!=(const PolarCoord& lhs, const PolarCoord& rhs);
 
-const PolarCoord operator+ (const PolarCoord& lhs, const PolarCoord& rhs);
-const PolarCoord operator- (const PolarCoord& lhs, const PolarCoord& rhs);
-const PolarCoord operator* (const PolarCoord& lhs, const double rhs);
-const PolarCoord operator* (const double lhs, const PolarCoord& rhs);
+const PolarCoord operator+(const PolarCoord& lhs, const PolarCoord& rhs);
+const PolarCoord operator-(const PolarCoord& lhs, const PolarCoord& rhs);
+const PolarCoord operator*(const PolarCoord& lhs, const double rhs);
+const PolarCoord operator*(const double lhs, const PolarCoord& rhs);
 
-inline Coord::Coord (const int x, const int y) : x (x), y (y)
-{
-}
+inline Coord::Coord(const int x, const int y) : x(x), y(y) {}
 
-inline Coord::Coord (const PolarCoord& other)
+inline Coord::Coord(const PolarCoord& other)
 {
     *this = other;
 }
 
-inline void Coord::get (int& x, int& y) const
+inline void Coord::get(int& x, int& y) const
 {
     x = this->x;
     y = this->y;
 }
 
-inline void Coord::set (const int x, const int y)
+inline void Coord::set(const int x, const int y)
 {
     this->x = x;
     this->y = y;
 }
 
-inline Coord& Coord::operator+= (const Coord& other)
+inline Coord& Coord::operator+=(const Coord& other)
 {
     x += other.x;
     y += other.y;
     return *this;
 }
 
-inline Coord& Coord::operator-= (const Coord& other)
+inline Coord& Coord::operator-=(const Coord& other)
 {
     x -= other.x;
     y -= other.y;
     return *this;
 }
 
-inline Coord& Coord::operator*= (const double scale)
+inline Coord& Coord::operator*=(const double scale)
 {
     x *= scale;
     y *= scale;
     return *this;
 }
 
-inline bool Coord::operator< (const Coord& rhs) const
+inline bool Coord::operator<(const Coord& rhs) const
 {
     return x < rhs.x && y < rhs.y;
 }
 
-inline bool Coord::operator> (const Coord& rhs) const
+inline bool Coord::operator>(const Coord& rhs) const
 {
     return x > rhs.x && y > rhs.y;
 }
@@ -152,103 +148,104 @@ inline bool Coord::operator>=(const Coord& rhs) const
     return x >= rhs.x && y >= rhs.y;
 }
 
-inline bool operator== (const Coord& lhs, const Coord& rhs)
+inline bool operator==(const Coord& lhs, const Coord& rhs)
 {
     return lhs.x == rhs.x && lhs.y == rhs.y;
 }
 
-inline bool operator!= (const Coord& lhs, const Coord& rhs)
+inline bool operator!=(const Coord& lhs, const Coord& rhs)
 {
     return !(lhs == rhs);
 }
 
-inline const Coord operator+ (const Coord& lhs, const Coord& rhs)
+inline const Coord operator+(const Coord& lhs, const Coord& rhs)
 {
-    return Coord (lhs) += rhs;
+    return Coord(lhs) += rhs;
 }
 
-inline const Coord operator- (const Coord& lhs, const Coord& rhs)
+inline const Coord operator-(const Coord& lhs, const Coord& rhs)
 {
-    return Coord (lhs) -= rhs;
+    return Coord(lhs) -= rhs;
 }
 
-inline const Coord operator* (const Coord& lhs, const double rhs)
+inline const Coord operator*(const Coord& lhs, const double rhs)
 {
-    return Coord (lhs) *= rhs;
+    return Coord(lhs) *= rhs;
 }
 
-inline const Coord operator* (const double lhs, const Coord& rhs)
+inline const Coord operator*(const double lhs, const Coord& rhs)
 {
-    return Coord (rhs) *= lhs;
+    return Coord(rhs) *= lhs;
 }
 
-inline PolarCoord::PolarCoord (const double radius, const double angle) : radius (radius), angle (angle)
+inline PolarCoord::PolarCoord(const double radius, const double angle)
+    : radius(radius), angle(angle)
 {
 }
 
-inline PolarCoord::PolarCoord (const Coord& other)
+inline PolarCoord::PolarCoord(const Coord& other)
 {
     *this = other;
 }
 
-inline void PolarCoord::get (double& radius, double& angle) const
+inline void PolarCoord::get(double& radius, double& angle) const
 {
     radius = this->radius;
     angle = this->angle;
 }
 
-inline void PolarCoord::set (const double radius, const double angle)
+inline void PolarCoord::set(const double radius, const double angle)
 {
     this->radius = radius;
     this->angle = angle;
 }
 
-inline PolarCoord& PolarCoord::operator+= (const PolarCoord& other)
+inline PolarCoord& PolarCoord::operator+=(const PolarCoord& other)
 {
-    *this = Coord (*this) + Coord (other);
+    *this = Coord(*this) + Coord(other);
     return *this;
 }
 
-inline PolarCoord &PolarCoord::operator-= (const PolarCoord &other)
+inline PolarCoord& PolarCoord::operator-=(const PolarCoord& other)
 {
-    *this = Coord (*this) - Coord (other);
+    *this = Coord(*this) - Coord(other);
     return *this;
 }
 
-inline PolarCoord &PolarCoord::operator*= (const double scale)
+inline PolarCoord& PolarCoord::operator*=(const double scale)
 {
     radius *= scale;
     return *this;
 }
 
-inline bool operator== (const PolarCoord& lhs, const PolarCoord& rhs)
+inline bool operator==(const PolarCoord& lhs, const PolarCoord& rhs)
 {
     return lhs.radius == rhs.radius && lhs.angle == rhs.angle;
 }
 
-inline bool operator!= (const PolarCoord& lhs, const PolarCoord& rhs)
+inline bool operator!=(const PolarCoord& lhs, const PolarCoord& rhs)
 {
     return !(lhs == rhs);
 }
 
-inline const PolarCoord operator+ (const PolarCoord& lhs, const PolarCoord& rhs)
+inline const PolarCoord operator+(const PolarCoord& lhs, const PolarCoord& rhs)
 {
-    return PolarCoord (lhs) += rhs;
+    return PolarCoord(lhs) += rhs;
 }
 
-inline const PolarCoord operator- (const PolarCoord& lhs, const PolarCoord& rhs)
+inline const PolarCoord operator-(const PolarCoord& lhs, const PolarCoord& rhs)
 {
-    return PolarCoord (lhs) -= rhs;
+    return PolarCoord(lhs) -= rhs;
 }
 
-inline const PolarCoord operator* (const PolarCoord& lhs, const double rhs)
+inline const PolarCoord operator*(const PolarCoord& lhs, const double rhs)
 {
-    return PolarCoord (lhs) *= rhs;
+    return PolarCoord(lhs) *= rhs;
 }
 
-inline const PolarCoord operator* (const double lhs, const PolarCoord& rhs)
+inline const PolarCoord operator*(const double lhs, const PolarCoord& rhs)
 {
-    return PolarCoord (rhs) *= lhs;
+    return PolarCoord(rhs) *= lhs;
 }
 
-}
+}  // namespace rtengine

@@ -28,46 +28,37 @@
 
 #include "rtgui/threadutils.h"
 
-namespace rtengine
+namespace rtengine {
+
+namespace cache_helper {
+
+// See http://stackoverflow.com/a/20790050
+template <typename, typename = void> struct has_hash : std::false_type
 {
+};
 
-namespace cache_helper
+template <typename T>
+struct has_hash<T, decltype(std::hash<T>()(std::declval<T>()), void())> : std::true_type
 {
+};
 
-    // See http://stackoverflow.com/a/20790050
-    template<typename, typename = void>
-    struct has_hash
-        : std::false_type
-    {
-    };
+}  // namespace cache_helper
 
-    template<typename T>
-    struct has_hash<T, decltype(std::hash<T>()(std::declval<T>()), void())>
-        : std::true_type
-    {
-    };
-
-}
-
-template<class K, class V>
-class Cache
+template <class K, class V> class Cache
 {
 public:
     class Hook
     {
     public:
-        virtual ~Hook()
-        {
-        }
+        virtual ~Hook() {}
         virtual void onDiscard(const K& key, const V& value) = 0;
         virtual void onDisplace(const K& key, const V& value) = 0;
         virtual void onRemove(const K& key, const V& value) = 0;
         virtual void onDestroy() = 0;
     };
 
-    explicit Cache(unsigned long _size, Hook* _hook = nullptr) :
-        store_size(_size),
-        hook(_hook)
+    explicit Cache(unsigned long _size, Hook* _hook = nullptr)
+        : store_size(_size), hook(_hook)
     {
     }
 
@@ -85,11 +76,7 @@ public:
         const StoreConstIterator store_it = store.find(key);
         const bool present = store_it != store.end();
         if (present) {
-            lru_list.splice(
-                lru_list.begin(),
-                lru_list,
-                store_it->second->lru_list_it
-            );
+            lru_list.splice(lru_list.begin(), lru_list, store_it->second->lru_list_it);
             value = store_it->second->value;
         }
         mutex.unlock();
@@ -97,20 +84,11 @@ public:
         return present;
     }
 
-    bool set(const K& key, const V& value)
-    {
-        return set(key, value, Mode::UNCOND);
-    }
+    bool set(const K& key, const V& value) { return set(key, value, Mode::UNCOND); }
 
-    bool replace(const K& key, const V& value)
-    {
-        return set(key, value, Mode::KNOWN);
-    }
+    bool replace(const K& key, const V& value) { return set(key, value, Mode::KNOWN); }
 
-    bool insert(const K& key, const V& value)
-    {
-        return set(key, value, Mode::UNKNOWN);
-    }
+    bool insert(const K& key, const V& value) { return set(key, value, Mode::UNKNOWN); }
 
     bool remove(const K& key)
     {
@@ -151,27 +129,22 @@ public:
 private:
     struct Value;
 
-    using Store = typename std::conditional<
-        cache_helper::has_hash<K>::value,
-        std::unordered_map<K, std::unique_ptr<Value>>,
-        std::map<K, std::unique_ptr<Value>>
-    >::type;
+    using Store = typename std::conditional<cache_helper::has_hash<K>::value,
+                                            std::unordered_map<K, std::unique_ptr<Value>>,
+                                            std::map<K, std::unique_ptr<Value>>>::type;
     using StoreIterator = typename Store::iterator;
     using StoreConstIterator = typename Store::const_iterator;
 
     using LruList = std::list<StoreIterator>;
     using LruListIterator = typename LruList::iterator;
 
-    struct Value {
+    struct Value
+    {
         V value;
         LruListIterator lru_list_it;
     };
 
-    enum class Mode {
-        UNCOND,
-        KNOWN,
-        UNKNOWN
-    };
+    enum class Mode { UNCOND, KNOWN, UNKNOWN };
 
     void discard()
     {
@@ -194,12 +167,7 @@ private:
                     discard();
                 }
                 lru_list.push_front(store.end());
-                std::unique_ptr<Value> v(
-                    new Value{
-                        value,
-                        lru_list.begin()
-                    }
-                );
+                std::unique_ptr<Value> v(new Value{ value, lru_list.begin() });
                 lru_list.front() = store.emplace(key, std::move(v)).first;
             }
         } else {
@@ -207,11 +175,8 @@ private:
                 if (hook) {
                     hook->onDisplace(key, store_it->second->value);
                 }
-                lru_list.splice(
-                    lru_list.begin(),
-                    lru_list,
-                    store_it->second->lru_list_it
-                );
+                lru_list.splice(lru_list.begin(), lru_list,
+                                store_it->second->lru_list_it);
                 store_it->second->value = value;
             }
         }
@@ -236,4 +201,4 @@ private:
     mutable LruList lru_list;
 };
 
-}
+}  // namespace rtengine

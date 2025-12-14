@@ -23,8 +23,6 @@
 #include "toolpanel.h"
 #include "widgets/basic/adjuster.h"
 
-
-
 class Compressgamut final :
     public ToolParamBlock,
     public AdjusterListener,
@@ -41,13 +39,13 @@ protected:
     Adjuster* d_y;
     Gtk::Label* acLabel;
     Gtk::Label* acLabelrgb;
-    Gtk::Label* acLabelcmy;  
+    Gtk::Label* acLabelcmy;
     Adjuster* pwr;
     bool lastAutodc;
     bool lastAutodm;
     bool lastAutody;
 
-    MyComboBoxText *colorspace;
+    MyComboBoxText* colorspace;
     sigc::connection colorspaceconn;
     Gtk::CheckButton* rolloff;
     sigc::connection rolloffconn;
@@ -72,21 +70,29 @@ private:
 public:
     static const Glib::ustring TOOL_NAME;
 
-    Compressgamut ();
+    Compressgamut();
     ~Compressgamut() override;
 
-
-    void read           (const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited = nullptr) override;
-    void write          (rtengine::procparams::ProcParams* pp, ParamsEdited* pedited = nullptr) override;
-    void setDefaults    (const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited = nullptr) override;
-    void setBatchMode   (bool batchMode) override;
-    void achromaticChanged (double acmax, double acmax0, double acmax1, double acmax2, bool auto_dc, bool auto_dm, bool auto_dy) override;
-    void adjusterAutoToggled (Adjuster* a, bool newval) override;   
-    void adjusterChanged (Adjuster* a, double newval) override;
-    void enabledChanged  () override;
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
+    void setBatchMode(bool batchMode) override;
+    void achromaticChanged(double acmax,
+                           double acmax0,
+                           double acmax1,
+                           double acmax2,
+                           bool auto_dc,
+                           bool auto_dm,
+                           bool auto_dy) override;
+    void adjusterAutoToggled(Adjuster* a, bool newval) override;
+    void adjusterChanged(Adjuster* a, double newval) override;
+    void enabledChanged() override;
     void rolloff_change();
 
-    void trimValues          (rtengine::procparams::ProcParams* pp) override;
+    void trimValues(rtengine::procparams::ProcParams* pp) override;
     void colorspaceChanged();
     void updategamutGUI();
 };

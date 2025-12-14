@@ -16,7 +16,7 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 /*
  * Haze removal using the algorithm described in the paper:
@@ -26,7 +26,7 @@
  *
  * using a guided filter for the "soft matting" of the transmission map
  *
-*/
+ */
 
 #include <algorithm>
 #include <iostream>
@@ -41,24 +41,22 @@
 #include "procparams.h"
 #include "rescale.h"
 #include "rt_math.h"
-//#define BENCHMARK
+// #define BENCHMARK
 #include "StopWatch.h"
 
 #include "rtgui/options.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
-namespace
-{
+namespace {
 
-float normalize(Imagefloat *rgb, bool multithread)
+float normalize(Imagefloat* rgb, bool multithread)
 {
     float maxval = 0.f;
     const int W = rgb->getWidth();
     const int H = rgb->getHeight();
 #ifdef _OPENMP
-    #pragma omp parallel for reduction(max:maxval) schedule(dynamic, 16) if (multithread)
+#pragma omp parallel for reduction(max : maxval) schedule(dynamic, 16) if (multithread)
 #endif
 
     for (int y = 0; y < H; ++y) {
@@ -69,7 +67,7 @@ float normalize(Imagefloat *rgb, bool multithread)
 
     maxval = max(maxval * 2.f, 65535.f);
 #ifdef _OPENMP
-    #pragma omp parallel for schedule(dynamic, 16) if (multithread)
+#pragma omp parallel for schedule(dynamic, 16) if (multithread)
 #endif
 
     for (int y = 0; y < H; ++y) {
@@ -83,14 +81,14 @@ float normalize(Imagefloat *rgb, bool multithread)
     return maxval;
 }
 
-void restore(Imagefloat *rgb, float maxval, bool multithread)
+void restore(Imagefloat* rgb, float maxval, bool multithread)
 {
     const int W = rgb->getWidth();
     const int H = rgb->getHeight();
 
     if (maxval > 0.f && maxval != 1.f) {
 #ifdef _OPENMP
-        #       pragma omp parallel for if (multithread)
+#pragma omp parallel for if (multithread)
 #endif
 
         for (int y = 0; y < H; ++y) {
@@ -103,13 +101,21 @@ void restore(Imagefloat *rgb, float maxval, bool multithread)
     }
 }
 
-int get_dark_channel(const array2D<float> &R, const array2D<float> &G, const array2D<float> &B, array2D<float> &dst, int patchsize, const float ambient[3], bool clip, bool multithread, float strength)
+int get_dark_channel(const array2D<float>& R,
+                     const array2D<float>& G,
+                     const array2D<float>& B,
+                     array2D<float>& dst,
+                     int patchsize,
+                     const float ambient[3],
+                     bool clip,
+                     bool multithread,
+                     float strength)
 {
     const int W = R.getWidth();
     const int H = R.getHeight();
 
 #ifdef _OPENMP
-    #pragma omp parallel for if (multithread)
+#pragma omp parallel for if (multithread)
 #endif
 
     for (int y = 0; y < H; y += patchsize) {
@@ -159,16 +165,22 @@ int get_dark_channel(const array2D<float> &R, const array2D<float> &G, const arr
         }
     }
 
-    return (W / patchsize + ((W % patchsize) > 0)) * (H / patchsize + ((H % patchsize) > 0));
+    return (W / patchsize + ((W % patchsize) > 0))
+           * (H / patchsize + ((H % patchsize) > 0));
 }
 
-int get_dark_channel_downsized(const array2D<float> &R, const array2D<float> &G, const array2D<float> &B, array2D<float> &dst, int patchsize, bool multithread)
+int get_dark_channel_downsized(const array2D<float>& R,
+                               const array2D<float>& G,
+                               const array2D<float>& B,
+                               array2D<float>& dst,
+                               int patchsize,
+                               bool multithread)
 {
     const int W = R.getWidth();
     const int H = R.getHeight();
 
 #ifdef _OPENMP
-    #pragma omp parallel for if (multithread)
+#pragma omp parallel for if (multithread)
 #endif
 
     for (int y = 0; y < H; y += patchsize) {
@@ -190,10 +202,17 @@ int get_dark_channel_downsized(const array2D<float> &R, const array2D<float> &G,
         }
     }
 
-    return (W / patchsize + ((W % patchsize) > 0)) * (H / patchsize + ((H % patchsize) > 0));
+    return (W / patchsize + ((W % patchsize) > 0))
+           * (H / patchsize + ((H % patchsize) > 0));
 }
 
-float estimate_ambient_light(const array2D<float> &R, const array2D<float> &G, const array2D<float> &B, const array2D<float> &dark, int patchsize, int npatches, float ambient[3])
+float estimate_ambient_light(const array2D<float>& R,
+                             const array2D<float>& G,
+                             const array2D<float>& B,
+                             const array2D<float>& dark,
+                             int patchsize,
+                             int npatches,
+                             float ambient[3])
 {
     const int W = R.getWidth();
     const int H = R.getHeight();
@@ -240,7 +259,7 @@ float estimate_ambient_light(const array2D<float> &R, const array2D<float> &G, c
         std::vector<float> l;
         l.reserve(patches.size() * patchsize * patchsize);
 
-        for (auto &p : patches) {
+        for (auto& p : patches) {
             const int pW = min(p.first + patchsize, W);
             const int pH = min(p.second + patchsize, H);
 
@@ -259,7 +278,7 @@ float estimate_ambient_light(const array2D<float> &R, const array2D<float> &G, c
     double rr = 0, gg = 0, bb = 0;
     int n = 0;
 
-    for (auto &p : patches) {
+    for (auto& p : patches) {
         const int pW = min(p.first + patchsize, W);
         const int pH = min(p.second + patchsize, H);
 
@@ -285,10 +304,17 @@ float estimate_ambient_light(const array2D<float> &R, const array2D<float> &G, c
     ambient[2] = bb / n;
 
     // taken from darktable
-    return darklim > 0 ? -1.125f * std::log(darklim) : std::log(std::numeric_limits<float>::max()) / 2;
+    return darklim > 0 ? -1.125f * std::log(darklim)
+                       : std::log(std::numeric_limits<float>::max()) / 2;
 }
 
-void extract_channels(Imagefloat *img, array2D<float> &r, array2D<float> &g, array2D<float> &b, int radius, float epsilon, bool multithread)
+void extract_channels(Imagefloat* img,
+                      array2D<float>& r,
+                      array2D<float>& g,
+                      array2D<float>& b,
+                      int radius,
+                      float epsilon,
+                      bool multithread)
 {
     const int W = img->getWidth();
     const int H = img->getHeight();
@@ -303,9 +329,9 @@ void extract_channels(Imagefloat *img, array2D<float> &r, array2D<float> &g, arr
     guidedFilter(imgB, imgB, b, radius, epsilon, multithread);
 }
 
-} // namespace
+}  // namespace
 
-void ImProcFunctions::dehaze(Imagefloat *img, const DehazeParams &dehazeParams)
+void ImProcFunctions::dehaze(Imagefloat* img, const DehazeParams& dehazeParams)
 {
     if (!dehazeParams.enabled || dehazeParams.strength == 0.0) {
         return;
@@ -324,7 +350,8 @@ void ImProcFunctions::dehaze(Imagefloat *img, const DehazeParams &dehazeParams)
     float maxDistance = 0.f;
 
     {
-        array2D<float>& R = dark; // R and dark can safely use the same buffer, which is faster and reduces memory allocations/deallocations
+        array2D<float>& R = dark;  // R and dark can safely use the same buffer, which is
+                                   // faster and reduces memory allocations/deallocations
         array2D<float> G(W, H);
         array2D<float> B(W, H);
         extract_channels(img, R, G, B, patchsize, 1e-1, multiThread);
@@ -338,8 +365,10 @@ void ImProcFunctions::dehaze(Imagefloat *img, const DehazeParams &dehazeParams)
             if (W <= ww && H <= hh) {
                 // don't rescale small thumbs
                 array2D<float> D(W, H);
-                const int npatches = get_dark_channel_downsized(R, G, B, D, 2, multiThread);
-                maxDistance = estimate_ambient_light(R, G, B, D, patchsize, npatches, ambient);
+                const int npatches =
+                    get_dark_channel_downsized(R, G, B, D, 2, multiThread);
+                maxDistance =
+                    estimate_ambient_light(R, G, B, D, patchsize, npatches, ambient);
             } else {
                 array2D<float> RR(ww, hh);
                 array2D<float> GG(ww, hh);
@@ -349,8 +378,10 @@ void ImProcFunctions::dehaze(Imagefloat *img, const DehazeParams &dehazeParams)
                 rescaleNearest(B, BB, multiThread);
                 array2D<float> D(ww, hh);
 
-                const int npatches = get_dark_channel_downsized(RR, GG, BB, D, 2, multiThread);
-                maxDistance = estimate_ambient_light(RR, GG, BB, D, patchsize, npatches, ambient);
+                const int npatches =
+                    get_dark_channel_downsized(RR, GG, BB, D, 2, multiThread);
+                maxDistance =
+                    estimate_ambient_light(RR, GG, BB, D, patchsize, npatches, ambient);
             }
         }
 
@@ -359,14 +390,13 @@ void ImProcFunctions::dehaze(Imagefloat *img, const DehazeParams &dehazeParams)
                 std::cout << "dehaze: no haze detected" << std::endl;
             }
             restore(img, maxChannel, multiThread);
-            return; // probably no haze at all
+            return;  // probably no haze at all
         }
         patchsize = max(max(W, H) / 600, 2);
 
         if (settings->verbose) {
-            std::cout << "dehaze: ambient light is "
-                      << ambient[0] << ", " << ambient[1] << ", " << ambient[2]
-                      << std::endl;
+            std::cout << "dehaze: ambient light is " << ambient[0] << ", " << ambient[1]
+                      << ", " << ambient[2] << std::endl;
         }
 
         get_dark_channel(R, G, B, dark, patchsize, ambient, true, multiThread, strength);
@@ -377,7 +407,7 @@ void ImProcFunctions::dehaze(Imagefloat *img, const DehazeParams &dehazeParams)
 
     array2D<float> guideB(W, H, img->b.ptrs, ARRAY2D_BYREFERENCE);
     guidedFilter(guideB, dark, dark, radius, epsilon, multiThread);
-        
+
     if (settings->verbose) {
         std::cout << "dehaze: max distance is " << maxDistance << std::endl;
     }
@@ -387,14 +417,15 @@ void ImProcFunctions::dehaze(Imagefloat *img, const DehazeParams &dehazeParams)
     constexpr float teps = 1.f + 1e-3f;
 
     const float satBlend = dehazeParams.saturation / 100.f;
-    const TMatrix ws = ICCStore::getInstance()->workingSpaceMatrix(params->icm.workingProfile);
+    const TMatrix ws =
+        ICCStore::getInstance()->workingSpaceMatrix(params->icm.workingProfile);
 #ifdef __SSE2__
-    const vfloat wsv[3] = {F2V(ws[1][0]), F2V(ws[1][1]),F2V(ws[1][2])};
+    const vfloat wsv[3] = { F2V(ws[1][0]), F2V(ws[1][1]), F2V(ws[1][2]) };
 #endif
     const float ambientY = Color::rgbLuminance(ambient[0], ambient[1], ambient[2], ws);
 
 #ifdef _OPENMP
-    #pragma omp parallel for if (multiThread)
+#pragma omp parallel for if (multiThread)
 #endif
     for (int y = 0; y < H; ++y) {
         int x = 0;
@@ -415,7 +446,8 @@ void ImProcFunctions::dehaze(Imagefloat *img, const DehazeParams &dehazeParams)
             const vfloat g = LVFU(img->g(y, x));
             const vfloat b = LVFU(img->b(y, x));
             // ... t >= tl to avoid negative values
-            const vfloat tlv = tepsv - vminf(r / ambient0v, vminf(g / ambient1v, b / ambient2v));
+            const vfloat tlv =
+                tepsv - vminf(r / ambient0v, vminf(g / ambient1v, b / ambient2v));
             const vfloat mtv = vmaxf(LVFU(dark[y][x]), vmaxf(tlv, t0v));
             if (dehazeParams.showDepthMap) {
                 const vfloat valv = vclampf(onev - mtv, ZEROV, onev) * cmaxChannelv;
@@ -425,10 +457,17 @@ void ImProcFunctions::dehaze(Imagefloat *img, const DehazeParams &dehazeParams)
             } else {
                 const vfloat Yv = Color::rgbLuminance(r, g, b, wsv);
                 const vfloat YYv = (Yv - ambientYv) / mtv + ambientYv;
-                const vfloat fv = vself(vmaskf_gt(Yv, epsYv), cmaxChannelv * YYv / Yv, cmaxChannelv);
-                STVFU(img->r(y, x), vintpf(satBlendv, ((r - ambient0v) / mtv + ambient0v) * cmaxChannelv, r * fv));
-                STVFU(img->g(y, x), vintpf(satBlendv, ((g - ambient1v) / mtv + ambient1v) * cmaxChannelv, g * fv));
-                STVFU(img->b(y, x), vintpf(satBlendv, ((b - ambient2v) / mtv + ambient2v) * cmaxChannelv, b * fv));
+                const vfloat fv =
+                    vself(vmaskf_gt(Yv, epsYv), cmaxChannelv * YYv / Yv, cmaxChannelv);
+                STVFU(img->r(y, x),
+                      vintpf(satBlendv,
+                             ((r - ambient0v) / mtv + ambient0v) * cmaxChannelv, r * fv));
+                STVFU(img->g(y, x),
+                      vintpf(satBlendv,
+                             ((g - ambient1v) / mtv + ambient1v) * cmaxChannelv, g * fv));
+                STVFU(img->b(y, x),
+                      vintpf(satBlendv,
+                             ((b - ambient2v) / mtv + ambient2v) * cmaxChannelv, b * fv));
             }
         }
 #endif
@@ -443,21 +482,29 @@ void ImProcFunctions::dehaze(Imagefloat *img, const DehazeParams &dehazeParams)
             if (dehazeParams.showDepthMap) {
                 img->r(y, x) = img->g(y, x) = img->b(y, x) = LIM01(1.f - mt) * maxChannel;
             } else {
-                const float Y = Color::rgbLuminance(img->r(y, x), img->g(y, x), img->b(y, x), ws);
+                const float Y =
+                    Color::rgbLuminance(img->r(y, x), img->g(y, x), img->b(y, x), ws);
                 const float YY = (Y - ambientY) / mt + ambientY;
                 const float f = Y > 1e-5f ? maxChannel * YY / Y : maxChannel;
-                img->r(y, x) = intp(satBlend, ((r - ambient[0]) / mt + ambient[0]) * maxChannel, r * f);
-                img->g(y, x) = intp(satBlend, ((g - ambient[1]) / mt + ambient[1]) * maxChannel, g * f);
-                img->b(y, x) = intp(satBlend, ((b - ambient[2]) / mt + ambient[2]) * maxChannel, b * f);
+                img->r(y, x) = intp(
+                    satBlend, ((r - ambient[0]) / mt + ambient[0]) * maxChannel, r * f);
+                img->g(y, x) = intp(
+                    satBlend, ((g - ambient[1]) / mt + ambient[1]) * maxChannel, g * f);
+                img->b(y, x) = intp(
+                    satBlend, ((b - ambient[2]) / mt + ambient[2]) * maxChannel, b * f);
             }
         }
     }
 }
 
-void ImProcFunctions::dehazeloc(Imagefloat *img, const DehazeParams &dehazeParams, int sk, int sp)
+void ImProcFunctions::dehazeloc(Imagefloat* img,
+                                const DehazeParams& dehazeParams,
+                                int sk,
+                                int sp)
 {
-    //J.Desmis 12 2019 - this version derived from ART, is slower than the main from maximum 10% - probably use of SSE
-    //Probably Ingo could solved this problem in some times
+    // J.Desmis 12 2019 - this version derived from ART, is slower than the main from
+    // maximum 10% - probably use of SSE Probably Ingo could solved this problem in some
+    // times
 
     if (!dehazeParams.enabled || dehazeParams.strength == 0.0) {
         return;
@@ -479,12 +526,14 @@ void ImProcFunctions::dehazeloc(Imagefloat *img, const DehazeParams &dehazeParam
     int whit = 0;
     int blac = params->locallab.spots.at(sp).dehazeblack;
 
-    if(blac != 0) {
-        ImProcFunctions::tone_eqdehaz(this, img, whit, blac, params->icm.workingProfile, sk, multiThread);
+    if (blac != 0) {
+        ImProcFunctions::tone_eqdehaz(this, img, whit, blac, params->icm.workingProfile,
+                                      sk, multiThread);
     }
 
     {
-        array2D<float>& R = dark; // R and dark can safely use the same buffer, which is faster and reduces memory allocations/deallocations
+        array2D<float>& R = dark;  // R and dark can safely use the same buffer, which is
+                                   // faster and reduces memory allocations/deallocations
         array2D<float> G(W, H);
         array2D<float> B(W, H);
         extract_channels(img, R, G, B, patchsize, 1e-1, multiThread);
@@ -498,8 +547,10 @@ void ImProcFunctions::dehazeloc(Imagefloat *img, const DehazeParams &dehazeParam
             if (W <= ww && H <= hh) {
                 // don't rescale small thumbs
                 array2D<float> D(W, H);
-                const int npatches = get_dark_channel_downsized(R, G, B, D, 2, multiThread);
-                maxDistance = estimate_ambient_light(R, G, B, D, patchsize, npatches, ambient);
+                const int npatches =
+                    get_dark_channel_downsized(R, G, B, D, 2, multiThread);
+                maxDistance =
+                    estimate_ambient_light(R, G, B, D, patchsize, npatches, ambient);
             } else {
                 array2D<float> RR(ww, hh);
                 array2D<float> GG(ww, hh);
@@ -509,8 +560,10 @@ void ImProcFunctions::dehazeloc(Imagefloat *img, const DehazeParams &dehazeParam
                 rescaleNearest(B, BB, multiThread);
                 array2D<float> D(ww, hh);
 
-                const int npatches = get_dark_channel_downsized(RR, GG, BB, D, 2, multiThread);
-                maxDistance = estimate_ambient_light(RR, GG, BB, D, patchsize, npatches, ambient);
+                const int npatches =
+                    get_dark_channel_downsized(RR, GG, BB, D, 2, multiThread);
+                maxDistance =
+                    estimate_ambient_light(RR, GG, BB, D, patchsize, npatches, ambient);
             }
         }
 
@@ -520,20 +573,18 @@ void ImProcFunctions::dehazeloc(Imagefloat *img, const DehazeParams &dehazeParam
             }
 
             restore(img, maxChannel, multiThread);
-            return; // probably no haze at all
+            return;  // probably no haze at all
         }
 
         patchsize = max(max(W, H) / 600, 2);
 
         if (settings->verbose) {
-            std::cout << "dehaze: ambient light is "
-                      << ambient[0] << ", " << ambient[1] << ", " << ambient[2]
-                      << std::endl;
+            std::cout << "dehaze: ambient light is " << ambient[0] << ", " << ambient[1]
+                      << ", " << ambient[2] << std::endl;
         }
 
         get_dark_channel(R, G, B, dark, patchsize, ambient, true, multiThread, strength);
     }
-
 
     const int radius = patchsize * 4;
     constexpr float epsilon = 1e-5f;
@@ -551,11 +602,12 @@ void ImProcFunctions::dehazeloc(Imagefloat *img, const DehazeParams &dehazeParam
 
     const float satBlend = dehazeParams.saturation / 100.f;
 
-    const TMatrix ws = ICCStore::getInstance()->workingSpaceMatrix(params->icm.workingProfile);
+    const TMatrix ws =
+        ICCStore::getInstance()->workingSpaceMatrix(params->icm.workingProfile);
 
     const float ambientY = Color::rgbLuminance(ambient[0], ambient[1], ambient[2], ws);
 #ifdef _OPENMP
-    #pragma omp parallel for if (multiThread)
+#pragma omp parallel for if (multiThread)
 #endif
 
     for (int y = 0; y < H; ++y) {
@@ -565,7 +617,8 @@ void ImProcFunctions::dehazeloc(Imagefloat *img, const DehazeParams &dehazeParam
             const float gIn = img->g(y, x);
             const float bIn = img->b(y, x);
             // ... t >= tl to avoid negative values
-            const float tl = 1.f + teps - min(rIn / ambient[0], gIn / ambient[1], bIn / ambient[2]);
+            const float tl =
+                1.f + teps - min(rIn / ambient[0], gIn / ambient[1], bIn / ambient[2]);
             const float mt = max(dark[y][x], t0, tl);
 
             if (dehazeParams.showDepthMap) {
@@ -601,7 +654,6 @@ void ImProcFunctions::dehazeloc(Imagefloat *img, const DehazeParams &dehazeParam
     }
 
     restore(img, maxChannel, multiThread);
-
 }
 
-} // namespace rtengine
+}  // namespace rtengine

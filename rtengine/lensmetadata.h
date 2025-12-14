@@ -25,34 +25,45 @@
 #include "procparams.h"
 #include "rtengine.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
-/* MetadataLensCorrection is an abstract class for various lens correction based on raw file metadata
- this metadata is vendor dependent */
-class MetadataLensCorrection : public LensCorrection,
-                               public NonCopyable
+/* MetadataLensCorrection is an abstract class for various lens correction based on raw
+ file metadata this metadata is vendor dependent */
+class MetadataLensCorrection : public LensCorrection, public NonCopyable
 {
 public:
-    virtual void initCorrections(int width, int height, const procparams::CoarseTransformParams &coarse, int rawRotationDeg) = 0;
+    virtual void initCorrections(int width,
+                                 int height,
+                                 const procparams::CoarseTransformParams& coarse,
+                                 int rawRotationDeg) = 0;
 };
 
-/* CenterRadiusMetadataLensCorrection is an abstract class the extends MetadataLensCorrection to easily handle center radius based corrections */
+/* CenterRadiusMetadataLensCorrection is an abstract class the extends
+ * MetadataLensCorrection to easily handle center radius based corrections */
 class CenterRadiusMetadataLensCorrection : public MetadataLensCorrection
 {
 public:
-    CenterRadiusMetadataLensCorrection(const FramesMetaData *meta);
+    CenterRadiusMetadataLensCorrection(const FramesMetaData* meta);
 
-    void process(double &x, double &y, int cx, int cy, int channel, bool dist, bool ca) const;
+    void
+    process(double& x, double& y, int cx, int cy, int channel, bool dist, bool ca) const;
 
-    void correctDistortionAndCA(double &x, double &y, int cx, int cy, int channel) const override;
-    void correctDistortion(double &x, double &y, int cx, int cy) const override;
-    void correctCA(double &x, double &y, int cx, int cy, int channel) const override;
-    void processVignette(int width, int height, float **rawData) const override;
-    void processVignette3Channels(int width, int height, float **rawData) const override;
+    void correctDistortionAndCA(double& x,
+                                double& y,
+                                int cx,
+                                int cy,
+                                int channel) const override;
+    void correctDistortion(double& x, double& y, int cx, int cy) const override;
+    void correctCA(double& x, double& y, int cx, int cy, int channel) const override;
+    void processVignette(int width, int height, float** rawData) const override;
+    void processVignette3Channels(int width, int height, float** rawData) const override;
 
-    void processVignetteNChannels(int width, int height, float **rawData, int channels) const;
-    void initCorrections(int width, int height, const procparams::CoarseTransformParams &coarse, int rawRotationDeg) override;
+    void
+    processVignetteNChannels(int width, int height, float** rawData, int channels) const;
+    void initCorrections(int width,
+                         int height,
+                         const procparams::CoarseTransformParams& coarse,
+                         int rawRotationDeg) override;
 
     /* Implementers should implement the below methods */
     virtual bool hasDistortionCorrection() const override = 0;
@@ -79,11 +90,13 @@ protected:
     Exiv2Metadata metadata;
 };
 
-/* MetadataLensCorrectionFinder tries to find and return MetadataLensCorrection for the provided metadata */
+/* MetadataLensCorrectionFinder tries to find and return MetadataLensCorrection for the
+ * provided metadata */
 class MetadataLensCorrectionFinder
 {
 public:
-    static std::unique_ptr<MetadataLensCorrection> findCorrection(const FramesMetaData *meta);
+    static std::unique_ptr<MetadataLensCorrection>
+    findCorrection(const FramesMetaData* meta);
 };
 
-} // namespace rtengine
+}  // namespace rtengine

@@ -23,22 +23,24 @@
 
 #include "rtsurface.h"
 
-std::map<std::pair<Glib::ustring, Gtk::IconSize>, std::shared_ptr<RTSurface>> RTImageCache::cache;
+std::map<std::pair<Glib::ustring, Gtk::IconSize>, std::shared_ptr<RTSurface>>
+    RTImageCache::cache;
 
-std::shared_ptr<RTSurface> RTImageCache::getCachedSurface(const Glib::ustring &icon_name, const Gtk::IconSize icon_size)
+std::shared_ptr<RTSurface> RTImageCache::getCachedSurface(const Glib::ustring& icon_name,
+                                                          const Gtk::IconSize icon_size)
 {
     // Look for an existing cached icon
     const auto key = std::pair<Glib::ustring, Gtk::IconSize>(icon_name, icon_size);
     const auto item = cache.find(key);
 
-    if (item != cache.end()) { // A cached icon exists
+    if (item != cache.end()) {  // A cached icon exists
         return item->second;
-    } else { // Create the icon
+    } else {  // Create the icon
         auto surface = std::shared_ptr<RTSurface>(new RTSurface(icon_name, icon_size));
 
         // Add the surface to the cache if the icon exist
         if (surface) {
-            cache.insert({key, surface});
+            cache.insert({ key, surface });
         }
 
         return surface;
@@ -53,15 +55,15 @@ void RTImageCache::updateCache()
     }
 }
 
-RTImage::RTImage () {}
+RTImage::RTImage() {}
 
-RTImage::RTImage (const Glib::ustring& iconName, const Gtk::IconSize iconSize) :
-    sigc::trackable(),
-    Glib::ObjectBase(),
-    Gtk::Image(),
-    size(iconSize),
-    icon_name(iconName),
-    g_icon(Glib::RefPtr<const Gio::Icon>())
+RTImage::RTImage(const Glib::ustring& iconName, const Gtk::IconSize iconSize)
+    : sigc::trackable(),
+      Glib::ObjectBase(),
+      Gtk::Image(),
+      size(iconSize),
+      icon_name(iconName),
+      g_icon(Glib::RefPtr<const Gio::Icon>())
 {
     // Set surface from icon cache
     surface = RTImageCache::getCachedSurface(this->icon_name, this->size);
@@ -74,11 +76,8 @@ RTImage::RTImage (const Glib::ustring& iconName, const Gtk::IconSize iconSize) :
     conn = RTScalable::connectToChanged(sigc::mem_fun(*this, &RTImage::onUpdate));
 }
 
-RTImage::RTImage (const Glib::RefPtr<const Gio::Icon>& gIcon, const Gtk::IconSize iconSize) :
-    Gtk::Image(),
-    size(iconSize),
-    icon_name(""),
-    g_icon(gIcon)
+RTImage::RTImage(const Glib::RefPtr<const Gio::Icon>& gIcon, const Gtk::IconSize iconSize)
+    : Gtk::Image(), size(iconSize), icon_name(""), g_icon(gIcon)
 {
     // Configure RTImage based on g_icon
     set(this->g_icon, this->size);
@@ -98,7 +97,8 @@ void RTImage::set_from_icon_name(const Glib::ustring& iconName)
     set_from_icon_name(iconName, this->size);
 }
 
-void RTImage::set_from_icon_name(const Glib::ustring& iconName, const Gtk::IconSize iconSize)
+void RTImage::set_from_icon_name(const Glib::ustring& iconName,
+                                 const Gtk::IconSize iconSize)
 {
     this->icon_name = iconName;
     this->size = iconSize;
@@ -122,7 +122,8 @@ void RTImage::set_from_gicon(const Glib::RefPtr<const Gio::Icon>& gIcon)
     set_from_gicon(gIcon, this->size);
 }
 
-void RTImage::set_from_gicon(const Glib::RefPtr<const Gio::Icon>& gIcon, const Gtk::IconSize iconSize)
+void RTImage::set_from_gicon(const Glib::RefPtr<const Gio::Icon>& gIcon,
+                             const Gtk::IconSize iconSize)
 {
     this->g_icon = gIcon;
     this->size = iconSize;

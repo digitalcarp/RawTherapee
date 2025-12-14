@@ -1,17 +1,15 @@
 #pragma once
 
-#include <memory>
 #include <cstdint>
+#include <memory>
 
-#include "cache.h"
 #include "alignedbuffer.h"
+#include "cache.h"
 #include "noncopyable.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
-class HaldCLUT final :
-    public NonCopyable
+class HaldCLUT final : public NonCopyable
 {
 public:
     HaldCLUT();
@@ -24,22 +22,18 @@ public:
     Glib::ustring getFilename() const;
     Glib::ustring getProfile() const;
 
-    void getRGB(
-        float strength,
-        std::size_t line_size,
-        const float* r,
-        const float* g,
-        const float* b,
-        float* out_rgbx
-    ) const;
+    void getRGB(float strength,
+                std::size_t line_size,
+                const float* r,
+                const float* g,
+                const float* b,
+                float* out_rgbx) const;
 
-    static void splitClutFilename(
-        const Glib::ustring& filename,
-        Glib::ustring& name,
-        Glib::ustring& extension,
-        Glib::ustring& profile_name,
-        bool checkProfile = true
-    );
+    static void splitClutFilename(const Glib::ustring& filename,
+                                  Glib::ustring& name,
+                                  Glib::ustring& extension,
+                                  Glib::ustring& profile_name,
+                                  bool checkProfile = true);
 
 private:
     AlignedBuffer<std::uint16_t> clut_image;
@@ -50,8 +44,7 @@ private:
     Glib::ustring clut_profile;
 };
 
-class CLUTStore final :
-    public NonCopyable
+class CLUTStore final : public NonCopyable
 {
 public:
     static CLUTStore& getInstance();
@@ -66,4 +59,4 @@ private:
     mutable Cache<Glib::ustring, std::shared_ptr<HaldCLUT>> cache;
 };
 
-}
+}  // namespace rtengine

@@ -27,16 +27,11 @@
 class RTSurface final : public RTScalable
 {
 public:
-    enum class RTSurfaceType {
-        InvalidType,
-        IconType,
-        PNGType,
-        SVGType
-    };
+    enum class RTSurfaceType { InvalidType, IconType, PNGType, SVGType };
 
 private:
-    double dpiBack; // Used to identify dpi change
-    int scaleBack;  // Used to identify scale change
+    double dpiBack;  // Used to identify dpi change
+    int scaleBack;   // Used to identify scale change
     RTSurfaceType type;
     Glib::ustring name;
     Gtk::IconSize icon_size;
@@ -44,8 +39,8 @@ private:
 
 public:
     RTSurface();
-    explicit RTSurface(const Glib::ustring &icon_name, const Gtk::IconSize iconSize);
-    explicit RTSurface(const Glib::ustring &fname);
+    explicit RTSurface(const Glib::ustring& icon_name, const Gtk::IconSize iconSize);
+    explicit RTSurface(const Glib::ustring& fname);
 
     int getWidth();
     int getHeight();

@@ -13,10 +13,10 @@
 ////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "opthelper.h"
+#include "rt_math.h"
 #include <assert.h>
 #include <stdint.h>
-#include "rt_math.h"
-#include "opthelper.h"
 
 #define PI4_A .7853981554508209228515625
 #define PI4_B .794662735614792836713604629039764404296875e-8
@@ -27,7 +27,8 @@
 #define L2L .28235290563031577122588448175013436025525412068e-12
 #define R_LN2 1.442695040888963407359924681001892137426645954152985934135449406931
 
-__inline int64_t doubleToRawLongBits(double d) {
+__inline int64_t doubleToRawLongBits(double d)
+{
     union {
         double f;
         int64_t i;
@@ -36,7 +37,8 @@ __inline int64_t doubleToRawLongBits(double d) {
     return tmp.i;
 }
 
-__inline double longBitsToDouble(int64_t i) {
+__inline double longBitsToDouble(int64_t i)
+{
     union {
         double f;
         int64_t i;
@@ -45,40 +47,69 @@ __inline double longBitsToDouble(int64_t i) {
     return tmp.f;
 }
 
-__inline double xfabs(double x) {
+__inline double xfabs(double x)
+{
     return longBitsToDouble(0x7fffffffffffffffLL & doubleToRawLongBits(x));
 }
 
-__inline double mulsign(double x, double y) {
-    return longBitsToDouble(doubleToRawLongBits(x) ^ (doubleToRawLongBits(y) & (1LL << 63)));
+__inline double mulsign(double x, double y)
+{
+    return longBitsToDouble(doubleToRawLongBits(x)
+                            ^ (doubleToRawLongBits(y) & (1LL << 63)));
 }
 
-__inline double sign(double d) { return mulsign(1, d); }
-__inline double mla(double x, double y, double z) { return x * y + z; }
-__inline double xrint(double x) { return x < 0 ? (int)(x - 0.5) : (int)(x + 0.5); }
+__inline double sign(double d)
+{
+    return mulsign(1, d);
+}
+__inline double mla(double x, double y, double z)
+{
+    return x * y + z;
+}
+__inline double xrint(double x)
+{
+    return x < 0 ? (int)(x - 0.5) : (int)(x + 0.5);
+}
 
-__inline int xisnan(double x) { return x != x; }
-__inline int xisinf(double x) { return x == rtengine::RT_INFINITY || x == -rtengine::RT_INFINITY; }
-__inline int xisminf(double x) { return x == -rtengine::RT_INFINITY; }
-__inline int xispinf(double x) { return x == rtengine::RT_INFINITY; }
+__inline int xisnan(double x)
+{
+    return x != x;
+}
+__inline int xisinf(double x)
+{
+    return x == rtengine::RT_INFINITY || x == -rtengine::RT_INFINITY;
+}
+__inline int xisminf(double x)
+{
+    return x == -rtengine::RT_INFINITY;
+}
+__inline int xispinf(double x)
+{
+    return x == rtengine::RT_INFINITY;
+}
 
-__inline double ldexpk(double x, int q) {
+__inline double ldexpk(double x, int q)
+{
     double u;
     int m;
     m = q >> 31;
     m = (((m + q) >> 9) - m) << 7;
     q = q - (m << 2);
     u = longBitsToDouble(((int64_t)(m + 0x3ff)) << 52);
-    double u2 = u*u;
+    double u2 = u * u;
     u2 = u2 * u2;
     x = x * u2;
     u = longBitsToDouble(((int64_t)(q + 0x3ff)) << 52);
     return x * u;
 }
 
-__inline double xldexp(double x, int q) { return ldexpk(x, q); }
+__inline double xldexp(double x, int q)
+{
+    return ldexpk(x, q);
+}
 
-__inline int ilogbp1(double d) {
+__inline int ilogbp1(double d)
+{
     int m = d < 4.9090934652977266E-91;
     d = m ? 2.037035976334486E90 * d : d;
     int q = (doubleToRawLongBits(d) >> 52) & 0x7ff;
@@ -86,32 +117,39 @@ __inline int ilogbp1(double d) {
     return q;
 }
 
-__inline int xilogb(double d) {
+__inline int xilogb(double d)
+{
     int e = ilogbp1(xfabs(d)) - 1;
     e = d == 0 ? (-2147483647 - 1) : e;
     e = d == rtengine::RT_INFINITY || d == -rtengine::RT_INFINITY ? 2147483647 : e;
     return e;
 }
 
-__inline double upper(double d) {
+__inline double upper(double d)
+{
     return longBitsToDouble(doubleToRawLongBits(d) & 0xfffffffff8000000LL);
 }
 
-typedef struct {
+typedef struct
+{
     double x, y;
 } double2;
 
-typedef struct {
+typedef struct
+{
     float x, y;
 } float2;
 
-__inline double2 dd(double h, double l) {
+__inline double2 dd(double h, double l)
+{
     double2 ret;
-    ret.x = h; ret.y = l;
+    ret.x = h;
+    ret.y = l;
     return ret;
 }
 
-__inline double2 normalize_d(double2 t) {
+__inline double2 normalize_d(double2 t)
+{
     double2 s;
 
     s.x = t.x + t.y;
@@ -120,7 +158,8 @@ __inline double2 normalize_d(double2 t) {
     return s;
 }
 
-__inline double2 scale_d(double2 d, double s) {
+__inline double2 scale_d(double2 d, double s)
+{
     double2 r;
 
     r.x = d.x * s;
@@ -129,7 +168,8 @@ __inline double2 scale_d(double2 d, double s) {
     return r;
 }
 
-__inline double2 add2_ss(double x, double y) {
+__inline double2 add2_ss(double x, double y)
+{
     double2 r;
 
     r.x = x + y;
@@ -139,7 +179,8 @@ __inline double2 add2_ss(double x, double y) {
     return r;
 }
 
-__inline double2 add_ds(double2 x, double y) {
+__inline double2 add_ds(double2 x, double y)
+{
     // |x| >= |y|
 
     double2 r;
@@ -152,12 +193,13 @@ __inline double2 add_ds(double2 x, double y) {
     return r;
 }
 
-__inline double2 add2_ds(double2 x, double y) {
+__inline double2 add2_ds(double2 x, double y)
+{
     // |x| >= |y|
 
     double2 r;
 
-    r.x  = x.x + y;
+    r.x = x.x + y;
     double v = r.x - x.x;
     r.y = (x.x - (r.x - v)) + (y - v);
     r.y += x.y;
@@ -165,7 +207,8 @@ __inline double2 add2_ds(double2 x, double y) {
     return r;
 }
 
-__inline double2 add_sd(double x, double2 y) {
+__inline double2 add_sd(double x, double2 y)
+{
     // |x| >= |y|
 
     double2 r;
@@ -178,7 +221,8 @@ __inline double2 add_sd(double x, double2 y) {
     return r;
 }
 
-__inline double2 add_dd(double2 x, double2 y) {
+__inline double2 add_dd(double2 x, double2 y)
+{
     // |x| >= |y|
 
     double2 r;
@@ -191,10 +235,11 @@ __inline double2 add_dd(double2 x, double2 y) {
     return r;
 }
 
-__inline double2 add2_dd(double2 x, double2 y) {
+__inline double2 add2_dd(double2 x, double2 y)
+{
     double2 r;
 
-    r.x  = x.x + y.x;
+    r.x = x.x + y.x;
     double v = r.x - x.x;
     r.y = (x.x - (r.x - v)) + (y.x - v);
     r.y += x.y + y.y;
@@ -202,25 +247,27 @@ __inline double2 add2_dd(double2 x, double2 y) {
     return r;
 }
 
-__inline double2 div_dd(double2 n, double2 d) {
+__inline double2 div_dd(double2 n, double2 d)
+{
     double t = 1.0 / d.x;
-    double dh  = upper(d.x), dl  = d.x - dh;
-    double th  = upper(t  ), tl  = t   - th;
+    double dh = upper(d.x), dl = d.x - dh;
+    double th = upper(t), tl = t - th;
     double nhh = upper(n.x), nhl = n.x - nhh;
 
     double2 q;
 
     q.x = n.x * t;
 
-    double u = -q.x + nhh * th + nhh * tl + nhl * th + nhl * tl +
-        q.x * (1 - dh * th - dh * tl - dl * th - dl * tl);
+    double u = -q.x + nhh * th + nhh * tl + nhl * th + nhl * tl
+               + q.x * (1 - dh * th - dh * tl - dl * th - dl * tl);
 
     q.y = t * (n.y - q.x * d.y) + u;
 
     return q;
 }
 
-__inline double2 mul_ss(double x, double y) {
+__inline double2 mul_ss(double x, double y)
+{
     double xh = upper(x), xl = x - xh;
     double yh = upper(y), yl = y - yh;
     double2 r;
@@ -231,9 +278,10 @@ __inline double2 mul_ss(double x, double y) {
     return r;
 }
 
-__inline double2 mul_ds(double2 x, double y) {
+__inline double2 mul_ds(double2 x, double y)
+{
     double xh = upper(x.x), xl = x.x - xh;
-    double yh = upper(y  ), yl = y   - yh;
+    double yh = upper(y), yl = y - yh;
     double2 r;
 
     r.x = x.x * y;
@@ -242,7 +290,8 @@ __inline double2 mul_ds(double2 x, double y) {
     return r;
 }
 
-__inline double2 mul_dd(double2 x, double2 y) {
+__inline double2 mul_dd(double2 x, double2 y)
+{
     double xh = upper(x.x), xl = x.x - xh;
     double yh = upper(y.x), yl = y.x - yh;
     double2 r;
@@ -253,7 +302,8 @@ __inline double2 mul_dd(double2 x, double2 y) {
     return r;
 }
 
-__inline double2 squ_d(double2 x) {
+__inline double2 squ_d(double2 x)
+{
     double xh = upper(x.x), xl = x.x - xh;
     double2 r;
 
@@ -263,7 +313,8 @@ __inline double2 squ_d(double2 x) {
     return r;
 }
 
-__inline double2 rec_s(double d) {
+__inline double2 rec_s(double d)
+{
     double t = 1.0 / d;
     double dh = upper(d), dl = d - dh;
     double th = upper(t), tl = t - th;
@@ -275,17 +326,27 @@ __inline double2 rec_s(double d) {
     return q;
 }
 
-__inline double2 sqrt_d(double2 d) {
+__inline double2 sqrt_d(double2 d)
+{
     double t = sqrt(d.x + d.y);
     return scale_d(mul_dd(add2_dd(d, mul_ss(t, t)), rec_s(t)), 0.5);
 }
 
-__inline double atan2k(double y, double x) {
+__inline double atan2k(double y, double x)
+{
     double s, t, u;
     int q = 0;
 
-    if (x < 0) { x = -x; q = -2; }
-    if (y > x) { t = x; x = y; y = -t; q += 1; }
+    if (x < 0) {
+        x = -x;
+        q = -2;
+    }
+    if (y > x) {
+        t = x;
+        x = y;
+        y = -t;
+        q += 1;
+    }
 
     s = y / x;
     t = s * s;
@@ -316,31 +377,44 @@ __inline double atan2k(double y, double x) {
     return t;
 }
 
-__inline double xatan2(double y, double x) {
+__inline double xatan2(double y, double x)
+{
     double r = atan2k(xfabs(y), x);
 
     r = mulsign(r, x);
-    if (xisinf(x) || x == 0) r = rtengine::RT_PI_2 - (xisinf(x) ? (sign(x) * (rtengine::RT_PI_2)) : 0);
-    if (xisinf(y)          ) r = rtengine::RT_PI_2 - (xisinf(x) ? (sign(x) * (rtengine::RT_PI*1/4)) : 0);
-    if (             y == 0) r = (sign(x) == -1 ? rtengine::RT_PI : 0);
+    if (xisinf(x) || x == 0)
+        r = rtengine::RT_PI_2 - (xisinf(x) ? (sign(x) * (rtengine::RT_PI_2)) : 0);
+    if (xisinf(y))
+        r = rtengine::RT_PI_2 - (xisinf(x) ? (sign(x) * (rtengine::RT_PI * 1 / 4)) : 0);
+    if (y == 0) r = (sign(x) == -1 ? rtengine::RT_PI : 0);
 
     return xisnan(x) || xisnan(y) ? rtengine::RT_NAN : mulsign(r, y);
 }
 
-__inline double xasin(double d) {
-    return mulsign(atan2k(xfabs(d), sqrt((1+d)*(1-d))), d);
+__inline double xasin(double d)
+{
+    return mulsign(atan2k(xfabs(d), sqrt((1 + d) * (1 - d))), d);
 }
 
-__inline double xacos(double d) {
-    return mulsign(atan2k(sqrt((1+d)*(1-d)), xfabs(d)), d) + (d < 0 ? rtengine::RT_PI : 0);
+__inline double xacos(double d)
+{
+    return mulsign(atan2k(sqrt((1 + d) * (1 - d)), xfabs(d)), d)
+           + (d < 0 ? rtengine::RT_PI : 0);
 }
 
-__inline double xatan(double s) {
+__inline double xatan(double s)
+{
     double t, u;
     int q = 0;
 
-    if (s < 0) { s = -s; q = 2; }
-    if (s > 1) { s = 1.0 / s; q |= 1; }
+    if (s < 0) {
+        s = -s;
+        q = 2;
+    }
+    if (s > 1) {
+        s = 1.0 / s;
+        q |= 1;
+    }
 
     t = s * s;
 
@@ -372,15 +446,16 @@ __inline double xatan(double s) {
     return t;
 }
 
-__inline double xsin(double d) {
+__inline double xsin(double d)
+{
     int q;
     double u, s;
 
     q = (int)xrint(d * rtengine::RT_1_PI);
 
-    d = mla(q, -PI4_A*4, d);
-    d = mla(q, -PI4_B*4, d);
-    d = mla(q, -PI4_C*4, d);
+    d = mla(q, -PI4_A * 4, d);
+    d = mla(q, -PI4_B * 4, d);
+    d = mla(q, -PI4_C * 4, d);
 
     s = d * d;
 
@@ -401,15 +476,16 @@ __inline double xsin(double d) {
     return u;
 }
 
-__inline double xcos(double d) {
+__inline double xcos(double d)
+{
     int q;
     double u, s;
 
-    q = 1 + 2*(int)xrint(d * rtengine::RT_1_PI - 0.5);
+    q = 1 + 2 * (int)xrint(d * rtengine::RT_1_PI - 0.5);
 
-    d = mla(q, -PI4_A*2, d);
-    d = mla(q, -PI4_B*2, d);
-    d = mla(q, -PI4_C*2, d);
+    d = mla(q, -PI4_A * 2, d);
+    d = mla(q, -PI4_B * 2, d);
+    d = mla(q, -PI4_C * 2, d);
 
     s = d * d;
 
@@ -430,7 +506,8 @@ __inline double xcos(double d) {
     return u;
 }
 
-__inline double2 xsincos(double d) {
+__inline double2 xsincos(double d)
+{
     int q;
     double u, s, t;
     double2 r;
@@ -439,9 +516,9 @@ __inline double2 xsincos(double d) {
 
     s = d;
 
-    s = mla(-q, PI4_A*2, s);
-    s = mla(-q, PI4_B*2, s);
-    s = mla(-q, PI4_C*2, s);
+    s = mla(-q, PI4_A * 2, s);
+    s = mla(-q, PI4_B * 2, s);
+    s = mla(-q, PI4_C * 2, s);
 
     t = s;
 
@@ -467,24 +544,35 @@ __inline double2 xsincos(double d) {
 
     r.y = u * s + 1;
 
-    if ((q & 1) != 0) { s = r.y; r.y = r.x; r.x = s; }
-    if ((q & 2) != 0) { r.x = -r.x; }
-    if (((q+1) & 2) != 0) { r.y = -r.y; }
+    if ((q & 1) != 0) {
+        s = r.y;
+        r.y = r.x;
+        r.x = s;
+    }
+    if ((q & 2) != 0) {
+        r.x = -r.x;
+    }
+    if (((q + 1) & 2) != 0) {
+        r.y = -r.y;
+    }
 
-    if (xisinf(d)) { r.x = r.y = rtengine::RT_NAN; }
+    if (xisinf(d)) {
+        r.x = r.y = rtengine::RT_NAN;
+    }
 
     return r;
 }
 
-__inline double xtan(double d) {
+__inline double xtan(double d)
+{
     int q;
     double u, s, x;
 
     q = (int)xrint(d * (2 * rtengine::RT_1_PI));
 
-    x = mla(q, -PI4_A*2, d);
-    x = mla(q, -PI4_B*2, x);
-    x = mla(q, -PI4_C*2, x);
+    x = mla(q, -PI4_A * 2, d);
+    x = mla(q, -PI4_B * 2, x);
+    x = mla(q, -PI4_C * 2, x);
 
     s = x * x;
 
@@ -515,14 +603,15 @@ __inline double xtan(double d) {
     return u;
 }
 
-__inline double xlog(double d) {
+__inline double xlog(double d)
+{
     double x, x2, t, m;
     int e;
 
     e = ilogbp1(d * 0.7071);
     m = ldexpk(d, -e);
 
-    x = (m-1) / (m+1);
+    x = (m - 1) / (m + 1);
     x2 = x * x;
 
     t = 0.148197055177935105296783;
@@ -543,7 +632,8 @@ __inline double xlog(double d) {
     return x;
 }
 
-__inline double xexp(double d) {
+__inline double xexp(double d)
+{
     int q = (int)xrint(d * R_LN2);
     double s, u;
 
@@ -570,7 +660,8 @@ __inline double xexp(double d) {
     return u;
 }
 
-__inline double2 logk(double d) {
+__inline double2 logk(double d)
+{
     double2 x, x2;
     double m, t;
     int e;
@@ -590,11 +681,13 @@ __inline double2 logk(double d) {
     t = mla(t, x2.x, 0.400000000000222439910458);
     t = mla(t, x2.x, 0.666666666666666371239645);
 
-    return add2_dd(mul_ds(dd(0.693147180559945286226764, 2.319046813846299558417771e-17), e),
-            add2_dd(scale_d(x, 2), mul_ds(mul_dd(x2, x), t)));
+    return add2_dd(
+        mul_ds(dd(0.693147180559945286226764, 2.319046813846299558417771e-17), e),
+        add2_dd(scale_d(x, 2), mul_ds(mul_dd(x2, x), t)));
 }
 
-__inline double expk(double2 d) {
+__inline double expk(double2 d)
+{
     int q = (int)rint((d.x + d.y) * R_LN2);
     double2 s, t;
     double u;
@@ -621,25 +714,29 @@ __inline double expk(double2 d) {
     return ldexpk(t.x + t.y, q);
 }
 
-__inline double xpow(double x, double y) {
+__inline double xpow(double x, double y)
+{
     int yisint = (int)y == y;
     int yisodd = (1 & (int)y) != 0 && yisint;
 
     double result = expk(mul_ds(logk(xfabs(x)), y));
 
     result = xisnan(result) ? rtengine::RT_INFINITY : result;
-    result *=  (x >= 0 ? 1 : (!yisint ? rtengine::RT_NAN : (yisodd ? -1 : 1)));
+    result *= (x >= 0 ? 1 : (!yisint ? rtengine::RT_NAN : (yisodd ? -1 : 1)));
 
     double efx = mulsign(xfabs(x) - 1, y);
     if (xisinf(y)) result = efx < 0 ? 0.0 : (efx == 0 ? 1.0 : rtengine::RT_INFINITY);
-    if (xisinf(x) || x == 0) result = (yisodd ? sign(x) : 1) * ((x == 0 ? -y : y) < 0 ? 0 : rtengine::RT_INFINITY);
+    if (xisinf(x) || x == 0)
+        result =
+            (yisodd ? sign(x) : 1) * ((x == 0 ? -y : y) < 0 ? 0 : rtengine::RT_INFINITY);
     if (xisnan(x) || xisnan(y)) result = rtengine::RT_NAN;
     if (y == 0 || x == 1) result = 1;
 
     return result;
 }
 
-__inline double2 expk2(double2 d) {
+__inline double2 expk2(double2 d)
+{
     int q = (int)rint((d.x + d.y) * R_LN2);
     double2 s, t;
     double u;
@@ -666,7 +763,8 @@ __inline double2 expk2(double2 d) {
     return dd(ldexpk(t.x, q), ldexpk(t.y, q));
 }
 
-__inline double xsinh(double x) {
+__inline double xsinh(double x)
+{
     double y = xfabs(x);
     double2 d = expk2(dd(y, 0));
     d = add2_dd(d, div_dd(dd(-1, 0), d));
@@ -679,7 +777,8 @@ __inline double xsinh(double x) {
     return y;
 }
 
-__inline double xcosh(double x) {
+__inline double xcosh(double x)
+{
     double2 d = expk2(dd(x, 0));
     d = add2_dd(d, div_dd(dd(1, 0), d));
     double y = (d.x + d.y) * 0.5;
@@ -690,7 +789,8 @@ __inline double xcosh(double x) {
     return y;
 }
 
-__inline double xtanh(double x) {
+__inline double xtanh(double x)
+{
     double y = xfabs(x);
     double2 d = expk2(dd(y, 0));
     double2 e = div_dd(dd(1, 0), d);
@@ -704,7 +804,8 @@ __inline double xtanh(double x) {
     return y;
 }
 
-__inline double2 logk2(double2 d) {
+__inline double2 logk2(double2 d)
+{
     double2 x, x2, m;
     double t;
     int e;
@@ -725,13 +826,15 @@ __inline double2 logk2(double2 d) {
     t = mla(t, x2.x, 0.400000000000222439910458);
     t = mla(t, x2.x, 0.666666666666666371239645);
 
-    return add2_dd(mul_ds(dd(0.693147180559945286226764, 2.319046813846299558417771e-17), e),
-            add2_dd(scale_d(x, 2), mul_ds(mul_dd(x2, x), t)));
+    return add2_dd(
+        mul_ds(dd(0.693147180559945286226764, 2.319046813846299558417771e-17), e),
+        add2_dd(scale_d(x, 2), mul_ds(mul_dd(x2, x), t)));
 }
 
-__inline double xasinh(double x) {
+__inline double xasinh(double x)
+{
     double y = xfabs(x);
-    double2 d = logk2(add2_ds(sqrt_d(add2_ds(mul_ss(y, y),  1)), y));
+    double2 d = logk2(add2_ds(sqrt_d(add2_ds(mul_ss(y, y), 1)), y));
     y = d.x + d.y;
 
     y = xisinf(x) || xisnan(y) ? rtengine::RT_INFINITY : y;
@@ -741,7 +844,8 @@ __inline double xasinh(double x) {
     return y;
 }
 
-__inline double xacosh(double x) {
+__inline double xacosh(double x)
+{
     double2 d = logk2(add2_ds(sqrt_d(add2_ds(mul_ss(x, x), -1)), x));
     double y = d.x + d.y;
 
@@ -753,10 +857,12 @@ __inline double xacosh(double x) {
     return y;
 }
 
-__inline double xatanh(double x) {
+__inline double xatanh(double x)
+{
     double y = xfabs(x);
     double2 d = logk2(div_dd(add2_ss(1, y), add2_ss(1, -y)));
-    y = y > 1.0 ? rtengine::RT_NAN : (y == 1.0 ? rtengine::RT_INFINITY : (d.x + d.y) * 0.5);
+    y = y > 1.0 ? rtengine::RT_NAN
+                : (y == 1.0 ? rtengine::RT_INFINITY : (d.x + d.y) * 0.5);
 
     y = xisinf(x) || xisnan(y) ? rtengine::RT_NAN : y;
     y = mulsign(y, x);
@@ -767,7 +873,8 @@ __inline double xatanh(double x) {
 
 //
 
-__inline double xfma(double x, double y, double z) {
+__inline double xfma(double x, double y, double z)
+{
     union {
         double f;
         long long int i;
@@ -793,7 +900,8 @@ __inline double xfma(double x, double y, double z) {
     return h2 + l2;
 }
 
-__inline double xsqrt(double d) { // max error : 0.5 ulp
+__inline double xsqrt(double d)
+{  // max error : 0.5 ulp
     double q = 1;
 
     if (d < 8.636168555094445E-78) {
@@ -802,7 +910,8 @@ __inline double xsqrt(double d) { // max error : 0.5 ulp
     }
 
     // http://en.wikipedia.org/wiki/Fast_inverse_square_root
-    double x = longBitsToDouble(0x5fe6ec85e7de30da - (doubleToRawLongBits(d + 1e-320) >> 1));
+    double x =
+        longBitsToDouble(0x5fe6ec85e7de30da - (doubleToRawLongBits(d + 1e-320) >> 1));
 
     x = x * (1.5 - 0.5 * d * x * x);
     x = x * (1.5 - 0.5 * d * x * x);
@@ -814,7 +923,8 @@ __inline double xsqrt(double d) { // max error : 0.5 ulp
     return d == rtengine::RT_INFINITY ? rtengine::RT_INFINITY : x * q;
 }
 
-__inline double xcbrt(double d) { // max error : 2 ulps
+__inline double xcbrt(double d)
+{  // max error : 2 ulps
     double x, y, q = 1.0;
     int e, r;
 
@@ -835,28 +945,33 @@ __inline double xcbrt(double d) { // max error : 2 ulps
     x = x * d + -3.85841935510444988821632;
     x = x * d + 2.2307275302496609725722;
 
-    y = x * x; y = y * y; x -= (d * y - x) * (1.0 / 3.0);
+    y = x * x;
+    y = y * y;
+    x -= (d * y - x) * (1.0 / 3.0);
     y = d * x * x;
     y = (y - (2.0 / 3.0) * y * (y * x - 1)) * q;
 
     return y;
 }
 
-__inline double xexp2(double a) {
+__inline double xexp2(double a)
+{
     double u = expk(mul_ds(dd(0.69314718055994528623, 2.3190468138462995584e-17), a));
     if (xispinf(a)) u = rtengine::RT_INFINITY;
     if (xisminf(a)) u = 0;
     return u;
 }
 
-__inline double xexp10(double a) {
+__inline double xexp10(double a)
+{
     double u = expk(mul_ds(dd(2.3025850929940459011, -2.1707562233822493508e-16), a));
     if (xispinf(a)) u = rtengine::RT_INFINITY;
     if (xisminf(a)) u = 0;
     return u;
 }
 
-__inline double xexpm1(double a) {
+__inline double xexpm1(double a)
+{
     double2 d = add2_ds(expk2(dd(a, 0)), -1.0);
     double x = d.x + d.y;
     if (xispinf(a)) x = rtengine::RT_INFINITY;
@@ -864,7 +979,8 @@ __inline double xexpm1(double a) {
     return x;
 }
 
-__inline double xlog10(double a) {
+__inline double xlog10(double a)
+{
     double2 d = mul_dd(logk(a), dd(0.43429448190325176116, 6.6494347733425473126e-17));
     double x = d.x + d.y;
 
@@ -875,7 +991,8 @@ __inline double xlog10(double a) {
     return x;
 }
 
-__inline double xlog1p(double a) {
+__inline double xlog1p(double a)
+{
     double2 d = logk2(add2_ss(a, 1));
     double x = d.x + d.y;
 
@@ -899,15 +1016,18 @@ __inline double xlog1p(double a) {
 #define R_LN2f 1.442695040888963407359924681001892137426645954152985934135449406931f
 
 #ifdef __SSE2__
-__inline int xrintf(float x) {
+__inline int xrintf(float x)
+{
     return _mm_cvt_ss2si(_mm_set_ss(x));
 }
 #else
-__inline int xrintf(float x) {
+__inline int xrintf(float x)
+{
     return x + (x < 0 ? -0.5f : 0.5f);
 }
 #endif
-__inline int32_t floatToRawIntBits(float d) {
+__inline int32_t floatToRawIntBits(float d)
+{
     union {
         float f;
         int32_t i;
@@ -916,7 +1036,8 @@ __inline int32_t floatToRawIntBits(float d) {
     return tmp.i;
 }
 
-__inline float intBitsToFloat(int32_t i) {
+__inline float intBitsToFloat(int32_t i)
+{
     union {
         float f;
         int32_t i;
@@ -925,23 +1046,44 @@ __inline float intBitsToFloat(int32_t i) {
     return tmp.f;
 }
 
-__inline float xfabsf(float x) {
+__inline float xfabsf(float x)
+{
     return intBitsToFloat(0x7fffffffL & floatToRawIntBits(x));
 }
 
-__inline float mulsignf(float x, float y) {
+__inline float mulsignf(float x, float y)
+{
     return intBitsToFloat(floatToRawIntBits(x) ^ (floatToRawIntBits(y) & (1 << 31)));
 }
 
-__inline float signf(float d) { return std::copysign(1.f, d); }
-__inline float mlaf(float x, float y, float z) { return x * y + z; }
+__inline float signf(float d)
+{
+    return std::copysign(1.f, d);
+}
+__inline float mlaf(float x, float y, float z)
+{
+    return x * y + z;
+}
 
-__inline int xisnanf(float x) { return x != x; }
-__inline int xisinff(float x) { return x == rtengine::RT_INFINITY_F || x == -rtengine::RT_INFINITY_F; }
-__inline int xisminff(float x) { return x == -rtengine::RT_INFINITY_F; }
-__inline int xispinff(float x) { return x == rtengine::RT_INFINITY_F; }
+__inline int xisnanf(float x)
+{
+    return x != x;
+}
+__inline int xisinff(float x)
+{
+    return x == rtengine::RT_INFINITY_F || x == -rtengine::RT_INFINITY_F;
+}
+__inline int xisminff(float x)
+{
+    return x == -rtengine::RT_INFINITY_F;
+}
+__inline int xispinff(float x)
+{
+    return x == rtengine::RT_INFINITY_F;
+}
 
-__inline int ilogbp1f(float d) {
+__inline int ilogbp1f(float d)
+{
     int m = d < 5.421010862427522E-20f;
     d = m ? 1.8446744073709552E19f * d : d;
     int q = (floatToRawIntBits(d) >> 23) & 0xff;
@@ -949,7 +1091,8 @@ __inline int ilogbp1f(float d) {
     return q;
 }
 
-__inline float ldexpkf(float x, int q) {
+__inline float ldexpkf(float x, int q)
+{
     float u;
     int m;
     m = q >> 31;
@@ -962,7 +1105,8 @@ __inline float ldexpkf(float x, int q) {
     return x * u;
 }
 
-__inline float xcbrtf(float d) { // max error : 2 ulps
+__inline float xcbrtf(float d)
+{  // max error : 2 ulps
     float x, y, q = 1.0f;
     int e, r;
 
@@ -989,16 +1133,17 @@ __inline float xcbrtf(float d) { // max error : 2 ulps
     return y;
 }
 
-__inline float xsinf(float d) {
+__inline float xsinf(float d)
+{
     int q;
     float u, s;
 
     q = xrintf(d * rtengine::RT_1_PI_F);
 
-    d = mlaf(q, -PI4_Af*4, d);
-    d = mlaf(q, -PI4_Bf*4, d);
-    d = mlaf(q, -PI4_Cf*4, d);
-    d = mlaf(q, -PI4_Df*4, d);
+    d = mlaf(q, -PI4_Af * 4, d);
+    d = mlaf(q, -PI4_Bf * 4, d);
+    d = mlaf(q, -PI4_Cf * 4, d);
+    d = mlaf(q, -PI4_Df * 4, d);
 
     s = d * d;
 
@@ -1014,7 +1159,8 @@ __inline float xsinf(float d) {
     return u;
 }
 
-__inline float xcosf(float d) {
+__inline float xcosf(float d)
+{
 #ifdef __SSE2__
     // faster than scalar version
     return xcosf(_mm_set_ss(d))[0];
@@ -1022,12 +1168,12 @@ __inline float xcosf(float d) {
     int q;
     float u, s;
 
-    q = 1 + 2*xrintf(d * rtengine::RT_1_PI_F - 0.5f);
+    q = 1 + 2 * xrintf(d * rtengine::RT_1_PI_F - 0.5f);
 
-    d = mlaf(q, -PI4_Af*2, d);
-    d = mlaf(q, -PI4_Bf*2, d);
-    d = mlaf(q, -PI4_Cf*2, d);
-    d = mlaf(q, -PI4_Df*2, d);
+    d = mlaf(q, -PI4_Af * 2, d);
+    d = mlaf(q, -PI4_Bf * 2, d);
+    d = mlaf(q, -PI4_Cf * 2, d);
+    d = mlaf(q, -PI4_Df * 2, d);
 
     s = d * d;
 
@@ -1044,11 +1190,12 @@ __inline float xcosf(float d) {
 #endif
 }
 
-__inline float2 xsincosf(float d) {
+__inline float2 xsincosf(float d)
+{
 #ifdef __SSE2__
     // faster than scalar version
     vfloat2 res = xsincosf(_mm_set_ss(d));
-    return {res.x[0], res.y[0]};
+    return { res.x[0], res.y[0] };
 #else
     int q;
     float u, s, t;
@@ -1058,10 +1205,10 @@ __inline float2 xsincosf(float d) {
 
     s = d;
 
-    s = mlaf(q, -PI4_Af*2, s);
-    s = mlaf(q, -PI4_Bf*2, s);
-    s = mlaf(q, -PI4_Cf*2, s);
-    s = mlaf(q, -PI4_Df*2, s);
+    s = mlaf(q, -PI4_Af * 2, s);
+    s = mlaf(q, -PI4_Bf * 2, s);
+    s = mlaf(q, -PI4_Cf * 2, s);
+    s = mlaf(q, -PI4_Df * 2, s);
 
     t = s;
 
@@ -1082,17 +1229,28 @@ __inline float2 xsincosf(float d) {
 
     r.y = u * s + 1;
 
-    if ((q & 1) != 0) { s = r.y; r.y = r.x; r.x = s; }
-    if ((q & 2) != 0) { r.x = -r.x; }
-    if (((q+1) & 2) != 0) { r.y = -r.y; }
+    if ((q & 1) != 0) {
+        s = r.y;
+        r.y = r.x;
+        r.x = s;
+    }
+    if ((q & 2) != 0) {
+        r.x = -r.x;
+    }
+    if (((q + 1) & 2) != 0) {
+        r.y = -r.y;
+    }
 
-    if (xisinff(d)) { r.x = r.y = rtengine::RT_NAN_F; }
+    if (xisinff(d)) {
+        r.x = r.y = rtengine::RT_NAN_F;
+    }
 
     return r;
 #endif
 }
 
-__inline float xtanf(float d) {
+__inline float xtanf(float d)
+{
     int q;
     float u, s, x;
 
@@ -1100,10 +1258,10 @@ __inline float xtanf(float d) {
 
     x = d;
 
-    x = mlaf(q, -PI4_Af*2, x);
-    x = mlaf(q, -PI4_Bf*2, x);
-    x = mlaf(q, -PI4_Cf*2, x);
-    x = mlaf(q, -PI4_Df*2, x);
+    x = mlaf(q, -PI4_Af * 2, x);
+    x = mlaf(q, -PI4_Bf * 2, x);
+    x = mlaf(q, -PI4_Cf * 2, x);
+    x = mlaf(q, -PI4_Df * 2, x);
 
     s = x * x;
 
@@ -1125,12 +1283,19 @@ __inline float xtanf(float d) {
     return u;
 }
 
-__inline float xatanf(float s) {
+__inline float xatanf(float s)
+{
     float t, u;
     int q = 0;
 
-    if (s < 0) { s = -s; q = 2; }
-    if (s > 1) { s = 1.0f / s; q |= 1; }
+    if (s < 0) {
+        s = -s;
+        q = 2;
+    }
+    if (s > 1) {
+        s = 1.0f / s;
+        q |= 1;
+    }
 
     t = s * s;
 
@@ -1151,12 +1316,21 @@ __inline float xatanf(float s) {
     return t;
 }
 
-__inline float atan2kf(float y, float x) {
+__inline float atan2kf(float y, float x)
+{
     float s, t, u;
     float q = 0.f;
 
-    if (x < 0) { x = -x; q = -2.f; }
-    if (y > x) { t = x; x = y; y = -t; q += 1.f; }
+    if (x < 0) {
+        x = -x;
+        q = -2.f;
+    }
+    if (y > x) {
+        t = x;
+        x = y;
+        y = -t;
+        q += 1.f;
+    }
 
     s = y / x;
     t = s * s;
@@ -1171,37 +1345,46 @@ __inline float atan2kf(float y, float x) {
     u = mlaf(u, t, -0.333331018686294555664062f);
 
     t = u * t;
-    t = mlaf(t,s,s);
-    return mlaf(q,(float)(rtengine::RT_PI_F_2),t);
+    t = mlaf(t, s, s);
+    return mlaf(q, (float)(rtengine::RT_PI_F_2), t);
 }
 
-__inline float xatan2f(float y, float x) {
+__inline float xatan2f(float y, float x)
+{
     float r = atan2kf(xfabsf(y), x);
 
     r = mulsignf(r, x);
-    if (xisinff(x) || x == 0) r = rtengine::RT_PI_F/2 - (xisinff(x) ? (signf(x) * (float)(rtengine::RT_PI_F*.5f)) : 0);
-    if (xisinff(y)          ) r = rtengine::RT_PI_F/2 - (xisinff(x) ? (signf(x) * (float)(rtengine::RT_PI_F*.25f)) : 0);
-    if (              y == 0) r = (signf(x) == -1 ? rtengine::RT_PI_F : 0);
+    if (xisinff(x) || x == 0)
+        r = rtengine::RT_PI_F / 2
+            - (xisinff(x) ? (signf(x) * (float)(rtengine::RT_PI_F * .5f)) : 0);
+    if (xisinff(y))
+        r = rtengine::RT_PI_F / 2
+            - (xisinff(x) ? (signf(x) * (float)(rtengine::RT_PI_F * .25f)) : 0);
+    if (y == 0) r = (signf(x) == -1 ? rtengine::RT_PI_F : 0);
 
     return xisnanf(x) || xisnanf(y) ? rtengine::RT_NAN_F : mulsignf(r, y);
 }
 
-__inline float xasinf(float d) {
-    return mulsignf(atan2kf(fabsf(d), sqrtf((1.0f+d)*(1.0f-d))), d);
+__inline float xasinf(float d)
+{
+    return mulsignf(atan2kf(fabsf(d), sqrtf((1.0f + d) * (1.0f - d))), d);
 }
 
-__inline float xacosf(float d) {
-    return mulsignf(atan2kf(sqrtf((1.0f+d)*(1.0f-d)), fabsf(d)), d) + (d < 0 ? (float)rtengine::RT_PI : 0.0f);
+__inline float xacosf(float d)
+{
+    return mulsignf(atan2kf(sqrtf((1.0f + d) * (1.0f - d)), fabsf(d)), d)
+           + (d < 0 ? (float)rtengine::RT_PI : 0.0f);
 }
 
-__inline float xlogf(float d) {
+__inline float xlogf(float d)
+{
     float x, x2, t, m;
     int e;
 
     e = ilogbp1f(d * 0.7071f);
     m = ldexpkf(d, -e);
 
-    x = (m-1.0f) / (m+1.0f);
+    x = (m - 1.0f) / (m + 1.0f);
     x2 = x * x;
 
     t = 0.2371599674224853515625f;
@@ -1219,14 +1402,15 @@ __inline float xlogf(float d) {
     return x;
 }
 
-__inline float xlogf1(float d) { // does xlogf(vmaxf(d, 1.f)) but faster
+__inline float xlogf1(float d)
+{  // does xlogf(vmaxf(d, 1.f)) but faster
     float x, x2, t, m;
     int e;
 
     e = ilogbp1f(d * 0.7071f);
     m = ldexpkf(d, -e);
 
-    x = (m-1.0f) / (m+1.0f);
+    x = (m - 1.0f) / (m + 1.0f);
     x2 = x * x;
 
     t = 0.2371599674224853515625f;
@@ -1243,8 +1427,9 @@ __inline float xlogf1(float d) { // does xlogf(vmaxf(d, 1.f)) but faster
     return x;
 }
 
-__inline float xexpf(float d) {
-    if(d<=-104.0f) return 0.0f;
+__inline float xexpf(float d)
+{
+    if (d <= -104.0f) return 0.0f;
 
     int q = xrintf(d * R_LN2f);
     float s, u;
@@ -1258,43 +1443,45 @@ __inline float xexpf(float d) {
     u = mlaf(u, s, 0.166665524244308471679688f);
     u = mlaf(u, s, 0.499999850988388061523438f);
 
-    u = mlaf( s, mlaf(s,u,1.f),1.f);
+    u = mlaf(s, mlaf(s, u, 1.f), 1.f);
     return ldexpkf(u, q);
-
 }
 
-__inline float xmul2f(float d) {
+__inline float xmul2f(float d)
+{
     union {
         float floatval;
         int intval;
     } uflint;
     uflint.floatval = d;
-    if (uflint.intval & 0x7FFFFFFF) { // if f==0 do nothing
-        uflint.intval += 1 << 23; // add 1 to the exponent
+    if (uflint.intval & 0x7FFFFFFF) {  // if f==0 do nothing
+        uflint.intval += 1 << 23;      // add 1 to the exponent
     }
     return uflint.floatval;
 }
 
-__inline float xdiv2f(float d) {
+__inline float xdiv2f(float d)
+{
     union {
         float floatval;
         int intval;
     } uflint;
     uflint.floatval = d;
-    if (uflint.intval & 0x7FFFFFFF) { // if f==0 do nothing
-        uflint.intval -= 1 << 23; // sub 1 from the exponent
+    if (uflint.intval & 0x7FFFFFFF) {  // if f==0 do nothing
+        uflint.intval -= 1 << 23;      // sub 1 from the exponent
     }
     return uflint.floatval;
 }
 
-__inline float xdivf( float d, int n){
+__inline float xdivf(float d, int n)
+{
     union {
         float floatval;
         int intval;
     } uflint;
     uflint.floatval = d;
-    if (uflint.intval & 0x7FFFFFFF) { // if f==0 do nothing
-        uflint.intval -= n << 23; // add n to the exponent
+    if (uflint.intval & 0x7FFFFFFF) {  // if f==0 do nothing
+        uflint.intval -= n << 23;      // add n to the exponent
     }
     return uflint.floatval;
 }

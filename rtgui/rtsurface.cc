@@ -24,8 +24,7 @@
 
 #include "options.h"
 
-RTSurface::RTSurface() :
-    surface(new Cairo::ImageSurface(nullptr, false))
+RTSurface::RTSurface() : surface(new Cairo::ImageSurface(nullptr, false))
 {
     // Initialize "back" parameters from RTScalable
     dpiBack = RTScalable::getDPI();
@@ -37,8 +36,8 @@ RTSurface::RTSurface() :
     icon_size = Gtk::ICON_SIZE_INVALID;
 }
 
-RTSurface::RTSurface(const Glib::ustring &icon_name, const Gtk::IconSize iconSize) :
-    RTSurface()
+RTSurface::RTSurface(const Glib::ustring& icon_name, const Gtk::IconSize iconSize)
+    : RTSurface()
 {
     // Create surface
     surface = RTScalable::loadSurfaceFromIcon(icon_name, iconSize);
@@ -51,8 +50,7 @@ RTSurface::RTSurface(const Glib::ustring &icon_name, const Gtk::IconSize iconSiz
     }
 }
 
-RTSurface::RTSurface(const Glib::ustring &fname) :
-    RTSurface()
+RTSurface::RTSurface(const Glib::ustring& fname) : RTSurface()
 {
     // Create surface based on file extension
     const auto pos = fname.find_last_of('.');
@@ -92,26 +90,26 @@ int RTSurface::getWidth()
 
     if (hasSurface()) {
         switch (type) {
-            case RTSurfaceType::IconType:
-                // Get width from Gtk::IconSize
-                if (!Gtk::IconSize::lookup(icon_size, w, h)) { // Size in invalid
-                    w = h = -1; // Invalid case
-                }
+        case RTSurfaceType::IconType:
+            // Get width from Gtk::IconSize
+            if (!Gtk::IconSize::lookup(icon_size, w, h)) {  // Size in invalid
+                w = h = -1;                                 // Invalid case
+            }
 
-                return RTScalable::scalePixelSize(w);
+            return RTScalable::scalePixelSize(w);
 
-            case RTSurfaceType::PNGType:
-                // Directly return surface width
-                return surface->get_width();
+        case RTSurfaceType::PNGType:
+            // Directly return surface width
+            return surface->get_width();
 
-            case RTSurfaceType::SVGType:
-                // Returned size shall consider the scaling
-                return (surface->get_width() / RTScalable::getScale());
+        case RTSurfaceType::SVGType:
+            // Returned size shall consider the scaling
+            return (surface->get_width() / RTScalable::getScale());
 
-            case RTSurfaceType::InvalidType:
-            default:
-                // Invalid case
-                return -1;
+        case RTSurfaceType::InvalidType:
+        default:
+            // Invalid case
+            return -1;
         }
     } else {
         // Invalid case
@@ -125,26 +123,26 @@ int RTSurface::getHeight()
 
     if (hasSurface()) {
         switch (type) {
-            case RTSurfaceType::IconType:
-                // Get width from Gtk::IconSize
-                if (!Gtk::IconSize::lookup(icon_size, w, h)) { // Size in invalid
-                    w = h = -1; // Invalid case
-                }
+        case RTSurfaceType::IconType:
+            // Get width from Gtk::IconSize
+            if (!Gtk::IconSize::lookup(icon_size, w, h)) {  // Size in invalid
+                w = h = -1;                                 // Invalid case
+            }
 
-                return RTScalable::scalePixelSize(h);
+            return RTScalable::scalePixelSize(h);
 
-            case RTSurfaceType::PNGType:
-                // Directly return surface width
-                return surface->get_height();
+        case RTSurfaceType::PNGType:
+            // Directly return surface width
+            return surface->get_height();
 
-            case RTSurfaceType::SVGType:
-                // Returned size shall consider the scaling
-                return (surface->get_height() / RTScalable::getScale());
+        case RTSurfaceType::SVGType:
+            // Returned size shall consider the scaling
+            return (surface->get_height() / RTScalable::getScale());
 
-            case RTSurfaceType::InvalidType:
-            default:
-                // Invalid case
-                return -1;
+        case RTSurfaceType::InvalidType:
+        default:
+            // Invalid case
+            return -1;
         }
     } else {
         // Invalid case
@@ -159,14 +157,13 @@ bool RTSurface::hasSurface()
 
 Cairo::RefPtr<Cairo::ImageSurface> RTSurface::get()
 {
-    if (dpiBack != RTScalable::getDPI() ||
-        scaleBack != RTScalable::getScale()) {
-            updateSurface();
+    if (dpiBack != RTScalable::getDPI() || scaleBack != RTScalable::getScale()) {
+        updateSurface();
 
-            // Save new DPI and scale
-            dpiBack = RTScalable::getDPI();
-            scaleBack = RTScalable::getScale();
-        }
+        // Save new DPI and scale
+        dpiBack = RTScalable::getDPI();
+        scaleBack = RTScalable::getScale();
+    }
 
     return surface;
 }
@@ -175,16 +172,16 @@ void RTSurface::updateSurface()
 {
     // Update surface based on the scale
     switch (type) {
-        case RTSurfaceType::IconType :
-            surface = RTScalable::loadSurfaceFromIcon(name, icon_size);
-            break;
-        case RTSurfaceType::PNGType :
-            surface = RTScalable::loadSurfaceFromPNG(name);
-            break;
-        case RTSurfaceType::SVGType :
-            surface = RTScalable::loadSurfaceFromSVG(name);
-            break;
-        default :
-            break;
+    case RTSurfaceType::IconType:
+        surface = RTScalable::loadSurfaceFromIcon(name, icon_size);
+        break;
+    case RTSurfaceType::PNGType:
+        surface = RTScalable::loadSurfaceFromPNG(name);
+        break;
+    case RTSurfaceType::SVGType:
+        surface = RTScalable::loadSurfaceFromSVG(name);
+        break;
+    default:
+        break;
     }
 }

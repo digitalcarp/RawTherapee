@@ -23,13 +23,20 @@
 
 #include <gtkmm.h>
 
+#include "coarsepanel.h"
+#include "guiutils.h"
+#include "imageareatoollistener.h"
+#include "lensgeomlistener.h"
+#include "pparamschangelistener.h"
+#include "profilechangelistener.h"
+#include "toolbar.h"
+#include "toolpanel.h"
 #include "tools/bayerpreprocess.h"
 #include "tools/bayerprocess.h"
 #include "tools/bayerrawexposure.h"
 #include "tools/blackwhite.h"
 #include "tools/cacorrection.h"
 #include "tools/chmixer.h"
-#include "coarsepanel.h"
 #include "tools/colorappearance.h"
 #include "tools/colortoning.h"
 #include "tools/compressgamut.h"
@@ -47,24 +54,19 @@
 #include "tools/flatfield.h"
 #include "tools/framing.h"
 #include "tools/gradient.h"
-#include "guiutils.h"
 #include "tools/hsvequalizer.h"
 #include "tools/icmpanel.h"
-#include "imageareatoollistener.h"
 #include "tools/impulsedenoise.h"
 #include "tools/labcurve.h"
 #include "tools/lensgeom.h"
-#include "lensgeomlistener.h"
 #include "tools/lensprofile.h"
 #include "tools/localcontrast.h"
 #include "tools/locallab.h"
 #include "tools/pcvignette.h"
 #include "tools/pdsharpening.h"
 #include "tools/perspective.h"
-#include "pparamschangelistener.h"
 #include "tools/preprocess.h"
 #include "tools/preprocesswb.h"
-#include "profilechangelistener.h"
 #include "tools/prsharpening.h"
 #include "tools/rawcacorrection.h"
 #include "tools/rawexposure.h"
@@ -82,8 +84,6 @@
 #include "tools/spot.h"
 #include "tools/tonecurve.h"
 #include "tools/toneequalizer.h"
-#include "toolbar.h"
-#include "toolpanel.h"
 #include "tools/vibrance.h"
 #include "tools/vignetting.h"
 #include "tools/wavelet.h"
@@ -119,7 +119,7 @@ protected:
     Vignetting* vignetting;
     Gradient* gradient;
     Locallab* locallab;
-    Retinex*  retinex;
+    Retinex* retinex;
     PCVignette* pcvignette;
     LensGeometry* lensgeom;
     LensProfilePanel* lensProf;
@@ -139,27 +139,27 @@ protected:
     ToneCurve* toneCurve;
     ShadowsHighlights* shadowshighlights;
     ToneEqualizer* toneEqualizer;
-    LocalContrast *localContrast;
+    LocalContrast* localContrast;
     Spot* spot;
     Defringe* defringe;
     Compressgamut* compressgamut;
     ImpulseDenoise* impulsedenoise;
     DirPyrDenoise* dirpyrdenoise;
-    EdgePreservingDecompositionUI *epd;
+    EdgePreservingDecompositionUI* epd;
     Sharpening* sharpening;
     SharpenEdge* sharpenEdge;
     SharpenMicro* sharpenMicro;
     LCurve* lcurve;
     RGBCurves* rgbcurves;
     ColorToning* colortoning;
-    Wavelet * wavelet;
+    Wavelet* wavelet;
     DirPyrEqualizer* dirpyrequalizer;
     HSVEqualizer* hsvequalizer;
-    SoftLight *softlight;
-    Dehaze *dehaze;
-    FilmSimulation *filmSimulation;
-    SensorBayer * sensorbayer;
-    SensorXTrans * sensorxtrans;
+    SoftLight* softlight;
+    Dehaze* dehaze;
+    FilmSimulation* filmSimulation;
+    SensorBayer* sensorbayer;
+    SensorXTrans* sensorxtrans;
     BayerProcess* bayerprocess;
     XTransProcess* xtransprocess;
     BayerPreProcess* bayerpreprocess;
@@ -171,13 +171,12 @@ protected:
     PreprocessWB* preprocessWB;
     BayerRAWExposure* bayerrawexposure;
     XTransRAWExposure* xtransrawexposure;
-    FattalToneMapping *fattal;
+    FattalToneMapping* fattal;
     MetaDataPanel* metadata;
     FilmNegative* filmNegative;
     PdSharpening* pdSharpening;
     std::vector<PParamsChangeListener*> paramcListeners;
-    std::unordered_map<Gtk::Widget *, FoldableToolPanel *>
-        expanderToToolPanelMap;
+    std::unordered_map<Gtk::Widget*, FoldableToolPanel*> expanderToToolPanelMap;
 
     rtengine::StagedImageProcessor* ipc;
 
@@ -223,17 +222,16 @@ protected:
     void addPanel(Gtk::Box* where, FoldableToolPanel* panel, int level = 1);
     void foldThemAll(GdkEventButton* event);
     void updateVScrollbars(bool hide);
-    void addfavoritePanel (Gtk::Box* where, FoldableToolPanel* panel, int level = 1);
+    void addfavoritePanel(Gtk::Box* where, FoldableToolPanel* panel, int level = 1);
     void notebookPageChanged(Gtk::Widget* page, guint page_num);
-    void updatePanelTools(
-        Gtk::Widget *page,
-        const std::vector<Glib::ustring> &favorites,
-        bool cloneFavoriteTools);
+    void updatePanelTools(Gtk::Widget* page,
+                          const std::vector<Glib::ustring>& favorites,
+                          bool cloneFavoriteTools);
 
 private:
-    EditDataProvider *editDataProvider;
+    EditDataProvider* editDataProvider;
     sigc::connection notebookconn;
-    bool photoLoadedOnce; // Used to indicated that a photo has been loaded yet
+    bool photoLoadedOnce;  // Used to indicated that a photo has been loaded yet
     std::shared_ptr<RTSurface> ornamentSurface;
     Gtk::Widget* prevPage;
 
@@ -311,20 +309,22 @@ public:
         PD_SHARPENING,
     };
 
-    struct ToolTree {
+    struct ToolTree
+    {
         Tool id;
         std::vector<ToolTree> children;
     };
 
-    using ToolLayout = std::unordered_map<Panel, const std::vector<ToolTree> &, ScopedEnumHash>;
+    using ToolLayout =
+        std::unordered_map<Panel, const std::vector<ToolTree>&, ScopedEnumHash>;
 
     CoarsePanel* coarse;
     Gtk::Notebook* toolPanelNotebook;
 
     ToolPanelCoordinator(bool batch = false);
-    ~ToolPanelCoordinator () override;
+    ~ToolPanelCoordinator() override;
 
-    static const ToolLayout &getDefaultToolLayout();
+    static const ToolLayout& getDefaultToolLayout();
     /**
      * Gets the tool with the provided tool name.
      *
@@ -332,7 +332,7 @@ public:
      * @return The tool.
      * @throws std::out_of_range If the name is not recognized.
      */
-    static Tool getToolFromName(const std::string &name);
+    static Tool getToolFromName(const std::string& name);
     /**
      * Gets the tool name for the tool's ToolPanel as a string.
      *
@@ -342,27 +342,23 @@ public:
     static std::string getToolName(Tool tool);
     static bool isFavoritable(Tool tool);
 
-    bool getChangedState()
-    {
-        return hasChanged;
-    }
-    void updateCurveBackgroundHistogram(
-        const LUTu& histToneCurve,
-        const LUTu& histLCurve,
-        const LUTu& histCCurve,
-        const LUTu& histLCAM,
-        const LUTu& histCCAM,
-        const LUTu& histRed,
-        const LUTu& histGreen,
-        const LUTu& histBlue,
-        const LUTu& histLuma,
-        const LUTu& histLRETI
-    );
+    bool getChangedState() { return hasChanged; }
+    void updateCurveBackgroundHistogram(const LUTu& histToneCurve,
+                                        const LUTu& histLCurve,
+                                        const LUTu& histCCurve,
+                                        const LUTu& histLCAM,
+                                        const LUTu& histCCAM,
+                                        const LUTu& histRed,
+                                        const LUTu& histGreen,
+                                        const LUTu& histBlue,
+                                        const LUTu& histLuma,
+                                        const LUTu& histLRETI);
     void foldAllButOne(Gtk::Box* parent, FoldableToolPanel* openedSection);
-    void updateToolLocations(
-        const std::vector<Glib::ustring> &favorites, bool cloneFavoriteTools);
+    void updateToolLocations(const std::vector<Glib::ustring>& favorites,
+                             bool cloneFavoriteTools);
 
-    // multiple listeners can be added that are notified on changes (typical: profile panel and the history)
+    // multiple listeners can be added that are notified on changes (typical: profile
+    // panel and the history)
     void addPParamsChangeListener(PParamsChangeListener* pp)
     {
         paramcListeners.push_back(pp);
@@ -370,28 +366,33 @@ public:
 
     // toolpanellistener interface
     void refreshPreview(const rtengine::ProcEvent& event) override;
-    void panelChanged(const rtengine::ProcEvent& event, const Glib::ustring& descr) override;
-    void setTweakOperator (rtengine::TweakOperator *tOperator) override;
-    void unsetTweakOperator (rtengine::TweakOperator *tOperator) override;
+    void panelChanged(const rtengine::ProcEvent& event,
+                      const Glib::ustring& descr) override;
+    void setTweakOperator(rtengine::TweakOperator* tOperator) override;
+    void unsetTweakOperator(rtengine::TweakOperator* tOperator) override;
 
     // FilmNegProvider interface
-    void imageTypeChanged (bool isRaw, bool isBayer, bool isXtrans, bool isMono = false, bool isGainMapSupported = false) override;
+    void imageTypeChanged(bool isRaw,
+                          bool isBayer,
+                          bool isXtrans,
+                          bool isMono = false,
+                          bool isGainMapSupported = false) override;
 
     // profilechangelistener interface
-    void profileChange(
-        const rtengine::procparams::PartialProfile* nparams,
-        const rtengine::ProcEvent& event,
-        const Glib::ustring& descr,
-        const ParamsEdited* paramsEdited = nullptr,
-        bool fromLastSave = false
-    ) override;
+    void profileChange(const rtengine::procparams::PartialProfile* nparams,
+                       const rtengine::ProcEvent& event,
+                       const Glib::ustring& descr,
+                       const ParamsEdited* paramsEdited = nullptr,
+                       bool fromLastSave = false) override;
     void setDefaults(const rtengine::procparams::ProcParams* defparams) override;
 
     // DirSelectionListener interface
     void dirSelected(const Glib::ustring& dirname, const Glib::ustring& openfile);
 
     // to support the GUI:
-    CropGUIListener* getCropGUIListener();  // through the CropGUIListener the editor area can notify the "crop" ToolPanel when the crop selection changes
+    CropGUIListener*
+    getCropGUIListener();  // through the CropGUIListener the editor area can notify the
+                           // "crop" ToolPanel when the crop selection changes
 
     // init the toolpanelcoordinator with an image & close it
     void initImage(rtengine::StagedImageProcessor* ipc_, bool israw);
@@ -401,47 +402,62 @@ public:
     void updateToolState();
     void openAllTools();
     void closeAllTools();
-    // read/write the "expanded" state of the expanders & read/write the crop panel settings (ratio, guide type, etc.)
+    // read/write the "expanded" state of the expanders & read/write the crop panel
+    // settings (ratio, guide type, etc.)
     void readOptions();
     void writeOptions();
-    void writeToolExpandedStatus(std::vector<int> &tpOpen);
-    void updateShowtooltipVisibility (bool showtooltip);
+    void writeToolExpandedStatus(std::vector<int>& tpOpen);
+    void updateShowtooltipVisibility(bool showtooltip);
 
     // wbprovider interface
-    void getAutoWB (double& temp, double& green, double equal, rtengine::StandardObserver observer, double tempBias) override
+    void getAutoWB(double& temp,
+                   double& green,
+                   double equal,
+                   rtengine::StandardObserver observer,
+                   double tempBias) override
     {
         if (ipc) {
             ipc->getAutoWB(temp, green, equal, observer, tempBias);
         }
     }
-    void getCamWB (double& temp, double& green, rtengine::StandardObserver observer) override
+    void
+    getCamWB(double& temp, double& green, rtengine::StandardObserver observer) override
     {
         if (ipc) {
             ipc->getCamWB(temp, green, observer);
         }
     }
 
-    //DFProvider interface
+    // DFProvider interface
     const rtengine::RawImage* getDF() override;
 
-    //FFProvider interface
+    // FFProvider interface
     rtengine::RawImage* getFF() override;
     Glib::ustring GetCurrentImageFilePath() override;
 
     // FilmNegProvider interface
-    bool getFilmNegativeSpot(rtengine::Coord spot, int spotSize, RGB &refInput, RGB &refOutput) override;
+    bool getFilmNegativeSpot(rtengine::Coord spot,
+                             int spotSize,
+                             RGB& refInput,
+                             RGB& refOutput) override;
 
     // rotatelistener interface
-    void straightenRequested () override;
-    void autoCropRequested () override;
-    void autoPerspRequested (bool corr_pitch, bool corr_yaw, double& rot, double& pitch, double& yaw, const std::vector<rtengine::ControlLine> *lines = nullptr) override;
-    double autoDistorRequested () override;
+    void straightenRequested() override;
+    void autoCropRequested() override;
+    void autoPerspRequested(
+        bool corr_pitch,
+        bool corr_yaw,
+        double& rot,
+        double& pitch,
+        double& yaw,
+        const std::vector<rtengine::ControlLine>* lines = nullptr) override;
+    double autoDistorRequested() override;
 
     // spotwblistener interface
-    void spotWBRequested (int size) override;
+    void spotWBRequested(int size) override;
 
     // croppanellistener interface
-    void cropSelectRequested () override;
+    void cropSelectRequested() override;
 
     // PerspCorrectionPanelListener interface
     void controlLineEditModeChanged(bool active) override;
@@ -463,31 +479,29 @@ public:
 
     // ToolBarListener interface
     void toolDeselected(ToolMode tool) override;
-    void toolSelected (ToolMode tool) override;
-    void editModeSwitchedOff () final;
+    void toolSelected(ToolMode tool) override;
+    void editModeSwitchedOff() final;
 
-    void setEditProvider(EditDataProvider *provider);
+    void setEditProvider(EditDataProvider* provider);
 
-    void setProgressListener(rtengine::ProgressListener *pl);
+    void setProgressListener(rtengine::ProgressListener* pl);
 
 protected:
     static std::unordered_map<std::string, Tool> toolNamesReverseMap;
 
-    std::unordered_map<Tool, const ToolTree *, ScopedEnumHash>
-        toolToDefaultToolTreeMap;
+    std::unordered_map<Tool, const ToolTree*, ScopedEnumHash> toolToDefaultToolTreeMap;
 
-    FoldableToolPanel *getFoldableToolPanel(Tool tool) const;
-    FoldableToolPanel *getFoldableToolPanel(const ToolTree &tool) const;
-    void updateFavoritesPanel(
-        const std::vector<Glib::ustring> &favorites, bool cloneFavoriteTools);
+    FoldableToolPanel* getFoldableToolPanel(Tool tool) const;
+    FoldableToolPanel* getFoldableToolPanel(const ToolTree& tool) const;
+    void updateFavoritesPanel(const std::vector<Glib::ustring>& favorites,
+                              bool cloneFavoriteTools);
     template <typename T>
     typename std::enable_if<std::is_convertible<T, const ToolTree>::value, void>::type
-    updateToolPanel(
-        Gtk::Box *panelBox,
-        const std::vector<T> &children,
-        int level,
-        const std::unordered_set<Tool, ScopedEnumHash> &favorites,
-        bool cloneFavoriteTools);
+    updateToolPanel(Gtk::Box* panelBox,
+                    const std::vector<T>& children,
+                    int level,
+                    const std::unordered_set<Tool, ScopedEnumHash>& favorites,
+                    bool cloneFavoriteTools);
 
 private:
     IdleRegister idle_register;

@@ -52,19 +52,17 @@
  */
 #pragma once
 
+#include "noncopyable.h"
 #include <cassert>
 #include <cstring>
 #include <sys/types.h>
 #include <vector>
-#include "noncopyable.h"
 
 // flags for use
 constexpr unsigned int ARRAY2D_CLEAR_DATA = 1;
 constexpr unsigned int ARRAY2D_BYREFERENCE = 2;
 
-
-template<typename T>
-class array2D
+template <typename T> class array2D
 {
 
 private:
@@ -87,8 +85,8 @@ private:
         buffer.resize(h * width + offset);
         initRows(h, offset);
     }
-public:
 
+public:
     // use as empty declaration, resize before use!
     // very useful as a member object
     array2D() : width(0) {}
@@ -105,7 +103,7 @@ public:
     }
 
     // creator type 2
-    array2D(int w, int h, T ** source, unsigned int flags = 0) : width(w)
+    array2D(int w, int h, T** source, unsigned int flags = 0) : width(w)
     {
         rows.resize(h);
         if (!(flags & ARRAY2D_BYREFERENCE)) {
@@ -125,7 +123,8 @@ public:
     }
 
     // creator type 3
-    array2D(int w, int h, int startx, int starty, T ** source, unsigned int flags = 0) : width(w)
+    array2D(int w, int h, int startx, int starty, T** source, unsigned int flags = 0)
+        : width(w)
     {
         rows.resize(h);
         if (!(flags & ARRAY2D_BYREFERENCE)) {
@@ -144,14 +143,12 @@ public:
         }
     }
 
-    array2D(const array2D& other) :
-        width(other.width),
-        buffer(other.buffer)
+    array2D(const array2D& other) : width(other.width), buffer(other.buffer)
     {
         initRows(other.rows.size());
     }
 
-    array2D& operator =(const array2D& other)
+    array2D& operator=(const array2D& other)
     {
         if (this != &other) {
             free();
@@ -167,7 +164,7 @@ public:
     {
         const ssize_t height = rows.size();
 #ifdef _OPENMP
-        #pragma omp parallel for if(multiThread)
+#pragma omp parallel for if (multiThread)
 #endif
         for (ssize_t i = 0; i < width * height; ++i) {
             buffer[i] = val;
@@ -182,29 +179,23 @@ public:
     }
 
     // use with indices
-    T * operator[](int index)
+    T* operator[](int index)
     {
         assert((index >= 0) && (std::size_t(index) < rows.size()));
         return rows[index];
     }
 
-    const T * operator[](int index) const
+    const T* operator[](int index) const
     {
         assert((index >= 0) && (std::size_t(index) < rows.size()));
         return rows[index];
     }
 
     // use as pointer to T**
-    operator T**()
-    {
-        return rows.data();
-    }
+    operator T**() { return rows.data(); }
 
     // use as pointer to T**
-    operator const T* const *() const
-    {
-        return rows.data();
-    }
+    operator const T* const*() const { return rows.data(); }
 
     // use as pointer to buffer
     operator T*()
@@ -218,7 +209,6 @@ public:
         // only if owner this will return a valid pointer
         return buffer.data();
     }
-
 
     // useful within init of parent object
     // or use as resize of 2D array
@@ -236,7 +226,7 @@ public:
         if (rhs.getWidth() == this->getWidth() && rhs.getHeight() == this->getHeight()) {
             for (int i = 0; i < getHeight(); ++i) {
 #ifdef _OPENMP
-                #pragma omp simd
+#pragma omp simd
 #endif
 
                 for (int j = 0; j < getWidth(); ++j) {
@@ -257,23 +247,12 @@ public:
         }
     }
 
-    int getWidth() const
-    {
-        return width;
-    }
-    int getHeight() const
-    {
-        return rows.size();
-    }
+    int getWidth() const { return width; }
+    int getHeight() const { return rows.size(); }
 
-    operator bool()
-    {
-        return (width > 0 && !rows.empty());
-    }
-
+    operator bool() { return (width > 0 && !rows.empty()); }
 };
-template<typename T, const size_t num>
-class multi_array2D : public rtengine::NonCopyable
+template <typename T, const size_t num> class multi_array2D : public rtengine::NonCopyable
 {
 private:
     array2D<T> list[num];
@@ -286,7 +265,7 @@ public:
         }
     }
 
-    array2D<T> & operator[](int index)
+    array2D<T>& operator[](int index)
     {
         assert(static_cast<size_t>(index) < num);
         return list[index];

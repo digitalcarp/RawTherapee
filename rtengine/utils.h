@@ -21,27 +21,23 @@
 #include <functional>
 #include <vector>
 
-#include <type_traits>
 #include <glibmm/ustring.h>
+#include <type_traits>
 
-namespace rtengine
-{
+namespace rtengine {
 
 /**
  * A function object that supplies a value and returns the same value for
  * subsequent calls.
  */
-template <typename T>
-struct MemoizingSupplier {
+template <typename T> struct MemoizingSupplier
+{
     using Supplier = std::function<T()>;
 
     /**
      * @param supplier The delegate supplier.
      */
-    explicit MemoizingSupplier(const Supplier &supplier) :
-        supplier(supplier)
-    {
-    }
+    explicit MemoizingSupplier(const Supplier& supplier) : supplier(supplier) {}
 
     T operator()() const
     {
@@ -55,7 +51,7 @@ struct MemoizingSupplier {
 private:
     const Supplier supplier;
     mutable T value;
-    mutable bool is_cached{false};
+    mutable bool is_cached{ false };
 };
 
 // Update a point of a Cairo::Surface by accessing the raw data
@@ -65,19 +61,29 @@ void poke01_d(unsigned char*& dest, double r, double g, double b);
 // Update a point of a Cairo::Surface by accessing the raw data
 void poke01_f(unsigned char*& dest, float r, float g, float b);
 
-void bilinearInterp(const unsigned char* src, int sw, int sh, unsigned char* dst, int dw, int dh);
-void nearestInterp(const unsigned char* src, int sw, int sh, unsigned char* dst, int dw, int dh);
+void bilinearInterp(const unsigned char* src,
+                    int sw,
+                    int sh,
+                    unsigned char* dst,
+                    int dw,
+                    int dh);
+void nearestInterp(const unsigned char* src,
+                   int sw,
+                   int sh,
+                   unsigned char* dst,
+                   int dw,
+                   int dh);
 void rotate(unsigned char* img, int& w, int& h, int deg);
 void hflip(unsigned char* img, int w, int h);
 void vflip(unsigned char* img, int w, int h);
 
-template<typename ENUM>
+template <typename ENUM>
 constexpr typename std::underlying_type<ENUM>::type toUnderlying(ENUM value)
 {
     return static_cast<typename std::underlying_type<ENUM>::type>(value);
 }
 
-std::vector<std::uint8_t> getFileData(const Glib::ustring &filename);
+std::vector<std::uint8_t> getFileData(const Glib::ustring& filename);
 
 // Return lower case extension without the "." or "" if the given name contains no "."
 Glib::ustring getFileExtension(const Glib::ustring& filename);
@@ -95,9 +101,8 @@ bool hasJxlExtension(const Glib::ustring& filename);
 
 void swab(const void* from, void* to, ssize_t n);
 
-}
+}  // namespace rtengine
 
 #if __SIZEOF_WCHAR_T__ == 4
 Glib::ustring utf32_to_utf8(wchar_t* UTF32Buffer, size_t sizeOfUTF32Buffer);
 #endif
-

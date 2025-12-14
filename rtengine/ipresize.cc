@@ -24,18 +24,17 @@
 #include "imagefloat.h"
 #include "labimage.h"
 #include "opthelper.h"
-#include "rt_math.h"
 #include "procparams.h"
+#include "rt_math.h"
 #include "sleef.h"
 
-//#define PROFILE
+// #define PROFILE
 
 #ifdef PROFILE
-#   include <iostream>
+#include <iostream>
 #endif
 
-namespace
-{
+namespace {
 
 using ProcParams = rtengine::procparams::ProcParams;
 using FramingParams = rtengine::procparams::FramingParams;
@@ -57,35 +56,44 @@ struct Dimensions
 
     bool isDegenerate() const { return width <= 0.0 || height <= 0.0; }
 
-    double aspectRatio() const {
-        if (isDegenerate()) return 1.0;
-        else return static_cast<double>(width) / static_cast<double>(height);
+    double aspectRatio() const
+    {
+        if (isDegenerate())
+            return 1.0;
+        else
+            return static_cast<double>(width) / static_cast<double>(height);
     }
 
-    Orientation orient() const {
+    Orientation orient() const
+    {
         return width >= height ? Orientation::LANDSCAPE : Orientation::PORTRAIT;
     }
 
-    bool inside(const Dimensions& other) const {
+    bool inside(const Dimensions& other) const
+    {
         return width <= other.width && height <= other.height;
     }
 
-    void rotate(Orientation newOrient) {
+    void rotate(Orientation newOrient)
+    {
         if (newOrient != orient()) {
             std::swap(width, height);
         }
     }
 
-    bool operator==(const Dimensions& other) const {
+    bool operator==(const Dimensions& other) const
+    {
         return width == other.width && height == other.height;
     }
     bool operator!=(const Dimensions& other) const { return !(*this == other); }
 
-    Dimensions intersect(const Dimensions& other) const {
+    Dimensions intersect(const Dimensions& other) const
+    {
         return Dimensions(std::min(width, other.width), std::min(height, other.height));
     }
 
-    void debug(const char* prefix) const {
+    void debug(const char* prefix) const
+    {
         printf("%s w=%f h=%f ar=%f\n", prefix, width, height, aspectRatio());
     }
 };
@@ -140,45 +148,48 @@ std::pair<double, double> computeImgAndBorderSize(double frameSize, double scale
     double imgSize = frameSize / imgFrameScale;
     double borderSize = scale * imgSize;
 
-    return {imgSize, borderSize};
+    return { imgSize, borderSize };
 }
 
 Orientation orient(const FramingParams& params, const Dimensions& imgSize)
 {
     switch (params.orientation) {
-        case FramingParams::Orientation::LANDSCAPE:
-            return Orientation::LANDSCAPE;
-        case FramingParams::Orientation::PORTRAIT:
-            return Orientation::PORTRAIT;
-        case FramingParams::Orientation::AS_IMAGE:
-        default:
-            return imgSize.orient();
+    case FramingParams::Orientation::LANDSCAPE:
+        return Orientation::LANDSCAPE;
+    case FramingParams::Orientation::PORTRAIT:
+        return Orientation::PORTRAIT;
+    case FramingParams::Orientation::AS_IMAGE:
+    default:
+        return imgSize.orient();
     }
 }
 
 double flipAspectRatioByOrientation(double aspectRatio, Orientation orient)
 {
     switch (orient) {
-        case Orientation::LANDSCAPE:
-            return aspectRatio >= 1.0 ? aspectRatio : 1.0 / aspectRatio;
-        case Orientation::PORTRAIT:
-            return aspectRatio <= 1.0 ? aspectRatio : 1.0 / aspectRatio;
-        default:
-            return aspectRatio;
+    case Orientation::LANDSCAPE:
+        return aspectRatio >= 1.0 ? aspectRatio : 1.0 / aspectRatio;
+    case Orientation::PORTRAIT:
+        return aspectRatio <= 1.0 ? aspectRatio : 1.0 / aspectRatio;
+    default:
+        return aspectRatio;
     }
 }
 
 Side autoPickBasis(const FramingParams& params, const Dimensions& imgSize)
 {
     if (imgSize.isDegenerate()) {
-        if (imgSize.width <= 0) return Side::HEIGHT;
-        else return Side::WIDTH;
+        if (imgSize.width <= 0)
+            return Side::HEIGHT;
+        else
+            return Side::WIDTH;
     }
 
     Orientation imgOrient = imgSize.orient();
     double imgAspectRatio = imgSize.aspectRatio();
     Orientation frameOrient = orient(params, imgSize);
-    double frameAspectRatio = flipAspectRatioByOrientation(params.aspectRatio, frameOrient);
+    double frameAspectRatio =
+        flipAspectRatioByOrientation(params.aspectRatio, frameOrient);
 
     if (frameOrient == imgOrient) {
         // Pick the more constrained side (i.e. hits 0 border width first)
@@ -195,17 +206,17 @@ Side autoPickBasis(const FramingParams& params, const Dimensions& imgSize)
 Side pickReferenceSide(const FramingParams& params, const Dimensions& imgSize)
 {
     switch (params.basis) {
-        case Basis::WIDTH:
-            return Side::WIDTH;
-        case Basis::HEIGHT:
-            return Side::HEIGHT;
-        case Basis::LONG:
-            return imgSize.width >= imgSize.height ? Side::WIDTH : Side::HEIGHT;
-        case Basis::SHORT:
-            return imgSize.width <= imgSize.height ? Side::WIDTH : Side::HEIGHT;
-        case Basis::AUTO:
-        default:
-            return autoPickBasis(params, imgSize);
+    case Basis::WIDTH:
+        return Side::WIDTH;
+    case Basis::HEIGHT:
+        return Side::HEIGHT;
+    case Basis::LONG:
+        return imgSize.width >= imgSize.height ? Side::WIDTH : Side::HEIGHT;
+    case Basis::SHORT:
+        return imgSize.width <= imgSize.height ? Side::WIDTH : Side::HEIGHT;
+    case Basis::AUTO:
+    default:
+        return autoPickBasis(params, imgSize);
     }
 }
 
@@ -301,8 +312,9 @@ double orientAspectRatio(const FramingParams& framing, const Dimensions& imgSize
     }
 
     Orientation borderOrient = orient(framing, imgSize);
-    if ((borderOrient == Orientation::PORTRAIT && aspectRatio > 1.0) ||
-            (borderOrient == Orientation::LANDSCAPE && aspectRatio < 1.0)) {
+    if ((borderOrient == Orientation::PORTRAIT && aspectRatio > 1.0)
+        || (borderOrient == Orientation::LANDSCAPE && aspectRatio < 1.0))
+    {
         aspectRatio = 1.0 / aspectRatio;
     }
     return aspectRatio;
@@ -324,8 +336,10 @@ Dimensions fromAspectRatio(const Dimensions& size, double aspectRatio)
 FramingParams sanitize(const FramingParams& dirty)
 {
     FramingParams framing = dirty;
-    framing.framedWidth = std::max(static_cast<int>(MIN_DOWNSCALE_PX), framing.framedWidth);
-    framing.framedHeight = std::max(static_cast<int>(MIN_DOWNSCALE_PX), framing.framedHeight);
+    framing.framedWidth =
+        std::max(static_cast<int>(MIN_DOWNSCALE_PX), framing.framedWidth);
+    framing.framedHeight =
+        std::max(static_cast<int>(MIN_DOWNSCALE_PX), framing.framedHeight);
     framing.relativeBorderSize = std::max(0.0, std::min(1.0, framing.relativeBorderSize));
     framing.minWidth = std::max(0, framing.minWidth);
     framing.minHeight = std::max(0, framing.minHeight);
@@ -334,15 +348,14 @@ FramingParams sanitize(const FramingParams& dirty)
     return framing;
 }
 
-Framing::Framing(const ProcParams& params, int fullWidth, int fullHeight) :
-    allParams(params),
-    framing(sanitize(params.framing)),
-    postCropImageSize(params.crop.enabled ?
-        Dimensions(params.crop.w, params.crop.h) :
-        Dimensions(fullWidth, fullHeight)),
-    maxUpscalingBBox(Dimensions(
-        computeSize(postCropImageSize.width, MAX_UPSCALE_FACTOR),
-        computeSize(postCropImageSize.height, MAX_UPSCALE_FACTOR)))
+Framing::Framing(const ProcParams& params, int fullWidth, int fullHeight)
+    : allParams(params),
+      framing(sanitize(params.framing)),
+      postCropImageSize(params.crop.enabled ? Dimensions(params.crop.w, params.crop.h)
+                                            : Dimensions(fullWidth, fullHeight)),
+      maxUpscalingBBox(
+          Dimensions(computeSize(postCropImageSize.width, MAX_UPSCALE_FACTOR),
+                     computeSize(postCropImageSize.height, MAX_UPSCALE_FACTOR)))
 {
 }
 
@@ -354,9 +367,9 @@ Dimensions Framing::clampResize(const Dimensions& imgSize, const Dimensions& bou
     // down the bounds to outside the upscaling limit. This is needed since
     // scaling the bounds to fit inside the upscaling bbox may artificially
     // reduce the upscaling limit due to aspect ratio differences.
-    Dimensions clampedBounds = maxUpscalingBBox.inside(bounds) ?
-        downscaleToTouchBBox(bounds, maxUpscalingBBox) :
-        clampToBBox(bounds, maxUpscalingBBox, INSIDE_BBOX);
+    Dimensions clampedBounds = maxUpscalingBBox.inside(bounds)
+                                   ? downscaleToTouchBBox(bounds, maxUpscalingBBox)
+                                   : clampToBBox(bounds, maxUpscalingBBox, INSIDE_BBOX);
 
     if (!imgSize.inside(clampedBounds)) {
         // Downscale large images to fit inside bounds (only if above limit)
@@ -374,9 +387,9 @@ Dimensions Framing::clampResize(const Dimensions& imgSize, const Dimensions& bou
         }
     } else {
         // Consider upscaling...
-        if (!framing.allowUpscaling ||
-                imgSize.width == clampedBounds.width ||
-                imgSize.height == clampedBounds.height) {
+        if (!framing.allowUpscaling || imgSize.width == clampedBounds.width
+            || imgSize.height == clampedBounds.height)
+        {
             return imgSize;
         } else {
             return upscaleToBBox(imgSize, clampedBounds);
@@ -498,8 +511,8 @@ Dimensions Framing::computeUniformRelativeImageBBox(const Dimensions& imgSize,
     double maxImageBasis = frameBasis;
     double maxImageOther = frameOther;
     if (framing.minSizeEnabled) {
-        double minBorder = static_cast<double>(
-            side == Side::WIDTH ? framing.minWidth : framing.minHeight);
+        double minBorder = static_cast<double>(side == Side::WIDTH ? framing.minWidth
+                                                                   : framing.minHeight);
 
         maxImageBasis = std::floor(frameBasis - 2.0 * minBorder);
         maxImageOther = std::floor(frameOther - 2.0 * minBorder);
@@ -526,14 +539,14 @@ ResizeArgs Framing::adjustResizeForFraming(const ResizeArgs& resize) const
     if (!framing.enabled) return resize;
 
     switch (framing.framingMethod) {
-        case FramingMethod::BBOX:
-            return resizeForBBox(resize);
-        case FramingMethod::FIXED_SIZE:
-            return resizeForFixedFrame(resize);
-        case FramingMethod::STANDARD:
-        default:
-            // No limits on framed size so do nothing
-            return resize;
+    case FramingMethod::BBOX:
+        return resizeForBBox(resize);
+    case FramingMethod::FIXED_SIZE:
+        return resizeForFixedFrame(resize);
+    case FramingMethod::STANDARD:
+    default:
+        // No limits on framed size so do nothing
+        return resize;
     }
 }
 
@@ -549,10 +562,8 @@ ResizeArgs Framing::resizeForFixedFrame(const ResizeArgs& args) const
             return std::max(0.0, frame - 2.0 * border);
         };
 
-        bbox = {
-            length(framedWidth, framing.absWidth),
-            length(framedHeight, framing.absHeight)
-        };
+        bbox = { length(framedWidth, framing.absWidth),
+                 length(framedHeight, framing.absHeight) };
     } else if (framing.borderSizingMethod == BorderSizing::UNIFORM_PERCENTAGE) {
         bbox = computeUniformRelativeImageBBox(args.size, frameSize);
     } else {
@@ -572,10 +583,8 @@ ResizeArgs Framing::resizeForBBox(const ResizeArgs& args) const
             return std::max(0.0, frame - 2.0 * border);
         };
 
-        bbox = {
-            length(boundary.width, framing.absWidth),
-            length(boundary.height, framing.absHeight)
-        };
+        bbox = { length(boundary.width, framing.absWidth),
+                 length(boundary.height, framing.absHeight) };
     } else if (framing.borderSizingMethod == BorderSizing::UNIFORM_PERCENTAGE) {
         bbox = computeUniformRelativeImageBBox(args.size, boundary);
     } else {
@@ -607,24 +616,24 @@ Dimensions Framing::computeFramedSize(const Dimensions& imgSize) const
     // calculations were correct and trim off any excess borders. The excess
     // may be from rounding errors or hitting some downscaling limit.
     switch (framing.framingMethod) {
-        case FramingMethod::BBOX:
-        {
-            Dimensions fixed(framing.framedWidth, framing.framedHeight);
-            if (imgSize.inside(fixed)) {
-                Dimensions framedSize = computeSizeWithBorders(imgSize);
-                return clampToBBox(framedSize, fixed, INSIDE_BBOX);
-            } else {
-                return imgSize;
-            }
+    case FramingMethod::BBOX:
+    {
+        Dimensions fixed(framing.framedWidth, framing.framedHeight);
+        if (imgSize.inside(fixed)) {
+            Dimensions framedSize = computeSizeWithBorders(imgSize);
+            return clampToBBox(framedSize, fixed, INSIDE_BBOX);
+        } else {
+            return imgSize;
         }
-        case FramingMethod::FIXED_SIZE:
-        {
-            Dimensions fixed(framing.framedWidth, framing.framedHeight);
-            return imgSize.inside(fixed) ? fixed : imgSize;
-        }
-        case FramingMethod::STANDARD:
-        default:
-            return computeSizeWithBorders(imgSize);
+    }
+    case FramingMethod::FIXED_SIZE:
+    {
+        Dimensions fixed(framing.framedWidth, framing.framedHeight);
+        return imgSize.inside(fixed) ? fixed : imgSize;
+    }
+    case FramingMethod::STANDARD:
+    default:
+        return computeSizeWithBorders(imgSize);
     }
 }
 
@@ -688,64 +697,63 @@ Dimensions Framing::computeSizeWithBorders(const Dimensions& imgSize) const
 
 }  // namespace
 
-namespace rtengine
-{
+namespace rtengine {
 
-static inline float Lanc (float x, float a)
+static inline float Lanc(float x, float a)
 {
     if (x * x < 1e-6f) {
         return 1.0f;
     } else if (x * x > a * a) {
         return 0.0f;
     } else {
-        x = static_cast<float> (rtengine::RT_PI) * x;
-        return a * xsinf (x) * xsinf (x / a) / (x * x);
+        x = static_cast<float>(rtengine::RT_PI) * x;
+        return a * xsinf(x) * xsinf(x / a) / (x * x);
     }
 }
 
-void ImProcFunctions::Lanczos (const Imagefloat* src, Imagefloat* dst, float scale)
+void ImProcFunctions::Lanczos(const Imagefloat* src, Imagefloat* dst, float scale)
 {
 
     const float delta = 1.0f / scale;
     const float a = 3.0f;
-    const float sc = min (scale, 1.0f);
-    const int support = static_cast<int> (2.0f * a / sc) + 1;
+    const float sc = min(scale, 1.0f);
+    const int support = static_cast<int>(2.0f * a / sc) + 1;
 
 #ifdef _OPENMP
-    #pragma omp parallel
+#pragma omp parallel
 #endif
     {
         // storage for precomputed parameters for horisontal interpolation
-        float * wwh = new float[support * dst->getWidth()];
-        int * jj0 = new int[dst->getWidth()];
-        int * jj1 = new int[dst->getWidth()];
+        float* wwh = new float[support * dst->getWidth()];
+        int* jj0 = new int[dst->getWidth()];
+        int* jj1 = new int[dst->getWidth()];
 
         // temporal storage for vertically-interpolated row of pixels
-        float * lr = new float[src->getWidth()];
-        float * lg = new float[src->getWidth()];
-        float * lb = new float[src->getWidth()];
+        float* lr = new float[src->getWidth()];
+        float* lg = new float[src->getWidth()];
+        float* lb = new float[src->getWidth()];
 
         // Phase 1: precompute coefficients for horisontal interpolation
 
         for (int j = 0; j < dst->getWidth(); j++) {
 
             // x coord of the center of pixel on src image
-            float x0 = (static_cast<float> (j) + 0.5f) * delta - 0.5f;
+            float x0 = (static_cast<float>(j) + 0.5f) * delta - 0.5f;
 
             // weights for interpolation in horisontal direction
-            float * w = wwh + j * support;
+            float* w = wwh + j * support;
 
             // sum of weights used for normalization
             float ws = 0.0f;
 
-            jj0[j] = max (0, static_cast<int> (floorf (x0 - a / sc)) + 1);
-            jj1[j] = min (src->getWidth(), static_cast<int> (floorf (x0 + a / sc)) + 1);
+            jj0[j] = max(0, static_cast<int>(floorf(x0 - a / sc)) + 1);
+            jj1[j] = min(src->getWidth(), static_cast<int>(floorf(x0 + a / sc)) + 1);
 
             // calculate weights
             for (int jj = jj0[j]; jj < jj1[j]; jj++) {
                 int k = jj - jj0[j];
-                float z = sc * (x0 - static_cast<float> (jj));
-                w[k] = Lanc (z, a);
+                float z = sc * (x0 - static_cast<float>(jj));
+                w[k] = Lanc(z, a);
                 ws += w[k];
             }
 
@@ -757,13 +765,13 @@ void ImProcFunctions::Lanczos (const Imagefloat* src, Imagefloat* dst, float sca
 
         // Phase 2: do actual interpolation
 #ifdef _OPENMP
-        #pragma omp for
+#pragma omp for
 #endif
 
         for (int i = 0; i < dst->getHeight(); i++) {
 
             // y coord of the center of pixel on src image
-            float y0 = (static_cast<float> (i) + 0.5f) * delta - 0.5f;
+            float y0 = (static_cast<float>(i) + 0.5f) * delta - 0.5f;
 
             // weights for interpolation in y direction
             float w[support];
@@ -774,14 +782,14 @@ void ImProcFunctions::Lanczos (const Imagefloat* src, Imagefloat* dst, float sca
             // sum of weights used for normalization
             float ws = 0.0f;
 
-            int ii0 = max (0, static_cast<int> (floorf (y0 - a / sc)) + 1);
-            int ii1 = min (src->getHeight(), static_cast<int> (floorf (y0 + a / sc)) + 1);
+            int ii0 = max(0, static_cast<int>(floorf(y0 - a / sc)) + 1);
+            int ii1 = min(src->getHeight(), static_cast<int>(floorf(y0 + a / sc)) + 1);
 
             // calculate weights for vertical interpolation
             for (int ii = ii0; ii < ii1; ii++) {
                 int k = ii - ii0;
-                float z = sc * (y0 - static_cast<float> (ii));
-                w[k] = Lanc (z, a);
+                float z = sc * (y0 - static_cast<float>(ii));
+                w[k] = Lanc(z, a);
                 ws += w[k];
             }
 
@@ -798,9 +806,9 @@ void ImProcFunctions::Lanczos (const Imagefloat* src, Imagefloat* dst, float sca
                 for (int ii = ii0; ii < ii1; ii++) {
                     int k = ii - ii0;
 
-                    r += w[k] * src->r (ii, j);
-                    g += w[k] * src->g (ii, j);
-                    b += w[k] * src->b (ii, j);
+                    r += w[k] * src->r(ii, j);
+                    g += w[k] * src->g(ii, j);
+                    b += w[k] * src->b(ii, j);
                 }
 
                 lr[j] = r;
@@ -811,7 +819,7 @@ void ImProcFunctions::Lanczos (const Imagefloat* src, Imagefloat* dst, float sca
             // Do horizontal interpolation
             for (int j = 0; j < dst->getWidth(); j++) {
 
-                float * wh = wwh + support * j;
+                float* wh = wwh + support * j;
 
                 float r = 0.0f, g = 0.0f, b = 0.0f;
 
@@ -823,9 +831,9 @@ void ImProcFunctions::Lanczos (const Imagefloat* src, Imagefloat* dst, float sca
                     b += wh[k] * lb[jj];
                 }
 
-                dst->r (i, j) = /*CLIP*/ (r);//static_cast<int> (r));
-                dst->g (i, j) = /*CLIP*/ (g);//static_cast<int> (g));
-                dst->b (i, j) = /*CLIP*/ (b);//static_cast<int> (b));
+                dst->r(i, j) = /*CLIP*/ (r);  // static_cast<int> (r));
+                dst->g(i, j) = /*CLIP*/ (g);  // static_cast<int> (g));
+                dst->b(i, j) = /*CLIP*/ (b);  // static_cast<int> (b));
             }
         }
 
@@ -838,13 +846,12 @@ void ImProcFunctions::Lanczos (const Imagefloat* src, Imagefloat* dst, float sca
     }
 }
 
-
-void ImProcFunctions::Lanczos (const LabImage* src, LabImage* dst, float scale)
+void ImProcFunctions::Lanczos(const LabImage* src, LabImage* dst, float scale)
 {
     const float delta = 1.0f / scale;
     constexpr float a = 3.0f;
     const float sc = min(scale, 1.0f);
-    const int support = static_cast<int> (2.0f * a / sc) + 1;
+    const int support = static_cast<int>(2.0f * a / sc) + 1;
 
     // storage for precomputed parameters for horizontal interpolation
     float* const wwh = new float[support * dst->W];
@@ -855,22 +862,22 @@ void ImProcFunctions::Lanczos (const LabImage* src, LabImage* dst, float scale)
     for (int j = 0; j < dst->W; j++) {
 
         // x coord of the center of pixel on src image
-        float x0 = (static_cast<float> (j) + 0.5f) * delta - 0.5f;
+        float x0 = (static_cast<float>(j) + 0.5f) * delta - 0.5f;
 
         // weights for interpolation in horizontal direction
-        float * w = wwh + j * support;
+        float* w = wwh + j * support;
 
         // sum of weights used for normalization
         float ws = 0.0f;
 
-        jj0[j] = max (0, static_cast<int> (floorf (x0 - a / sc)) + 1);
-        jj1[j] = min (src->W, static_cast<int> (floorf (x0 + a / sc)) + 1);
+        jj0[j] = max(0, static_cast<int>(floorf(x0 - a / sc)) + 1);
+        jj1[j] = min(src->W, static_cast<int>(floorf(x0 + a / sc)) + 1);
 
         // calculate weights
         for (int jj = jj0[j]; jj < jj1[j]; jj++) {
             int k = jj - jj0[j];
-            float z = sc * (x0 - static_cast<float> (jj));
-            w[k] = Lanc (z, a);
+            float z = sc * (x0 - static_cast<float>(jj));
+            w[k] = Lanc(z, a);
             ws += w[k];
         }
 
@@ -881,7 +888,7 @@ void ImProcFunctions::Lanczos (const LabImage* src, LabImage* dst, float scale)
     }
 
 #ifdef _OPENMP
-    #pragma omp parallel
+#pragma omp parallel
 #endif
     {
         // temporal storage for vertically-interpolated row of pixels
@@ -897,24 +904,24 @@ void ImProcFunctions::Lanczos (const LabImage* src, LabImage* dst, float scale)
 
         // Phase 2: do actual interpolation
 #ifdef _OPENMP
-        #pragma omp for
+#pragma omp for
 #endif
 
         for (int i = 0; i < dst->H; i++) {
             // y coord of the center of pixel on src image
-            float y0 = (static_cast<float> (i) + 0.5f) * delta - 0.5f;
+            float y0 = (static_cast<float>(i) + 0.5f) * delta - 0.5f;
 
             // sum of weights used for normalization
             float ws = 0.0f;
 
-            int ii0 = max (0, static_cast<int> (floorf (y0 - a / sc)) + 1);
-            int ii1 = min (src->H, static_cast<int> (floorf (y0 + a / sc)) + 1);
+            int ii0 = max(0, static_cast<int>(floorf(y0 - a / sc)) + 1);
+            int ii1 = min(src->H, static_cast<int>(floorf(y0 + a / sc)) + 1);
 
             // calculate weights for vertical interpolation
             for (int ii = ii0; ii < ii1; ii++) {
                 int k = ii - ii0;
-                float z = sc * (y0 - static_cast<float> (ii));
-                w[k] = Lanc (z, a);
+                float z = sc * (y0 - static_cast<float>(ii));
+                w[k] = Lanc(z, a);
                 ws += w[k];
             }
 
@@ -965,7 +972,7 @@ void ImProcFunctions::Lanczos (const LabImage* src, LabImage* dst, float scale)
 
             // Do horizontal interpolation
             for (int x = 0; x < dst->W; ++x) {
-                float * wh = wwh + support * x;
+                float* wh = wwh + support * x;
                 float Ll = 0.0f, La = 0.0f, Lb = 0.0f;
 
                 for (int jj = jj0[x]; jj < jj1[x]; ++jj) {
@@ -987,7 +994,8 @@ void ImProcFunctions::Lanczos (const LabImage* src, LabImage* dst, float scale)
     delete[] wwh;
 }
 
-double ImProcFunctions::resizeScale (const ProcParams* params, int fw, int fh, int &imw, int &imh)
+double
+ImProcFunctions::resizeScale(const ProcParams* params, int fw, int fh, int& imw, int& imh)
 {
     imw = fw;
     imh = fh;
@@ -1012,52 +1020,54 @@ double ImProcFunctions::resizeScale (const ProcParams* params, int fw, int fh, i
     }
 
     switch (params->resize.dataspec) {
-        case (1):
-            // Width
+    case (1):
+        // Width
+        dScale = (double)params->resize.width / (double)refw;
+        break;
+
+    case (2):
+        // Height
+        dScale = (double)params->resize.height / (double)refh;
+        break;
+
+    case (3):
+
+        // FitBox
+        if ((double)refw / (double)refh
+            > (double)params->resize.width / (double)params->resize.height)
+        {
             dScale = (double)params->resize.width / (double)refw;
-            break;
-
-        case (2):
-            // Height
+        } else {
             dScale = (double)params->resize.height / (double)refh;
-            break;
+        }
+        dScale = (dScale > 1.0 && !params->resize.allowUpscaling) ? 1.0 : dScale;
 
-        case (3):
+        break;
 
-            // FitBox
-            if ((double)refw / (double)refh > (double)params->resize.width / (double)params->resize.height) {
-                dScale = (double)params->resize.width / (double)refw;
-            } else {
-                dScale = (double)params->resize.height / (double)refh;
-            }
-            dScale = (dScale > 1.0 && !params->resize.allowUpscaling) ? 1.0 : dScale;
+    case (4):
 
-            break;
-            
-        case (4):
-        
-            // Long Edge
-            if (refw > refh) {
-                dScale = (double)params->resize.longedge / (double)refw;
-            } else {
-                dScale = (double)params->resize.longedge / (double)refh;
-            }
-            break;
-            
-        case (5):
-        
-            // Short Edge
-            if (refw > refh) {
-                dScale = (double)params->resize.shortedge / (double)refh;
-            } else {
-                dScale = (double)params->resize.shortedge / (double)refw;
-            }
-            break;
+        // Long Edge
+        if (refw > refh) {
+            dScale = (double)params->resize.longedge / (double)refw;
+        } else {
+            dScale = (double)params->resize.longedge / (double)refh;
+        }
+        break;
 
-        default:
-            // Scale
-            dScale = params->resize.scale;
-            break;
+    case (5):
+
+        // Short Edge
+        if (refw > refh) {
+            dScale = (double)params->resize.shortedge / (double)refh;
+        } else {
+            dScale = (double)params->resize.shortedge / (double)refw;
+        }
+        break;
+
+    default:
+        // Scale
+        dScale = params->resize.scale;
+        break;
     }
 
     if (params->crop.enabled && params->resize.appliesTo == "Full image") {
@@ -1068,7 +1078,7 @@ double ImProcFunctions::resizeScale (const ProcParams* params, int fw, int fh, i
         imh = refh;
     }
 
-    if (fabs (dScale - 1.0) <= 1e-5) {
+    if (fabs(dScale - 1.0) <= 1e-5) {
         return 1.0;
     } else {
         imw = computeSize(imw, dScale);
@@ -1077,30 +1087,30 @@ double ImProcFunctions::resizeScale (const ProcParams* params, int fw, int fh, i
     }
 }
 
-void ImProcFunctions::resize (Imagefloat* src, Imagefloat* dst, float dScale)
+void ImProcFunctions::resize(Imagefloat* src, Imagefloat* dst, float dScale)
 {
 #ifdef PROFILE
     time_t t1 = clock();
 #endif
 
-    if (params->resize.method != "Nearest" ) {
-        Lanczos (src, dst, dScale);
+    if (params->resize.method != "Nearest") {
+        Lanczos(src, dst, dScale);
     } else {
         // Nearest neighbour algorithm
 #ifdef _OPENMP
-        #pragma omp parallel for if (multiThread)
+#pragma omp parallel for if (multiThread)
 #endif
 
         for (int i = 0; i < dst->getHeight(); i++) {
             int sy = i / dScale;
-            sy = LIM (sy, 0, src->getHeight() - 1);
+            sy = LIM(sy, 0, src->getHeight() - 1);
 
             for (int j = 0; j < dst->getWidth(); j++) {
                 int sx = j / dScale;
-                sx = LIM (sx, 0, src->getWidth() - 1);
-                dst->r (i, j) = src->r (sy, sx);
-                dst->g (i, j) = src->g (sy, sx);
-                dst->b (i, j) = src->b (sy, sx);
+                sx = LIM(sx, 0, src->getWidth() - 1);
+                dst->r(i, j) = src->r(sy, sx);
+                dst->g(i, j) = src->g(sy, sx);
+                dst->b(i, j) = src->b(sy, sx);
             }
         }
     }
@@ -1108,7 +1118,7 @@ void ImProcFunctions::resize (Imagefloat* src, Imagefloat* dst, float dScale)
 #ifdef PROFILE
     time_t t2 = clock();
     std::cout << "Resize: " << params->resize.method << ": "
-              << (float) (t2 - t1) / CLOCKS_PER_SEC << std::endl;
+              << (float)(t2 - t1) / CLOCKS_PER_SEC << std::endl;
 #endif
 }
 
@@ -1145,10 +1155,11 @@ ImProcFunctions::FramingData ImProcFunctions::framing(const FramingArgs& args) c
 
 // Draws the border around the input image.
 // It should be called after gamma correction.
-Imagefloat* ImProcFunctions::drawFrame(Imagefloat* rgb, const FramingParams& params,
+Imagefloat* ImProcFunctions::drawFrame(Imagefloat* rgb,
+                                       const FramingParams& params,
                                        const FramingData& dims) const
 {
-    if (rgb->getWidth() > dims.framedWidth || rgb->getHeight() >  dims.framedHeight) {
+    if (rgb->getWidth() > dims.framedWidth || rgb->getHeight() > dims.framedHeight) {
         return rgb;
     }
     if (rgb->getWidth() == dims.framedWidth && rgb->getHeight() == dims.framedHeight) {
@@ -1171,7 +1182,7 @@ Imagefloat* ImProcFunctions::drawFrame(Imagefloat* rgb, const FramingParams& par
     float b = Color::gamma2curve[clip(params.borderBlue)];
 
 #ifdef _OPENMP
-    #pragma omp parallel for if (multiThread)
+#pragma omp parallel for if (multiThread)
 #endif
     for (int i = 0; i < framed->getHeight(); i++) {
         for (int j = 0; j < framed->getWidth(); j++) {
@@ -1190,7 +1201,7 @@ Imagefloat* ImProcFunctions::drawFrame(Imagefloat* rgb, const FramingParams& par
     int colOffset = offset(rgb->getWidth(), framed->getWidth());
 
 #ifdef _OPENMP
-    #pragma omp parallel for if (multiThread)
+#pragma omp parallel for if (multiThread)
 #endif
     for (int i = 0; i < rgb->getHeight(); i++) {
         for (int j = 0; j < rgb->getWidth(); j++) {

@@ -42,19 +42,22 @@ using namespace rtengine::procparams;
 
 const Glib::ustring ICMPanel::TOOL_NAME = "icm";
 
-ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iunchanged(nullptr), icmplistener(nullptr)
-{    
+ICMPanel::ICMPanel()
+    : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")),
+      iunchanged(nullptr),
+      icmplistener(nullptr)
+{
     CurveListener::setMulti(true);
     auto m = ProcEventMapper::getInstance();
     EvICMprimariMethod = m->newEvent(GAMMA, "HISTORY_MSG_ICM_OUTPUT_PRIMARIES");
     EvICMprofileMethod = m->newEvent(GAMMA, "HISTORY_MSG_ICM_OUTPUT_TYPE");
     EvICMtempMethod = m->newEvent(GAMMA, "HISTORY_MSG_ICM_OUTPUT_TEMP");
-    //EvICMpredx = m->newEvent(GAMMA, "HISTORY_MSG_ICMPREDX");
-    //EvICMpredy = m->newEvent(GAMMA, "HISTORY_MSG_ICMPREDY");
-    //EvICMpgrex = m->newEvent(GAMMA, "HISTORY_MSG_ICMPGREX");
-    //EvICMpgrey = m->newEvent(GAMMA, "HISTORY_MSG_ICMPGREY");
-    //EvICMpblux = m->newEvent(GAMMA, "HISTORY_MSG_ICMPBLUX");
-    //EvICMpbluy = m->newEvent(GAMMA, "HISTORY_MSG_ICMPBLUY");
+    // EvICMpredx = m->newEvent(GAMMA, "HISTORY_MSG_ICMPREDX");
+    // EvICMpredy = m->newEvent(GAMMA, "HISTORY_MSG_ICMPREDY");
+    // EvICMpgrex = m->newEvent(GAMMA, "HISTORY_MSG_ICMPGREX");
+    // EvICMpgrey = m->newEvent(GAMMA, "HISTORY_MSG_ICMPGREY");
+    // EvICMpblux = m->newEvent(GAMMA, "HISTORY_MSG_ICMPBLUX");
+    // EvICMpbluy = m->newEvent(GAMMA, "HISTORY_MSG_ICMPBLUY");
     EvICMgamm = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_WORKING_GAMMA");
     EvICMslop = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_WORKING_SLOPE");
     EvICMtrcinMethod = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_WORKING_TRC_METHOD");
@@ -82,25 +85,26 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     EvICMwsmoothciesli = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_SMOOTHCIESLI");
     EvICMsigmatrc = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_SIGMATRC");
     EvICMoffstrc = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_OFFSTRC");
-    EvICMopacityWLI  = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_OPACITYW");
+    EvICMopacityWLI = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_OPACITYW");
     EvICMpyrwavtrc = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_PYRWAVTRC");
     EvICMresidtrc = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_RESIDTRC");
     EvICMwavExp = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_WAVEXP");
 
     auto& options = App::get().mut_options();
 
-    isBatchMode = lastToneCurve = lastApplyLookTable = lastApplyBaselineExposureOffset = lastApplyHueSatMap = false;
+    isBatchMode = lastToneCurve = lastApplyLookTable = lastApplyBaselineExposureOffset =
+        lastApplyHueSatMap = false;
 
-    ipDialog = Gtk::manage(new MyFileChooserButton(M("TP_ICM_INPUTDLGLABEL"), Gtk::FILE_CHOOSER_ACTION_OPEN));
+    ipDialog = Gtk::manage(new MyFileChooserButton(M("TP_ICM_INPUTDLGLABEL"),
+                                                   Gtk::FILE_CHOOSER_ACTION_OPEN));
     ipDialog->set_tooltip_text(M("TP_ICM_INPUTCUSTOM_TOOLTIP"));
     bindCurrentFolder(*ipDialog, options.lastIccDir);
-    labgridcie = Gtk::manage(new LabGrid(EvICMLabGridciexy, M("TP_ICM_LABGRID_CIEXY"), true, true, false, true));
-
+    labgridcie = Gtk::manage(new LabGrid(EvICMLabGridciexy, M("TP_ICM_LABGRID_CIEXY"),
+                                         true, true, false, true));
 
     // ------------------------------- Input profile
 
-
-    Gtk::Frame *iFrame = Gtk::manage(new Gtk::Frame(M("TP_ICM_INPUTPROFILE")));
+    Gtk::Frame* iFrame = Gtk::manage(new Gtk::Frame(M("TP_ICM_INPUTPROFILE")));
     iFrame->set_label_align(0.025, 0.5);
 
     iVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
@@ -151,7 +155,8 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     dcpIllGrid->set_row_spacing(2);
 
     dcpIllLabel = Gtk::manage(new Gtk::Label(M("TP_ICM_DCPILLUMINANT") + ":"));
-    setExpandAlignProperties(dcpIllLabel, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(dcpIllLabel, false, false, Gtk::ALIGN_START,
+                             Gtk::ALIGN_CENTER);
     dcpIllLabel->set_tooltip_text(M("TP_ICM_DCPILLUMINANT_TOOLTIP"));
     dcpIllLabel->show();
     dcpIll = Gtk::manage(new MyComboBoxText());
@@ -169,22 +174,28 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     ckbToneCurve = Gtk::manage(new Gtk::CheckButton(M("TP_ICM_TONECURVE")));
     ckbToneCurve->set_sensitive(false);
     ckbToneCurve->set_tooltip_text(M("TP_ICM_TONECURVE_TOOLTIP"));
-    setExpandAlignProperties(ckbToneCurve, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(ckbToneCurve, false, false, Gtk::ALIGN_START,
+                             Gtk::ALIGN_CENTER);
 
     ckbApplyLookTable = Gtk::manage(new Gtk::CheckButton(M("TP_ICM_APPLYLOOKTABLE")));
     ckbApplyLookTable->set_sensitive(false);
     ckbApplyLookTable->set_tooltip_text(M("TP_ICM_APPLYLOOKTABLE_TOOLTIP"));
-    setExpandAlignProperties(ckbApplyLookTable, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(ckbApplyLookTable, false, false, Gtk::ALIGN_START,
+                             Gtk::ALIGN_CENTER);
 
     ckbApplyHueSatMap = Gtk::manage(new Gtk::CheckButton(M("TP_ICM_APPLYHUESATMAP")));
     ckbApplyHueSatMap->set_sensitive(false);
     ckbApplyHueSatMap->set_tooltip_text(M("TP_ICM_APPLYHUESATMAP_TOOLTIP"));
-    setExpandAlignProperties(ckbApplyHueSatMap, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(ckbApplyHueSatMap, false, false, Gtk::ALIGN_START,
+                             Gtk::ALIGN_CENTER);
 
-    ckbApplyBaselineExposureOffset = Gtk::manage(new Gtk::CheckButton(M("TP_ICM_APPLYBASELINEEXPOSUREOFFSET")));
+    ckbApplyBaselineExposureOffset =
+        Gtk::manage(new Gtk::CheckButton(M("TP_ICM_APPLYBASELINEEXPOSUREOFFSET")));
     ckbApplyBaselineExposureOffset->set_sensitive(false);
-    ckbApplyBaselineExposureOffset->set_tooltip_text(M("TP_ICM_APPLYBASELINEEXPOSUREOFFSET_TOOLTIP"));
-    setExpandAlignProperties(ckbApplyBaselineExposureOffset, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    ckbApplyBaselineExposureOffset->set_tooltip_text(
+        M("TP_ICM_APPLYBASELINEEXPOSUREOFFSET_TOOLTIP"));
+    setExpandAlignProperties(ckbApplyBaselineExposureOffset, false, false,
+                             Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
 
     dcpGrid->attach_next_to(*dcpIllGrid, Gtk::POS_BOTTOM, 1, 1);
     dcpGrid->attach_next_to(*ckbToneCurve, Gtk::POS_BOTTOM, 1, 1);
@@ -203,13 +214,11 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     iVBox->pack_start(*saveRef, Gtk::PACK_SHRINK);
 
     iFrame->add(*iVBox);
-//    pack_start(*iFrame, Gtk::PACK_EXPAND_WIDGET);
-
+    //    pack_start(*iFrame, Gtk::PACK_EXPAND_WIDGET);
 
     // ---------------------------- Working profile
 
-
-    Gtk::Frame *wFrame = Gtk::manage(new Gtk::Frame(M("TP_ICM_WORKINGPROFILE")));
+    Gtk::Frame* wFrame = Gtk::manage(new Gtk::Frame(M("TP_ICM_WORKINGPROFILE")));
     wFrame->set_label_align(0.025, 0.5);
 
     Gtk::Box* wProfVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
@@ -217,7 +226,8 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     wProfNames = Gtk::manage(new MyComboBoxText());
     wProfVBox->pack_start(*wProfNames, Gtk::PACK_SHRINK);
 
-    std::vector<Glib::ustring> wpnames = rtengine::ICCStore::getInstance()->getWorkingProfiles();
+    std::vector<Glib::ustring> wpnames =
+        rtengine::ICCStore::getInstance()->getWorkingProfiles();
 
     for (size_t i = 0; i < wpnames.size(); i++) {
         wProfNames->append(wpnames[i]);
@@ -228,26 +238,28 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     wFrame->add(*wProfVBox);
 
     //-----------------gamma TRC working - Abstract Profile
-    Gtk::Label *trcLabel = Gtk::manage(new Gtk::Label());
+    Gtk::Label* trcLabel = Gtk::manage(new Gtk::Label());
     setExpandAlignProperties(trcLabel, true, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
     trcLabel->set_markup(escapeHtmlChars(M("TP_ICM_TRCFRAME")));
     trcLabel->set_tooltip_text(M("TP_ICM_TRCFRAME_TOOLTIP"));
-    Gtk::Box *trcLabelBox = Gtk::manage(new Gtk::Box());
+    Gtk::Box* trcLabelBox = Gtk::manage(new Gtk::Box());
     trcLabelBox->add(*trcLabel);
-    trcExp = Gtk::manage(new MyExpander(true, trcLabelBox));//expander Abstract Profile
+    trcExp = Gtk::manage(new MyExpander(true, trcLabelBox));  // expander Abstract Profile
     setExpandAlignProperties(trcExp, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
-    Gtk::Box *trcProfVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
-    trcExp->signal_button_release_event().connect_notify(sigc::bind(sigc::mem_fun(this, &ICMPanel::foldAllButMe), trcExp, getExpander()));
-    trcExpconn = trcExp->signal_enabled_toggled().connect(sigc::mem_fun(*this, &ICMPanel::trcExpChanged));
-    Gtk::Box *trcPrimVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
-  //  Gtk::Box *trcWavVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* trcProfVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    trcExp->signal_button_release_event().connect_notify(
+        sigc::bind(sigc::mem_fun(this, &ICMPanel::foldAllButMe), trcExp, getExpander()));
+    trcExpconn = trcExp->signal_enabled_toggled().connect(
+        sigc::mem_fun(*this, &ICMPanel::trcExpChanged));
+    Gtk::Box* trcPrimVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    //  Gtk::Box *trcWavVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
     ToolParamBlock* const trcWavFBox = Gtk::manage(new ToolParamBlock());
 
-    Gtk::Box *trcWav2VBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* trcWav2VBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
     wavlocLabels = Gtk::manage(new Gtk::Label("---", Gtk::ALIGN_CENTER));
     wTRCBox = Gtk::manage(new Gtk::Box());
 
-    //TRC gamma and slope
+    // TRC gamma and slope
     wTRC = Gtk::manage(new MyComboBoxText());
     wTRCBox->pack_start(*wTRC, Gtk::PACK_EXPAND_WIDGET);
     trcProfVBox->pack_start(*wTRCBox, Gtk::PACK_EXPAND_WIDGET);
@@ -264,29 +276,36 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
 
     wFrame->set_tooltip_text(M("TP_ICM_WORKING_TRC_TOOLTIP"));
 
-
-
-    wGamma = Gtk::manage(new Adjuster(M("TP_ICM_WORKING_TRC_GAMMA"), 0.40, 20.0, 0.001, 2.4));//default sRGB
-    wSlope = Gtk::manage(new Adjuster(M("TP_ICM_WORKING_TRC_SLOPE"), 0., 300., 0.01, 12.92));//defautl sRGB
-    wapsat = Gtk::manage(new Adjuster(M("TP_ICM_WORKING_TRC_SAT"), 0., 2., 0.1, 0.5));//saturation slider
-    wmidtcie = Gtk::manage(new Adjuster(M("TP_LOCALLAB_MIDTCIEMAIN"), -100., 100., 1., 0.));
-    wsmoothcie = Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_SMOOTHCIE")));//highlights
-    wsmoothciesli = Gtk::manage(new Adjuster(M("TP_LOCALLAB_SMOOTHCIETH"), 0., 1.5, 0.1, 0.));
+    wGamma = Gtk::manage(new Adjuster(M("TP_ICM_WORKING_TRC_GAMMA"), 0.40, 20.0, 0.001,
+                                      2.4));  // default sRGB
+    wSlope = Gtk::manage(new Adjuster(M("TP_ICM_WORKING_TRC_SLOPE"), 0., 300., 0.01,
+                                      12.92));  // defautl sRGB
+    wapsat = Gtk::manage(new Adjuster(M("TP_ICM_WORKING_TRC_SAT"), 0., 2., 0.1,
+                                      0.5));  // saturation slider
+    wmidtcie =
+        Gtk::manage(new Adjuster(M("TP_LOCALLAB_MIDTCIEMAIN"), -100., 100., 1., 0.));
+    wsmoothcie =
+        Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_SMOOTHCIE")));  // highlights
+    wsmoothciesli =
+        Gtk::manage(new Adjuster(M("TP_LOCALLAB_SMOOTHCIETH"), 0., 1.5, 0.1, 0.));
     trcProfVBox->pack_start(*wGamma, Gtk::PACK_SHRINK);
     wGamma->show();
 
-    //wavelets variables
+    // wavelets variables
     sigmatrc = Gtk::manage(new Adjuster(M("TP_WAVELET_SIGMAFIN"), 0.025, 2.5, 0.01, 1.));
     offstrc = Gtk::manage(new Adjuster(M("TP_WAVELET_OFFSFIN"), 0.33, 1.66, 0.01, 1.));
     pyrwavtrc = Gtk::manage(new Adjuster(M("TP_WAVELET_PYRWAVTRC"), 1, 5, 1, 2));
     residtrc = Gtk::manage(new Adjuster(M("TP_WAVELET_RESIDTRC"), -100., 100., 1., 0.));
-    opacityCurveEditorWLI = std::unique_ptr<CurveEditorGroup>(new CurveEditorGroup(options.lastIcmCurvesDir, M("TP_ICM_OPACITYWLI")));
+    opacityCurveEditorWLI = std::unique_ptr<CurveEditorGroup>(
+        new CurveEditorGroup(options.lastIcmCurvesDir, M("TP_ICM_OPACITYWLI")));
     opacityCurveEditorWLI->setCurveListener(this);
     const ColorManagementParams default_params;
 
-    opacityShapeWLI = static_cast<FlatCurveEditor*>(opacityCurveEditorWLI->addCurve(CT_Flat, "", nullptr, false, false));
+    opacityShapeWLI = static_cast<FlatCurveEditor*>(
+        opacityCurveEditorWLI->addCurve(CT_Flat, "", nullptr, false, false));
     opacityShapeWLI->setIdentityValue(0.);
-    opacityShapeWLI->setResetCurve(FlatCurveType(default_params.opacityCurveWLI.at(0)), default_params.opacityCurveWLI);
+    opacityShapeWLI->setResetCurve(FlatCurveType(default_params.opacityCurveWLI.at(0)),
+                                   default_params.opacityCurveWLI);
     opacityShapeWLI->setTooltip(M("TP_LOCALLAB_WAT_LEVELLOCCONTRAST_TOOLTIP"));
     opacityCurveEditorWLI->setTooltip(M("TP_WAVELET_PYRWAVTRC_CURVE_TOOLTIP"));
     // This will add the reset button at the end of the curveType buttons
@@ -297,30 +316,35 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     wSlope->show();
     trcProfVBox->pack_start(*wapsat, Gtk::PACK_SHRINK);
     wapsat->show();
-        
+
     trcProfVBox->pack_start(*wmidtcie, Gtk::PACK_SHRINK);
     wmidtcie->show();
     trcProfVBox->pack_start(*wsmoothciesli, Gtk::PACK_SHRINK);
     wsmoothciesli->show();
 
-   
-    wsmoothcieconn = wsmoothcie->signal_toggled().connect(sigc::mem_fun(*this, &ICMPanel::wsmoothcieChanged));
+    wsmoothcieconn = wsmoothcie->signal_toggled().connect(
+        sigc::mem_fun(*this, &ICMPanel::wsmoothcieChanged));
     wsmoothcie->set_active(false);
 
     fbw = Gtk::manage(new Gtk::CheckButton((M("TP_ICM_FBW"))));
     fbw->set_active(true);
     trcProfVBox->pack_start(*fbw, Gtk::PACK_SHRINK);
 
-    wavExp = Gtk::manage(new MyExpander(true, M("TP_ICM_WAVFRAME")));//expander Contrast Enhancement
+    wavExp = Gtk::manage(
+        new MyExpander(true, M("TP_ICM_WAVFRAME")));  // expander Contrast Enhancement
     setExpandAlignProperties(wavExp, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
-    wavExp->signal_button_release_event().connect_notify(sigc::bind(sigc::mem_fun(this, &ICMPanel::foldAllButMe), wavExp, trcExp));
-    wavExpconn = wavExp->signal_enabled_toggled().connect(sigc::mem_fun(*this, &ICMPanel::wavExpChanged));
+    wavExp->signal_button_release_event().connect_notify(
+        sigc::bind(sigc::mem_fun(this, &ICMPanel::foldAllButMe), wavExp, trcExp));
+    wavExpconn = wavExp->signal_enabled_toggled().connect(
+        sigc::mem_fun(*this, &ICMPanel::wavExpChanged));
 
-    wav2Exp = Gtk::manage(new MyExpander(false, M("TP_ICM_WAVREFI")));//expander Refinement wavelet
+    wav2Exp = Gtk::manage(
+        new MyExpander(false, M("TP_ICM_WAVREFI")));  // expander Refinement wavelet
     setExpandAlignProperties(wav2Exp, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
-    wav2Exp->signal_button_release_event().connect_notify(sigc::bind(sigc::mem_fun(this, &ICMPanel::foldAllButMe), wav2Exp, wavExp));
+    wav2Exp->signal_button_release_event().connect_notify(
+        sigc::bind(sigc::mem_fun(this, &ICMPanel::foldAllButMe), wav2Exp, wavExp));
     trcWavFBox->pack_start(*pyrwavtrc, Gtk::PACK_SHRINK);
-    trcWavFBox->pack_start(*wavlocLabels,  Gtk::PACK_SHRINK);
+    trcWavFBox->pack_start(*wavlocLabels, Gtk::PACK_SHRINK);
     pyrwavtrc->set_tooltip_text(M("TP_WAVELET_PYRWAVTRC_TOOLTIP"));
     trcWavFBox->pack_start(*opacityCurveEditorWLI, Gtk::PACK_SHRINK, 2);
     trcWav2VBox->pack_start(*sigmatrc, Gtk::PACK_SHRINK);
@@ -331,9 +355,10 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     offstrc->set_tooltip_text(M("TP_WAVELET_OFFSET_TOOLTIP"));
     primExp = Gtk::manage(new MyExpander(false, M("TP_ICM_PRIMFRAME")));
     setExpandAlignProperties(primExp, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
-    primExp->signal_button_release_event().connect_notify(sigc::bind(sigc::mem_fun(this, &ICMPanel::foldAllButMe), primExp, trcExp));
+    primExp->signal_button_release_event().connect_notify(
+        sigc::bind(sigc::mem_fun(this, &ICMPanel::foldAllButMe), primExp, trcExp));
 
-    //Illuminants and Primaries
+    // Illuminants and Primaries
     willuBox = Gtk::manage(new Gtk::Box());
     willulab = Gtk::manage(new Gtk::Label(M("TP_ICM_WORKING_ILLU") + ":"));
 
@@ -356,32 +381,32 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     will->set_active(0);
     will->set_tooltip_text(M("TP_ICM_ILLUMPRIM_TOOLTIP"));
 
-
     wprimBox = Gtk::manage(new Gtk::Box());
     wprimlab = Gtk::manage(new Gtk::Label(M("TP_ICM_WORKING_PRIM") + ":"));
 
     wprimBox->pack_start(*wprimlab, Gtk::PACK_SHRINK);
     wprim = Gtk::manage(new MyComboBoxText());
     wprimBox->pack_start(*wprim, Gtk::PACK_EXPAND_WIDGET);
-//    fbw = Gtk::manage(new Gtk::CheckButton((M("TP_ICM_FBW"))));
-//    fbw->set_active(true);
+    //    fbw = Gtk::manage(new Gtk::CheckButton((M("TP_ICM_FBW"))));
+    //    fbw->set_active(true);
     gamut = Gtk::manage(new Gtk::CheckButton((M("TP_ICM_GAMUT"))));
     gamut->set_active(true);
 
     trcPrimVBox->pack_start(*wprimBox, Gtk::PACK_EXPAND_WIDGET);
-//    trcPrimVBox->pack_start(*fbw, Gtk::PACK_EXPAND_WIDGET);
-//    trcProfVBox->pack_start(*gamut, Gtk::PACK_EXPAND_WIDGET);
+    //    trcPrimVBox->pack_start(*fbw, Gtk::PACK_EXPAND_WIDGET);
+    //    trcProfVBox->pack_start(*gamut, Gtk::PACK_EXPAND_WIDGET);
 
-    neutral = Gtk::manage (new Gtk::Button (M ("TP_ICM_NEUTRAL")));
-    setExpandAlignProperties (neutral, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
-    RTImage *resetImg = Gtk::manage (new RTImage ("undo-small", Gtk::ICON_SIZE_BUTTON));
-    setExpandAlignProperties (resetImg, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
-    neutral->set_image (*resetImg);
-    neutralconn = neutral->signal_pressed().connect ( sigc::mem_fun (*this, &ICMPanel::neutral_pressed) );
+    neutral = Gtk::manage(new Gtk::Button(M("TP_ICM_NEUTRAL")));
+    setExpandAlignProperties(neutral, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+    RTImage* resetImg = Gtk::manage(new RTImage("undo-small", Gtk::ICON_SIZE_BUTTON));
+    setExpandAlignProperties(resetImg, false, false, Gtk::ALIGN_CENTER,
+                             Gtk::ALIGN_CENTER);
+    neutral->set_image(*resetImg);
+    neutralconn = neutral->signal_pressed().connect(
+        sigc::mem_fun(*this, &ICMPanel::neutral_pressed));
     neutral->show();
 
-    trcPrimVBox->pack_start (*neutral);
-
+    trcPrimVBox->pack_start(*neutral);
 
     wprim->append(M("TP_ICM_WORKING_PRIM_NONE"));
     wprim->append(M("TP_ICM_WORKING_PRIM_SRGB"));
@@ -402,7 +427,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
 
     wprim->set_tooltip_text(M("TP_ICM_PRIMILLUM_TOOLTIP"));
 
-    //Primaries as sliders
+    // Primaries as sliders
     redx = Gtk::manage(new Adjuster(M("TC_PRIM_REDX"), 0.41, 1.0, 0.0001, 0.7347));
     setExpandAlignProperties(redx, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
     redy = Gtk::manage(new Adjuster(M("TC_PRIM_REDY"), 0.0, 0.70, 0.0001, 0.2653));
@@ -428,7 +453,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     colorFramecie->set_label_align(0.025, 0.5);
     colorFramecie->set_tooltip_text(M("TP_LOCALLAB_PRECAMREFIMAIN_TOOLTIP"));
 
-    Gtk::Box *redVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* redVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
     primCoordGrid = Gtk::manage(new Gtk::Grid());
     primCoordGrid->set_column_homogeneous(true);
     primCoordGrid->attach(*redx, 0, 0, 1, 1);
@@ -439,8 +464,10 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     primCoordGrid->attach_next_to(*bluy, *blux, Gtk::PositionType::POS_RIGHT, 1, 1);
     redVBox->pack_start(*primCoordGrid, Gtk::PACK_EXPAND_WIDGET);
 
-    Gtk::Separator* const separator1 = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL));
-    Gtk::Separator* const separator2 = Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Separator* const separator1 =
+        Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Separator* const separator2 =
+        Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_VERTICAL));
 
     preser = Gtk::manage(new Adjuster(M("TP_ICM_WORKING_PRESER"), 0., 100., 0.5, 0.));
     preser->setAdjusterListener(this);
@@ -458,12 +485,14 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     redVBox->pack_start(*labgridcie, Gtk::PACK_EXPAND_WIDGET, 4);
     redVBox->pack_start(*gamut, Gtk::PACK_EXPAND_WIDGET);
 
-    //Shift and refine color in CIE xy
+    // Shift and refine color in CIE xy
     refi = Gtk::manage(new Adjuster(M("TC_PRIM_REFI"), -0.5, 1., 0.0001, 0.));
-    shiftx = Gtk::manage(new Adjuster(M("TC_LOCALLAB_PRIM_SHIFTX"), -0.2, 0.2, 0.0001, 0.));
-    shifty = Gtk::manage(new Adjuster(M("TC_LOCALLAB_PRIM_SHIFTY"), -0.2, 0.2, 0.0001, 0.));
+    shiftx =
+        Gtk::manage(new Adjuster(M("TC_LOCALLAB_PRIM_SHIFTX"), -0.2, 0.2, 0.0001, 0.));
+    shifty =
+        Gtk::manage(new Adjuster(M("TC_LOCALLAB_PRIM_SHIFTY"), -0.2, 0.2, 0.0001, 0.));
 
-    //Chromatic adaptation
+    // Chromatic adaptation
     wcatBox = Gtk::manage(new Gtk::Box());
     wcatlab = Gtk::manage(new Gtk::Label(M("TP_ICM_WORKING_CAT") + ":"));
     wcatBox->pack_start(*wcatlab, Gtk::PACK_SHRINK);
@@ -476,14 +505,14 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     wcat->append(M("TP_ICM_WORKING_CAT_VK"));
     wcat->append(M("TP_ICM_WORKING_CAT_XYZ"));
     wcat->set_active(0);
-    redVBox->pack_start(*wcatBox, Gtk::PACK_SHRINK); 
+    redVBox->pack_start(*wcatBox, Gtk::PACK_SHRINK);
 
     ToolParamBlock* const colorBox = Gtk::manage(new ToolParamBlock());
 
     colorBox->pack_start(*refi, Gtk::PACK_EXPAND_WIDGET);
     colorBox->pack_start(*shiftx, Gtk::PACK_EXPAND_WIDGET);
     colorBox->pack_start(*shifty, Gtk::PACK_EXPAND_WIDGET);
-    colorFramecie->add(*colorBox); 
+    colorFramecie->add(*colorBox);
     redVBox->pack_start(*colorFramecie);
     redFrame->add(*redVBox);
 
@@ -507,19 +536,19 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     pyrwavtrc->setAdjusterListener(this);
     residtrc->setAdjusterListener(this);
 
-    //wGamma->setDelay(std::max(options.adjusterMinDelay, options.adjusterMaxDelay));
+    // wGamma->setDelay(std::max(options.adjusterMinDelay, options.adjusterMaxDelay));
 
     // wSlope->setDelay(std::max(options.adjusterMinDelay, options.adjusterMaxDelay));
     wmidtcie->setDelay(std::max(options.adjusterMinDelay, options.adjusterMaxDelay));
     wsmoothciesli->setDelay(std::max(options.adjusterMinDelay, options.adjusterMaxDelay));
     wav2Exp->add(*trcWav2VBox, false);
-    wav2Exp->setLevel (2);
+    wav2Exp->setLevel(2);
     trcWavFBox->pack_start(*wav2Exp, false, false);
-    
+
     wavExp->add(*trcWavFBox, false);
-    wavExp->setLevel (2);
+    wavExp->setLevel(2);
     trcProfVBox->pack_start(*wavExp, false, false);
-    
+
     trcProfVBox->pack_start(*primExp, false, false);
 
     // Rendering intent
@@ -537,13 +566,13 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     trcPrimVBox->pack_start(*redFrame, Gtk::PACK_EXPAND_WIDGET);
 
     primExp->add(*trcPrimVBox, false);
-    primExp->setLevel (2);
+    primExp->setLevel(2);
 
     trcExp->add(*trcProfVBox, false);
     trcExp->show_all();
     trcExp->set_expanded(false);
     trcExp->set_no_show_all();
-    trcExp->setLevel (2);
+    trcExp->setLevel(2);
     pack_start(*trcExp, Gtk::PACK_EXPAND_WIDGET);
 
     pack_start(*wFrame, Gtk::PACK_EXPAND_WIDGET);
@@ -551,8 +580,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
 
     // ---------------------------- Output profile
 
-
-    Gtk::Frame *oFrame = Gtk::manage(new Gtk::Frame(M("TP_ICM_OUTPUTPROFILE")));
+    Gtk::Frame* oFrame = Gtk::manage(new Gtk::Frame(M("TP_ICM_OUTPUTPROFILE")));
     oFrame->set_label_align(0.025, 0.5);
     oFrame->set_tooltip_text(M("TP_ICM_OUTPUTPROFILE_TOOLTIP"));
 
@@ -564,7 +592,8 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     oProfNames->append(M("TP_ICM_NOICM"));
     oProfNames->set_active(0);
 
-    std::vector<Glib::ustring> opnames = ICCStore::getInstance()->getProfiles(rtengine::ICCStore::ProfileType::OUTPUT);
+    std::vector<Glib::ustring> opnames =
+        ICCStore::getInstance()->getProfiles(rtengine::ICCStore::ProfileType::OUTPUT);
 
     for (size_t i = 0; i < opnames.size(); i++) {
         oProfNames->append(opnames[i]);
@@ -573,7 +602,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     oProfNames->set_active(0);
 
     // Rendering intent
-    Gtk::Box *riHBox = Gtk::manage(new Gtk::Box());
+    Gtk::Box* riHBox = Gtk::manage(new Gtk::Box());
     Gtk::Label* outputIntentLbl = Gtk::manage(new Gtk::Label(M("TP_ICM_PROFILEINTENT")));
     riHBox->pack_start(*outputIntentLbl, Gtk::PACK_SHRINK);
     oRendIntent.reset(new PopUpButton());
@@ -626,39 +655,58 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     ipDialog->set_show_hidden(true);  // ProgramData is hidden on Windows
 #endif
 
-    wprofnamesconn = wProfNames->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::wpChanged));
-    oprofnamesconn = oProfNames->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::opChanged));
-    orendintentconn = oRendIntent->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::oiChanged));
-    arendintentconn = aRendIntent->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::aiChanged));
-    dcpillconn = dcpIll->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::dcpIlluminantChanged));
-    wtrcconn = wTRC->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::wtrcinChanged));
-    willconn = will->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::willChanged));
-    wprimconn = wprim->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::wprimChanged));
-    wcatconn = wcat->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::wcatChanged));
+    wprofnamesconn =
+        wProfNames->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::wpChanged));
+    oprofnamesconn =
+        oProfNames->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::opChanged));
+    orendintentconn =
+        oRendIntent->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::oiChanged));
+    arendintentconn =
+        aRendIntent->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::aiChanged));
+    dcpillconn = dcpIll->signal_changed().connect(
+        sigc::mem_fun(*this, &ICMPanel::dcpIlluminantChanged));
+    wtrcconn =
+        wTRC->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::wtrcinChanged));
+    willconn =
+        will->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::willChanged));
+    wprimconn =
+        wprim->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::wprimChanged));
+    wcatconn =
+        wcat->signal_changed().connect(sigc::mem_fun(*this, &ICMPanel::wcatChanged));
 
     fbwconn = fbw->signal_toggled().connect(sigc::mem_fun(*this, &ICMPanel::fbwChanged));
-    gamutconn = gamut->signal_toggled().connect(sigc::mem_fun(*this, &ICMPanel::gamutChanged));
-    obpcconn = obpc->signal_toggled().connect(sigc::mem_fun(*this, &ICMPanel::oBPCChanged));
-    tcurveconn = ckbToneCurve->signal_toggled().connect(sigc::mem_fun(*this, &ICMPanel::toneCurveChanged));
-    ltableconn = ckbApplyLookTable->signal_toggled().connect(sigc::mem_fun(*this, &ICMPanel::applyLookTableChanged));
-    beoconn = ckbApplyBaselineExposureOffset->signal_toggled().connect(sigc::mem_fun(*this, &ICMPanel::applyBaselineExposureOffsetChanged));
-    hsmconn = ckbApplyHueSatMap->signal_toggled().connect(sigc::mem_fun(*this, &ICMPanel::applyHueSatMapChanged));
+    gamutconn =
+        gamut->signal_toggled().connect(sigc::mem_fun(*this, &ICMPanel::gamutChanged));
+    obpcconn =
+        obpc->signal_toggled().connect(sigc::mem_fun(*this, &ICMPanel::oBPCChanged));
+    tcurveconn = ckbToneCurve->signal_toggled().connect(
+        sigc::mem_fun(*this, &ICMPanel::toneCurveChanged));
+    ltableconn = ckbApplyLookTable->signal_toggled().connect(
+        sigc::mem_fun(*this, &ICMPanel::applyLookTableChanged));
+    beoconn = ckbApplyBaselineExposureOffset->signal_toggled().connect(
+        sigc::mem_fun(*this, &ICMPanel::applyBaselineExposureOffsetChanged));
+    hsmconn = ckbApplyHueSatMap->signal_toggled().connect(
+        sigc::mem_fun(*this, &ICMPanel::applyHueSatMapChanged));
 
     icamera->signal_toggled().connect(sigc::mem_fun(*this, &ICMPanel::ipChanged));
     icameraICC->signal_toggled().connect(sigc::mem_fun(*this, &ICMPanel::ipChanged));
     iembedded->signal_toggled().connect(sigc::mem_fun(*this, &ICMPanel::ipChanged));
     ifromfile->signal_toggled().connect(sigc::mem_fun(*this, &ICMPanel::ipChanged));
 
-    ipc = ipDialog->signal_selection_changed().connect(sigc::mem_fun(*this, &ICMPanel::ipSelectionChanged));
-    saveRef->signal_pressed().connect(sigc::mem_fun(*this, &ICMPanel::saveReferencePressed));
+    ipc = ipDialog->signal_selection_changed().connect(
+        sigc::mem_fun(*this, &ICMPanel::ipSelectionChanged));
+    saveRef->signal_pressed().connect(
+        sigc::mem_fun(*this, &ICMPanel::saveReferencePressed));
 
     show_all();
 }
 
-void ICMPanel::foldAllButMe(GdkEventButton *event, MyExpander *expander, const MyExpander *parent)
+void ICMPanel::foldAllButMe(GdkEventButton* event,
+                            MyExpander* expander,
+                            const MyExpander* parent)
 {
     if (event->button == 3) {
-        const auto set_expanded = [expander](MyExpander *expander_to_modify) {
+        const auto set_expanded = [expander](MyExpander* expander_to_modify) {
             expander_to_modify->set_expanded(expander_to_modify == expander);
         };
 
@@ -678,27 +726,24 @@ void ICMPanel::foldAllButMe(GdkEventButton *event, MyExpander *expander, const M
 void ICMPanel::wavlocChanged(double nlevel, double nmax, bool curveloc)
 {
     if (!batchMode) {
-        idle_register.add(
-        [this, nlevel, nmax, curveloc]() -> bool {
-            if(nlevel != nmax && curveloc) {
+        idle_register.add([this, nlevel, nmax, curveloc]() -> bool {
+            if (nlevel != nmax && curveloc) {
                 wavlocLabels->show();
-                wavlocLabels->set_text(
-                    Glib::ustring::compose(
-                        M("TP_WAVELET_LEVLOCLABEL"),
-                        Glib::ustring::format(std::fixed, std::setprecision(0), nlevel)//not use but keep in case of
-                    )
-                );
+                wavlocLabels->set_text(Glib::ustring::compose(
+                    M("TP_WAVELET_LEVLOCLABEL"),
+                    Glib::ustring::format(std::fixed, std::setprecision(0),
+                                          nlevel)  // not use but keep in case of
+                    ));
             } else {
                 wavlocLabels->hide();
             }
             return false;
-        }
-        );
+        });
     }
 }
 
-void ICMPanel::neutral_pressed ()
-{   //find working profile and set the same destination profile
+void ICMPanel::neutral_pressed()
+{  // find working profile and set the same destination profile
     if (wProfNames->get_active_text() == "Rec2020") {
         wprim->set_active(toUnderlying(ColorManagementParams::Primaries::REC2020));
     } else if (wProfNames->get_active_text() == "sRGB") {
@@ -727,17 +772,23 @@ void ICMPanel::neutral_pressed ()
     const ColorManagementParams defPar;
 }
 
-void ICMPanel::updateRenderingIntent(const Glib::ustring &profile)
+void ICMPanel::updateRenderingIntent(const Glib::ustring& profile)
 {
-    const uint8_t supportedIntents = rtengine::ICCStore::getInstance()->getOutputIntents(profile);
+    const uint8_t supportedIntents =
+        rtengine::ICCStore::getInstance()->getOutputIntents(profile);
     const bool supportsPerceptual = supportedIntents & 1 << INTENT_PERCEPTUAL;
-    const bool supportsRelative   = supportedIntents & 1 << INTENT_RELATIVE_COLORIMETRIC;
+    const bool supportsRelative = supportedIntents & 1 << INTENT_RELATIVE_COLORIMETRIC;
     const bool supportsSaturation = supportedIntents & 1 << INTENT_SATURATION;
-    const bool supportsAbsolute   = supportedIntents & 1 << INTENT_ABSOLUTE_COLORIMETRIC;
+    const bool supportsAbsolute = supportedIntents & 1 << INTENT_ABSOLUTE_COLORIMETRIC;
 
-    //printf("Intents: %d / Perceptual: %d  Relative: %d  Saturation: %d  Absolute: %d\n", supportedIntents, supportsPerceptual, supportsRelative, supportsSaturation, supportsAbsolute);
+    // printf("Intents: %d / Perceptual: %d  Relative: %d  Saturation: %d  Absolute:
+    // %d\n", supportedIntents, supportsPerceptual, supportsRelative, supportsSaturation,
+    // supportsAbsolute);
 
-    if (!profile.empty() && (supportsPerceptual || supportsRelative || supportsSaturation || supportsAbsolute)) {
+    if (!profile.empty()
+        && (supportsPerceptual || supportsRelative || supportsSaturation
+            || supportsAbsolute))
+    {
         oRendIntent->set_sensitive(true);
         oRendIntent->setItemSensitivity(0, supportsPerceptual);
         oRendIntent->setItemSensitivity(1, supportsRelative);
@@ -764,18 +815,16 @@ void ICMPanel::updateRenderingIntent(const Glib::ustring &profile)
         aRendIntent->setItemSensitivity(3, true);
         aRendIntent->set_sensitive(false);
         aRendIntent->setSelected(1);
-
     }
 }
 
 ICMPanel::~ICMPanel()
 {
     idle_register.destroy();
-
 }
 
-void ICMPanel::primChanged (float rx, float ry, float bx, float by, float gx, float gy)
-{ //update sliders R G B Ciexy
+void ICMPanel::primChanged(float rx, float ry, float bx, float by, float gx, float gy)
+{  // update sliders R G B Ciexy
     nextrx = rx;
     nextry = ry;
     nextbx = bx;
@@ -783,25 +832,31 @@ void ICMPanel::primChanged (float rx, float ry, float bx, float by, float gx, fl
     nextgx = gx;
     nextgy = gy;
 
-    idle_register.add(
-        [this]() -> bool
-        {
-            disableListener();
-            redx->setValue(nextrx);
-            redy->setValue(nextry);
-            blux->setValue(nextbx);
-            bluy->setValue(nextby);
-            grex->setValue(nextgx);
-            grey->setValue(nextgy);
+    idle_register.add([this]() -> bool {
+        disableListener();
+        redx->setValue(nextrx);
+        redy->setValue(nextry);
+        blux->setValue(nextbx);
+        bluy->setValue(nextby);
+        grex->setValue(nextgx);
+        grey->setValue(nextgy);
 
-            enableListener();
-            return false;
-        }
-    );
+        enableListener();
+        return false;
+    });
 }
 
-void ICMPanel::iprimChanged (float r_x, float r_y, float b_x, float b_y, float g_x, float g_y, float w_x, float w_y, float m_x, float m_y)
-{//update CIE xy graph
+void ICMPanel::iprimChanged(float r_x,
+                            float r_y,
+                            float b_x,
+                            float b_y,
+                            float g_x,
+                            float g_y,
+                            float w_x,
+                            float w_y,
+                            float m_x,
+                            float m_y)
+{  // update CIE xy graph
     nextrx = r_x;
     nextry = r_y;
     nextbx = b_x;
@@ -812,7 +867,7 @@ void ICMPanel::iprimChanged (float r_x, float r_y, float b_x, float b_y, float g
     nextwy = w_y;
     nextmx = m_x;
     nextmy = m_y;
-    //convert xy datas in datas for labgrid areas
+    // convert xy datas in datas for labgrid areas
     nextrx = 1.81818f * (nextrx + 0.1f) - 1.f;
     nextry = 1.81818f * (nextry + 0.1f) - 1.f;
     nextbx = 1.81818f * (nextbx + 0.1f) - 1.f;
@@ -824,28 +879,24 @@ void ICMPanel::iprimChanged (float r_x, float r_y, float b_x, float b_y, float g
     nextmx = 1.81818f * (nextmx + 0.1f) - 1.f;
     nextmy = 1.81818f * (nextmy + 0.1f) - 1.f;
 
-    idle_register.add(
-        [this]() -> bool
-        {
-            disableListener();
-            labgridcie->setParams(nextrx, nextry, nextbx, nextby, nextgx, nextgy, nextwx, nextwy, nextmx, nextmy, false);
-            enableListener();
-            return false;
-        }
-    );
+    idle_register.add([this]() -> bool {
+        disableListener();
+        labgridcie->setParams(nextrx, nextry, nextbx, nextby, nextgx, nextgy, nextwx,
+                              nextwy, nextmx, nextmy, false);
+        enableListener();
+        return false;
+    });
 }
 
-
-void ICMPanel::setEditProvider(EditDataProvider *provider)
+void ICMPanel::setEditProvider(EditDataProvider* provider)
 {
     opacityShapeWLI->setEditProvider(provider);
-
 }
 
-void ICMPanel::setListener(ToolPanelListener *tpl)
-{//enable listener Toolpanel and Labgridcie
-        ToolPanel::setListener(tpl);
-        labgridcie->setListener(tpl);
+void ICMPanel::setListener(ToolPanelListener* tpl)
+{  // enable listener Toolpanel and Labgridcie
+    ToolPanel::setListener(tpl);
+    labgridcie->setListener(tpl);
 }
 
 void ICMPanel::updateDCP(int dcpIlluminant, Glib::ustring dcp_name)
@@ -875,7 +926,8 @@ void ICMPanel::updateDCP(int dcpIlluminant, Glib::ustring dcp_name)
 
         if (dcpIll->get_active_row_number() == -1 && dcpIlluminant == -1) {
             dcpIll->set_active(0);
-        } else if (dcpIlluminant >= 0 && dcpIlluminant != dcpIll->get_active_row_number()) {
+        } else if (dcpIlluminant >= 0 && dcpIlluminant != dcpIll->get_active_row_number())
+        {
             dcpIll->set_active(dcpIlluminant);
         }
 
@@ -898,7 +950,9 @@ void ICMPanel::updateDCP(int dcpIlluminant, Glib::ustring dcp_name)
         dcp = DCPStore::getInstance()->getStdProfile(camName);
     } else if (dcp_name == "(embedded)") {
         dcp = DCPStore::getInstance()->getProfile(filename);
-    } else if (ifromfile->get_active() && DCPStore::getInstance()->isValidDCPFileName(dcp_name)) {
+    } else if (ifromfile->get_active()
+               && DCPStore::getInstance()->isValidDCPFileName(dcp_name))
+    {
         dcp = DCPStore::getInstance()->getProfile(dcp_name);
     }
 
@@ -924,7 +978,9 @@ void ICMPanel::updateDCP(int dcpIlluminant, Glib::ustring dcp_name)
         const DCPProfile::Illuminants illuminants = dcp->getIlluminants();
 
         if (illuminants.will_interpolate) {
-            if (dcpTemperatures[0] != illuminants.temperature_1 || dcpTemperatures[1] != illuminants.temperature_2) {
+            if (dcpTemperatures[0] != illuminants.temperature_1
+                || dcpTemperatures[1] != illuminants.temperature_2)
+            {
                 char tempstr1[64], tempstr2[64];
                 snprintf(tempstr1, sizeof(tempstr1), "%.0fK", illuminants.temperature_1);
                 snprintf(tempstr2, sizeof(tempstr2), "%.0fK", illuminants.temperature_2);
@@ -944,7 +1000,9 @@ void ICMPanel::updateDCP(int dcpIlluminant, Glib::ustring dcp_name)
 
             if (dcpIll->get_active_row_number() == -1 && dcpIlluminant == -1) {
                 dcpIll->set_active(0);
-            } else if (dcpIlluminant >= 0 && dcpIlluminant != dcpIll->get_active_row_number()) {
+            } else if (dcpIlluminant >= 0
+                       && dcpIlluminant != dcpIll->get_active_row_number())
+            {
                 dcpIll->set_active(dcpIlluminant);
             }
 
@@ -1002,29 +1060,45 @@ void ICMPanel::read(const ProcParams* pp, const ParamsEdited* pedited)
     ConnectionBlocker trcExpconn_(trcExpconn);
     ConnectionBlocker wavExpconn_(wavExpconn);
 
-    if (pp->icm.inputProfile.substr(0, 5) != "file:" && !ipDialog->get_filename().empty()) {
+    if (pp->icm.inputProfile.substr(0, 5) != "file:" && !ipDialog->get_filename().empty())
+    {
         ipDialog->set_filename(pp->icm.inputProfile);
     }
 
     if (pp->icm.inputProfile == "(none)") {
         inone->set_active(true);
         updateDCP(pp->icm.dcpIlluminant, "");
-    } else if (pp->icm.inputProfile == "(embedded)" || ((pp->icm.inputProfile == "(camera)" || pp->icm.inputProfile.empty()) && icamera->get_state() == Gtk::STATE_INSENSITIVE)) {
+    } else if (pp->icm.inputProfile == "(embedded)"
+               || ((pp->icm.inputProfile == "(camera)" || pp->icm.inputProfile.empty())
+                   && icamera->get_state() == Gtk::STATE_INSENSITIVE))
+    {
         iembedded->set_active(true);
         updateDCP(pp->icm.dcpIlluminant, "(embedded)");
-    } else if ((pp->icm.inputProfile == "(cameraICC)") && icameraICC->get_state() != Gtk::STATE_INSENSITIVE) {
+    } else if ((pp->icm.inputProfile == "(cameraICC)")
+               && icameraICC->get_state() != Gtk::STATE_INSENSITIVE)
+    {
         icameraICC->set_active(true);
         updateDCP(pp->icm.dcpIlluminant, "(cameraICC)");
-    } else if ((pp->icm.inputProfile == "(cameraICC)") && icamera->get_state() != Gtk::STATE_INSENSITIVE && icameraICC->get_state() == Gtk::STATE_INSENSITIVE) {
-        // this is the case when (cameraICC) is instructed by packaged profiles, but ICC file is not found
-        // therefore falling back UI to explicitly reflect the (camera) option
+    } else if ((pp->icm.inputProfile == "(cameraICC)")
+               && icamera->get_state() != Gtk::STATE_INSENSITIVE
+               && icameraICC->get_state() == Gtk::STATE_INSENSITIVE)
+    {
+        // this is the case when (cameraICC) is instructed by packaged profiles, but ICC
+        // file is not found therefore falling back UI to explicitly reflect the (camera)
+        // option
         icamera->set_active(true);
         updateDCP(pp->icm.dcpIlluminant, "");
-    } else if ((pp->icm.inputProfile == "(cameraICC)") && icamera->get_state() == Gtk::STATE_INSENSITIVE && icameraICC->get_state() == Gtk::STATE_INSENSITIVE) {
-        // If neither (camera) nor (cameraICC) are available, as is the case when loading a non-raw, activate (embedded).
+    } else if ((pp->icm.inputProfile == "(cameraICC)")
+               && icamera->get_state() == Gtk::STATE_INSENSITIVE
+               && icameraICC->get_state() == Gtk::STATE_INSENSITIVE)
+    {
+        // If neither (camera) nor (cameraICC) are available, as is the case when loading
+        // a non-raw, activate (embedded).
         iembedded->set_active(true);
         updateDCP(pp->icm.dcpIlluminant, "(cameraICC)");
-    } else if ((pp->icm.inputProfile == "(camera)" || pp->icm.inputProfile.empty()) && icamera->get_state() != Gtk::STATE_INSENSITIVE) {
+    } else if ((pp->icm.inputProfile == "(camera)" || pp->icm.inputProfile.empty())
+               && icamera->get_state() != Gtk::STATE_INSENSITIVE)
+    {
         icamera->set_active(true);
         updateDCP(pp->icm.dcpIlluminant, "");
     } else {
@@ -1079,8 +1153,8 @@ void ICMPanel::read(const ProcParams* pp, const ParamsEdited* pedited)
     ckbApplyHueSatMap->set_active(pp->icm.applyHueSatMap);
     lastApplyHueSatMap = pp->icm.applyHueSatMap;
 
-  //  wGamma->setValue(pp->icm.workingTRCGamma);
-  //  wSlope->setValue(pp->icm.workingTRCSlope);
+    //  wGamma->setValue(pp->icm.workingTRCGamma);
+    //  wSlope->setValue(pp->icm.workingTRCSlope);
     wGamma->setValue(pp->icm.wGamma);
     wSlope->setValue(pp->icm.wSlope);
     wapsat->setValue(pp->icm.wapsat);
@@ -1100,7 +1174,11 @@ void ICMPanel::read(const ProcParams* pp, const ParamsEdited* pedited)
     shiftx->setValue(pp->icm.shiftx);
     shifty->setValue(pp->icm.shifty);
     preser->setValue(pp->icm.preser);
-    labgridcie->setParams(pp->icm.labgridcieALow, pp->icm.labgridcieBLow, pp->icm.labgridcieAHigh, pp->icm.labgridcieBHigh, pp->icm.labgridcieGx, pp->icm.labgridcieGy, pp->icm.labgridcieWx, pp->icm.labgridcieWy, pp->icm.labgridcieMx, pp->icm.labgridcieMy, false);
+    labgridcie->setParams(pp->icm.labgridcieALow, pp->icm.labgridcieBLow,
+                          pp->icm.labgridcieAHigh, pp->icm.labgridcieBHigh,
+                          pp->icm.labgridcieGx, pp->icm.labgridcieGy,
+                          pp->icm.labgridcieWx, pp->icm.labgridcieWy,
+                          pp->icm.labgridcieMx, pp->icm.labgridcieMy, false);
 
     if (pedited) {
         iunchanged->set_active(!pedited->icm.inputProfile);
@@ -1112,7 +1190,8 @@ void ICMPanel::read(const ProcParams* pp, const ParamsEdited* pedited)
         wsmoothcie->set_inconsistent(!pedited->icm.wsmoothcie);
         ckbToneCurve->set_inconsistent(!pedited->icm.toneCurve);
         ckbApplyLookTable->set_inconsistent(!pedited->icm.applyLookTable);
-        ckbApplyBaselineExposureOffset->set_inconsistent(!pedited->icm.applyBaselineExposureOffset);
+        ckbApplyBaselineExposureOffset->set_inconsistent(
+            !pedited->icm.applyBaselineExposureOffset);
         ckbApplyHueSatMap->set_inconsistent(!pedited->icm.applyHueSatMap);
         opacityShapeWLI->setUnChanged(!pedited->icm.opacityCurveWLI);
 
@@ -1147,323 +1226,344 @@ void ICMPanel::read(const ProcParams* pp, const ParamsEdited* pedited)
         if (!pedited->icm.wprim) {
             wprim->set_active_text(M("GENERAL_UNCHANGED"));
         }
-        
+
         if (!pedited->icm.wcat) {
             wcat->set_active_text(M("GENERAL_UNCHANGED"));
         }
-        
-        labgridcie->setEdited(pedited->icm.labgridcieALow || pedited->icm.labgridcieBLow || pedited->icm.labgridcieAHigh || pedited->icm.labgridcieBHigh  || pedited->icm.labgridcieGx  || pedited->icm.labgridcieGy || pedited->icm.labgridcieWx  || pedited->icm.labgridcieWy || pedited->icm.labgridcieMx || pedited->icm.labgridcieMy);
+
+        labgridcie->setEdited(pedited->icm.labgridcieALow || pedited->icm.labgridcieBLow
+                              || pedited->icm.labgridcieAHigh
+                              || pedited->icm.labgridcieBHigh || pedited->icm.labgridcieGx
+                              || pedited->icm.labgridcieGy || pedited->icm.labgridcieWx
+                              || pedited->icm.labgridcieWy || pedited->icm.labgridcieMx
+                              || pedited->icm.labgridcieMy);
         opacityShapeWLI->setCurve(pp->icm.opacityCurveWLI);
 
-     //   wGamma->setEditedState(pedited->icm.workingTRCGamma ? Edited : UnEdited);
-     //   wSlope->setEditedState(pedited->icm.workingTRCSlope  ? Edited : UnEdited);
+        //   wGamma->setEditedState(pedited->icm.workingTRCGamma ? Edited : UnEdited);
+        //   wSlope->setEditedState(pedited->icm.workingTRCSlope  ? Edited : UnEdited);
         wGamma->setEditedState(pedited->icm.wGamma ? Edited : UnEdited);
-        wSlope->setEditedState(pedited->icm.wSlope  ? Edited : UnEdited);
-        wapsat->setEditedState(pedited->icm.wapsat  ? Edited : UnEdited);
-        wmidtcie->setEditedState(pedited->icm.wmidtcie  ? Edited : UnEdited);
-        wsmoothciesli->setEditedState(pedited->icm.wsmoothciesli  ? Edited : UnEdited);
-        sigmatrc->setEditedState(pedited->icm.sigmatrc  ? Edited : UnEdited);
-        offstrc->setEditedState(pedited->icm.offstrc  ? Edited : UnEdited);
-        residtrc->setEditedState(pedited->icm.residtrc  ? Edited : UnEdited);
-        pyrwavtrc->setEditedState(pedited->icm.pyrwavtrc  ? Edited : UnEdited);
-        redx->setEditedState(pedited->icm.redx  ? Edited : UnEdited);
-        redy->setEditedState(pedited->icm.redy  ? Edited : UnEdited);
-        grex->setEditedState(pedited->icm.grex  ? Edited : UnEdited);
-        grey->setEditedState(pedited->icm.grey  ? Edited : UnEdited);
-        blux->setEditedState(pedited->icm.blux  ? Edited : UnEdited);
-        bluy->setEditedState(pedited->icm.bluy  ? Edited : UnEdited);
-        refi->setEditedState(pedited->icm.refi  ? Edited : UnEdited);
-        preser->setEditedState(pedited->icm.preser  ? Edited : UnEdited);
-        shiftx->setEditedState(pedited->icm.shiftx  ? Edited : UnEdited);
-        shifty->setEditedState(pedited->icm.shifty  ? Edited : UnEdited);
-
+        wSlope->setEditedState(pedited->icm.wSlope ? Edited : UnEdited);
+        wapsat->setEditedState(pedited->icm.wapsat ? Edited : UnEdited);
+        wmidtcie->setEditedState(pedited->icm.wmidtcie ? Edited : UnEdited);
+        wsmoothciesli->setEditedState(pedited->icm.wsmoothciesli ? Edited : UnEdited);
+        sigmatrc->setEditedState(pedited->icm.sigmatrc ? Edited : UnEdited);
+        offstrc->setEditedState(pedited->icm.offstrc ? Edited : UnEdited);
+        residtrc->setEditedState(pedited->icm.residtrc ? Edited : UnEdited);
+        pyrwavtrc->setEditedState(pedited->icm.pyrwavtrc ? Edited : UnEdited);
+        redx->setEditedState(pedited->icm.redx ? Edited : UnEdited);
+        redy->setEditedState(pedited->icm.redy ? Edited : UnEdited);
+        grex->setEditedState(pedited->icm.grex ? Edited : UnEdited);
+        grey->setEditedState(pedited->icm.grey ? Edited : UnEdited);
+        blux->setEditedState(pedited->icm.blux ? Edited : UnEdited);
+        bluy->setEditedState(pedited->icm.bluy ? Edited : UnEdited);
+        refi->setEditedState(pedited->icm.refi ? Edited : UnEdited);
+        preser->setEditedState(pedited->icm.preser ? Edited : UnEdited);
+        shiftx->setEditedState(pedited->icm.shiftx ? Edited : UnEdited);
+        shifty->setEditedState(pedited->icm.shifty ? Edited : UnEdited);
     }
 
     switch (ColorManagementParams::WorkingTrc(wTRC->get_active_row_number())) {
-        case ColorManagementParams::WorkingTrc::NONE: {
-            wSlope->set_sensitive(false);
-            wGamma->set_sensitive(false);
-            wmidtcie->set_sensitive(false);
-            wsmoothciesli->set_sensitive(false);
-            sigmatrc->set_sensitive(false);
-            offstrc->set_sensitive(false);
-            residtrc->set_sensitive(false);
-            pyrwavtrc->set_sensitive(false);
-            will->set_sensitive(false);
-            willulab->set_sensitive(false);
-            wprim->set_sensitive(false);
-            wcat->set_sensitive(false);
-            wcatlab->set_sensitive(false);
-            fbw->set_sensitive(false);
-            gamut->set_sensitive(false);
-            wsmoothcie->set_sensitive(false);
-            wprimlab->set_sensitive(false);
-            riaHBox->set_sensitive(false);
-            redFrame->hide();
-            break;
+    case ColorManagementParams::WorkingTrc::NONE:
+    {
+        wSlope->set_sensitive(false);
+        wGamma->set_sensitive(false);
+        wmidtcie->set_sensitive(false);
+        wsmoothciesli->set_sensitive(false);
+        sigmatrc->set_sensitive(false);
+        offstrc->set_sensitive(false);
+        residtrc->set_sensitive(false);
+        pyrwavtrc->set_sensitive(false);
+        will->set_sensitive(false);
+        willulab->set_sensitive(false);
+        wprim->set_sensitive(false);
+        wcat->set_sensitive(false);
+        wcatlab->set_sensitive(false);
+        fbw->set_sensitive(false);
+        gamut->set_sensitive(false);
+        wsmoothcie->set_sensitive(false);
+        wprimlab->set_sensitive(false);
+        riaHBox->set_sensitive(false);
+        redFrame->hide();
+        break;
+    }
+
+    case ColorManagementParams::WorkingTrc::CUSTOM:
+    {
+        will->set_sensitive(false);
+        willulab->set_sensitive(true);
+        wprim->set_sensitive(true);
+        wcat->set_sensitive(true);
+        wcatlab->set_sensitive(true);
+        if (gamut->get_active()) {
+            wcatBox->set_sensitive(true);
+        } else {
+            wcatBox->set_sensitive(false);
         }
 
-        case ColorManagementParams::WorkingTrc::CUSTOM: {
-            will->set_sensitive(false);
-            willulab->set_sensitive(true);
-            wprim->set_sensitive(true);
-            wcat->set_sensitive(true);
-            wcatlab->set_sensitive(true);
-            if (gamut->get_active()) {
-                wcatBox->set_sensitive(true);
-            } else {
-                wcatBox->set_sensitive(false);
-            }
-            
-            fbw->set_sensitive(true);
-            gamut->set_sensitive(true);
-            wsmoothcie->set_sensitive(true);
-            wsmoothciesli->set_sensitive(true);
-            
-            wprimlab->set_sensitive(true);
-            if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::DEFAULT) {
-                redFrame->hide();
-            } else {
-                redFrame->show();
-                colorFramecie->set_sensitive(true);
+        fbw->set_sensitive(true);
+        gamut->set_sensitive(true);
+        wsmoothcie->set_sensitive(true);
+        wsmoothciesli->set_sensitive(true);
 
-                if (
-                    ColorManagementParams::Primaries(wprim->get_active_row_number()) != ColorManagementParams::Primaries::CUSTOM
-                    && ColorManagementParams::Primaries(wprim->get_active_row_number()) != ColorManagementParams::Primaries::CUSTOM_GRID
-                ) {
-                  will->set_sensitive(false);
-                  primCoordGrid->set_sensitive(false);
-                  labgridcie->set_sensitive(false);
+        wprimlab->set_sensitive(true);
+        if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+            == ColorManagementParams::Primaries::DEFAULT)
+        {
+            redFrame->hide();
+        } else {
+            redFrame->show();
+            colorFramecie->set_sensitive(true);
 
-                } else {
-                  will->set_sensitive(false);
-                  if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::CUSTOM) {
+            if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+                    != ColorManagementParams::Primaries::CUSTOM
+                && ColorManagementParams::Primaries(wprim->get_active_row_number())
+                       != ColorManagementParams::Primaries::CUSTOM_GRID)
+            {
+                will->set_sensitive(false);
+                primCoordGrid->set_sensitive(false);
+                labgridcie->set_sensitive(false);
+
+            } else {
+                will->set_sensitive(false);
+                if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+                    == ColorManagementParams::Primaries::CUSTOM)
+                {
                     will->set_sensitive(true);
                     colorFramecie->set_sensitive(true);
-
-                  }
-                  primCoordGrid->set_sensitive(true);
-                  labgridcie->set_sensitive(true);
-                  colorFramecie->set_sensitive(false);
-
                 }
-
+                primCoordGrid->set_sensitive(true);
+                labgridcie->set_sensitive(true);
+                colorFramecie->set_sensitive(false);
             }
-            riaHBox->set_sensitive(true);
+        }
+        riaHBox->set_sensitive(true);
 
         //    if (pp->icm.workingTRCGamma <= 1.) {
-            if (pp->icm.wGamma <= 1.) {
-                wGamma->set_sensitive(true);
-                wSlope->set_sensitive(false);
-                wmidtcie->set_sensitive(true);
-            } else {
-                wGamma->set_sensitive(true);
-                wSlope->set_sensitive(true);
-                wmidtcie->set_sensitive(true);
-            }
-            break;
+        if (pp->icm.wGamma <= 1.) {
+            wGamma->set_sensitive(true);
+            wSlope->set_sensitive(false);
+            wmidtcie->set_sensitive(true);
+        } else {
+            wGamma->set_sensitive(true);
+            wSlope->set_sensitive(true);
+            wmidtcie->set_sensitive(true);
+        }
+        break;
+    }
+
+    case ColorManagementParams::WorkingTrc::BT709:
+        wGamma->setValue(2.222);
+        wSlope->setValue(4.5);
+        will->set_sensitive(false);
+        willulab->set_sensitive(true);
+        wprim->set_sensitive(true);
+        wcat->set_sensitive(true);
+        wcatlab->set_sensitive(true);
+        if (gamut->get_active()) {
+            wcatBox->set_sensitive(true);
+        } else {
+            wcatBox->set_sensitive(false);
         }
 
-        case ColorManagementParams::WorkingTrc::BT709:
-            wGamma->setValue(2.222);
-            wSlope->setValue(4.5);
-            will->set_sensitive(false);
-            willulab->set_sensitive(true);
-            wprim->set_sensitive(true);
-            wcat->set_sensitive(true);
-            wcatlab->set_sensitive(true);
-            if (gamut->get_active()) {
-                wcatBox->set_sensitive(true);
-            } else {
-                wcatBox->set_sensitive(false);
-            }
-            
-            fbw->set_sensitive(true);
-            gamut->set_sensitive(true);
-            wsmoothcie->set_sensitive(true);
-            wsmoothciesli->set_sensitive(true);
-            wprimlab->set_sensitive(true);
-            wGamma->set_sensitive(false);
-            wSlope->set_sensitive(false);
-            wmidtcie->set_sensitive(true);
-            sigmatrc->set_sensitive(true);
-            offstrc->set_sensitive(true);
-            residtrc->set_sensitive(true);
-            pyrwavtrc->set_sensitive(true);
-            if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::DEFAULT) {
-                redFrame->hide();
-            } else {
-                redFrame->show();
-            }
-            riaHBox->set_sensitive(true);
-            break;
-        case ColorManagementParams::WorkingTrc::SRGB:
-            wGamma->setValue(2.4);
-            wSlope->setValue(12.92);
-            will->set_sensitive(false);
-            willulab->set_sensitive(true);
-            wprim->set_sensitive(true);
-            wcat->set_sensitive(true);
-            wcatlab->set_sensitive(true);
-            if (gamut->get_active()) {
-                wcatBox->set_sensitive(true);
-            } else {
-                wcatBox->set_sensitive(false);
-            }
-            fbw->set_sensitive(true);
-            gamut->set_sensitive(true);
-            wsmoothcie->set_sensitive(true);
-            wsmoothciesli->set_sensitive(true);
-            wprimlab->set_sensitive(true);
-            wGamma->set_sensitive(false);
-            wSlope->set_sensitive(false);
-            wmidtcie->set_sensitive(true);
-            sigmatrc->set_sensitive(true);
-            offstrc->set_sensitive(true);
-            residtrc->set_sensitive(true);
-            pyrwavtrc->set_sensitive(true);
-            riaHBox->set_sensitive(true);
-            if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::DEFAULT) {
-                redFrame->hide();
-            } else {
-                redFrame->show();
-            }
-            break;
-        case ColorManagementParams::WorkingTrc::GAMMA_2_2:
-            wGamma->setValue(2.2);
-            wSlope->setValue(0.);
-            will->set_sensitive(false);
-            willulab->set_sensitive(true);
-            wprim->set_sensitive(true);
-            wcat->set_sensitive(true);
-            wcatlab->set_sensitive(true);
-            if (gamut->get_active()) {
-                wcatBox->set_sensitive(true);
-            } else {
-                wcatBox->set_sensitive(false);
-            }
-            fbw->set_sensitive(true);
-            gamut->set_sensitive(true);
-            wsmoothcie->set_sensitive(true);
-            wsmoothciesli->set_sensitive(true);
-            wprimlab->set_sensitive(true);
+        fbw->set_sensitive(true);
+        gamut->set_sensitive(true);
+        wsmoothcie->set_sensitive(true);
+        wsmoothciesli->set_sensitive(true);
+        wprimlab->set_sensitive(true);
+        wGamma->set_sensitive(false);
+        wSlope->set_sensitive(false);
+        wmidtcie->set_sensitive(true);
+        sigmatrc->set_sensitive(true);
+        offstrc->set_sensitive(true);
+        residtrc->set_sensitive(true);
+        pyrwavtrc->set_sensitive(true);
+        if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+            == ColorManagementParams::Primaries::DEFAULT)
+        {
+            redFrame->hide();
+        } else {
             redFrame->show();
-            wGamma->set_sensitive(false);
-            wSlope->set_sensitive(false);
-            wmidtcie->set_sensitive(true);
-            sigmatrc->set_sensitive(true);
-            offstrc->set_sensitive(true);
-            residtrc->set_sensitive(true);
-            pyrwavtrc->set_sensitive(true);
-            riaHBox->set_sensitive(true);
-            if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::DEFAULT) {
-                redFrame->hide();
-            } else {
-                redFrame->show();
-            }
-            break;
-        case ColorManagementParams::WorkingTrc::GAMMA_1_8:
-            wGamma->setValue(1.8);
-            wSlope->setValue(0.);
-            will->set_sensitive(false);
-            willulab->set_sensitive(true);
-            wprim->set_sensitive(true);
-            wcat->set_sensitive(true);
-            wcatlab->set_sensitive(true);
-            if (gamut->get_active()) {
-                wcatBox->set_sensitive(true);
-            } else {
-                wcatBox->set_sensitive(false);
-            }
-            fbw->set_sensitive(true);
-            gamut->set_sensitive(true);
-            wsmoothcie->set_sensitive(true);
-            wsmoothciesli->set_sensitive(true);
-            wprimlab->set_sensitive(true);
-            riaHBox->set_sensitive(true);
-            if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::DEFAULT) {
-                redFrame->hide();
-            } else {
-                redFrame->show();
-            }
-            wGamma->set_sensitive(false);
-            wSlope->set_sensitive(false);
-            wmidtcie->set_sensitive(true);
-            sigmatrc->set_sensitive(true);
-            offstrc->set_sensitive(true);
-            residtrc->set_sensitive(true);
-            pyrwavtrc->set_sensitive(true);
-            break;
-        case ColorManagementParams::WorkingTrc::LINEAR:
-            wGamma->setValue(1.);
-            wSlope->setValue(1.);
-            will->set_sensitive(false);
-            willulab->set_sensitive(true);
-            wprim->set_sensitive(true);
-            wcat->set_sensitive(true);
-            wcatlab->set_sensitive(true);
-             if (gamut->get_active()) {
-                wcatBox->set_sensitive(true);
-            } else {
-                wcatBox->set_sensitive(false);
-            }
-            fbw->set_sensitive(true);
-            gamut->set_sensitive(true);
-            wsmoothcie->set_sensitive(true);
-            wsmoothciesli->set_sensitive(true);
-            wprimlab->set_sensitive(true);
-            wGamma->set_sensitive(false);
-            wSlope->set_sensitive(false);
-            wmidtcie->set_sensitive(true);
-            sigmatrc->set_sensitive(true);
-            offstrc->set_sensitive(true);
-            residtrc->set_sensitive(true);
-            pyrwavtrc->set_sensitive(true);
-            riaHBox->set_sensitive(true);
-            if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::DEFAULT) {
-                redFrame->hide();
-            } else {
-                redFrame->show();
-            }
-            break;
+        }
+        riaHBox->set_sensitive(true);
+        break;
+    case ColorManagementParams::WorkingTrc::SRGB:
+        wGamma->setValue(2.4);
+        wSlope->setValue(12.92);
+        will->set_sensitive(false);
+        willulab->set_sensitive(true);
+        wprim->set_sensitive(true);
+        wcat->set_sensitive(true);
+        wcatlab->set_sensitive(true);
+        if (gamut->get_active()) {
+            wcatBox->set_sensitive(true);
+        } else {
+            wcatBox->set_sensitive(false);
+        }
+        fbw->set_sensitive(true);
+        gamut->set_sensitive(true);
+        wsmoothcie->set_sensitive(true);
+        wsmoothciesli->set_sensitive(true);
+        wprimlab->set_sensitive(true);
+        wGamma->set_sensitive(false);
+        wSlope->set_sensitive(false);
+        wmidtcie->set_sensitive(true);
+        sigmatrc->set_sensitive(true);
+        offstrc->set_sensitive(true);
+        residtrc->set_sensitive(true);
+        pyrwavtrc->set_sensitive(true);
+        riaHBox->set_sensitive(true);
+        if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+            == ColorManagementParams::Primaries::DEFAULT)
+        {
+            redFrame->hide();
+        } else {
+            redFrame->show();
+        }
+        break;
+    case ColorManagementParams::WorkingTrc::GAMMA_2_2:
+        wGamma->setValue(2.2);
+        wSlope->setValue(0.);
+        will->set_sensitive(false);
+        willulab->set_sensitive(true);
+        wprim->set_sensitive(true);
+        wcat->set_sensitive(true);
+        wcatlab->set_sensitive(true);
+        if (gamut->get_active()) {
+            wcatBox->set_sensitive(true);
+        } else {
+            wcatBox->set_sensitive(false);
+        }
+        fbw->set_sensitive(true);
+        gamut->set_sensitive(true);
+        wsmoothcie->set_sensitive(true);
+        wsmoothciesli->set_sensitive(true);
+        wprimlab->set_sensitive(true);
+        redFrame->show();
+        wGamma->set_sensitive(false);
+        wSlope->set_sensitive(false);
+        wmidtcie->set_sensitive(true);
+        sigmatrc->set_sensitive(true);
+        offstrc->set_sensitive(true);
+        residtrc->set_sensitive(true);
+        pyrwavtrc->set_sensitive(true);
+        riaHBox->set_sensitive(true);
+        if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+            == ColorManagementParams::Primaries::DEFAULT)
+        {
+            redFrame->hide();
+        } else {
+            redFrame->show();
+        }
+        break;
+    case ColorManagementParams::WorkingTrc::GAMMA_1_8:
+        wGamma->setValue(1.8);
+        wSlope->setValue(0.);
+        will->set_sensitive(false);
+        willulab->set_sensitive(true);
+        wprim->set_sensitive(true);
+        wcat->set_sensitive(true);
+        wcatlab->set_sensitive(true);
+        if (gamut->get_active()) {
+            wcatBox->set_sensitive(true);
+        } else {
+            wcatBox->set_sensitive(false);
+        }
+        fbw->set_sensitive(true);
+        gamut->set_sensitive(true);
+        wsmoothcie->set_sensitive(true);
+        wsmoothciesli->set_sensitive(true);
+        wprimlab->set_sensitive(true);
+        riaHBox->set_sensitive(true);
+        if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+            == ColorManagementParams::Primaries::DEFAULT)
+        {
+            redFrame->hide();
+        } else {
+            redFrame->show();
+        }
+        wGamma->set_sensitive(false);
+        wSlope->set_sensitive(false);
+        wmidtcie->set_sensitive(true);
+        sigmatrc->set_sensitive(true);
+        offstrc->set_sensitive(true);
+        residtrc->set_sensitive(true);
+        pyrwavtrc->set_sensitive(true);
+        break;
+    case ColorManagementParams::WorkingTrc::LINEAR:
+        wGamma->setValue(1.);
+        wSlope->setValue(1.);
+        will->set_sensitive(false);
+        willulab->set_sensitive(true);
+        wprim->set_sensitive(true);
+        wcat->set_sensitive(true);
+        wcatlab->set_sensitive(true);
+        if (gamut->get_active()) {
+            wcatBox->set_sensitive(true);
+        } else {
+            wcatBox->set_sensitive(false);
+        }
+        fbw->set_sensitive(true);
+        gamut->set_sensitive(true);
+        wsmoothcie->set_sensitive(true);
+        wsmoothciesli->set_sensitive(true);
+        wprimlab->set_sensitive(true);
+        wGamma->set_sensitive(false);
+        wSlope->set_sensitive(false);
+        wmidtcie->set_sensitive(true);
+        sigmatrc->set_sensitive(true);
+        offstrc->set_sensitive(true);
+        residtrc->set_sensitive(true);
+        pyrwavtrc->set_sensitive(true);
+        riaHBox->set_sensitive(true);
+        if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+            == ColorManagementParams::Primaries::DEFAULT)
+        {
+            redFrame->hide();
+        } else {
+            redFrame->show();
+        }
+        break;
     }
     colorFramecie->set_sensitive(true);
 
     switch (ColorManagementParams::Primaries(wprim->get_active_row_number())) {
-        case ColorManagementParams::Primaries::DEFAULT:
-        case ColorManagementParams::Primaries::SRGB:
-        case ColorManagementParams::Primaries::ADOBE_RGB:
-        case ColorManagementParams::Primaries::PRO_PHOTO:
-        case ColorManagementParams::Primaries::REC2020:
-        case ColorManagementParams::Primaries::ACES_P1:
-        case ColorManagementParams::Primaries::WIDE_GAMUT:
-        case ColorManagementParams::Primaries::ACES_P0:
-        case ColorManagementParams::Primaries::JDC_MAX:
-        case ColorManagementParams::Primaries::JDC_MAXSTDA:
-        case ColorManagementParams::Primaries::BRUCE_RGB:
-        case ColorManagementParams::Primaries::BETA_RGB:
-        case ColorManagementParams::Primaries::BEST_RGB: {
-            labgridcie->set_sensitive(false);
-            will->set_sensitive(false);
-            break;
-        }
+    case ColorManagementParams::Primaries::DEFAULT:
+    case ColorManagementParams::Primaries::SRGB:
+    case ColorManagementParams::Primaries::ADOBE_RGB:
+    case ColorManagementParams::Primaries::PRO_PHOTO:
+    case ColorManagementParams::Primaries::REC2020:
+    case ColorManagementParams::Primaries::ACES_P1:
+    case ColorManagementParams::Primaries::WIDE_GAMUT:
+    case ColorManagementParams::Primaries::ACES_P0:
+    case ColorManagementParams::Primaries::JDC_MAX:
+    case ColorManagementParams::Primaries::JDC_MAXSTDA:
+    case ColorManagementParams::Primaries::BRUCE_RGB:
+    case ColorManagementParams::Primaries::BETA_RGB:
+    case ColorManagementParams::Primaries::BEST_RGB:
+    {
+        labgridcie->set_sensitive(false);
+        will->set_sensitive(false);
+        break;
+    }
 
-        case ColorManagementParams::Primaries::CUSTOM: {
-            will->set_sensitive(true);
-            labgridcie->set_sensitive(false);
-            colorFramecie->set_sensitive(true);
+    case ColorManagementParams::Primaries::CUSTOM:
+    {
+        will->set_sensitive(true);
+        labgridcie->set_sensitive(false);
+        colorFramecie->set_sensitive(true);
 
-            break;
-        }
+        break;
+    }
 
-        case ColorManagementParams::Primaries::CUSTOM_GRID: {
-            labgridcie->set_sensitive(true);
-            primCoordGrid->set_sensitive(false);
-            will->set_sensitive(false);
-            colorFramecie->set_sensitive(false);
+    case ColorManagementParams::Primaries::CUSTOM_GRID:
+    {
+        labgridcie->set_sensitive(true);
+        primCoordGrid->set_sensitive(false);
+        will->set_sensitive(false);
+        colorFramecie->set_sensitive(false);
 
-            break;
-        }
+        break;
+    }
     }
 
     enableListener();
@@ -1481,39 +1581,44 @@ void ICMPanel::write(ProcParams* pp, ParamsEdited* pedited)
     } else if (icameraICC->get_active()) {
         pp->icm.inputProfile = "(cameraICC)";
     } else {
-        if (Glib::file_test(ipDialog->get_filename(), Glib::FILE_TEST_EXISTS) && !Glib::file_test(ipDialog->get_filename(), Glib::FILE_TEST_IS_DIR)) {
+        if (Glib::file_test(ipDialog->get_filename(), Glib::FILE_TEST_EXISTS)
+            && !Glib::file_test(ipDialog->get_filename(), Glib::FILE_TEST_IS_DIR))
+        {
             pp->icm.inputProfile = "file:" + ipDialog->get_filename();
         } else {
-            pp->icm.inputProfile = "";    // just a directory
+            pp->icm.inputProfile = "";  // just a directory
         }
     }
 
     pp->icm.workingProfile = wProfNames->get_active_text();
     pp->icm.dcpIlluminant = rtengine::max<int>(dcpIll->get_active_row_number(), 0);
 
-
-    labgridcie->getParams(pp->icm.labgridcieALow, pp->icm.labgridcieBLow, pp->icm.labgridcieAHigh, pp->icm.labgridcieBHigh, pp->icm.labgridcieGx, pp->icm.labgridcieGy, pp->icm.labgridcieWx, pp->icm.labgridcieWy, pp->icm.labgridcieMx, pp->icm.labgridcieMy);
+    labgridcie->getParams(pp->icm.labgridcieALow, pp->icm.labgridcieBLow,
+                          pp->icm.labgridcieAHigh, pp->icm.labgridcieBHigh,
+                          pp->icm.labgridcieGx, pp->icm.labgridcieGy,
+                          pp->icm.labgridcieWx, pp->icm.labgridcieWy,
+                          pp->icm.labgridcieMx, pp->icm.labgridcieMy);
 
     if (oProfNames->get_active_text() == M("TP_ICM_NOICM")) {
-        pp->icm.outputProfile  = ColorManagementParams::NoICMString;
+        pp->icm.outputProfile = ColorManagementParams::NoICMString;
     } else {
-        pp->icm.outputProfile  = oProfNames->get_active_text();
+        pp->icm.outputProfile = oProfNames->get_active_text();
     }
 
     int ointentVal = oRendIntent->getSelected();
 
     if (ointentVal >= 0 && ointentVal < RI__COUNT) {
-        pp->icm.outputIntent  = static_cast<RenderingIntent>(ointentVal);
+        pp->icm.outputIntent = static_cast<RenderingIntent>(ointentVal);
     } else {
-        pp->icm.outputIntent  = rtengine::RI_RELATIVE;
+        pp->icm.outputIntent = rtengine::RI_RELATIVE;
     }
 
     int aintentVal = aRendIntent->getSelected();
 
     if (aintentVal >= 0 && aintentVal < RI__COUNT) {
-        pp->icm.aRendIntent  = static_cast<RenderingIntent>(aintentVal);
+        pp->icm.aRendIntent = static_cast<RenderingIntent>(aintentVal);
     } else {
-        pp->icm.aRendIntent  = rtengine::RI_RELATIVE;
+        pp->icm.aRendIntent = rtengine::RI_RELATIVE;
     }
 
     pp->icm.workingTRC = ColorManagementParams::WorkingTrc(wTRC->get_active_row_number());
@@ -1531,34 +1636,36 @@ void ICMPanel::write(ProcParams* pp, ParamsEdited* pedited)
     pp->icm.wavExp = wavExp->getEnabled();
     pp->icm.gamut = gamut->get_active();
     pp->icm.wsmoothcie = wsmoothcie->get_active();
- //   pp->icm.workingTRCGamma =  wGamma->getValue();
- //   pp->icm.workingTRCSlope =  wSlope->getValue();
-    pp->icm.wGamma =  wGamma->getValue();
-    pp->icm.wSlope =  wSlope->getValue();
-    pp->icm.wapsat =  wapsat->getValue();
-    pp->icm.wmidtcie =  wmidtcie->getValue();
-    pp->icm.wsmoothciesli =  wsmoothciesli->getValue();
-    pp->icm.sigmatrc =  sigmatrc->getValue();
-    pp->icm.offstrc =  offstrc->getValue();
-    pp->icm.residtrc =  residtrc->getValue();
-    pp->icm.pyrwavtrc =  pyrwavtrc->getIntValue();
-    pp->icm.redx =  redx->getValue();
-    pp->icm.redy =  redy->getValue();
-    pp->icm.grex =  grex->getValue();
-    pp->icm.grey =  grey->getValue();
-    pp->icm.blux =  blux->getValue();
-    pp->icm.bluy =  bluy->getValue();
-    pp->icm.refi =  refi->getValue();
-    pp->icm.shiftx =  shiftx->getValue();
-    pp->icm.shifty =  shifty->getValue();
+    //   pp->icm.workingTRCGamma =  wGamma->getValue();
+    //   pp->icm.workingTRCSlope =  wSlope->getValue();
+    pp->icm.wGamma = wGamma->getValue();
+    pp->icm.wSlope = wSlope->getValue();
+    pp->icm.wapsat = wapsat->getValue();
+    pp->icm.wmidtcie = wmidtcie->getValue();
+    pp->icm.wsmoothciesli = wsmoothciesli->getValue();
+    pp->icm.sigmatrc = sigmatrc->getValue();
+    pp->icm.offstrc = offstrc->getValue();
+    pp->icm.residtrc = residtrc->getValue();
+    pp->icm.pyrwavtrc = pyrwavtrc->getIntValue();
+    pp->icm.redx = redx->getValue();
+    pp->icm.redy = redy->getValue();
+    pp->icm.grex = grex->getValue();
+    pp->icm.grey = grey->getValue();
+    pp->icm.blux = blux->getValue();
+    pp->icm.bluy = bluy->getValue();
+    pp->icm.refi = refi->getValue();
+    pp->icm.shiftx = shiftx->getValue();
+    pp->icm.shifty = shifty->getValue();
     pp->toneCurve.fromHistMatching = false;
-    pp->icm.preser =  preser->getValue();
+    pp->icm.preser = preser->getValue();
     pp->icm.opacityCurveWLI = opacityShapeWLI->getCurve();
 
     if (pedited) {
         pedited->icm.inputProfile = !iunchanged->get_active();
-        pedited->icm.workingProfile = wProfNames->get_active_text() != M("GENERAL_UNCHANGED");
-        pedited->icm.outputProfile = oProfNames->get_active_text() != M("GENERAL_UNCHANGED");
+        pedited->icm.workingProfile =
+            wProfNames->get_active_text() != M("GENERAL_UNCHANGED");
+        pedited->icm.outputProfile =
+            oProfNames->get_active_text() != M("GENERAL_UNCHANGED");
         pedited->icm.outputIntent = oRendIntent->getSelected() < 4;
         pedited->icm.aRendIntent = aRendIntent->getSelected() < 4;
         pedited->icm.outputBPC = !obpc->get_inconsistent();
@@ -1570,10 +1677,11 @@ void ICMPanel::write(ProcParams* pp, ParamsEdited* pedited)
         pedited->icm.dcpIlluminant = dcpIll->get_active_text() != M("GENERAL_UNCHANGED");
         pedited->icm.toneCurve = !ckbToneCurve->get_inconsistent();
         pedited->icm.applyLookTable = !ckbApplyLookTable->get_inconsistent();
-        pedited->icm.applyBaselineExposureOffset = !ckbApplyBaselineExposureOffset->get_inconsistent();
+        pedited->icm.applyBaselineExposureOffset =
+            !ckbApplyBaselineExposureOffset->get_inconsistent();
         pedited->icm.applyHueSatMap = !ckbApplyHueSatMap->get_inconsistent();
-      //  pedited->icm.workingTRCGamma = wGamma->getEditedState();
-       // pedited->icm.workingTRCSlope = wSlope->getEditedState();
+        //  pedited->icm.workingTRCGamma = wGamma->getEditedState();
+        // pedited->icm.workingTRCSlope = wSlope->getEditedState();
         pedited->icm.wGamma = wGamma->getEditedState();
         pedited->icm.wSlope = wSlope->getEditedState();
         pedited->icm.wapsat = wapsat->getEditedState();
@@ -1589,10 +1697,14 @@ void ICMPanel::write(ProcParams* pp, ParamsEdited* pedited)
         pedited->icm.wcat = wcat->get_active_text() != M("GENERAL_UNCHANGED");
         pedited->icm.redx = redx->getEditedState();
         pedited->icm.redy = redy->getEditedState();
-        pedited->icm.labgridcieALow = pedited->icm.labgridcieBLow = pedited->icm.labgridcieAHigh = pedited->icm.labgridcieBHigh = pedited->icm.labgridcieGx = pedited->icm.labgridcieGy = pedited->icm.labgridcieWx = pedited->icm.labgridcieWy = pedited->icm.labgridcieMx = pedited->icm.labgridcieMy = labgridcie->getEdited();
-        pedited->icm.opacityCurveWLI  = !opacityShapeWLI->isUnChanged();
-
-   }
+        pedited->icm.labgridcieALow = pedited->icm.labgridcieBLow =
+            pedited->icm.labgridcieAHigh = pedited->icm.labgridcieBHigh =
+                pedited->icm.labgridcieGx = pedited->icm.labgridcieGy =
+                    pedited->icm.labgridcieWx = pedited->icm.labgridcieWy =
+                        pedited->icm.labgridcieMx = pedited->icm.labgridcieMy =
+                            labgridcie->getEdited();
+        pedited->icm.opacityCurveWLI = !opacityShapeWLI->isUnChanged();
+    }
 }
 
 void ICMPanel::curveChanged(CurveEditor* ce)
@@ -1601,13 +1713,13 @@ void ICMPanel::curveChanged(CurveEditor* ce)
     if (listener) {
         if (ce == opacityShapeWLI) {
             listener->panelChanged(EvICMopacityWLI, M("HISTORY_CUSTOMCURVE"));
-        } 
+        }
     }
 }
 void ICMPanel::setDefaults(const ProcParams* defParams, const ParamsEdited* pedited)
 {
-   // wGamma->setDefault(defParams->icm.workingTRCGamma);
-   // wSlope->setDefault(defParams->icm.workingTRCSlope);
+    // wGamma->setDefault(defParams->icm.workingTRCGamma);
+    // wSlope->setDefault(defParams->icm.workingTRCSlope);
     wGamma->setDefault(defParams->icm.wGamma);
     wSlope->setDefault(defParams->icm.wSlope);
     wapsat->setDefault(defParams->icm.wapsat);
@@ -1628,17 +1740,22 @@ void ICMPanel::setDefaults(const ProcParams* defParams, const ParamsEdited* pedi
     shifty->setDefault(defParams->icm.shifty);
     preser->setDefault(defParams->icm.preser);
 
-
-    labgridcie->setDefault(defParams->icm.labgridcieALow, defParams->icm.labgridcieBLow , defParams->icm.labgridcieAHigh, defParams->icm.labgridcieBHigh, defParams->icm.labgridcieGx, defParams->icm.labgridcieGy, defParams->icm.labgridcieWx, defParams->icm.labgridcieWy, defParams->icm.labgridcieMx, defParams->icm.labgridcieMy);
+    labgridcie->setDefault(defParams->icm.labgridcieALow, defParams->icm.labgridcieBLow,
+                           defParams->icm.labgridcieAHigh, defParams->icm.labgridcieBHigh,
+                           defParams->icm.labgridcieGx, defParams->icm.labgridcieGy,
+                           defParams->icm.labgridcieWx, defParams->icm.labgridcieWy,
+                           defParams->icm.labgridcieMx, defParams->icm.labgridcieMy);
 
     if (pedited) {
-     //   wGamma->setDefaultEditedState(pedited->icm.workingTRCGamma ? Edited : UnEdited);
-     //   wSlope->setDefaultEditedState(pedited->icm.workingTRCSlope ? Edited : UnEdited);
+        //   wGamma->setDefaultEditedState(pedited->icm.workingTRCGamma ? Edited :
+        //   UnEdited); wSlope->setDefaultEditedState(pedited->icm.workingTRCSlope ?
+        //   Edited : UnEdited);
         wGamma->setDefaultEditedState(pedited->icm.wGamma ? Edited : UnEdited);
         wSlope->setDefaultEditedState(pedited->icm.wSlope ? Edited : UnEdited);
         wapsat->setDefaultEditedState(pedited->icm.wapsat ? Edited : UnEdited);
         wmidtcie->setDefaultEditedState(pedited->icm.wmidtcie ? Edited : UnEdited);
-        wsmoothciesli->setDefaultEditedState(pedited->icm.wsmoothciesli ? Edited : UnEdited);
+        wsmoothciesli->setDefaultEditedState(pedited->icm.wsmoothciesli ? Edited
+                                                                        : UnEdited);
         sigmatrc->setDefaultEditedState(pedited->icm.sigmatrc ? Edited : UnEdited);
         offstrc->setDefaultEditedState(pedited->icm.offstrc ? Edited : UnEdited);
         residtrc->setDefaultEditedState(pedited->icm.residtrc ? Edited : UnEdited);
@@ -1652,7 +1769,14 @@ void ICMPanel::setDefaults(const ProcParams* defParams, const ParamsEdited* pedi
         refi->setDefaultEditedState(pedited->icm.refi ? Edited : UnEdited);
         shiftx->setDefaultEditedState(pedited->icm.shiftx ? Edited : UnEdited);
         shifty->setDefaultEditedState(pedited->icm.shifty ? Edited : UnEdited);
-        labgridcie->setEdited((pedited->icm.labgridcieALow || pedited->icm.labgridcieBLow || pedited->icm.labgridcieAHigh || pedited->icm.labgridcieBHigh || pedited->icm.labgridcieGx || pedited->icm.labgridcieGy || pedited->icm.labgridcieWx || pedited->icm.labgridcieWy || pedited->icm.labgridcieMx || pedited->icm.labgridcieMy) ? Edited : UnEdited);
+        labgridcie->setEdited((pedited->icm.labgridcieALow || pedited->icm.labgridcieBLow
+                               || pedited->icm.labgridcieAHigh
+                               || pedited->icm.labgridcieBHigh
+                               || pedited->icm.labgridcieGx || pedited->icm.labgridcieGy
+                               || pedited->icm.labgridcieWx || pedited->icm.labgridcieWy
+                               || pedited->icm.labgridcieMx || pedited->icm.labgridcieMy)
+                                  ? Edited
+                                  : UnEdited);
         preser->setDefaultEditedState(pedited->icm.preser ? Edited : UnEdited);
 
     } else {
@@ -1676,14 +1800,14 @@ void ICMPanel::setDefaults(const ProcParams* defParams, const ParamsEdited* pedi
         shifty->setDefaultEditedState(Irrelevant);
         preser->setDefaultEditedState(Irrelevant);
         labgridcie->setEdited(Edited);
-
     }
 }
 
 void ICMPanel::adjusterChanged(Adjuster* a, double newval)
 {
     if (listener) {
-        Glib::ustring costr2 = Glib::ustring::format(std::setw(3), std::fixed, std::setprecision(2), newval);
+        Glib::ustring costr2 =
+            Glib::ustring::format(std::setw(3), std::fixed, std::setprecision(2), newval);
 
         if (a == wGamma) {
             if (wGamma->getValue() <= 1.) {
@@ -1729,7 +1853,6 @@ void ICMPanel::adjusterChanged(Adjuster* a, double newval)
         } else if (a == shifty) {
             listener->panelChanged(EvICMshifty, costr2);
         }
-
     }
 }
 
@@ -1743,288 +1866,317 @@ void ICMPanel::wpChanged()
 void ICMPanel::wtrcinChanged()
 {
     switch (ColorManagementParams::WorkingTrc(wTRC->get_active_row_number())) {
-        case ColorManagementParams::WorkingTrc::NONE: {
-            wGamma->set_sensitive(false);
-            wSlope->set_sensitive(false);
-            wmidtcie->set_sensitive(false);
-            wsmoothciesli->set_sensitive(false);
-            sigmatrc->set_sensitive(false);
-            offstrc->set_sensitive(false);
-            residtrc->set_sensitive(false);
-            pyrwavtrc->set_sensitive(false);
-            will->set_sensitive(false);
-            willulab->set_sensitive(false);
-            wprim->set_sensitive(false);
-            fbw->set_sensitive(false);
-            gamut->set_sensitive(false);
-            wsmoothcie->set_sensitive(false);
-            wprimlab->set_sensitive(false);
+    case ColorManagementParams::WorkingTrc::NONE:
+    {
+        wGamma->set_sensitive(false);
+        wSlope->set_sensitive(false);
+        wmidtcie->set_sensitive(false);
+        wsmoothciesli->set_sensitive(false);
+        sigmatrc->set_sensitive(false);
+        offstrc->set_sensitive(false);
+        residtrc->set_sensitive(false);
+        pyrwavtrc->set_sensitive(false);
+        will->set_sensitive(false);
+        willulab->set_sensitive(false);
+        wprim->set_sensitive(false);
+        fbw->set_sensitive(false);
+        gamut->set_sensitive(false);
+        wsmoothcie->set_sensitive(false);
+        wprimlab->set_sensitive(false);
+        redFrame->hide();
+        riaHBox->set_sensitive(false);
+        break;
+    }
+
+    case ColorManagementParams::WorkingTrc::CUSTOM:
+    {
+        will->set_sensitive(false);
+        wprim->set_sensitive(true);
+        wmidtcie->set_sensitive(true);
+        sigmatrc->set_sensitive(true);
+        offstrc->set_sensitive(true);
+        residtrc->set_sensitive(true);
+        pyrwavtrc->set_sensitive(true);
+        wcat->set_sensitive(true);
+        wcatlab->set_sensitive(true);
+        fbw->set_sensitive(true);
+        gamut->set_sensitive(true);
+        wsmoothcie->set_sensitive(true);
+        wsmoothciesli->set_sensitive(true);
+        wprimlab->set_sensitive(true);
+        willulab->set_sensitive(true);
+        if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+            == ColorManagementParams::Primaries::DEFAULT)
+        {
             redFrame->hide();
-            riaHBox->set_sensitive(false);
-            break;
-        }
-
-        case ColorManagementParams::WorkingTrc::CUSTOM: {
-            will->set_sensitive(false);
-            wprim->set_sensitive(true);
-            wmidtcie->set_sensitive(true);
-            sigmatrc->set_sensitive(true);
-            offstrc->set_sensitive(true);
-            residtrc->set_sensitive(true);
-            pyrwavtrc->set_sensitive(true);
-            wcat->set_sensitive(true);
-            wcatlab->set_sensitive(true);
-            fbw->set_sensitive(true);
-            gamut->set_sensitive(true);
-            wsmoothcie->set_sensitive(true);
-            wsmoothciesli->set_sensitive(true);
-            wprimlab->set_sensitive(true);
-            willulab->set_sensitive(true);
-            if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::DEFAULT) {
-                redFrame->hide();
+        } else {
+            redFrame->show();
+            if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+                    != ColorManagementParams::Primaries::CUSTOM
+                && ColorManagementParams::Primaries(wprim->get_active_row_number())
+                       != ColorManagementParams::Primaries::CUSTOM_GRID)
+            {
+                primCoordGrid->set_sensitive(false);
             } else {
-                redFrame->show();
-                if (
-                    ColorManagementParams::Primaries(wprim->get_active_row_number()) != ColorManagementParams::Primaries::CUSTOM
-                    && ColorManagementParams::Primaries(wprim->get_active_row_number()) != ColorManagementParams::Primaries::CUSTOM_GRID
-                ) {
-                   primCoordGrid->set_sensitive(false);
-                } else {
-                   primCoordGrid->set_sensitive(true);
-                }
+                primCoordGrid->set_sensitive(true);
             }
-            riaHBox->set_sensitive(true);
-            if (wGamma->getValue() <= 1.) {
-                wGamma->set_sensitive(true);
-                wSlope->set_sensitive(false);
-            } else {
-                wGamma->set_sensitive(true);
-                wSlope->set_sensitive(true);
-            }
-            break;
         }
-
-        case ColorManagementParams::WorkingTrc::BT709: {
-            wGamma->setValue(2.222);
-            wSlope->setValue(4.5);
-            wmidtcie->set_sensitive(true);
-            sigmatrc->set_sensitive(true);
-            offstrc->set_sensitive(true);
-            residtrc->set_sensitive(true);
-            pyrwavtrc->set_sensitive(true);
-            will->set_sensitive(false);
-            willulab->set_sensitive(true);
-            wprim->set_sensitive(true);
-            wcat->set_sensitive(true);
-            wcatlab->set_sensitive(true);
-            fbw->set_sensitive(true);
-            gamut->set_sensitive(true);
-            wsmoothcie->set_sensitive(true);
-            wsmoothciesli->set_sensitive(true);
-            wprimlab->set_sensitive(true);
-            wGamma->set_sensitive(false);
+        riaHBox->set_sensitive(true);
+        if (wGamma->getValue() <= 1.) {
+            wGamma->set_sensitive(true);
             wSlope->set_sensitive(false);
-            if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::DEFAULT) {
-                redFrame->hide();
-            } else {
-                redFrame->show();
-                if (
-                    ColorManagementParams::Primaries(wprim->get_active_row_number()) != ColorManagementParams::Primaries::CUSTOM
-                    && ColorManagementParams::Primaries(wprim->get_active_row_number()) != ColorManagementParams::Primaries::CUSTOM_GRID
-                ) {
-                    primCoordGrid->set_sensitive(false);
-                }
-            }
-            riaHBox->set_sensitive(true);
-            break;
+        } else {
+            wGamma->set_sensitive(true);
+            wSlope->set_sensitive(true);
         }
+        break;
+    }
 
-        case ColorManagementParams::WorkingTrc::SRGB: {
-            wGamma->setValue(2.4);
-            wSlope->setValue(12.92);
-            wmidtcie->set_sensitive(true);
-            sigmatrc->set_sensitive(true);
-            offstrc->set_sensitive(true);
-            residtrc->set_sensitive(true);
-            pyrwavtrc->set_sensitive(true);
-            will->set_sensitive(false);
-            willulab->set_sensitive(true);
-            wprim->set_sensitive(true);
-            wcat->set_sensitive(true);
-            wcatlab->set_sensitive(true);
-            fbw->set_sensitive(true);
-            gamut->set_sensitive(true);
-            wsmoothcie->set_sensitive(true);
-            wsmoothciesli->set_sensitive(true);
-            wGamma->set_sensitive(false);
-            wSlope->set_sensitive(false);
-            riaHBox->set_sensitive(true);
-            if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::DEFAULT) {
-                redFrame->hide();
-            } else {
-                redFrame->show();
-                if (
-                    ColorManagementParams::Primaries(wprim->get_active_row_number()) != ColorManagementParams::Primaries::CUSTOM
-                    && ColorManagementParams::Primaries(wprim->get_active_row_number()) != ColorManagementParams::Primaries::CUSTOM_GRID
-                ) {
-                    primCoordGrid->set_sensitive(false);
-                } else {
-                    primCoordGrid->set_sensitive(true);
-                }
+    case ColorManagementParams::WorkingTrc::BT709:
+    {
+        wGamma->setValue(2.222);
+        wSlope->setValue(4.5);
+        wmidtcie->set_sensitive(true);
+        sigmatrc->set_sensitive(true);
+        offstrc->set_sensitive(true);
+        residtrc->set_sensitive(true);
+        pyrwavtrc->set_sensitive(true);
+        will->set_sensitive(false);
+        willulab->set_sensitive(true);
+        wprim->set_sensitive(true);
+        wcat->set_sensitive(true);
+        wcatlab->set_sensitive(true);
+        fbw->set_sensitive(true);
+        gamut->set_sensitive(true);
+        wsmoothcie->set_sensitive(true);
+        wsmoothciesli->set_sensitive(true);
+        wprimlab->set_sensitive(true);
+        wGamma->set_sensitive(false);
+        wSlope->set_sensitive(false);
+        if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+            == ColorManagementParams::Primaries::DEFAULT)
+        {
+            redFrame->hide();
+        } else {
+            redFrame->show();
+            if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+                    != ColorManagementParams::Primaries::CUSTOM
+                && ColorManagementParams::Primaries(wprim->get_active_row_number())
+                       != ColorManagementParams::Primaries::CUSTOM_GRID)
+            {
+                primCoordGrid->set_sensitive(false);
             }
-            break;
         }
+        riaHBox->set_sensitive(true);
+        break;
+    }
 
-        case ColorManagementParams::WorkingTrc::GAMMA_2_2: {
-            wGamma->setValue(2.2);
-            wSlope->setValue(0.);
-            wmidtcie->set_sensitive(true);
-            sigmatrc->set_sensitive(true);
-            offstrc->set_sensitive(true);
-            residtrc->set_sensitive(true);
-            pyrwavtrc->set_sensitive(true);
-            will->set_sensitive(false);
-            willulab->set_sensitive(true);
-            wprim->set_sensitive(true);
-            wcat->set_sensitive(true);
-            wcatlab->set_sensitive(true);
-            fbw->set_sensitive(true);
-            gamut->set_sensitive(true);
-            wsmoothcie->set_sensitive(true);
-            wsmoothciesli->set_sensitive(true);
-            wprimlab->set_sensitive(true);
-            wGamma->set_sensitive(false);
-            wSlope->set_sensitive(false);
-            riaHBox->set_sensitive(true);
-            if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::DEFAULT) {
-                redFrame->hide();
+    case ColorManagementParams::WorkingTrc::SRGB:
+    {
+        wGamma->setValue(2.4);
+        wSlope->setValue(12.92);
+        wmidtcie->set_sensitive(true);
+        sigmatrc->set_sensitive(true);
+        offstrc->set_sensitive(true);
+        residtrc->set_sensitive(true);
+        pyrwavtrc->set_sensitive(true);
+        will->set_sensitive(false);
+        willulab->set_sensitive(true);
+        wprim->set_sensitive(true);
+        wcat->set_sensitive(true);
+        wcatlab->set_sensitive(true);
+        fbw->set_sensitive(true);
+        gamut->set_sensitive(true);
+        wsmoothcie->set_sensitive(true);
+        wsmoothciesli->set_sensitive(true);
+        wGamma->set_sensitive(false);
+        wSlope->set_sensitive(false);
+        riaHBox->set_sensitive(true);
+        if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+            == ColorManagementParams::Primaries::DEFAULT)
+        {
+            redFrame->hide();
+        } else {
+            redFrame->show();
+            if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+                    != ColorManagementParams::Primaries::CUSTOM
+                && ColorManagementParams::Primaries(wprim->get_active_row_number())
+                       != ColorManagementParams::Primaries::CUSTOM_GRID)
+            {
+                primCoordGrid->set_sensitive(false);
             } else {
-                redFrame->show();
-                if (
-                    ColorManagementParams::Primaries(wprim->get_active_row_number()) != ColorManagementParams::Primaries::CUSTOM
-                    && ColorManagementParams::Primaries(wprim->get_active_row_number()) != ColorManagementParams::Primaries::CUSTOM_GRID
-                ) {
-                    primCoordGrid->set_sensitive(false);
-                } else {
-                    primCoordGrid->set_sensitive(true);
-                }
+                primCoordGrid->set_sensitive(true);
             }
-            break;
         }
+        break;
+    }
 
-        case ColorManagementParams::WorkingTrc::GAMMA_1_8: {
-            wGamma->setValue(1.8);
-            wSlope->setValue(0.);
-            wmidtcie->set_sensitive(true);
-            sigmatrc->set_sensitive(true);
-            offstrc->set_sensitive(true);
-            residtrc->set_sensitive(true);
-            pyrwavtrc->set_sensitive(true);
-            will->set_sensitive(false);
-            willulab->set_sensitive(true);
-            wprim->set_sensitive(true);
-            wcat->set_sensitive(true);
-            wcatlab->set_sensitive(true);
-            fbw->set_sensitive(true);
-            gamut->set_sensitive(true);
-            wsmoothcie->set_sensitive(true);
-            wsmoothciesli->set_sensitive(true);
-            wprimlab->set_sensitive(true);
-            wGamma->set_sensitive(false);
-            wSlope->set_sensitive(false);
-            riaHBox->set_sensitive(true);
-            if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::DEFAULT) {
-                redFrame->hide();
+    case ColorManagementParams::WorkingTrc::GAMMA_2_2:
+    {
+        wGamma->setValue(2.2);
+        wSlope->setValue(0.);
+        wmidtcie->set_sensitive(true);
+        sigmatrc->set_sensitive(true);
+        offstrc->set_sensitive(true);
+        residtrc->set_sensitive(true);
+        pyrwavtrc->set_sensitive(true);
+        will->set_sensitive(false);
+        willulab->set_sensitive(true);
+        wprim->set_sensitive(true);
+        wcat->set_sensitive(true);
+        wcatlab->set_sensitive(true);
+        fbw->set_sensitive(true);
+        gamut->set_sensitive(true);
+        wsmoothcie->set_sensitive(true);
+        wsmoothciesli->set_sensitive(true);
+        wprimlab->set_sensitive(true);
+        wGamma->set_sensitive(false);
+        wSlope->set_sensitive(false);
+        riaHBox->set_sensitive(true);
+        if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+            == ColorManagementParams::Primaries::DEFAULT)
+        {
+            redFrame->hide();
+        } else {
+            redFrame->show();
+            if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+                    != ColorManagementParams::Primaries::CUSTOM
+                && ColorManagementParams::Primaries(wprim->get_active_row_number())
+                       != ColorManagementParams::Primaries::CUSTOM_GRID)
+            {
+                primCoordGrid->set_sensitive(false);
             } else {
-                redFrame->show();
-                if (
-                    ColorManagementParams::Primaries(wprim->get_active_row_number()) != ColorManagementParams::Primaries::CUSTOM
-                    && ColorManagementParams::Primaries(wprim->get_active_row_number()) != ColorManagementParams::Primaries::CUSTOM_GRID
-                ) {
-                    primCoordGrid->set_sensitive(false);
-                } else {
-                    primCoordGrid->set_sensitive(true);
-                }
+                primCoordGrid->set_sensitive(true);
             }
-            break;
         }
+        break;
+    }
 
-        case ColorManagementParams::WorkingTrc::LINEAR: {
-            wGamma->setValue(1.0);
-            wSlope->setValue(1.);
-            wmidtcie->set_sensitive(true);
-            sigmatrc->set_sensitive(true);
-            offstrc->set_sensitive(true);
-            residtrc->set_sensitive(true);
-            pyrwavtrc->set_sensitive(true);
-            will->set_sensitive(false);
-            willulab->set_sensitive(true);
-            wprim->set_sensitive(true);
-            wcat->set_sensitive(true);
-            wcatlab->set_sensitive(true);
-            fbw->set_sensitive(true);
-            gamut->set_sensitive(true);
-            wsmoothcie->set_sensitive(true);
-            wsmoothciesli->set_sensitive(true);
-            wprimlab->set_sensitive(true);
-            wGamma->set_sensitive(false);
-            wSlope->set_sensitive(false);
-            riaHBox->set_sensitive(true);
-            if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::DEFAULT) {
-                redFrame->hide();
+    case ColorManagementParams::WorkingTrc::GAMMA_1_8:
+    {
+        wGamma->setValue(1.8);
+        wSlope->setValue(0.);
+        wmidtcie->set_sensitive(true);
+        sigmatrc->set_sensitive(true);
+        offstrc->set_sensitive(true);
+        residtrc->set_sensitive(true);
+        pyrwavtrc->set_sensitive(true);
+        will->set_sensitive(false);
+        willulab->set_sensitive(true);
+        wprim->set_sensitive(true);
+        wcat->set_sensitive(true);
+        wcatlab->set_sensitive(true);
+        fbw->set_sensitive(true);
+        gamut->set_sensitive(true);
+        wsmoothcie->set_sensitive(true);
+        wsmoothciesli->set_sensitive(true);
+        wprimlab->set_sensitive(true);
+        wGamma->set_sensitive(false);
+        wSlope->set_sensitive(false);
+        riaHBox->set_sensitive(true);
+        if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+            == ColorManagementParams::Primaries::DEFAULT)
+        {
+            redFrame->hide();
+        } else {
+            redFrame->show();
+            if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+                    != ColorManagementParams::Primaries::CUSTOM
+                && ColorManagementParams::Primaries(wprim->get_active_row_number())
+                       != ColorManagementParams::Primaries::CUSTOM_GRID)
+            {
+                primCoordGrid->set_sensitive(false);
             } else {
-                redFrame->show();
-                if (
-                    ColorManagementParams::Primaries(wprim->get_active_row_number()) != ColorManagementParams::Primaries::CUSTOM
-                    && ColorManagementParams::Primaries(wprim->get_active_row_number()) != ColorManagementParams::Primaries::CUSTOM_GRID
-                ) {
-                    primCoordGrid->set_sensitive(false);
-                } else {
-                    primCoordGrid->set_sensitive(true);
-                }
+                primCoordGrid->set_sensitive(true);
             }
-            break;
         }
+        break;
+    }
+
+    case ColorManagementParams::WorkingTrc::LINEAR:
+    {
+        wGamma->setValue(1.0);
+        wSlope->setValue(1.);
+        wmidtcie->set_sensitive(true);
+        sigmatrc->set_sensitive(true);
+        offstrc->set_sensitive(true);
+        residtrc->set_sensitive(true);
+        pyrwavtrc->set_sensitive(true);
+        will->set_sensitive(false);
+        willulab->set_sensitive(true);
+        wprim->set_sensitive(true);
+        wcat->set_sensitive(true);
+        wcatlab->set_sensitive(true);
+        fbw->set_sensitive(true);
+        gamut->set_sensitive(true);
+        wsmoothcie->set_sensitive(true);
+        wsmoothciesli->set_sensitive(true);
+        wprimlab->set_sensitive(true);
+        wGamma->set_sensitive(false);
+        wSlope->set_sensitive(false);
+        riaHBox->set_sensitive(true);
+        if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+            == ColorManagementParams::Primaries::DEFAULT)
+        {
+            redFrame->hide();
+        } else {
+            redFrame->show();
+            if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+                    != ColorManagementParams::Primaries::CUSTOM
+                && ColorManagementParams::Primaries(wprim->get_active_row_number())
+                       != ColorManagementParams::Primaries::CUSTOM_GRID)
+            {
+                primCoordGrid->set_sensitive(false);
+            } else {
+                primCoordGrid->set_sensitive(true);
+            }
+        }
+        break;
+    }
     }
     wprimChanged();
     wcatChanged();
 
     switch (ColorManagementParams::Primaries(wprim->get_active_row_number())) {
-        case ColorManagementParams::Primaries::DEFAULT:
-        case ColorManagementParams::Primaries::SRGB:
-        case ColorManagementParams::Primaries::ADOBE_RGB:
-        case ColorManagementParams::Primaries::PRO_PHOTO:
-        case ColorManagementParams::Primaries::REC2020:
-        case ColorManagementParams::Primaries::ACES_P1:
-        case ColorManagementParams::Primaries::WIDE_GAMUT:
-        case ColorManagementParams::Primaries::ACES_P0:
-        case ColorManagementParams::Primaries::JDC_MAX:
-        case ColorManagementParams::Primaries::JDC_MAXSTDA:
-        case ColorManagementParams::Primaries::BRUCE_RGB:
-        case ColorManagementParams::Primaries::BETA_RGB:
-        case ColorManagementParams::Primaries::BEST_RGB: {
-            labgridcie->set_sensitive(false);
-            will->set_sensitive(false);
-            break;
-        }
-
-        case ColorManagementParams::Primaries::CUSTOM: {
-            will->set_sensitive(true);
-            labgridcie->set_sensitive(false);
-            break;
-        }
-
-        case ColorManagementParams::Primaries::CUSTOM_GRID: {
-            labgridcie->set_sensitive(true);
-            will->set_sensitive(false);
-            break;
-        }
+    case ColorManagementParams::Primaries::DEFAULT:
+    case ColorManagementParams::Primaries::SRGB:
+    case ColorManagementParams::Primaries::ADOBE_RGB:
+    case ColorManagementParams::Primaries::PRO_PHOTO:
+    case ColorManagementParams::Primaries::REC2020:
+    case ColorManagementParams::Primaries::ACES_P1:
+    case ColorManagementParams::Primaries::WIDE_GAMUT:
+    case ColorManagementParams::Primaries::ACES_P0:
+    case ColorManagementParams::Primaries::JDC_MAX:
+    case ColorManagementParams::Primaries::JDC_MAXSTDA:
+    case ColorManagementParams::Primaries::BRUCE_RGB:
+    case ColorManagementParams::Primaries::BETA_RGB:
+    case ColorManagementParams::Primaries::BEST_RGB:
+    {
+        labgridcie->set_sensitive(false);
+        will->set_sensitive(false);
+        break;
     }
 
-    if (ColorManagementParams::WorkingTrc(wTRC->get_active_row_number()) == ColorManagementParams::WorkingTrc::NONE) {
+    case ColorManagementParams::Primaries::CUSTOM:
+    {
+        will->set_sensitive(true);
+        labgridcie->set_sensitive(false);
+        break;
+    }
+
+    case ColorManagementParams::Primaries::CUSTOM_GRID:
+    {
+        labgridcie->set_sensitive(true);
+        will->set_sensitive(false);
+        break;
+    }
+    }
+
+    if (ColorManagementParams::WorkingTrc(wTRC->get_active_row_number())
+        == ColorManagementParams::WorkingTrc::NONE)
+    {
         redFrame->hide();
         will->set_sensitive(false);
-        
     }
 
     if (listener) {
@@ -2036,38 +2188,41 @@ void ICMPanel::willChanged()
 {
     colorFramecie->set_sensitive(true);
 
-    switch (ColorManagementParams::Primaries(wprim->get_active_row_number() )) {
-        case ColorManagementParams::Primaries::DEFAULT:
-        case ColorManagementParams::Primaries::SRGB:
-        case ColorManagementParams::Primaries::ADOBE_RGB:
-        case ColorManagementParams::Primaries::PRO_PHOTO:
-        case ColorManagementParams::Primaries::REC2020:
-        case ColorManagementParams::Primaries::ACES_P1:
-        case ColorManagementParams::Primaries::WIDE_GAMUT:
-        case ColorManagementParams::Primaries::ACES_P0:
-        case ColorManagementParams::Primaries::JDC_MAX:
-        case ColorManagementParams::Primaries::JDC_MAXSTDA:
-        case ColorManagementParams::Primaries::BRUCE_RGB:
-        case ColorManagementParams::Primaries::BETA_RGB:
-        case ColorManagementParams::Primaries::BEST_RGB: {
-            labgridcie->set_sensitive(false);
-            will->set_sensitive(false);
-            break;
-        }
+    switch (ColorManagementParams::Primaries(wprim->get_active_row_number())) {
+    case ColorManagementParams::Primaries::DEFAULT:
+    case ColorManagementParams::Primaries::SRGB:
+    case ColorManagementParams::Primaries::ADOBE_RGB:
+    case ColorManagementParams::Primaries::PRO_PHOTO:
+    case ColorManagementParams::Primaries::REC2020:
+    case ColorManagementParams::Primaries::ACES_P1:
+    case ColorManagementParams::Primaries::WIDE_GAMUT:
+    case ColorManagementParams::Primaries::ACES_P0:
+    case ColorManagementParams::Primaries::JDC_MAX:
+    case ColorManagementParams::Primaries::JDC_MAXSTDA:
+    case ColorManagementParams::Primaries::BRUCE_RGB:
+    case ColorManagementParams::Primaries::BETA_RGB:
+    case ColorManagementParams::Primaries::BEST_RGB:
+    {
+        labgridcie->set_sensitive(false);
+        will->set_sensitive(false);
+        break;
+    }
 
-        case ColorManagementParams::Primaries::CUSTOM: {
-            will->set_sensitive(true);
-            labgridcie->set_sensitive(false);
-            break;
-        }
+    case ColorManagementParams::Primaries::CUSTOM:
+    {
+        will->set_sensitive(true);
+        labgridcie->set_sensitive(false);
+        break;
+    }
 
-        case ColorManagementParams::Primaries::CUSTOM_GRID: {
-            labgridcie->set_sensitive(true);
-            will->set_sensitive(false);
-            colorFramecie->set_sensitive(false);
-            
-            break;
-        }
+    case ColorManagementParams::Primaries::CUSTOM_GRID:
+    {
+        labgridcie->set_sensitive(true);
+        will->set_sensitive(false);
+        colorFramecie->set_sensitive(false);
+
+        break;
+    }
     }
 
     if (listener) {
@@ -2075,154 +2230,166 @@ void ICMPanel::willChanged()
     }
 }
 
-
-
 void ICMPanel::wprimChanged()
 {
     colorFramecie->set_sensitive(true);
 
     switch (ColorManagementParams::Primaries(wprim->get_active_row_number())) {
-        case ColorManagementParams::Primaries::DEFAULT:
-        case ColorManagementParams::Primaries::CUSTOM:
-        case ColorManagementParams::Primaries::CUSTOM_GRID: {
-            break;
-        }
-
-        case ColorManagementParams::Primaries::SRGB: {
-            redx->setValue(0.64);
-            redy->setValue(0.33);
-            grex->setValue(0.30);
-            grey->setValue(0.60);
-            blux->setValue(0.15);
-            bluy->setValue(0.06);
-            will->set_active(toUnderlying(ColorManagementParams::Illuminant::D65));
-            break;
-        }
-
-        case ColorManagementParams::Primaries::ADOBE_RGB: {
-            redx->setValue(0.64);
-            redy->setValue(0.33);
-            grex->setValue(0.21);
-            grey->setValue(0.71);
-            blux->setValue(0.15);
-            bluy->setValue(0.06);
-            will->set_active(toUnderlying(ColorManagementParams::Illuminant::D65));
-            break;
-        }
-
-        case ColorManagementParams::Primaries::PRO_PHOTO: {
-            redx->setValue(0.7347);
-            redy->setValue(0.2653);
-            grex->setValue(0.1596);
-            grey->setValue(0.8404);
-            blux->setValue(0.0366);
-            bluy->setValue(0.0001);
-            will->set_active(toUnderlying(ColorManagementParams::Illuminant::D50));
-            break;
-        }
-
-        case ColorManagementParams::Primaries::REC2020: {
-            redx->setValue(0.708);
-            redy->setValue(0.292);
-            grex->setValue(0.17);
-            grey->setValue(0.797);
-            blux->setValue(0.131);
-            bluy->setValue(0.046);
-            will->set_active(toUnderlying(ColorManagementParams::Illuminant::D65));
-            break;
-        }
-
-        case ColorManagementParams::Primaries::ACES_P1: {
-            redx->setValue(0.713);
-            redy->setValue(0.293);
-            grex->setValue(0.165);
-            grey->setValue(0.830);
-            blux->setValue(0.128);
-            bluy->setValue(0.044);
-            will->set_active(toUnderlying(ColorManagementParams::Illuminant::D60));
-            break;
-        }
-
-        case ColorManagementParams::Primaries::WIDE_GAMUT: {
-            redx->setValue(0.735);
-            redy->setValue(0.265);
-            grex->setValue(0.115);
-            grey->setValue(0.826);
-            blux->setValue(0.1570);
-            bluy->setValue(0.018);
-            will->set_active(toUnderlying(ColorManagementParams::Illuminant::D50));
-            break;
-        }
-
-        case ColorManagementParams::Primaries::ACES_P0: {
-            redx->setValue(0.7347);
-            redy->setValue(0.2653);
-            grex->setValue(0.);
-            grey->setValue(1.0);
-            blux->setValue(0.0001);
-            bluy->setValue(-0.077);
-            will->set_active(toUnderlying(ColorManagementParams::Illuminant::D60));
-            break;
-        }
-
-        case ColorManagementParams::Primaries::JDC_MAX: {
-            redx->setValue(0.734702);
-            redy->setValue(0.265302);
-            grex->setValue(0.021908);
-            grey->setValue(0.930288);
-            blux->setValue(0.120593);
-            bluy->setValue(0.001583);
-            will->set_active(toUnderlying(ColorManagementParams::Illuminant::D50));
-            break;
-        }
-
-        case ColorManagementParams::Primaries::JDC_MAXSTDA: {
-            redx->setValue(0.734702);
-            redy->setValue(0.265302);
-            grex->setValue(0.021908);
-            grey->setValue(0.930288);
-            blux->setValue(0.120593);
-            bluy->setValue(0.001583);
-            will->set_active(toUnderlying(ColorManagementParams::Illuminant::STDA));
-            break;
-        }
-
-        case ColorManagementParams::Primaries::BRUCE_RGB: {
-            redx->setValue(0.64);
-            redy->setValue(0.33);
-            grex->setValue(0.28);
-            grey->setValue(0.65);
-            blux->setValue(0.15);
-            bluy->setValue(0.06);
-            will->set_active(toUnderlying(ColorManagementParams::Illuminant::D65));
-            break;
-        }
-
-        case ColorManagementParams::Primaries::BETA_RGB: {
-            redx->setValue(0.6888);
-            redy->setValue(0.3112);
-            grex->setValue(0.1986);
-            grey->setValue(0.7551);
-            blux->setValue(0.1265);
-            bluy->setValue(0.0352);
-            will->set_active(toUnderlying(ColorManagementParams::Illuminant::D50));
-            break;
-        }
-
-        case ColorManagementParams::Primaries::BEST_RGB: {
-            redx->setValue(0.7347);
-            redy->setValue(0.2653);
-            grex->setValue(0.2150);
-            grey->setValue(0.7750);
-            blux->setValue(0.130);
-            bluy->setValue(0.035);
-            will->set_active(toUnderlying(ColorManagementParams::Illuminant::D50));
-            break;
-        }
+    case ColorManagementParams::Primaries::DEFAULT:
+    case ColorManagementParams::Primaries::CUSTOM:
+    case ColorManagementParams::Primaries::CUSTOM_GRID:
+    {
+        break;
     }
 
+    case ColorManagementParams::Primaries::SRGB:
+    {
+        redx->setValue(0.64);
+        redy->setValue(0.33);
+        grex->setValue(0.30);
+        grey->setValue(0.60);
+        blux->setValue(0.15);
+        bluy->setValue(0.06);
+        will->set_active(toUnderlying(ColorManagementParams::Illuminant::D65));
+        break;
+    }
 
-    if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::DEFAULT) {
+    case ColorManagementParams::Primaries::ADOBE_RGB:
+    {
+        redx->setValue(0.64);
+        redy->setValue(0.33);
+        grex->setValue(0.21);
+        grey->setValue(0.71);
+        blux->setValue(0.15);
+        bluy->setValue(0.06);
+        will->set_active(toUnderlying(ColorManagementParams::Illuminant::D65));
+        break;
+    }
+
+    case ColorManagementParams::Primaries::PRO_PHOTO:
+    {
+        redx->setValue(0.7347);
+        redy->setValue(0.2653);
+        grex->setValue(0.1596);
+        grey->setValue(0.8404);
+        blux->setValue(0.0366);
+        bluy->setValue(0.0001);
+        will->set_active(toUnderlying(ColorManagementParams::Illuminant::D50));
+        break;
+    }
+
+    case ColorManagementParams::Primaries::REC2020:
+    {
+        redx->setValue(0.708);
+        redy->setValue(0.292);
+        grex->setValue(0.17);
+        grey->setValue(0.797);
+        blux->setValue(0.131);
+        bluy->setValue(0.046);
+        will->set_active(toUnderlying(ColorManagementParams::Illuminant::D65));
+        break;
+    }
+
+    case ColorManagementParams::Primaries::ACES_P1:
+    {
+        redx->setValue(0.713);
+        redy->setValue(0.293);
+        grex->setValue(0.165);
+        grey->setValue(0.830);
+        blux->setValue(0.128);
+        bluy->setValue(0.044);
+        will->set_active(toUnderlying(ColorManagementParams::Illuminant::D60));
+        break;
+    }
+
+    case ColorManagementParams::Primaries::WIDE_GAMUT:
+    {
+        redx->setValue(0.735);
+        redy->setValue(0.265);
+        grex->setValue(0.115);
+        grey->setValue(0.826);
+        blux->setValue(0.1570);
+        bluy->setValue(0.018);
+        will->set_active(toUnderlying(ColorManagementParams::Illuminant::D50));
+        break;
+    }
+
+    case ColorManagementParams::Primaries::ACES_P0:
+    {
+        redx->setValue(0.7347);
+        redy->setValue(0.2653);
+        grex->setValue(0.);
+        grey->setValue(1.0);
+        blux->setValue(0.0001);
+        bluy->setValue(-0.077);
+        will->set_active(toUnderlying(ColorManagementParams::Illuminant::D60));
+        break;
+    }
+
+    case ColorManagementParams::Primaries::JDC_MAX:
+    {
+        redx->setValue(0.734702);
+        redy->setValue(0.265302);
+        grex->setValue(0.021908);
+        grey->setValue(0.930288);
+        blux->setValue(0.120593);
+        bluy->setValue(0.001583);
+        will->set_active(toUnderlying(ColorManagementParams::Illuminant::D50));
+        break;
+    }
+
+    case ColorManagementParams::Primaries::JDC_MAXSTDA:
+    {
+        redx->setValue(0.734702);
+        redy->setValue(0.265302);
+        grex->setValue(0.021908);
+        grey->setValue(0.930288);
+        blux->setValue(0.120593);
+        bluy->setValue(0.001583);
+        will->set_active(toUnderlying(ColorManagementParams::Illuminant::STDA));
+        break;
+    }
+
+    case ColorManagementParams::Primaries::BRUCE_RGB:
+    {
+        redx->setValue(0.64);
+        redy->setValue(0.33);
+        grex->setValue(0.28);
+        grey->setValue(0.65);
+        blux->setValue(0.15);
+        bluy->setValue(0.06);
+        will->set_active(toUnderlying(ColorManagementParams::Illuminant::D65));
+        break;
+    }
+
+    case ColorManagementParams::Primaries::BETA_RGB:
+    {
+        redx->setValue(0.6888);
+        redy->setValue(0.3112);
+        grex->setValue(0.1986);
+        grey->setValue(0.7551);
+        blux->setValue(0.1265);
+        bluy->setValue(0.0352);
+        will->set_active(toUnderlying(ColorManagementParams::Illuminant::D50));
+        break;
+    }
+
+    case ColorManagementParams::Primaries::BEST_RGB:
+    {
+        redx->setValue(0.7347);
+        redy->setValue(0.2653);
+        grex->setValue(0.2150);
+        grey->setValue(0.7750);
+        blux->setValue(0.130);
+        bluy->setValue(0.035);
+        will->set_active(toUnderlying(ColorManagementParams::Illuminant::D50));
+        break;
+    }
+    }
+
+    if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+        == ColorManagementParams::Primaries::DEFAULT)
+    {
         if (wProfNames->get_active_text() == "Rec2020") {
             redx->setValue(0.708);
             redy->setValue(0.292);
@@ -2286,7 +2453,7 @@ void ICMPanel::wprimChanged()
             grey->setValue(0.930288);
             blux->setValue(0.120593);
             bluy->setValue(0.001583);
-            will->set_active(toUnderlying(ColorManagementParams::Illuminant::D50));//D50
+            will->set_active(toUnderlying(ColorManagementParams::Illuminant::D50));  // D50
         } else if (wProfNames->get_active_text() == "JDCmax stdA") {
             redx->setValue(0.734702);
             redy->setValue(0.265302);
@@ -2302,7 +2469,7 @@ void ICMPanel::wprimChanged()
             grey->setValue(0.65);
             blux->setValue(0.15);
             bluy->setValue(0.06);
-            will->set_active(toUnderlying(ColorManagementParams::Illuminant::D65)); 
+            will->set_active(toUnderlying(ColorManagementParams::Illuminant::D65));
         } else if (wProfNames->get_active_text() == "Beta RGB") {
             redx->setValue(0.6888);
             redy->setValue(0.3112);
@@ -2325,36 +2492,38 @@ void ICMPanel::wprimChanged()
     } else {
         redFrame->show();
 
-        if (ColorManagementParams::Primaries(wprim->get_active_row_number()) != ColorManagementParams::Primaries::CUSTOM) {
+        if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+            != ColorManagementParams::Primaries::CUSTOM)
+        {
             primCoordGrid->set_sensitive(false);
             labgridcie->set_sensitive(false);
             will->set_sensitive(false);
             colorFramecie->set_sensitive(true);
 
-            if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::CUSTOM_GRID) {
+            if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+                == ColorManagementParams::Primaries::CUSTOM_GRID)
+            {
                 labgridcie->set_sensitive(true);
                 colorFramecie->set_sensitive(false);
-                
             }
         } else {
             primCoordGrid->set_sensitive(true);
             labgridcie->set_sensitive(false);
             will->set_sensitive(true);
             colorFramecie->set_sensitive(true);
-
         }
-
     }
-    willChanged ();
+    willChanged();
 
-    if (ColorManagementParams::Primaries(wprim->get_active_row_number()) == ColorManagementParams::Primaries::CUSTOM_GRID) {
+    if (ColorManagementParams::Primaries(wprim->get_active_row_number())
+        == ColorManagementParams::Primaries::CUSTOM_GRID)
+    {
         labgridcie->set_sensitive(true);
         colorFramecie->set_sensitive(false);
 
     } else {
         labgridcie->set_sensitive(false);
         colorFramecie->set_sensitive(true);
-        
     }
 
     if (listener) {
@@ -2367,7 +2536,6 @@ void ICMPanel::wcatChanged()
     if (listener) {
         listener->panelChanged(EvICMcat, wcat->get_active_text());
     }
-    
 }
 
 void ICMPanel::dcpIlluminantChanged()
@@ -2446,11 +2614,14 @@ void ICMPanel::applyBaselineExposureOffsetChanged()
 
     if (listener) {
         if (ckbApplyBaselineExposureOffset->get_inconsistent()) {
-            listener->panelChanged(EvDCPApplyBaselineExposureOffset, M("GENERAL_UNCHANGED"));
+            listener->panelChanged(EvDCPApplyBaselineExposureOffset,
+                                   M("GENERAL_UNCHANGED"));
         } else if (ckbApplyBaselineExposureOffset->get_active()) {
-            listener->panelChanged(EvDCPApplyBaselineExposureOffset, M("GENERAL_ENABLED"));
+            listener->panelChanged(EvDCPApplyBaselineExposureOffset,
+                                   M("GENERAL_ENABLED"));
         } else {
-            listener->panelChanged(EvDCPApplyBaselineExposureOffset, M("GENERAL_DISABLED"));
+            listener->panelChanged(EvDCPApplyBaselineExposureOffset,
+                                   M("GENERAL_DISABLED"));
         }
     }
 }
@@ -2531,26 +2702,26 @@ void ICMPanel::oiChanged(int n)
         Glib::ustring str;
 
         switch (n) {
-            case 0:
-                str = M("PREFERENCES_INTENT_PERCEPTUAL");
-                break;
+        case 0:
+            str = M("PREFERENCES_INTENT_PERCEPTUAL");
+            break;
 
-            case 1:
-                str = M("PREFERENCES_INTENT_RELATIVE");
-                break;
+        case 1:
+            str = M("PREFERENCES_INTENT_RELATIVE");
+            break;
 
-            case 2:
-                str = M("PREFERENCES_INTENT_SATURATION");
-                break;
+        case 2:
+            str = M("PREFERENCES_INTENT_SATURATION");
+            break;
 
-            case 3:
-                str = M("PREFERENCES_INTENT_ABSOLUTE");
-                break;
+        case 3:
+            str = M("PREFERENCES_INTENT_ABSOLUTE");
+            break;
 
-            case 4:
-            default:
-                str = M("GENERAL_UNCHANGED");
-                break;
+        case 4:
+        default:
+            str = M("GENERAL_UNCHANGED");
+            break;
         }
 
         listener->panelChanged(EvOIntent, str);
@@ -2564,26 +2735,26 @@ void ICMPanel::aiChanged(int n)
         Glib::ustring str;
 
         switch (n) {
-            case 0:
-                str = M("PREFERENCES_INTENT_PERCEPTUAL");
-                break;
+        case 0:
+            str = M("PREFERENCES_INTENT_PERCEPTUAL");
+            break;
 
-            case 1:
-                str = M("PREFERENCES_INTENT_RELATIVE");
-                break;
+        case 1:
+            str = M("PREFERENCES_INTENT_RELATIVE");
+            break;
 
-            case 2:
-                str = M("PREFERENCES_INTENT_SATURATION");
-                break;
+        case 2:
+            str = M("PREFERENCES_INTENT_SATURATION");
+            break;
 
-            case 3:
-                str = M("PREFERENCES_INTENT_ABSOLUTE");
-                break;
+        case 3:
+            str = M("PREFERENCES_INTENT_ABSOLUTE");
+            break;
 
-            case 4:
-            default:
-                str = M("GENERAL_UNCHANGED");
-                break;
+        case 4:
+        default:
+            str = M("GENERAL_UNCHANGED");
+            break;
         }
 
         listener->panelChanged(EvaIntent, str);
@@ -2640,7 +2811,6 @@ void ICMPanel::wavExpChanged()
     }
 }
 
-
 void ICMPanel::fbwChanged()
 {
     if (multiImage) {
@@ -2681,13 +2851,13 @@ void ICMPanel::gamutChanged()
 
         lastgamut = gamut->get_active();
     }
-    
+
     if (gamut->get_active()) {
         wcatBox->set_sensitive(true);
     } else {
         wcatBox->set_sensitive(false);
     }
-    
+
     if (listener) {
         if (gamut->get_inconsistent()) {
             listener->panelChanged(EvICMgamut, M("GENERAL_UNCHANGED"));
@@ -2698,7 +2868,6 @@ void ICMPanel::gamutChanged()
         }
     }
 }
-
 
 void ICMPanel::wsmoothcieChanged()
 {
@@ -2714,8 +2883,7 @@ void ICMPanel::wsmoothcieChanged()
 
         lastwsmoothcie = wsmoothcie->get_active();
     }
-    
-    
+
     if (listener) {
         if (wsmoothcie->get_inconsistent()) {
             listener->panelChanged(EvICMwsmoothcie, M("GENERAL_UNCHANGED"));
@@ -2727,7 +2895,6 @@ void ICMPanel::wsmoothcieChanged()
     }
 }
 
-
 void ICMPanel::setRawMeta(bool raw, const rtengine::FramesData* pMeta)
 {
 
@@ -2738,7 +2905,10 @@ void ICMPanel::setRawMeta(bool raw, const rtengine::FramesData* pMeta)
     icamera->set_sensitive(raw);
     camName = pMeta->getCamera();
     filename = pMeta->getFileName();
-    icameraICC->set_sensitive(raw && (ICCStore::getInstance()->getStdProfile(pMeta->getCamera()) != nullptr || DCPStore::getInstance()->getStdProfile(pMeta->getCamera()) != nullptr));
+    icameraICC->set_sensitive(
+        raw
+        && (ICCStore::getInstance()->getStdProfile(pMeta->getCamera()) != nullptr
+            || DCPStore::getInstance()->getStdProfile(pMeta->getCamera()) != nullptr));
     iembedded->set_sensitive(!raw || DCPStore::getInstance()->getProfile(filename));
 
     enableListener();
@@ -2754,8 +2924,6 @@ void ICMPanel::ipSelectionChanged()
     ipChanged();
 }
 
-
-
 void ICMPanel::saveReferencePressed()
 {
 
@@ -2763,7 +2931,8 @@ void ICMPanel::saveReferencePressed()
         return;
     }
 
-    Gtk::FileChooserDialog dialog(getToplevelWindow(this), M("TP_ICM_SAVEREFERENCE"), Gtk::FILE_CHOOSER_ACTION_SAVE);
+    Gtk::FileChooserDialog dialog(getToplevelWindow(this), M("TP_ICM_SAVEREFERENCE"),
+                                  Gtk::FILE_CHOOSER_ACTION_SAVE);
     bindCurrentFolder(dialog, App::get().mut_options().lastProfilingReferenceDir);
     dialog.set_current_name(lastRefFilename);
 
@@ -2774,7 +2943,7 @@ void ICMPanel::saveReferencePressed()
     applyWB.set_tooltip_text(M("TP_ICM_SAVEREFERENCE_APPLYWB_TOOLTIP"));
     Gtk::Box* hbox = Gtk::manage(new Gtk::Box());
     hbox->pack_end(applyWB, Gtk::PACK_SHRINK, 2);
-    Gtk::Box *box = dialog.get_content_area();
+    Gtk::Box* box = dialog.get_content_area();
     box->pack_end(*hbox, Gtk::PACK_SHRINK, 2);
 
     Glib::RefPtr<Gtk::FileFilter> filter_tif = Gtk::FileFilter::create();
@@ -2789,7 +2958,7 @@ void ICMPanel::saveReferencePressed()
     dialog.add_filter(filter_any);
 
     dialog.show_all_children();
-    //dialog.set_do_overwrite_confirmation (true);
+    // dialog.set_do_overwrite_confirmation (true);
 
     bool done = false;
 
@@ -2857,4 +3026,3 @@ void ICMPanel::setBatchMode(bool batchMode)
     shifty->showEditedCB();
     preser->showEditedCB();
 }
-

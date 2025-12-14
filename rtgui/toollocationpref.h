@@ -36,7 +36,7 @@ public:
      * Constructs a tool location preference widget that gets values from and
      * updates the provided options object.
      */
-    explicit ToolLocationPreference(Options &options);
+    explicit ToolLocationPreference(Options& options);
     /**
      * Updates the options object associated with this object with the current
      * favorites preferences.

@@ -23,51 +23,41 @@
 
 #include "noncopyable.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
 // These emulate a jagged array, but use only 2 allocations instead of 1 + H.
 
-template<typename T>
-class JaggedArray :
-    public NonCopyable
+template <typename T> class JaggedArray : public NonCopyable
 {
 public:
-    JaggedArray(std::size_t width, std::size_t height, bool init_zero = false) :
-        array(
-            [width, height, init_zero]() -> T**
-            {
-                T** const res = new T*[height];
-                res[0] = new T[height * width];
+    JaggedArray(std::size_t width, std::size_t height, bool init_zero = false)
+        : array([width, height, init_zero]() -> T** {
+              T** const res = new T*[height];
+              res[0] = new T[height * width];
 
-                for (std::size_t i = 1; i < height; ++i) {
-                    res[i] = res[i - 1] + width;
-                }
+              for (std::size_t i = 1; i < height; ++i) {
+                  res[i] = res[i - 1] + width;
+              }
 
-                if (init_zero) {
-                    std::memset(res[0], 0, sizeof(T) * width * height);
-                }
+              if (init_zero) {
+                  std::memset(res[0], 0, sizeof(T) * width * height);
+              }
 
-                return res;
-            }()
-        )
+              return res;
+          }())
     {
     }
 
-    ~JaggedArray ()
+    ~JaggedArray()
     {
         delete[] array[0];
         delete[] array;
     }
 
-    operator T** ()
-    {
-        return array;
-    }
+    operator T**() { return array; }
 
 private:
     T** const array;
-
 };
 
-} // rtengine
+}  // namespace rtengine

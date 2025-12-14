@@ -15,7 +15,7 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with RawTherapee.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 #pragma once
 
 #include "toolpanel.h"
@@ -60,22 +60,25 @@ protected:
 public:
     static const Glib::ustring TOOL_NAME;
 
-    PdSharpening ();
-    ~PdSharpening () override;
+    PdSharpening();
+    ~PdSharpening() override;
 
-    void read (const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited = nullptr) override;
-    void write (rtengine::procparams::ProcParams* pp, ParamsEdited* pedited = nullptr) override;
-    void setDefaults (const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited = nullptr) override;
-    void setBatchMode (bool batchMode) override;
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
+    void setBatchMode(bool batchMode) override;
 
-    void adjusterAutoToggled (Adjuster* a, bool newval) override;
-    void adjusterChanged (Adjuster* a, double newval) override;
-    void enabledChanged () override;
+    void adjusterAutoToggled(Adjuster* a, bool newval) override;
+    void adjusterChanged(Adjuster* a, double newval) override;
+    void enabledChanged() override;
 
-    void autoContrastChanged (double autoContrast) override;
-    void autoRadiusChanged (double autoRadius) override;
+    void autoContrastChanged(double autoContrast) override;
+    void autoRadiusChanged(double autoRadius) override;
 
-    void setAdjusterBehavior (bool contrastadd, bool radiusadd, bool iteradd);
-    void trimValues (rtengine::procparams::ProcParams* pp) override;
+    void setAdjusterBehavior(bool contrastadd, bool radiusadd, bool iteradd);
+    void trimValues(rtengine::procparams::ProcParams* pp) override;
     void checkBoxToggled(CheckBox* c, CheckValue newval) override;
 };

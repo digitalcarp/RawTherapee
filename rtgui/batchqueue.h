@@ -26,8 +26,8 @@
 #include "widgets/basic/lwbutton.h"
 #include "widgets/basic/lwbuttonset.h"
 
-#include "rtengine/rtengine.h"
 #include "rtengine/noncopyable.h"
+#include "rtengine/rtengine.h"
 
 class BatchQueueEntry;
 
@@ -36,7 +36,10 @@ class BatchQueueListener
 
 public:
     virtual ~BatchQueueListener() = default;
-    virtual void queueSizeChanged(int qsize, bool queueRunning, bool queueError, const Glib::ustring& queueErrorMessage) = 0;
+    virtual void queueSizeChanged(int qsize,
+                                  bool queueRunning,
+                                  bool queueError,
+                                  const Glib::ustring& queueErrorMessage) = 0;
     virtual bool canStartNext() = 0;
     virtual void setDestinationPreviewText(const Glib::ustring& destinationPath) = 0;
 };
@@ -50,21 +53,23 @@ class BatchQueue final :
     public rtengine::NonCopyable
 {
 public:
-    explicit BatchQueue (FileCatalog* aFileCatalog);
-    ~BatchQueue () override;
+    explicit BatchQueue(FileCatalog* aFileCatalog);
+    ~BatchQueue() override;
 
-    void addEntries (const std::vector<BatchQueueEntry*>& entries, bool head = false, bool save = true);
-    void cancelItems (const std::vector<ThumbBrowserEntryBase*>& items);
-    void headItems (const std::vector<ThumbBrowserEntryBase *>& items);
-    void tailItems (const std::vector<ThumbBrowserEntryBase *>& items);
-    void selectAll ();
+    void addEntries(const std::vector<BatchQueueEntry*>& entries,
+                    bool head = false,
+                    bool save = true);
+    void cancelItems(const std::vector<ThumbBrowserEntryBase*>& items);
+    void headItems(const std::vector<ThumbBrowserEntryBase*>& items);
+    void tailItems(const std::vector<ThumbBrowserEntryBase*>& items);
+    void selectAll();
     void openItemInEditor(ThumbBrowserEntryBase* item);
     void openLastSelectedItemInEditor();
     void updateDestinationPathPreview();
 
-    void startProcessing ();
+    void startProcessing();
 
-    bool hasJobs ()
+    bool hasJobs()
     {
         MYREADERLOCK(l, entryRW);
         return (!fd.empty());
@@ -76,39 +81,39 @@ public:
     void error(const Glib::ustring& descr) override;
     rtengine::ProcessingJob* imageReady(rtengine::IImagefloat* img) override;
 
-    void rightClicked () override;
-    void doubleClicked (ThumbBrowserEntryBase* entry) override;
-    bool keyPressed (GdkEventKey* event) override;
-    void buttonPressed (LWButton* button, int actionCode, void* actionData) override;
-    void redrawNeeded  (LWButton* button) override;
-    void selectionChanged () override;
+    void rightClicked() override;
+    void doubleClicked(ThumbBrowserEntryBase* entry) override;
+    bool keyPressed(GdkEventKey* event) override;
+    void buttonPressed(LWButton* button, int actionCode, void* actionData) override;
+    void redrawNeeded(LWButton* button) override;
+    void selectionChanged() override;
 
-    void setBatchQueueListener (BatchQueueListener* l)
-    {
-        listener = l;
-    }
+    void setBatchQueueListener(BatchQueueListener* l) { listener = l; }
 
-    bool loadBatchQueue ();
+    bool loadBatchQueue();
     void resizeLoadedQueue();
 
-    static Glib::ustring calcAutoFileNameBase (const Glib::ustring& origFileName, int sequence=0, const Glib::ustring& format="");
+    static Glib::ustring calcAutoFileNameBase(const Glib::ustring& origFileName,
+                                              int sequence = 0,
+                                              const Glib::ustring& format = "");
     static int calcMaxThumbnailHeight();
 
 private:
     int getMaxThumbnailHeight() const override;
-    void saveThumbnailHeight (int height) override;
-    int  getThumbnailHeight () override;
+    void saveThumbnailHeight(int height) override;
+    int getThumbnailHeight() override;
 
-    Glib::ustring autoCompleteFileName (const Glib::ustring& fileName, const Glib::ustring& format);
-    Glib::ustring getTempFilenameForParams( const Glib::ustring &filename );
-    bool saveBatchQueue ();
-    void notifyListener ();
+    Glib::ustring autoCompleteFileName(const Glib::ustring& fileName,
+                                       const Glib::ustring& format);
+    Glib::ustring getTempFilenameForParams(const Glib::ustring& filename);
+    bool saveBatchQueue();
+    void notifyListener();
 
     using ThumbBrowserBase::redrawNeeded;
 
     BatchQueueEntry* processing;  // holds the currently processed image
     FileCatalog* fileCatalog;
-    int sequence; // holds the current sequence index
+    int sequence;  // holds the current sequence index
 
     Glib::ustring nameTemplate;
 

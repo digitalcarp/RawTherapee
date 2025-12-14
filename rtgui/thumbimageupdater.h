@@ -24,18 +24,16 @@
 
 #include "hidpi.h"
 
-namespace rtengine
-{
-    class IImage8;
+namespace rtengine {
+class IImage8;
 
-namespace procparams
-{
+namespace procparams {
 
-    struct CropParams;
+struct CropParams;
 
 }
 
-}
+}  // namespace rtengine
 
 class ThumbBrowserEntryBase;
 
@@ -44,20 +42,28 @@ class ThumbImageUpdateListener
 public:
     virtual ~ThumbImageUpdateListener() = default;
 
-    struct ImageUpdate {
-        rtengine::IImage8* img;  // New thumbnail image
+    struct ImageUpdate
+    {
+        rtengine::IImage8* img;   // New thumbnail image
         hidpi::LogicalSize size;  // Desired logical pixel size
-        int device_scale;  // logical to device pixel scaling factor
-        double scale;  // scale (??)
+        int device_scale;         // logical to device pixel scaling factor
+        double scale;             // scale (??)
         // Why is this a reference? Seems dangerous and could diverge from
         // used values?
         const rtengine::procparams::CropParams& crop;  // crop params used (??)
 
-        ImageUpdate(rtengine::IImage8* a_img, hidpi::LogicalSize a_size,
-                    int a_device_scale, double a_scale,
+        ImageUpdate(rtengine::IImage8* a_img,
+                    hidpi::LogicalSize a_size,
+                    int a_device_scale,
+                    double a_scale,
                     const rtengine::procparams::CropParams& a_crop)
-                : img(a_img), size(a_size), device_scale(a_device_scale),
-                  scale(a_scale), crop(a_crop) {}
+            : img(a_img),
+              size(a_size),
+              device_scale(a_device_scale),
+              scale(a_scale),
+              crop(a_crop)
+        {
+        }
     };
 
     /**
@@ -68,8 +74,7 @@ public:
     virtual void updateImage(const ImageUpdate& update) = 0;
 };
 
-class ThumbImageUpdater :
-    public rtengine::NonCopyable
+class ThumbImageUpdater : public rtengine::NonCopyable
 {
 public:
     /**
@@ -89,7 +94,11 @@ public:
      * @param priority if \c true then run as soon as possible
      * @param l listener waiting on update
      */
-    void add(ThumbBrowserEntryBase* tbe, bool* priority, bool upgrade, bool forceUpgrade, ThumbImageUpdateListener* l);
+    void add(ThumbBrowserEntryBase* tbe,
+             bool* priority,
+             bool upgrade,
+             bool forceUpgrade,
+             ThumbImageUpdateListener* l);
 
     /**
      * @brief Remove jobs associated with listener \c l.
@@ -109,7 +118,6 @@ public:
     void removeAllJobs(void);
 
 private:
-
     ThumbImageUpdater();
     ~ThumbImageUpdater();
 

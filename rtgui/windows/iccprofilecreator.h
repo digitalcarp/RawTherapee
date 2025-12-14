@@ -32,14 +32,13 @@ class ICCProfileCreator final : public Gtk::Dialog, public AdjusterListener
 {
 
 private:
-
     enum class ColorTemp {
         D50 = 5003,  // for Widegamut, Prophoto Best, Beta -> D50
         D60 = 6005,  // for ACESc                          -> D60
         D65 = 6504   // for sRGB, AdobeRGB, Bruce Rec2020  -> D65
     };
 
-    cmsFloat64Number ga[7]; // 7 parameters for smoother curves
+    cmsFloat64Number ga[7];  // 7 parameters for smoother curves
 
     //------------------------ Params -----------------------
     Glib::ustring primariesPreset;
@@ -60,7 +59,7 @@ private:
     Glib::ustring copyright;
     //-------------------------------------------------------
 
-    RTWindow *parent;
+    RTWindow* parent;
 
     Adjuster* aGamma;
     Adjuster* aSlope;
@@ -82,12 +81,12 @@ private:
     Gtk::Entry* eDescription;
     Gtk::Entry* eCopyright;
     Gtk::Button* resetCopyright;
-    Gtk::CheckButton *cAppendParamsToDesc;
+    Gtk::CheckButton* cAppendParamsToDesc;
 
-    //Glib::ustring lastPath;
+    // Glib::ustring lastPath;
 
-    void initWithDefaults ();
-    void storeDefaults ();
+    void initWithDefaults();
+    void storeDefaults();
     void storeValues();
 
     void updateICCVersion();
@@ -96,14 +95,14 @@ private:
     void trcPresetsChanged();
     void adjusterChanged(Adjuster* a, double newval) override;
     static std::vector<Glib::ustring> getGamma();
-    Glib::ustring getPrimariesPresetName(const Glib::ustring &preset);
-    void getPrimaries(const Glib::ustring &preset, double *p, ColorTemp &temp);
-    Glib::ustring getGammaPresetName(const Glib::ustring &preset);
-    void getGamma(const Glib::ustring &preset, double &gamma, double &slope);
+    Glib::ustring getPrimariesPresetName(const Glib::ustring& preset);
+    void getPrimaries(const Glib::ustring& preset, double* p, ColorTemp& temp);
+    Glib::ustring getGammaPresetName(const Glib::ustring& preset);
+    void getGamma(const Glib::ustring& preset, double& gamma, double& slope);
     void savePressed();
     void closePressed();
     void onResetCopyright();
 
 public:
-    explicit ICCProfileCreator (RTWindow *rtwindow);
+    explicit ICCProfileCreator(RTWindow* rtwindow);
 };

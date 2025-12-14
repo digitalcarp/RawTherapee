@@ -1,29 +1,29 @@
 /*
-*  This file is part of RawTherapee.
-*
-*  Copyright (c) 2012 Oliver Duis <www.oliverduis.de>
-*
-*  RawTherapee is free software: you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation, either version 3 of the License, or
-*  (at your option) any later version.
-*
-*  RawTherapee is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ *  This file is part of RawTherapee.
+ *
+ *  Copyright (c) 2012 Oliver Duis <www.oliverduis.de>
+ *
+ *  RawTherapee is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  RawTherapee is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <algorithm>
 #include <cassert>
 #include <cstring>
 
-#include <glibmm/ustring.h>
-#include <glibmm/fileutils.h>
 #include <glib/gstdio.h>
+#include <glibmm/fileutils.h>
+#include <glibmm/ustring.h>
 
 #ifdef _WIN32
 #include <shlobj.h>
@@ -50,46 +50,45 @@ public:
     LCPModelCommon base;  // base perspective correction
     LCPModelCommon chromRG;
     LCPModelCommon chromG;
-    LCPModelCommon chromBG;  // red/green, green, blue/green (may be empty)
+    LCPModelCommon chromBG;   // red/green, green, blue/green (may be empty)
     LCPModelCommon vignette;  // vignette (may be empty)
 };
 
-rtengine::LCPModelCommon::LCPModelCommon() :
-    foc_len_x(-1.0f),
-    foc_len_y(-1.0f),
-    img_center_x(0.5f),
-    img_center_y(0.5f),
-    param{{}},
-    scale_factor(1.0f),
-    mean_error(0.0),
-    bad_error(false),
-    x0(0.0f),
-    y0(0.0f),
-    fx(0.0f),
-    fy(0.0f),
-    rfx(0.0f),
-    rfy(0.0f),
-    vign_param{{}}
+rtengine::LCPModelCommon::LCPModelCommon()
+    : foc_len_x(-1.0f),
+      foc_len_y(-1.0f),
+      img_center_x(0.5f),
+      img_center_y(0.5f),
+      param{ {} },
+      scale_factor(1.0f),
+      mean_error(0.0),
+      bad_error(false),
+      x0(0.0f),
+      y0(0.0f),
+      fx(0.0f),
+      fy(0.0f),
+      rfx(0.0f),
+      rfy(0.0f),
+      vign_param{ {} }
 {
 }
 
 bool rtengine::LCPModelCommon::empty() const
 {
-    return
-        param[0] == 0.0f
-        && param[1] == 0.0f
-        && param[2] == 0.0f;
+    return param[0] == 0.0f && param[1] == 0.0f && param[2] == 0.0f;
 }
 
 // weighted merge two parameters
-void rtengine::LCPModelCommon::merge(const LCPModelCommon& a, const LCPModelCommon& b, float facA)
+void rtengine::LCPModelCommon::merge(const LCPModelCommon& a,
+                                     const LCPModelCommon& b,
+                                     float facA)
 {
-    foc_len_x    = rtengine::intp<float>(facA, a.foc_len_x, b.foc_len_x);
-    foc_len_y    = rtengine::intp<float>(facA, a.foc_len_y, b.foc_len_y);
+    foc_len_x = rtengine::intp<float>(facA, a.foc_len_x, b.foc_len_x);
+    foc_len_y = rtengine::intp<float>(facA, a.foc_len_y, b.foc_len_y);
     img_center_x = rtengine::intp<float>(facA, a.img_center_x, b.img_center_x);
     img_center_y = rtengine::intp<float>(facA, a.img_center_y, b.img_center_y);
     scale_factor = rtengine::intp<float>(facA, a.scale_factor, b.scale_factor);
-    mean_error   = rtengine::intp<float>(facA, a.mean_error, b.mean_error);
+    mean_error = rtengine::intp<float>(facA, a.mean_error, b.mean_error);
 
     for (int i = 0; i < 5; ++i) {
         param[i] = rtengine::intp<float>(facA, a.param[i], b.param[i]);
@@ -100,32 +99,34 @@ void rtengine::LCPModelCommon::merge(const LCPModelCommon& a, const LCPModelComm
     vign_param[0] = -param[0];
     vign_param[1] = param0Sqr - param[1];
     vign_param[2] = param0Sqr * param[0] - 2.0f * param[0] * param[1] + param[2];
-    vign_param[3] = param0Sqr * param0Sqr + param[1] * param[1] + 2.0f * param[0] * param[2] - 3.0f * param0Sqr * param[1];
-
+    vign_param[3] = param0Sqr * param0Sqr + param[1] * param[1]
+                    + 2.0f * param[0] * param[2] - 3.0f * param0Sqr * param[1];
 }
 
-void rtengine::LCPModelCommon::prepareParams(
-    int fullWidth,
-    int fullHeight,
-    float focalLength,
-    float focalLength35mm,
-    float sensorFormatFactor,
-    bool swapXY,
-    bool mirrorX,
-    bool mirrorY
-)
+void rtengine::LCPModelCommon::prepareParams(int fullWidth,
+                                             int fullHeight,
+                                             float focalLength,
+                                             float focalLength35mm,
+                                             float sensorFormatFactor,
+                                             bool swapXY,
+                                             bool mirrorX,
+                                             bool mirrorY)
 {
-    // Mention that the Adobe technical paper has a bug here, the DMAX is handled differently for focLen and imgCenter
+    // Mention that the Adobe technical paper has a bug here, the DMAX is handled
+    // differently for focLen and imgCenter
     const int Dmax = std::max(fullWidth, fullHeight);
 
     // correct focLens
-    if (foc_len_x < 0.0f) { // they may not be given
+    if (foc_len_x < 0.0f) {  // they may not be given
         // and 35mm may not be given either
         if (focalLength35mm < 1.0f) {
             focalLength35mm = focalLength * sensorFormatFactor;
         }
 
-        foc_len_x = foc_len_y = focalLength / (35.0f * focalLength / focalLength35mm); // focLen must be calculated in pixels
+        foc_len_x = foc_len_y =
+            focalLength
+            / (35.0f * focalLength
+               / focalLength35mm);  // focLen must be calculated in pixels
     }
 
     if (swapXY) {
@@ -141,56 +142,51 @@ void rtengine::LCPModelCommon::prepareParams(
     }
     rfx = 1.0f / fx;
     rfy = 1.0f / fy;
-
 }
 
-rtengine::LCPProfile::LCPPersModel::LCPPersModel() :
-    focLen(0.f),
-    focDist(0.f),
-    aperture(0.f)
+rtengine::LCPProfile::LCPPersModel::LCPPersModel()
+    : focLen(0.f), focDist(0.f), aperture(0.f)
 {
 }
 
 bool rtengine::LCPProfile::LCPPersModel::hasModeData(LCPCorrectionMode mode) const
 {
     switch (mode) {
-        case LCPCorrectionMode::VIGNETTE: {
-            return !vignette.empty() && !vignette.bad_error;
-        }
+    case LCPCorrectionMode::VIGNETTE:
+    {
+        return !vignette.empty() && !vignette.bad_error;
+    }
 
-        case LCPCorrectionMode::DISTORTION: {
-            return !base.empty() && !base.bad_error;
-        }
+    case LCPCorrectionMode::DISTORTION:
+    {
+        return !base.empty() && !base.bad_error;
+    }
 
-        case LCPCorrectionMode::CA: {
-            return
-                !chromRG.empty()
-                && !chromG.empty()
-                && !chromBG.empty()
-                && !chromRG.bad_error
-                && !chromG.bad_error
-                && !chromBG.bad_error;
-        }
+    case LCPCorrectionMode::CA:
+    {
+        return !chromRG.empty() && !chromG.empty() && !chromBG.empty()
+               && !chromRG.bad_error && !chromG.bad_error && !chromBG.bad_error;
+    }
     }
 
     assert(false);
     return false;
 }
 
-rtengine::LCPProfile::LCPProfile(const Glib::ustring& fname) :
-    isFisheye(false),
-    sensorFormatFactor(1.f),
-    persModelCount(0),
-    inCamProfiles(false),
-    firstLIDone(false),
-    inPerspect(false),
-    inAlternateLensID(false),
-    inAlternateLensNames(false),
-    lastTag{},
-    inInvalidTag{},
-    pCurPersModel(nullptr),
-    pCurCommon(nullptr),
-    aPersModel{}
+rtengine::LCPProfile::LCPProfile(const Glib::ustring& fname)
+    : isFisheye(false),
+      sensorFormatFactor(1.f),
+      persModelCount(0),
+      inCamProfiles(false),
+      firstLIDone(false),
+      inPerspect(false),
+      inAlternateLensID(false),
+      inAlternateLensNames(false),
+      lastTag{},
+      inInvalidTag{},
+      pCurPersModel(nullptr),
+      pCurCommon(nullptr),
+      aPersModel{}
 {
 
     XML_Parser parser = XML_ParserCreate(nullptr);
@@ -203,7 +199,7 @@ rtengine::LCPProfile::LCPProfile(const Glib::ustring& fname) :
     XML_SetCharacterDataHandler(parser, XmlTextHandler);
     XML_SetUserData(parser, static_cast<void*>(this));
 
-    FILE* const pFile = g_fopen(fname.c_str (), "rb");
+    FILE* const pFile = g_fopen(fname.c_str(), "rb");
 
     if (pFile) {
         constexpr int BufferSize = 8192;
@@ -228,11 +224,12 @@ rtengine::LCPProfile::LCPProfile(const Glib::ustring& fname) :
     if (settings->verbose) {
         std::printf("Parsing %s\n", fname.c_str());
     }
-    // Two phase filter: first filter out the very rough ones, that distord the average a lot
-    // force it, even if there are few frames (community profiles)
+    // Two phase filter: first filter out the very rough ones, that distord the average a
+    // lot force it, even if there are few frames (community profiles)
     filterBadFrames(LCPCorrectionMode::VIGNETTE, 2.0, 0);
     filterBadFrames(LCPCorrectionMode::CA, 2.0, 0);
-    // from the non-distorded, filter again on new average basis, but only if there are enough frames left
+    // from the non-distorded, filter again on new average basis, but only if there are
+    // enough frames left
     filterBadFrames(LCPCorrectionMode::VIGNETTE, 1.5, 50);
     filterBadFrames(LCPCorrectionMode::CA, 1.5, 50);
 }
@@ -246,15 +243,13 @@ rtengine::LCPProfile::~LCPProfile()
     }
 }
 
-void rtengine::LCPProfile::calcParams(
-    LCPCorrectionMode mode,
-    float focalLength,
-    float focusDist,
-    float aperture,
-    LCPModelCommon* pCorr1,
-    LCPModelCommon* pCorr2,
-    LCPModelCommon* pCorr3
-) const
+void rtengine::LCPProfile::calcParams(LCPCorrectionMode mode,
+                                      float focalLength,
+                                      float focusDist,
+                                      float aperture,
+                                      LCPModelCommon* pCorr1,
+                                      LCPModelCommon* pCorr2,
+                                      LCPModelCommon* pCorr3) const
 {
     const float euler = std::exp(1.0);
 
@@ -262,41 +257,29 @@ void rtengine::LCPProfile::calcParams(
     LCPPersModel* pLow = nullptr;
     LCPPersModel* pHigh = nullptr;
 
-    const float focalLengthLog = std::log(focalLength); //, apertureLog=aperture>0 ? std::log(aperture) : 0;
+    const float focalLengthLog =
+        std::log(focalLength);  //, apertureLog=aperture>0 ? std::log(aperture) : 0;
     const float focusDistLog = focusDist > 0 ? std::log(focusDist) + euler : 0;
 
-    // Pass 1: determining best focal length, if possible different focusDistances (for the focDist is not given case)
+    // Pass 1: determining best focal length, if possible different focusDistances (for
+    // the focDist is not given case)
     for (int pm = 0; pm < persModelCount; ++pm) {
         const float f = aPersModel[pm]->focLen;
 
         if (aPersModel[pm]->hasModeData(mode)) {
-            if (
-                f <= focalLength
-                && (
-                    pLow == nullptr
-                    || f > pLow->focLen
-                    || (
-                        focusDist == 0
-                        && f == pLow->focLen
-                        && pLow->focDist > aPersModel[pm]->focDist
-                    )
-                )
-            ) {
+            if (f <= focalLength
+                && (pLow == nullptr || f > pLow->focLen
+                    || (focusDist == 0 && f == pLow->focLen
+                        && pLow->focDist > aPersModel[pm]->focDist)))
+            {
                 pLow = aPersModel[pm];
             }
 
-            if (
-                f >= focalLength
-                && (
-                    pHigh == nullptr
-                    || f < pHigh->focLen
-                    || (
-                        focusDist == 0
-                        && f == pHigh->focLen
-                        && pHigh->focDist < aPersModel[pm]->focDist
-                    )
-                )
-            ) {
+            if (f >= focalLength
+                && (pHigh == nullptr || f < pHigh->focLen
+                    || (focusDist == 0 && f == pHigh->focLen
+                        && pHigh->focDist < aPersModel[pm]->focDist)))
+            {
                 pHigh = aPersModel[pm];
             }
         }
@@ -304,19 +287,18 @@ void rtengine::LCPProfile::calcParams(
 
     if (!pLow) {
         pLow = pHigh;
-    }
-    else if (!pHigh) {
+    } else if (!pHigh) {
         pHigh = pLow;
-    }
-    else {
-        // Pass 2: We have some, so take the best aperture for vignette and best focus for CA and distortion
-        // there are usually several frame per focal length. In the end pLow will have both flen and apterure/focdis below the target,
-        // and vice versa pHigh
+    } else {
+        // Pass 2: We have some, so take the best aperture for vignette and best focus for
+        // CA and distortion there are usually several frame per focal length. In the end
+        // pLow will have both flen and apterure/focdis below the target, and vice versa
+        // pHigh
         const float bestFocLenLow = pLow->focLen;
         const float bestFocLenHigh = pHigh->focLen;
 
         for (int pm = 0; pm < persModelCount; ++pm) {
-            const float aper = aPersModel[pm]->aperture; // float aperLog=std::log(aper);
+            const float aper = aPersModel[pm]->aperture;  // float aperLog=std::log(aper);
             const float focDist = aPersModel[pm]->focDist;
             const float focDistLog = std::log(focDist) + euler;
 
@@ -326,138 +308,93 @@ void rtengine::LCPProfile::calcParams(
                 double highMeanErr = 0.0;
 
                 switch (mode) {
-                    case LCPCorrectionMode::VIGNETTE: {
-                        meanErr = aPersModel[pm]->vignette.mean_error;
-                        lowMeanErr = pLow->vignette.mean_error;
-                        highMeanErr = pHigh->vignette.mean_error;
-                        break;
-                    }
+                case LCPCorrectionMode::VIGNETTE:
+                {
+                    meanErr = aPersModel[pm]->vignette.mean_error;
+                    lowMeanErr = pLow->vignette.mean_error;
+                    highMeanErr = pHigh->vignette.mean_error;
+                    break;
+                }
 
-                    case LCPCorrectionMode::DISTORTION: {
-                        meanErr = aPersModel[pm]->base.mean_error;
-                        lowMeanErr = pLow->base.mean_error;
-                        highMeanErr = pHigh->base.mean_error;
-                        break;
-                    }
+                case LCPCorrectionMode::DISTORTION:
+                {
+                    meanErr = aPersModel[pm]->base.mean_error;
+                    lowMeanErr = pLow->base.mean_error;
+                    highMeanErr = pHigh->base.mean_error;
+                    break;
+                }
 
-                    case LCPCorrectionMode::CA: {
-                        meanErr = aPersModel[pm]->chromG.mean_error;
-                        lowMeanErr = pLow->chromG.mean_error;
-                        highMeanErr = pHigh->chromG.mean_error;
-                        break;
-                    }
+                case LCPCorrectionMode::CA:
+                {
+                    meanErr = aPersModel[pm]->chromG.mean_error;
+                    lowMeanErr = pLow->chromG.mean_error;
+                    highMeanErr = pHigh->chromG.mean_error;
+                    break;
+                }
                 }
 
                 if (aperture > 0 && mode != LCPCorrectionMode::CA) {
-                    if (
-                        aPersModel[pm]->focLen == bestFocLenLow
-                        && (
-                            (
-                                aper == aperture
-                                && lowMeanErr > meanErr
-                            )
-                            || (
-                                aper >= aperture
-                                && aper < pLow->aperture
-                                && pLow->aperture > aperture
-                            )
-                            || (
-                                aper <= aperture
-                                && (
-                                    pLow->aperture > aperture
-                                    || fabs(aperture - aper) < fabs(aperture - pLow->aperture)
-                                )
-                            )
-                        )
-                    ) {
+                    if (aPersModel[pm]->focLen == bestFocLenLow
+                        && ((aper == aperture && lowMeanErr > meanErr)
+                            || (aper >= aperture && aper < pLow->aperture
+                                && pLow->aperture > aperture)
+                            || (aper <= aperture
+                                && (pLow->aperture > aperture
+                                    || fabs(aperture - aper)
+                                           < fabs(aperture - pLow->aperture)))))
+                    {
                         pLow = aPersModel[pm];
                     }
 
-                    if (
-                        aPersModel[pm]->focLen == bestFocLenHigh
-                        && (
-                            (
-                                aper == aperture
-                                && highMeanErr > meanErr
-                            )
-                            || (
-                                aper <= aperture
-                                && aper > pHigh->aperture
-                                && pHigh->aperture < aperture
-                            )
-                            || (
-                                aper >= aperture
-                                && (
-                                    pHigh->aperture < aperture
-                                    || fabs(aperture - aper) < fabs(aperture - pHigh->aperture)
-                                )
-                            )
-                        )
-                    ) {
+                    if (aPersModel[pm]->focLen == bestFocLenHigh
+                        && ((aper == aperture && highMeanErr > meanErr)
+                            || (aper <= aperture && aper > pHigh->aperture
+                                && pHigh->aperture < aperture)
+                            || (aper >= aperture
+                                && (pHigh->aperture < aperture
+                                    || fabs(aperture - aper)
+                                           < fabs(aperture - pHigh->aperture)))))
+                    {
                         pHigh = aPersModel[pm];
                     }
-                }
-                else if (focusDist > 0 && mode != LCPCorrectionMode::VIGNETTE) {
+                } else if (focusDist > 0 && mode != LCPCorrectionMode::VIGNETTE) {
                     // by focus distance
-                    if (
-                        aPersModel[pm]->focLen == bestFocLenLow
-                        && (
-                            (
-                                focDist == focusDist
-                                && lowMeanErr > meanErr
-                            )
-                            || (
-                                focDist >= focusDist
-                                && focDist < pLow->focDist
-                                && pLow->focDist > focusDist
-                            )
-                            || (
-                                focDist <= focusDist
-                                && (
-                                    pLow->focDist > focusDist
-                                    || fabs(focusDistLog - focDistLog) < fabs(focusDistLog - (std::log(pLow->focDist) + euler))
-                                )
-                            )
-                        )
-                    ) {
+                    if (aPersModel[pm]->focLen == bestFocLenLow
+                        && ((focDist == focusDist && lowMeanErr > meanErr)
+                            || (focDist >= focusDist && focDist < pLow->focDist
+                                && pLow->focDist > focusDist)
+                            || (focDist <= focusDist
+                                && (pLow->focDist > focusDist
+                                    || fabs(focusDistLog - focDistLog)
+                                           < fabs(focusDistLog
+                                                  - (std::log(pLow->focDist) + euler))))))
+                    {
                         pLow = aPersModel[pm];
                     }
 
-                    if (
-                        aPersModel[pm]->focLen == bestFocLenHigh
-                        && (
-                            (
-                                focDist == focusDist
-                                && highMeanErr > meanErr
-                            )
-                            || (
-                                focDist <= focusDist
-                                && focDist > pHigh->focDist
-                                && pHigh->focDist < focusDist
-                            )
-                            || (
-                                focDist >= focusDist
-                                && (
-                                    pHigh->focDist < focusDist
-                                    || fabs(focusDistLog - focDistLog) < fabs(focusDistLog - (std::log(pHigh->focDist) + euler))
-                                )
-                            )
-                        )
-                    ) {
+                    if (aPersModel[pm]->focLen == bestFocLenHigh
+                        && ((focDist == focusDist && highMeanErr > meanErr)
+                            || (focDist <= focusDist && focDist > pHigh->focDist
+                                && pHigh->focDist < focusDist)
+                            || (focDist >= focusDist
+                                && (pHigh->focDist < focusDist
+                                    || fabs(focusDistLog - focDistLog) < fabs(
+                                           focusDistLog
+                                           - (std::log(pHigh->focDist) + euler))))))
+                    {
                         pHigh = aPersModel[pm];
                     }
-                }
-                else {
+                } else {
                     // no focus distance available, just error
                     if (aPersModel[pm]->focLen == bestFocLenLow && lowMeanErr > meanErr) {
                         pLow = aPersModel[pm];
                     }
 
-                    if (aPersModel[pm]->focLen == bestFocLenHigh && highMeanErr > meanErr) {
+                    if (aPersModel[pm]->focLen == bestFocLenHigh && highMeanErr > meanErr)
+                    {
                         pHigh = aPersModel[pm];
                     }
                 }
-
             }
         }
     }
@@ -465,77 +402,81 @@ void rtengine::LCPProfile::calcParams(
     if (pLow != nullptr && pHigh != nullptr) {
         // average out the factors, linear interpolation in logarithmic scale
         float facLow = 0.5f;
-        bool focLenOnSpot = false; // pretty often, since max/min are often as frames in LCP
+        bool focLenOnSpot =
+            false;  // pretty often, since max/min are often as frames in LCP
 
         // There is as foclen range, take that as basis
         if (pLow->focLen < pHigh->focLen) {
-            facLow = (std::log(pHigh->focLen) - focalLengthLog) / (std::log(pHigh->focLen) - std::log(pLow->focLen));
+            facLow = (std::log(pHigh->focLen) - focalLengthLog)
+                     / (std::log(pHigh->focLen) - std::log(pLow->focLen));
         } else {
             focLenOnSpot = pLow->focLen == pHigh->focLen && pLow->focLen == focalLength;
         }
 
         // and average the other factor if available
-        if (
-            mode == LCPCorrectionMode::VIGNETTE
-            && pLow->aperture < aperture
-            && pHigh->aperture > aperture
-        ) {
+        if (mode == LCPCorrectionMode::VIGNETTE && pLow->aperture < aperture
+            && pHigh->aperture > aperture)
+        {
             // Mix in aperture
-            const float facAperLow = (pHigh->aperture - aperture) / (pHigh->aperture - pLow->aperture);
+            const float facAperLow =
+                (pHigh->aperture - aperture) / (pHigh->aperture - pLow->aperture);
             facLow = focLenOnSpot ? facAperLow : (0.5f * (facLow + facAperLow));
-        }
-        else if (
-            mode != LCPCorrectionMode::VIGNETTE
-            && focusDist > 0
-            && pLow->focDist < focusDist
-            && pHigh->focDist > focusDist
-        ) {
+        } else if (mode != LCPCorrectionMode::VIGNETTE && focusDist > 0
+                   && pLow->focDist < focusDist && pHigh->focDist > focusDist)
+        {
             // focus distance for all else (if focus distance is given)
-            const float facDistLow = (std::log(pHigh->focDist) + euler - focusDistLog) / (std::log(pHigh->focDist) - std::log(pLow->focDist));
+            const float facDistLow =
+                (std::log(pHigh->focDist) + euler - focusDistLog)
+                / (std::log(pHigh->focDist) - std::log(pLow->focDist));
             facLow = focLenOnSpot ? facDistLow : (0.8f * facLow + 0.2f * facDistLow);
         }
 
         switch (mode) {
-            case LCPCorrectionMode::VIGNETTE: {
-                pCorr1->merge(pLow->vignette, pHigh->vignette, facLow);
-                break;
-            }
+        case LCPCorrectionMode::VIGNETTE:
+        {
+            pCorr1->merge(pLow->vignette, pHigh->vignette, facLow);
+            break;
+        }
 
-            case LCPCorrectionMode::DISTORTION: {
-                pCorr1->merge(pLow->base, pHigh->base, facLow);
-                break;
-            }
+        case LCPCorrectionMode::DISTORTION:
+        {
+            pCorr1->merge(pLow->base, pHigh->base, facLow);
+            break;
+        }
 
-            case LCPCorrectionMode::CA: {
-                pCorr1->merge(pLow->chromRG, pHigh->chromRG, facLow);
-                pCorr2->merge(pLow->chromG,  pHigh->chromG,  facLow);
-                pCorr3->merge(pLow->chromBG, pHigh->chromBG, facLow);
-                break;
-            }
+        case LCPCorrectionMode::CA:
+        {
+            pCorr1->merge(pLow->chromRG, pHigh->chromRG, facLow);
+            pCorr2->merge(pLow->chromG, pHigh->chromG, facLow);
+            pCorr3->merge(pLow->chromBG, pHigh->chromBG, facLow);
+            break;
+        }
         }
 
         if (settings->verbose) {
-            std::printf("LCP mode=%i, dist: %g found frames: Fno %g-%g; FocLen %g-%g; Dist %g-%g with weight %g\n",
-                        toUnderlying(mode),
-                        static_cast<double>(focusDist),
-                        static_cast<double>(pLow->aperture),
-                        static_cast<double>(pHigh->aperture),
-                        static_cast<double>(pLow->focLen),
-                        static_cast<double>(pHigh->focLen),
-                        static_cast<double>(pLow->focDist),
-                        static_cast<double>(pHigh->focDist),
-                        static_cast<double>(facLow));
+            std::printf(
+                "LCP mode=%i, dist: %g found frames: Fno %g-%g; FocLen %g-%g; Dist %g-%g with weight %g\n",
+                toUnderlying(mode), static_cast<double>(focusDist),
+                static_cast<double>(pLow->aperture), static_cast<double>(pHigh->aperture),
+                static_cast<double>(pLow->focLen), static_cast<double>(pHigh->focLen),
+                static_cast<double>(pLow->focDist), static_cast<double>(pHigh->focDist),
+                static_cast<double>(facLow));
         }
     } else {
         if (settings->verbose) {
-            std::printf("Error: LCP file contained no %s parameters\n", mode == LCPCorrectionMode::VIGNETTE ? "vignette" : mode == LCPCorrectionMode::DISTORTION ? "distortion" : "CA" );
+            std::printf("Error: LCP file contained no %s parameters\n",
+                        mode == LCPCorrectionMode::VIGNETTE     ? "vignette"
+                        : mode == LCPCorrectionMode::DISTORTION ? "distortion"
+                                                                : "CA");
         }
     }
 }
 
-
-// from all frames not marked as bad already, take average and filter out frames with higher deviation than this if there are enough values
-int rtengine::LCPProfile::filterBadFrames(LCPCorrectionMode mode, double maxAvgDevFac, int minFramesLeft)
+// from all frames not marked as bad already, take average and filter out frames with
+// higher deviation than this if there are enough values
+int rtengine::LCPProfile::filterBadFrames(LCPCorrectionMode mode,
+                                          double maxAvgDevFac,
+                                          int minFramesLeft)
 {
     // take average error, then calculated the maximum deviation allowed
     double err = 0.0;
@@ -545,20 +486,25 @@ int rtengine::LCPProfile::filterBadFrames(LCPCorrectionMode mode, double maxAvgD
         if (aPersModel[pm]->hasModeData(mode)) {
             ++count;
             switch (mode) {
-                case LCPCorrectionMode::VIGNETTE: {
-                    err += aPersModel[pm]->vignette.mean_error;
-                    break;
-                }
+            case LCPCorrectionMode::VIGNETTE:
+            {
+                err += aPersModel[pm]->vignette.mean_error;
+                break;
+            }
 
-                case LCPCorrectionMode::DISTORTION: {
-                    err += aPersModel[pm]->base.mean_error;
-                    break;
-                }
+            case LCPCorrectionMode::DISTORTION:
+            {
+                err += aPersModel[pm]->base.mean_error;
+                break;
+            }
 
-                case LCPCorrectionMode::CA: {
-                    err += rtengine::max(aPersModel[pm]->chromRG.mean_error, aPersModel[pm]->chromG.mean_error, aPersModel[pm]->chromBG.mean_error);
-                    break;
-                }
+            case LCPCorrectionMode::CA:
+            {
+                err += rtengine::max(aPersModel[pm]->chromRG.mean_error,
+                                     aPersModel[pm]->chromG.mean_error,
+                                     aPersModel[pm]->chromBG.mean_error);
+                break;
+            }
             }
         }
     }
@@ -575,41 +521,44 @@ int rtengine::LCPProfile::filterBadFrames(LCPCorrectionMode mode, double maxAvgD
         for (int pm = 0; pm < MaxPersModelCount && aPersModel[pm]; ++pm) {
             if (aPersModel[pm]->hasModeData(mode)) {
                 switch (mode) {
-                    case LCPCorrectionMode::VIGNETTE: {
-                        if (aPersModel[pm]->vignette.mean_error > maxAvgDevFac * err) {
-                            aPersModel[pm]->vignette.bad_error = true;
-                            filtered++;
-                        }
-                        break;
+                case LCPCorrectionMode::VIGNETTE:
+                {
+                    if (aPersModel[pm]->vignette.mean_error > maxAvgDevFac * err) {
+                        aPersModel[pm]->vignette.bad_error = true;
+                        filtered++;
                     }
+                    break;
+                }
 
-                    case LCPCorrectionMode::DISTORTION: {
-                        if (aPersModel[pm]->base.mean_error > maxAvgDevFac * err) {
-                            aPersModel[pm]->base.bad_error = true;
-                            filtered++;
-                        }
-                        break;
+                case LCPCorrectionMode::DISTORTION:
+                {
+                    if (aPersModel[pm]->base.mean_error > maxAvgDevFac * err) {
+                        aPersModel[pm]->base.bad_error = true;
+                        filtered++;
                     }
+                    break;
+                }
 
-                    case LCPCorrectionMode::CA: {
-                        if (
-                            aPersModel[pm]->chromRG.mean_error > maxAvgDevFac * err
-                            || aPersModel[pm]->chromG.mean_error > maxAvgDevFac * err
-                            || aPersModel[pm]->chromBG.mean_error > maxAvgDevFac * err
-                        ) {
-                            aPersModel[pm]->chromRG.bad_error = true;
-                            aPersModel[pm]->chromG.bad_error = true;
-                            aPersModel[pm]->chromBG.bad_error = true;
-                            ++filtered;
-                        }
-                        break;
+                case LCPCorrectionMode::CA:
+                {
+                    if (aPersModel[pm]->chromRG.mean_error > maxAvgDevFac * err
+                        || aPersModel[pm]->chromG.mean_error > maxAvgDevFac * err
+                        || aPersModel[pm]->chromBG.mean_error > maxAvgDevFac * err)
+                    {
+                        aPersModel[pm]->chromRG.bad_error = true;
+                        aPersModel[pm]->chromG.bad_error = true;
+                        aPersModel[pm]->chromBG.bad_error = true;
+                        ++filtered;
                     }
+                    break;
+                }
                 }
             }
         }
 
         if (settings->verbose && count) {
-            std::printf("Filtered %.1f%% frames for maxAvgDevFac %g leaving %i\n", filtered * 100.0 / count, maxAvgDevFac, count - filtered);
+            std::printf("Filtered %.1f%% frames for maxAvgDevFac %g leaving %i\n",
+                        filtered * 100.0 / count, maxAvgDevFac, count - filtered);
         }
     }
 
@@ -618,7 +567,8 @@ int rtengine::LCPProfile::filterBadFrames(LCPCorrectionMode mode, double maxAvgD
 
 void rtengine::LCPProfile::handle_text(const std::string& text)
 {
-    // Check if it contains non-whitespaces (there are several calls to this for one tag unfortunately)
+    // Check if it contains non-whitespaces (there are several calls to this for one tag
+    // unfortunately)
     bool onlyWhiteSpace = true;
     for (auto c : text) {
         if (!std::isspace(c)) {
@@ -699,14 +649,16 @@ void rtengine::LCPProfile::handle_text(const std::string& text)
     }
 }
 
-void XMLCALL rtengine::LCPProfile::XmlStartHandler(void* pLCPProfile, const char* el, const char** attr)
+void XMLCALL rtengine::LCPProfile::XmlStartHandler(void* pLCPProfile,
+                                                   const char* el,
+                                                   const char** attr)
 {
     LCPProfile* const pProf = static_cast<LCPProfile*>(pLCPProfile);
 
     bool parseAttr = false;
 
     if (*pProf->inInvalidTag) {
-        return;    // We ignore everything in dirty tag till it's gone
+        return;  // We ignore everything in dirty tag till it's gone
     }
 
     // clean up tagname
@@ -739,17 +691,15 @@ void XMLCALL rtengine::LCPProfile::XmlStartHandler(void* pLCPProfile, const char
         pProf->inAlternateLensNames = true;
     }
 
-    if (
-        !pProf->inCamProfiles
-        || pProf->inAlternateLensID
-        || pProf->inAlternateLensNames
-    ) {
+    if (!pProf->inCamProfiles || pProf->inAlternateLensID || pProf->inAlternateLensNames)
+    {
         return;
     }
 
     if (src_str == "li") {
         pProf->pCurPersModel = new LCPPersModel();
-        pProf->pCurCommon = &pProf->pCurPersModel->base; // iterated to next tags within persModel
+        pProf->pCurCommon =
+            &pProf->pCurPersModel->base;  // iterated to next tags within persModel
         return;
     }
 
@@ -760,7 +710,8 @@ void XMLCALL rtengine::LCPProfile::XmlStartHandler(void* pLCPProfile, const char
     } else if (src_str == "FisheyeModel") {
         pProf->firstLIDone = true;
         pProf->inPerspect = true;
-        pProf->isFisheye = true; // just misses third param, and different path, rest is the same
+        pProf->isFisheye =
+            true;  // just misses third param, and different path, rest is the same
         parseAttr = true;
     } else if (src_str == "Description") {
         parseAttr = true;
@@ -802,16 +753,15 @@ void XMLCALL rtengine::LCPProfile::XmlStartHandler(void* pLCPProfile, const char
     }
 }
 
-void XMLCALL rtengine::LCPProfile::XmlTextHandler(void* pLCPProfile, const XML_Char* s, int len)
+void XMLCALL rtengine::LCPProfile::XmlTextHandler(void* pLCPProfile,
+                                                  const XML_Char* s,
+                                                  int len)
 {
     LCPProfile* const pProf = static_cast<LCPProfile*>(pLCPProfile);
 
-    if (
-        !pProf->inCamProfiles
-        || pProf->inAlternateLensID
-        || pProf->inAlternateLensNames
-        || *pProf->inInvalidTag
-    ) {
+    if (!pProf->inCamProfiles || pProf->inAlternateLensID || pProf->inAlternateLensNames
+        || *pProf->inInvalidTag)
+    {
         return;
     }
 
@@ -848,11 +798,8 @@ void XMLCALL rtengine::LCPProfile::XmlEndHandler(void* pLCPProfile, const char* 
         pProf->inAlternateLensNames = false;
     }
 
-    if (
-        !pProf->inCamProfiles
-        || pProf->inAlternateLensID
-        || pProf->inAlternateLensNames
-    ) {
+    if (!pProf->inCamProfiles || pProf->inAlternateLensID || pProf->inAlternateLensNames)
+    {
         return;
     }
 
@@ -874,15 +821,18 @@ rtengine::LCPStore* rtengine::LCPStore::getInstance()
 
 bool rtengine::LCPStore::isValidLCPFileName(const Glib::ustring& filename) const
 {
-    if (!Glib::file_test(filename, Glib::FILE_TEST_EXISTS) || Glib::file_test (filename, Glib::FILE_TEST_IS_DIR)) {
+    if (!Glib::file_test(filename, Glib::FILE_TEST_EXISTS)
+        || Glib::file_test(filename, Glib::FILE_TEST_IS_DIR))
+    {
         return false;
     }
 
-    const size_t pos = filename.find_last_of ('.');
+    const size_t pos = filename.find_last_of('.');
     return pos > 0 && !filename.casefold().compare(pos, 4, ".lcp");
 }
 
-std::shared_ptr<rtengine::LCPProfile> rtengine::LCPStore::getProfile(const Glib::ustring& filename) const
+std::shared_ptr<rtengine::LCPProfile>
+rtengine::LCPStore::getProfile(const Glib::ustring& filename) const
 {
     if (filename.length() == 0 || !isValidLCPFileName(filename)) {
         return nullptr;
@@ -907,14 +857,15 @@ Glib::ustring rtengine::LCPStore::getDefaultCommonDirectory() const
     Glib::ustring dir;
 
 #ifdef _WIN32
-    WCHAR pathW[MAX_PATH] = {0};
+    WCHAR pathW[MAX_PATH] = { 0 };
 
     if (SHGetSpecialFolderPathW(NULL, pathW, CSIDL_COMMON_APPDATA, false)) {
         char pathA[MAX_PATH];
         WideCharToMultiByte(CP_UTF8, 0, pathW, -1, pathA, MAX_PATH, 0, 0);
-        Glib::ustring fullDir = Glib::ustring(pathA) + Glib::ustring("\\Adobe\\CameraRaw\\LensProfiles\\1.0");
+        Glib::ustring fullDir =
+            Glib::ustring(pathA) + Glib::ustring("\\Adobe\\CameraRaw\\LensProfiles\\1.0");
 
-        if (Glib::file_test (fullDir, Glib::FILE_TEST_IS_DIR)) {
+        if (Glib::file_test(fullDir, Glib::FILE_TEST_IS_DIR)) {
             dir = fullDir;
         }
     }
@@ -926,58 +877,58 @@ Glib::ustring rtengine::LCPStore::getDefaultCommonDirectory() const
     return dir;
 }
 
-rtengine::LCPStore::LCPStore(unsigned int _cache_size) :
-    cache(_cache_size)
-{
-}
+rtengine::LCPStore::LCPStore(unsigned int _cache_size) : cache(_cache_size) {}
 
 // if !vignette then geometric and CA
-rtengine::LCPMapper::LCPMapper(
-    const std::shared_ptr<LCPProfile>& pProf,
-    float focalLength,
-    float focalLength35mm,
-    float focusDist,
-    float aperture,
-    bool vignette,
-    bool useCADistP,
-    int fullWidth,
-    int fullHeight,
-    const procparams::CoarseTransformParams& coarse,
-    int rawRotationDeg
-) :
-    enableCA(false),
-    useCADist(useCADistP),
-    swapXY(false),
-    isFisheye(false)
+rtengine::LCPMapper::LCPMapper(const std::shared_ptr<LCPProfile>& pProf,
+                               float focalLength,
+                               float focalLength35mm,
+                               float focusDist,
+                               float aperture,
+                               bool vignette,
+                               bool useCADistP,
+                               int fullWidth,
+                               int fullHeight,
+                               const procparams::CoarseTransformParams& coarse,
+                               int rawRotationDeg)
+    : enableCA(false), useCADist(useCADistP), swapXY(false), isFisheye(false)
 {
     if (!pProf) {
         return;
     }
 
-    // determine in what the image with the RAW landscape in comparison (calibration target)
-    // in vignetting, the rotation has not taken place yet
+    // determine in what the image with the RAW landscape in comparison (calibration
+    // target) in vignetting, the rotation has not taken place yet
     int rot = 0;
 
     if (rawRotationDeg >= 0) {
         rot = (coarse.rotate + rawRotationDeg) % 360;
     }
 
-    swapXY = (rot == 90  || rot == 270);
+    swapXY = (rot == 90 || rot == 270);
 
-    const bool mirrorX = (rot == 90  || rot == 180);
+    const bool mirrorX = (rot == 90 || rot == 180);
     const bool mirrorY = (rot == 180 || rot == 270);
     if (settings->verbose) {
-        std::printf("Vign: %i, fullWidth: %i/%i, focLen %g SwapXY: %i / MirX/Y %i / %i on rot:%i from %i\n",vignette, fullWidth, fullHeight, static_cast<double>(focalLength), swapXY, mirrorX, mirrorY, rot, rawRotationDeg);
+        std::printf(
+            "Vign: %i, fullWidth: %i/%i, focLen %g SwapXY: %i / MirX/Y %i / %i on rot:%i from %i\n",
+            vignette, fullWidth, fullHeight, static_cast<double>(focalLength), swapXY,
+            mirrorX, mirrorY, rot, rawRotationDeg);
     }
 
-    pProf->calcParams(vignette ? LCPCorrectionMode::VIGNETTE : LCPCorrectionMode::DISTORTION, focalLength, focusDist, aperture, &mc, nullptr, nullptr);
-    mc.prepareParams(fullWidth, fullHeight, focalLength, focalLength35mm, pProf->sensorFormatFactor, swapXY, mirrorX, mirrorY);
+    pProf->calcParams(vignette ? LCPCorrectionMode::VIGNETTE
+                               : LCPCorrectionMode::DISTORTION,
+                      focalLength, focusDist, aperture, &mc, nullptr, nullptr);
+    mc.prepareParams(fullWidth, fullHeight, focalLength, focalLength35mm,
+                     pProf->sensorFormatFactor, swapXY, mirrorX, mirrorY);
 
     if (!vignette) {
-        pProf->calcParams(LCPCorrectionMode::CA, focalLength, focusDist, aperture, &chrom[0], &chrom[1], &chrom[2]);
+        pProf->calcParams(LCPCorrectionMode::CA, focalLength, focusDist, aperture,
+                          &chrom[0], &chrom[1], &chrom[2]);
 
         for (int i = 0; i < 3; ++i) {
-            chrom[i].prepareParams(fullWidth, fullHeight, focalLength, focalLength35mm, pProf->sensorFormatFactor, swapXY, mirrorX, mirrorY);
+            chrom[i].prepareParams(fullWidth, fullHeight, focalLength, focalLength35mm,
+                                   pProf->sensorFormatFactor, swapXY, mirrorX, mirrorY);
         }
     }
 
@@ -1002,13 +953,17 @@ bool rtengine::LCPMapper::hasVignettingCorrection() const
     return true;
 }
 
-void rtengine::LCPMapper::correctDistortionAndCA(double &x, double &y, int cx, int cy, int channel) const
+void rtengine::LCPMapper::correctDistortionAndCA(double& x,
+                                                 double& y,
+                                                 int cx,
+                                                 int cy,
+                                                 int channel) const
 {
     correctDistortion(x, y, cx, cy);
     correctCA(x, y, cx, cy, channel);
 }
 
-void rtengine::LCPMapper::correctDistortion(double &x, double &y, int cx, int cy) const
+void rtengine::LCPMapper::correctDistortion(double& x, double& y, int cx, int cy) const
 {
     x += cx;
     y += cy;
@@ -1025,7 +980,7 @@ void rtengine::LCPMapper::correctDistortion(double &x, double &y, int cx, int cy
         const double k1 = mc.param[0];
         const double k2 = mc.param[1];
         const double r = sqrt(du * du + dv * dv);
-        const double f = sqrt(fx*fy);
+        const double f = sqrt(fx * fy);
         const double th = atan2(r, f);
         const double th2 = th * th;
         const double cfact = (((k2 * th2 + k1) * th2 + 1) * th) / r;
@@ -1037,13 +992,20 @@ void rtengine::LCPMapper::correctDistortion(double &x, double &y, int cx, int cy
     } else {
         const double x0 = static_cast<double>(mc.x0);
         const double y0 = static_cast<double>(mc.y0);
-        const double xd = (x - x0) / static_cast<double>(mc.fx), yd = (y - y0) / static_cast<double>(mc.fy);
+        const double xd = (x - x0) / static_cast<double>(mc.fx),
+                     yd = (y - y0) / static_cast<double>(mc.fy);
 
         const auto& aDist = mc.param;
-        const double rsqr      = xd * xd + yd * yd;
-        const double xfac = static_cast<double>(aDist[swapXY ? 3 : 4]), yfac = static_cast<double>(aDist[swapXY ? 4 : 3]);
+        const double rsqr = xd * xd + yd * yd;
+        const double xfac = static_cast<double>(aDist[swapXY ? 3 : 4]),
+                     yfac = static_cast<double>(aDist[swapXY ? 4 : 3]);
 
-        const double commonFac = (((static_cast<double>(aDist[2]) * rsqr + static_cast<double>(aDist[1])) * rsqr + static_cast<double>(aDist[0])) * rsqr + 1.)
+        const double commonFac =
+            (((static_cast<double>(aDist[2]) * rsqr + static_cast<double>(aDist[1]))
+                  * rsqr
+              + static_cast<double>(aDist[0]))
+                 * rsqr
+             + 1.)
             + 2. * (yfac * yd + xfac * xd);
 
         const double xnew = xd * commonFac + xfac * rsqr;
@@ -1057,7 +1019,11 @@ void rtengine::LCPMapper::correctDistortion(double &x, double &y, int cx, int cy
     y -= cy;
 }
 
-void rtengine::LCPMapper::correctCA(double& x, double& y, int cx, int cy, int channel) const
+void rtengine::LCPMapper::correctCA(double& x,
+                                    double& y,
+                                    int cx,
+                                    int cy,
+                                    int channel) const
 {
     if (!enableCA) {
         return;
@@ -1077,10 +1043,16 @@ void rtengine::LCPMapper::correctCA(double& x, double& y, int cx, int cy, int ch
     if (useCADist) {
         const auto& aDist = chrom[1].param;
         double rsqr = xd * xd + yd * yd;
-        double xfac = static_cast<double>(aDist[swapXY ? 3 : 4]), yfac = static_cast<double>(aDist[swapXY ? 4 : 3]);
+        double xfac = static_cast<double>(aDist[swapXY ? 3 : 4]),
+               yfac = static_cast<double>(aDist[swapXY ? 4 : 3]);
 
-        double commonFac = (((static_cast<double>(aDist[2]) * rsqr + static_cast<double>(aDist[1])) * rsqr + static_cast<double>(aDist[0])) * rsqr + 1.)
-                           + 2. * (yfac * yd + xfac * xd);
+        double commonFac =
+            (((static_cast<double>(aDist[2]) * rsqr + static_cast<double>(aDist[1]))
+                  * rsqr
+              + static_cast<double>(aDist[0]))
+                 * rsqr
+             + 1.)
+            + 2. * (yfac * yd + xfac * xd);
 
         xgreen = xd * commonFac + static_cast<double>(aDist[4]) * rsqr;
         ygreen = yd * commonFac + static_cast<double>(aDist[3]) * rsqr;
@@ -1100,11 +1072,24 @@ void rtengine::LCPMapper::correctCA(double& x, double& y, int cx, int cy, int ch
         const double rsqr = xd * xd + yd * yd;
 
         const auto& aCA = chrom[channel].param;
-        const double xfac = static_cast<double>(aCA[swapXY ? 3 : 4]), yfac = static_cast<double>(aCA[swapXY ? 4 : 3]);
-        const double commonSum = 1. + rsqr * (static_cast<double>(aCA[0]) + rsqr * (static_cast<double>(aCA[1]) + static_cast<double>(aCA[2] )* rsqr)) + 2. * (yfac * yd + xfac * xd);
+        const double xfac = static_cast<double>(aCA[swapXY ? 3 : 4]),
+                     yfac = static_cast<double>(aCA[swapXY ? 4 : 3]);
+        const double commonSum = 1.
+                                 + rsqr
+                                       * (static_cast<double>(aCA[0])
+                                          + rsqr
+                                                * (static_cast<double>(aCA[1])
+                                                   + static_cast<double>(aCA[2]) * rsqr))
+                                 + 2. * (yfac * yd + xfac * xd);
 
-        x = (static_cast<double>(chrom[channel].scale_factor) * ( xd * commonSum + xfac * rsqr )) * static_cast<double>(chrom[channel].fx) + static_cast<double>(chrom[channel].x0);
-        y = (static_cast<double>(chrom[channel].scale_factor) * ( yd * commonSum + yfac * rsqr )) * static_cast<double>(chrom[channel].fy) + static_cast<double>(chrom[channel].y0);
+        x = (static_cast<double>(chrom[channel].scale_factor)
+             * (xd * commonSum + xfac * rsqr))
+                * static_cast<double>(chrom[channel].fx)
+            + static_cast<double>(chrom[channel].x0);
+        y = (static_cast<double>(chrom[channel].scale_factor)
+             * (yd * commonSum + yfac * rsqr))
+                * static_cast<double>(chrom[channel].fy)
+            + static_cast<double>(chrom[channel].y0);
     }
 
     x -= cx;
@@ -1114,7 +1099,7 @@ void rtengine::LCPMapper::correctCA(double& x, double& y, int cx, int cy, int ch
 void rtengine::LCPMapper::processVignette(int width, int height, float** rawData) const
 {
 #ifdef _OPENMP
-    #pragma omp parallel for schedule(dynamic,16)
+#pragma omp parallel for schedule(dynamic, 16)
 #endif
 
     for (int y = 0; y < height; ++y) {
@@ -1140,30 +1125,37 @@ void rtengine::LCPMapper::processVignetteLine(int width, int y, float* line) con
     const vfloat rfxv = F2V(mc.rfx);
 
     vfloat xv = _mm_setr_ps(0.f, 1.f, 2.f, 3.f);
-    for (; x < width-3; x+=4) {
+    for (; x < width - 3; x += 4) {
         const vfloat xdv = (xv - x0v) * rfxv;
         const vfloat rsqr = xdv * xdv + ydv;
-        const vfloat vignFactorv = rsqr * (p0 + rsqr * (p1 - p2 * rsqr + p3 * rsqr * rsqr));
+        const vfloat vignFactorv =
+            rsqr * (p0 + rsqr * (p1 - p2 * rsqr + p3 * rsqr * rsqr));
         vfloat valv = LVFU(line[x]);
         valv += valv * vselfzero(vmaskf_gt(valv, zerov), vignFactorv);
         STVFU(line[x], valv);
         xv += fourv;
     }
-#endif // __SSE2__
+#endif  // __SSE2__
     for (; x < width; x++) {
         if (line[x] > 0) {
             const float xd = ((float)x - mc.x0) * mc.rfx;
             const LCPModelCommon::VignParam vignParam = mc.vign_param;
             const float rsqr = xd * xd + yd;
-            line[x] += line[x] * rsqr * (vignParam[0] + rsqr * ((vignParam[1]) - (vignParam[2]) * rsqr + (vignParam[3]) * rsqr * rsqr));
+            line[x] += line[x] * rsqr
+                       * (vignParam[0]
+                          + rsqr
+                                * ((vignParam[1]) - (vignParam[2]) * rsqr
+                                   + (vignParam[3]) * rsqr * rsqr));
         }
     }
 }
 
-void rtengine::LCPMapper::processVignette3Channels(int width, int height, float** rawData) const
+void rtengine::LCPMapper::processVignette3Channels(int width,
+                                                   int height,
+                                                   float** rawData) const
 {
 #ifdef _OPENMP
-    #pragma omp parallel for schedule(dynamic,16)
+#pragma omp parallel for schedule(dynamic, 16)
 #endif
 
     for (int y = 0; y < height; ++y) {
@@ -1171,7 +1163,9 @@ void rtengine::LCPMapper::processVignette3Channels(int width, int height, float*
     }
 }
 
-void rtengine::LCPMapper::processVignetteLine3Channels(int width, int y, float* line) const
+void rtengine::LCPMapper::processVignetteLine3Channels(int width,
+                                                       int y,
+                                                       float* line) const
 {
     // No need for swapXY, since vignette is in RAW and always before rotation
     float yd = ((float)y - mc.y0) * mc.rfy;
@@ -1180,10 +1174,14 @@ void rtengine::LCPMapper::processVignetteLine3Channels(int width, int y, float* 
     for (int x = 0; x < width; x++) {
         const float xd = ((float)x - mc.x0) * mc.rfx;
         const float rsqr = xd * xd + yd;
-        const float vignetteFactor = rsqr * (vignParam[0] + rsqr * ((vignParam[1]) - (vignParam[2]) * rsqr + (vignParam[3]) * rsqr * rsqr));
-        for(int c = 0;c < 3; ++c) {
-            if (line[3*x+c] > 0) {
-                line[3*x+c] += line[3*x+c] * vignetteFactor;
+        const float vignetteFactor = rsqr
+                                     * (vignParam[0]
+                                        + rsqr
+                                              * ((vignParam[1]) - (vignParam[2]) * rsqr
+                                                 + (vignParam[3]) * rsqr * rsqr));
+        for (int c = 0; c < 3; ++c) {
+            if (line[3 * x + c] > 0) {
+                line[3 * x + c] += line[3 * x + c] * vignetteFactor;
             }
         }
     }

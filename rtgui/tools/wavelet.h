@@ -53,21 +53,65 @@ public:
     void adjusterChanged(Adjuster* a, double newval) override;
     void autoOpenCurve() override;
     void curveChanged(CurveEditor* ce) override;
-    void read(const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited = nullptr) override;
-//    void setAdjusterBehavior(bool multiplieradd, bool thresholdadd, bool threshold2add, bool thresadd, bool chroadd, bool chromaadd, bool contrastadd, bool skinadd, bool reschroadd, bool tmrsadd, bool resconadd, bool resconHadd, bool thradd, bool thrHadd, bool skyadd, bool edgradadd, bool edgvaladd, bool strengthadd, bool gammaadd, bool edgedetectadd, bool edgedetectthradd, bool edgedetectthr2add);
-    void setAdjusterBehavior (bool multiplieradd, bool thresholdadd, bool threshold2add, bool thresadd, bool chroadd, bool chromaadd, bool contrastadd, bool skinadd, bool reschroadd, bool tmrsadd, bool edgsadd, bool scaleadd, bool resconadd, bool resconHadd, bool thradd, bool thrHadd, bool radiusadd, bool skyadd, bool edgradadd, bool edgvaladd, bool strengthadd, bool gammaadd, bool edgedetectadd, bool edgedetectthradd, bool edgedetectthr2add);
+    void read(const rtengine::procparams::ProcParams* pp,
+              const ParamsEdited* pedited = nullptr) override;
+    //    void setAdjusterBehavior(bool multiplieradd, bool thresholdadd, bool
+    //    threshold2add, bool thresadd, bool chroadd, bool chromaadd, bool contrastadd,
+    //    bool skinadd, bool reschroadd, bool tmrsadd, bool resconadd, bool resconHadd,
+    //    bool thradd, bool thrHadd, bool skyadd, bool edgradadd, bool edgvaladd, bool
+    //    strengthadd, bool gammaadd, bool edgedetectadd, bool edgedetectthradd, bool
+    //    edgedetectthr2add);
+    void setAdjusterBehavior(bool multiplieradd,
+                             bool thresholdadd,
+                             bool threshold2add,
+                             bool thresadd,
+                             bool chroadd,
+                             bool chromaadd,
+                             bool contrastadd,
+                             bool skinadd,
+                             bool reschroadd,
+                             bool tmrsadd,
+                             bool edgsadd,
+                             bool scaleadd,
+                             bool resconadd,
+                             bool resconHadd,
+                             bool thradd,
+                             bool thrHadd,
+                             bool radiusadd,
+                             bool skyadd,
+                             bool edgradadd,
+                             bool edgvaladd,
+                             bool strengthadd,
+                             bool gammaadd,
+                             bool edgedetectadd,
+                             bool edgedetectthradd,
+                             bool edgedetectthr2add);
     void setBatchMode(bool batchMode) override;
-    void setDefaults(const rtengine::procparams::ProcParams* defParams, const ParamsEdited* pedited = nullptr) override;
-    void setEditProvider(EditDataProvider *provider) override;
+    void setDefaults(const rtengine::procparams::ProcParams* defParams,
+                     const ParamsEdited* pedited = nullptr) override;
+    void setEditProvider(EditDataProvider* provider) override;
     void updateToolState(const std::vector<int>& tpOpen);
-    void write(rtengine::procparams::ProcParams* pp, ParamsEdited* pedited = nullptr) override;
-    void writeOptions(std::vector<int> &tpOpen);
+    void write(rtengine::procparams::ProcParams* pp,
+               ParamsEdited* pedited = nullptr) override;
+    void writeOptions(std::vector<int>& tpOpen);
 
     void adjusterChanged(ThresholdAdjuster* a, double newBottom, double newTop) override;
-    void adjusterChanged(ThresholdAdjuster* a, double newBottomLeft, double newTopLeft, double newBottomRight, double newTopRight) override;
+    void adjusterChanged(ThresholdAdjuster* a,
+                         double newBottomLeft,
+                         double newTopLeft,
+                         double newBottomRight,
+                         double newTopRight) override;
     void adjusterChanged(ThresholdAdjuster* a, int newBottom, int newTop) override;
-    void adjusterChanged(ThresholdAdjuster* a, int newBottomLeft, int newTopLeft, int newBottomRight, int newTopRight) override;
-    void adjusterChanged2(ThresholdAdjuster* a, int newBottomL, int newTopL, int newBottomR, int newTopR) override;
+    void adjusterChanged(ThresholdAdjuster* a,
+                         int newBottomLeft,
+                         int newTopLeft,
+                         int newBottomRight,
+                         int newTopRight) override;
+    void adjusterChanged2(ThresholdAdjuster* a,
+                          int newBottomL,
+                          int newTopL,
+                          int newBottomR,
+                          int newTopR) override;
 
 private:
     rtengine::ProcEvent EvWavenaclari;
@@ -122,12 +166,16 @@ private:
     rtengine::ProcEvent EvWavlevelsigm;
     rtengine::ProcEvent EvWavlimden;
 
-    LabGrid *labgrid;
+    LabGrid* labgrid;
 
-    void foldAllButMe(GdkEventButton* event, MyExpander *expander);
-    void setListener(ToolPanelListener *tpl) override;
+    void foldAllButMe(GdkEventButton* event, MyExpander* expander);
+    void setListener(ToolPanelListener* tpl) override;
 
-    void colorForValue(double valX, double valY, enum ColorCaller::ElemType elemType, int callerId, ColorCaller* caller) override;
+    void colorForValue(double valX,
+                       double valY,
+                       enum ColorCaller::ElemType elemType,
+                       int callerId,
+                       ColorCaller* caller) override;
     void BAmethodChanged();
     void NPmethodChanged();
     void BackmethodChanged();
@@ -141,14 +189,14 @@ private:
     void MedgreinfChanged();
     void TMmethodChanged();
     void complexmethodChanged();
-    //void denmethodChanged();
+    // void denmethodChanged();
     void mixmethodChanged();
     void quamethodChanged();
     void slimethodChanged();
     void TilesmethodChanged();
     void avoidToggled();
-    void showmaskToggled ();
-    void oldshToggled ();
+    void showmaskToggled();
+    void oldshToggled();
     void cbenabToggled();
     void contrastMinusPressed();
     void contrastPlusPressed();
@@ -162,7 +210,7 @@ private:
     void neutral_pressed();
     void neutralchPressed();
     void tmrToggled();
-    void updatewavLabel ();
+    void updatewavLabel();
     void wavChanged(double nlevel) override;
     void ushamethodChanged();
     void updateGUI();
@@ -171,18 +219,18 @@ private:
     void updateGUIToMode(int mode);
     void HSmethodUpdateUI();
     void CHmethodUpdateUI();
-//  void CHSLmethodChangedUI();
+    //  void CHSLmethodChangedUI();
     void EDmethodUpdateUI();
     void NPmethodUpdateUI();
     void BAmethodUpdateUI();
     void TMmethodUpdateUI();
-//  void BackmethodUpdateUI();
+    //  void BackmethodUpdateUI();
     void CLmethodUpdateUI();
-//  void TilesmethodUpdateUI();
-//  void daubcoeffmethodUpdateUI();
-//  void MedgreinfUpdateUI();
-//  void DirmethodUpdateUI();
-//  void LmethodUpdateUI();
+    //  void TilesmethodUpdateUI();
+    //  void daubcoeffmethodUpdateUI();
+    //  void MedgreinfUpdateUI();
+    //  void DirmethodUpdateUI();
+    //  void LmethodUpdateUI();
     void adjusterUpdateUI(Adjuster* a);
     void enabledUpdateUI();
     void medianlevUpdateUI();
@@ -192,8 +240,8 @@ private:
     void enableToggled(MyExpander* expander);
 
     CurveEditorGroup* const curveEditorG;
-    //CurveEditorGroup* const curveEditorC;
-    //FlatCurveEditor* opacityShapeSH;
+    // CurveEditorGroup* const curveEditorC;
+    // FlatCurveEditor* opacityShapeSH;
 
     CurveEditorGroup* const CCWcurveEditorG;
     CurveEditorGroup* const curveEditorbl;
@@ -320,45 +368,45 @@ private:
     Adjuster* const chrwav;
 
     MyComboBoxText* const Lmethod;
-    sigc::connection  Lmethodconn;
+    sigc::connection Lmethodconn;
     MyComboBoxText* const CHmethod;
-    sigc::connection  CHmethodconn;
+    sigc::connection CHmethodconn;
     MyComboBoxText* const CHSLmethod;
-    sigc::connection  CHSLmethodconn;
+    sigc::connection CHSLmethodconn;
     MyComboBoxText* const EDmethod;
-    sigc::connection  EDmethodconn;
+    sigc::connection EDmethodconn;
     MyComboBoxText* const BAmethod;
-    sigc::connection  BAmethodconn;
+    sigc::connection BAmethodconn;
     MyComboBoxText* const NPmethod;
-    sigc::connection  NPmethodconn;
+    sigc::connection NPmethodconn;
     MyComboBoxText* const TMmethod;
-    sigc::connection  TMmethodconn;
+    sigc::connection TMmethodconn;
     MyComboBoxText* const HSmethod;
-    sigc::connection  HSmethodconn;
+    sigc::connection HSmethodconn;
     MyComboBoxText* const CLmethod;
-    sigc::connection  CLmethodconn;
+    sigc::connection CLmethodconn;
     MyComboBoxText* const Backmethod;
-    sigc::connection  Backmethodconn;
+    sigc::connection Backmethodconn;
     MyComboBoxText* const complexmethod;
-    sigc::connection  complexmethodconn;
+    sigc::connection complexmethodconn;
     MyComboBoxText* const Tilesmethod;
-    sigc::connection  Tilesmethodconn;
+    sigc::connection Tilesmethodconn;
     MyComboBoxText* const daubcoeffmethod;
-    sigc::connection  daubcoeffmethodconn;
+    sigc::connection daubcoeffmethodconn;
     MyComboBoxText* const Dirmethod;
-    sigc::connection  Dirmethodconn;
+    sigc::connection Dirmethodconn;
     MyComboBoxText* const Medgreinf;
-    sigc::connection  MedgreinfConn;
+    sigc::connection MedgreinfConn;
     MyComboBoxText* const ushamethod;
-    sigc::connection  ushamethodconn;
-    //MyComboBoxText* const denmethod;
-    //sigc::connection  denmethodconn;
+    sigc::connection ushamethodconn;
+    // MyComboBoxText* const denmethod;
+    // sigc::connection  denmethodconn;
     MyComboBoxText* const mixmethod;
-    sigc::connection  mixmethodconn;
+    sigc::connection mixmethodconn;
     MyComboBoxText* const quamethod;
-    sigc::connection  quamethodconn;
+    sigc::connection quamethodconn;
     MyComboBoxText* const slimethod;
-    sigc::connection  slimethodconn;
+    sigc::connection slimethodconn;
 
     Gtk::Frame* const chanMixerHLFrame;
     Gtk::Frame* const chanMixerMidFrame;
@@ -394,19 +442,22 @@ private:
     Gtk::Box* const ctboxch;
     Gtk::Box* const quaHBox;
     Gtk::Box* const sliHBox;
-    //Gtk::Box* const denHBox;
+    // Gtk::Box* const denHBox;
     Gtk::Box* const mixHBox;
-    Gtk::Box* const ctboxBA;// = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    Gtk::Box* const ctboxBA;  // = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
 
-    sigc::connection enableChromaConn, enableContrastConn, enableEdgeConn, enabletmConn, enableFinalConn, enableclariConn;
+    sigc::connection enableChromaConn, enableContrastConn, enableEdgeConn, enabletmConn,
+        enableFinalConn, enableclariConn;
     sigc::connection enableNoiseConn, enableResidConn, enableToningConn;
-    sigc::connection medianConn, avoidConn, tmrConn, medianlevConn, linkedgConn, lipstConn, cbenabConn, neutralconn, showmaskConn, oldshConn;
+    sigc::connection medianConn, avoidConn, tmrConn, medianlevConn, linkedgConn,
+        lipstConn, cbenabConn, neutralconn, showmaskConn, oldshConn;
     sigc::connection neutralPressedConn;
     sigc::connection contrastPlusPressedConn;
     sigc::connection contrastMinusPressedConn;
     sigc::connection neutralchPressedConn;
 
-    bool lastmedian, lastmedianlev, lastlinkedg, lastavoid, lastlipst, lasttmr, lastcbenab, lastshowmask, lastoldsh;
+    bool lastmedian, lastmedianlev, lastlinkedg, lastavoid, lastlipst, lasttmr,
+        lastcbenab, lastshowmask, lastoldsh;
     int nextnlevel;
 
     IdleRegister idle_register;

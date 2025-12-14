@@ -18,12 +18,7 @@
  */
 #pragma once
 
-namespace rtengine
-{
-
-
-
-
+namespace rtengine {
 
 // Aligned so the first entry starts on line 30
 enum ProcEventCode {
@@ -42,9 +37,9 @@ enum ProcEventCode {
     EvClip = 12,
     EvLBrightness = 13,
     EvLContrast = 14,
-    obsolete_15 = 15, // obsolete
-    obsolete_16 = 16, // obsolete
-    obsolete_17 = 17, // obsolete
+    obsolete_15 = 15,  // obsolete
+    obsolete_16 = 16,  // obsolete
+    obsolete_17 = 17,  // obsolete
     EvLLCurve = 18,
     EvShrEnabled = 19,
     EvShrRadius = 20,
@@ -70,10 +65,10 @@ enum ProcEventCode {
     EvToneCurveMode1 = 40,
     EvToneCurve2 = 41,
     EvToneCurveMode2 = 42,
-    obsolete_43 = 43, // obsolete
-    obsolete_44 = 44, // obsolete
-    obsolete_45 = 45, // obsolete
-    obsolete_46 = 46, // obsolete
+    obsolete_43 = 43,  // obsolete
+    obsolete_44 = 44,  // obsolete
+    obsolete_45 = 45,  // obsolete
+    obsolete_46 = 46,  // obsolete
     EvDCPToneCurve = 47,
     EvDCPIlluminant = 48,
     EvSHEnabled = 49,
@@ -81,7 +76,7 @@ enum ProcEventCode {
     EvSHShadows = 51,
     EvSHHLTonalW = 52,
     EvSHSHTonalW = 53,
-    obsolete_54 = 54, // obsolete
+    obsolete_54 = 54,  // obsolete
     EvSHRadius = 55,
     EvCTRotate = 56,
     EvCTHFlip = 57,
@@ -93,7 +88,7 @@ enum ProcEventCode {
     EvCrop = 63,
     EvCACorr = 64,
     EvHREnabled = 65,
-    obsolete_66 = 66, // obsolete
+    obsolete_66 = 66,  // obsolete
     EvHRMethod = 67,
     EvWProfile = 68,
     EvOProfile = 69,
@@ -104,12 +99,12 @@ enum ProcEventCode {
     EvResizeMethod = 74,
     EvExif = 75,
     EvIPTC = 76,
-    obsolete_77 = 77, // obsolete
+    obsolete_77 = 77,  // obsolete
     EvResizeWidth = 78,
     EvResizeHeight = 79,
     EvResizeEnabled = 80,
     EvProfileChangeNotification = 81,
-    obsolete_82 = 82, // obsolete
+    obsolete_82 = 82,  // obsolete
     EvPerspCorr = 83,
     EvLCPFile = 84,
     EvRGBrCurveLumamode = 85,
@@ -137,8 +132,8 @@ enum ProcEventCode {
     EvHLComprThreshold = 107,
     EvResizeBoundingBox = 108,
     EvResizeAppliesTo = 109,
-    //EvLAvoidColorShift = 110,
-    obsolete_111 = 111,    // obsolete
+    // EvLAvoidColorShift = 110,
+    obsolete_111 = 111,  // obsolete
     EvLRSTProtection = 112,
     EvDemosaicDCBIter = 113,
     EvDemosaicFalseColorIter = 114,
@@ -151,18 +146,18 @@ enum ProcEventCode {
     EvPreProcessAutoDF = 121,
     EvPreProcessDFFile = 122,
     EvPreProcessExpCorrLinear = 123,
-    obsolete_124 = 124, // obsolete
+    obsolete_124 = 124,  // obsolete
     EvFlatFieldFile = 125,
     EvFlatFieldAutoSelect = 126,
     EvFlatFieldBlurRadius = 127,
     EvFlatFieldBlurType = 128,
     EvAutoDIST = 129,
-    obsolete_130 = 130, // obsolete
-    obsolete_131 = 131, // obsolete
-    obsolete_132 = 132, // obsolete
-    obsolete_133 = 133, // obsolete
-    obsolete_134 = 134, // obsolete
-    obsolete_135 = 135, // obsolete
+    obsolete_130 = 130,  // obsolete
+    obsolete_131 = 131,  // obsolete
+    obsolete_132 = 132,  // obsolete
+    obsolete_133 = 133,  // obsolete
+    obsolete_134 = 134,  // obsolete
+    obsolete_135 = 135,  // obsolete
     EvPreProcessExpBlackzero = 136,
     EvPreProcessExpBlackone = 137,
     EvPreProcessExpBlacktwo = 138,
@@ -176,7 +171,8 @@ enum ProcEventCode {
     EvSharpenEdgeThreechannels = 146,
     EvSharpenMicroEnabled = 147,
     EvSharpenMicroMatrix = 148,
-    EvDemosaicALLEnhanced = 149,  // Disabled but not removed for now, may be reintroduced some day
+    EvDemosaicALLEnhanced =
+        149,  // Disabled but not removed for now, may be reintroduced some day
     EvVibranceEnabled = 150,
     EvVibrancePastels = 151,
     EvVibranceSaturated = 152,
@@ -262,7 +258,7 @@ enum ProcEventCode {
     EvBWAfterCurve = 232,
     EvBWAfterCurveMode = 233,
     EvAutoch = 234,
-//  EvFixedch=235,   -- can be reused --
+    //  EvFixedch=235,   -- can be reused --
     EvNeutralBW = 236,
     EvGradientFeather = 237,
     EvGradientStrength = 238,
@@ -281,12 +277,12 @@ enum ProcEventCode {
     EvDirPyrEqualizerSkin = 251,
     EvDirPyrEqlgamutlab = 252,
     EvDirPyrEqualizerHueskin = 253,
-    EvDPDNmedian = 254, //  EvDirPyrEqualizeralg=254,
+    EvDPDNmedian = 254,  //  EvDirPyrEqualizeralg=254,
     EvDPDNmedmet = 255,
     EvColorToningEnabled = 256,
     EvColorToningColor = 257,
     EvColorToningOpacity = 258,
-    EvColorToningCLCurve = 259, //  EvColorToningTwocolor=259,
+    EvColorToningCLCurve = 259,  //  EvColorToningTwocolor=259,
     EvColorToningMethod = 260,
     EvColorToningLLCurve = 261,
     EvColorToningredlow = 262,
@@ -445,13 +441,14 @@ enum ProcEventCode {
     EvRetinexEnabled = 415,
     EvRetinexmedianmap = 416,
     EvLlimd = 417,
-    EvretinexColorSpace = 418, // 418 if we want a separate history entry "Retinex - Color space", 406 if we don't
+    EvretinexColorSpace = 418,  // 418 if we want a separate history entry "Retinex -
+                                // Color space", 406 if we don't
     EvLCDHCurve = 419,
     Evretinexgamma = 420,
     EvLgam = 421,
     EvLslope = 422,
     EvLhighl = 423,
-//    EvLbaselog = 424,   -- can be reused --
+    //    EvLbaselog = 424,   -- can be reused --
     EvRetinexlhcurve = 425,
     EvOIntent = 426,
     EvMonitorTransform = 427,
@@ -472,31 +469,31 @@ enum ProcEventCode {
     EvOBPCompens = 442,
     EvWBtempBias = 443,
     EvRawImageNum = 444,
-//    EvPixelShiftMotion = 445,
-//    EvPixelShiftMotionCorrection = 446,
-//    EvPixelShiftStddevFactorGreen = 447,
+    //    EvPixelShiftMotion = 445,
+    //    EvPixelShiftMotionCorrection = 446,
+    //    EvPixelShiftStddevFactorGreen = 447,
     EvPixelShiftEperIso = 448,
-//    EvPixelShiftNreadIso = 449,
-//    EvPixelShiftPrnu = 450,
+    //    EvPixelShiftNreadIso = 449,
+    //    EvPixelShiftPrnu = 450,
     EvPixelshiftShowMotion = 451,
     EvPixelshiftShowMotionMaskOnly = 452,
-//    EvPixelShiftAutomatic = 453,
-//    EvPixelShiftNonGreenHorizontal = 454,
-//    EvPixelShiftNonGreenVertical = 455,
+    //    EvPixelShiftAutomatic = 453,
+    //    EvPixelShiftNonGreenHorizontal = 454,
+    //    EvPixelShiftNonGreenVertical = 455,
     EvPixelShiftNonGreenCross = 456,
-//    EvPixelShiftStddevFactorRed = 457,
-//    EvPixelShiftStddevFactorBlue = 458,
-//    EvPixelShiftGreenAmaze = 459,
-//    EvPixelShiftNonGreenAmaze = 460,
+    //    EvPixelShiftStddevFactorRed = 457,
+    //    EvPixelShiftStddevFactorBlue = 458,
+    //    EvPixelShiftGreenAmaze = 459,
+    //    EvPixelShiftNonGreenAmaze = 460,
     EvPixelShiftGreen = 461,
-//    EvPixelShiftRedBlueWeight = 462,
+    //    EvPixelShiftRedBlueWeight = 462,
     EvPixelShiftBlur = 463,
     EvPixelShiftSigma = 464,
-//    EvPixelShiftSum = 465,
-//    EvPixelShiftExp0 = 466,
+    //    EvPixelShiftSum = 465,
+    //    EvPixelShiftExp0 = 466,
     EvPixelShiftHoleFill = 467,
     EvPixelShiftMedian = 468,
-//    EvPixelShiftMedian3 = 469,
+    //    EvPixelShiftMedian3 = 469,
     EvPixelShiftMotionMethod = 470,
     EvPixelShiftSmooth = 471,
     obsolete_472 = 472,
@@ -617,7 +614,7 @@ enum ProcEventCode {
     Evlocallabadjblur = 587,
     Evlocallabbilateral = 588,
     Evlocallabsensiden = 589,
-   // Evlocallabavoid = 590,
+    // Evlocallabavoid = 590,
     Evlocallabsharcontrast = 591,
     EvLocenacontrast = 592,
     Evlocallablcradius = 593,
@@ -690,7 +687,7 @@ enum ProcEventCode {
     EvLocallabcontresid = 660,
     Evlocallabnoiselumf0 = 661,
     Evlocallabnoiselumf2 = 662,
-    //EvLocallabblurcbdl = 663,
+    // EvLocallabblurcbdl = 663,
     Evlocallabblendmaskcb = 664,
     Evlocallabradmaskcb = 665,
     Evlocallabchromaskcb = 666,
@@ -893,7 +890,7 @@ enum ProcEventCode {
     Evlocallabsigmadc = 863,
     Evlocallabdeltad = 864,
     EvlocallabwavCurvecomp = 865,
-    //Evlocallabfatres = 866,
+    // Evlocallabfatres = 866,
     EvLocallabSpotbalanh = 867,
     EvlocallabwavCurveden = 868,
     EvlocallabHHmasklcshape = 869,
@@ -922,7 +919,7 @@ enum ProcEventCode {
     Evlocallabanglog = 892,
     EvLocallabSpotcolorde = 893,
     // EvlocallabshowmasksharMethod = 894,
-    //Evlocallabshowreset = 895,
+    // Evlocallabshowreset = 895,
     Evlocallabstrengthw = 896,
     Evlocallabradiusw = 897,
     Evlocallabdetailw = 898,
@@ -1002,7 +999,7 @@ enum ProcEventCode {
     EvLocallabchromaskL = 972,
     EvlocallabLmaskshapeL = 973,
     Evlocallablightl = 974,
-    //EvlocallabLshapeL = 975,
+    // EvlocallabLshapeL = 975,
     Evlocallabcontq = 976,
     Evlocallabsursour = 977,
     Evlocallablightq = 978,
@@ -1067,7 +1064,7 @@ enum ProcEventCode {
     Evlocallabnlgam = 1037,
     Evlocallabdivgr = 1038,
     EvLocallabSpotavoidrad = 1039,
-    //EvLocallabSpotavoidmun = 1040,
+    // EvLocallabSpotavoidmun = 1040,
     Evlocallabcontthres = 1041,
     Evlocallabnorm = 1042,
     Evlocallabreparw = 1043,
@@ -1138,7 +1135,7 @@ enum ProcEventCode {
     Evlocallabshapejz = 1108,
     Evlocallabshapecz = 1109,
     Evlocallabshapeczjz = 1110,
-    //Evlocallabforcejz = 1111,
+    // Evlocallabforcejz = 1111,
     Evlocallabpqremapcam16 = 1112,
     EvLocallabEnacieMask = 1113,
     EvlocallabCCmaskcieshape = 1114,
@@ -1180,48 +1177,41 @@ enum ProcEventCode {
     NUMOFEVENTS
 };
 
-
-
-
 class ProcEvent
 {
 public:
-    ProcEvent(): code_(0) {}
-    ProcEvent(ProcEventCode code): code_(code) {}
-    explicit ProcEvent(int code): code_(code) {}
-    operator int() const
-    {
-        return code_;
-    }
+    ProcEvent() : code_(0) {}
+    ProcEvent(ProcEventCode code) : code_(code) {}
+    explicit ProcEvent(int code) : code_(code) {}
+    operator int() const { return code_; }
 
 private:
     int code_;
 };
 
+inline bool operator==(ProcEvent a, ProcEvent b)
+{
+    return int(a) == int(b);
+}
+inline bool operator==(ProcEvent a, ProcEventCode b)
+{
+    return int(a) == int(b);
+}
+inline bool operator==(ProcEventCode a, ProcEvent b)
+{
+    return int(a) == int(b);
+}
+inline bool operator!=(ProcEvent a, ProcEvent b)
+{
+    return int(a) != int(b);
+}
+inline bool operator!=(ProcEvent a, ProcEventCode b)
+{
+    return int(a) != int(b);
+}
+inline bool operator!=(ProcEventCode a, ProcEvent b)
+{
+    return int(a) != int(b);
+}
 
-inline bool operator ==(ProcEvent a, ProcEvent b)
-{
-    return int(a) == int(b);
-}
-inline bool operator ==(ProcEvent a, ProcEventCode b)
-{
-    return int(a) == int(b);
-}
-inline bool operator ==(ProcEventCode a, ProcEvent b)
-{
-    return int(a) == int(b);
-}
-inline bool operator !=(ProcEvent a, ProcEvent b)
-{
-    return int(a) != int(b);
-}
-inline bool operator !=(ProcEvent a, ProcEventCode b)
-{
-    return int(a) != int(b);
-}
-inline bool operator !=(ProcEventCode a, ProcEvent b)
-{
-    return int(a) != int(b);
-}
-
-}
+}  // namespace rtengine

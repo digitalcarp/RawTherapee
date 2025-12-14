@@ -26,24 +26,22 @@
 
 struct ParamsEdited;
 
-namespace rtengine
-{
+namespace rtengine {
 
-namespace procparams
-{
+namespace procparams {
 class ProcParams;
 class PartialProfile;
 class IPTCPairs;
 
-}
+}  // namespace procparams
 
-}
+}  // namespace rtengine
 
 class Clipboard
 {
 public:
-    Clipboard ();
-    ~Clipboard ();
+    Clipboard();
+    ~Clipboard();
 
     bool hasIPTC() const;
     const rtengine::procparams::IPTCPairs& getIPTC() const;

@@ -21,10 +21,9 @@
 
 #include "labimage.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
-LabImage::LabImage (int w, int h, bool initZero, bool multiThread) : W(w), H(h)
+LabImage::LabImage(int w, int h, bool initZero, bool multiThread) : W(w), H(h)
 {
     allocLab(w, h);
     if (initZero) {
@@ -32,27 +31,27 @@ LabImage::LabImage (int w, int h, bool initZero, bool multiThread) : W(w), H(h)
     }
 }
 
-LabImage::LabImage (const LabImage& source, bool multiThread) : W(source.W), H(source.H)
+LabImage::LabImage(const LabImage& source, bool multiThread) : W(source.W), H(source.H)
 {
     allocLab(W, H);
     CopyFrom(&source, multiThread);
 }
 
-LabImage::~LabImage ()
+LabImage::~LabImage()
 {
     deleteLab();
 }
 
-void LabImage::CopyFrom(const LabImage *Img, bool multiThread)
+void LabImage::CopyFrom(const LabImage* Img, bool multiThread)
 {
 #ifdef _OPENMP
-    #pragma omp parallel sections if(multiThread)
+#pragma omp parallel sections if (multiThread)
     {
-        #pragma omp section
+#pragma omp section
         memcpy(L[0], Img->L[0], static_cast<std::size_t>(W) * H * sizeof(float));
-        #pragma omp section
+#pragma omp section
         memcpy(a[0], Img->a[0], static_cast<std::size_t>(W) * H * sizeof(float));
-        #pragma omp section
+#pragma omp section
         memcpy(b[0], Img->b[0], static_cast<std::size_t>(W) * H * sizeof(float));
     }
 #else
@@ -60,7 +59,12 @@ void LabImage::CopyFrom(const LabImage *Img, bool multiThread)
 #endif
 }
 
-void LabImage::getPipetteData (float &v1, float &v2, float &v3, int posX, int posY, int squareSize) const
+void LabImage::getPipetteData(float& v1,
+                              float& v2,
+                              float& v3,
+                              int posX,
+                              int posY,
+                              int squareSize) const
 {
     float accumulator_L = 0.f;
     float accumulator_a = 0.f;
@@ -90,8 +94,8 @@ void LabImage::allocLab(size_t w, size_t h)
     a = new float*[h];
     b = new float*[h];
 
-    data = new float [w * h * 3];
-    float * index = data;
+    data = new float[w * h * 3];
+    float* index = data;
 
     for (size_t i = 0; i < h; i++) {
         L[i] = index + i * w;
@@ -112,10 +116,10 @@ void LabImage::allocLab(size_t w, size_t h)
 
 void LabImage::deleteLab()
 {
-    delete [] L;
-    delete [] a;
-    delete [] b;
-    delete [] data;
+    delete[] L;
+    delete[] a;
+    delete[] b;
+    delete[] data;
 }
 
 void LabImage::reallocLab()
@@ -123,12 +127,13 @@ void LabImage::reallocLab()
     allocLab(W, H);
 }
 
-void LabImage::clear(bool multiThread) {
+void LabImage::clear(bool multiThread)
+{
 #ifdef _OPENMP
-        #pragma omp parallel for if(multiThread)
+#pragma omp parallel for if (multiThread)
 #endif
-        for(size_t i = 0; i < static_cast<size_t>(H) * W * 3; ++i) {
-            data[i] = 0.f;
-        }
+    for (size_t i = 0; i < static_cast<size_t>(H) * W * 3; ++i) {
+        data[i] = 0.f;
     }
 }
+}  // namespace rtengine

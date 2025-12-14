@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- *  
+ *
  *  This file is part of RawTherapee.
  *
  *  Copyright (c) 2017 Alberto Griggio <alberto.griggio@gmail.com>
@@ -21,7 +21,6 @@
 #include "eventmapper.h"
 #include "multilangmgr.h"
 
-
 ProcEventMapper::ProcEventMapper()
 {
     for (int event = 0; event < rtengine::NUMOFEVENTS; ++event) {
@@ -29,15 +28,13 @@ ProcEventMapper::ProcEventMapper()
     }
 }
 
-
-ProcEventMapper *ProcEventMapper::getInstance()
+ProcEventMapper* ProcEventMapper::getInstance()
 {
     static ProcEventMapper instance;
     return &instance;
 }
 
-
-rtengine::ProcEvent ProcEventMapper::newEvent(int action, const std::string &history_msg)
+rtengine::ProcEvent ProcEventMapper::newEvent(int action, const std::string& history_msg)
 {
     std::string eventkey = std::to_string(action) + history_msg;
     const auto ret = events_.find(eventkey);
@@ -57,8 +54,7 @@ rtengine::ProcEvent ProcEventMapper::newEvent(int action, const std::string &his
     }
 }
 
-
-const std::string &ProcEventMapper::getHistoryMsg(rtengine::ProcEvent event) const
+const std::string& ProcEventMapper::getHistoryMsg(rtengine::ProcEvent event) const
 {
     static std::string empty;
     auto it = history_msgs_.find(event);

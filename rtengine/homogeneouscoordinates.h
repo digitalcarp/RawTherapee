@@ -20,38 +20,32 @@
 
 #include <array>
 
-namespace rtengine
-{
+namespace rtengine {
 
-namespace homogeneous
-{
+namespace homogeneous {
 
-enum Axis {X, Y, Z};
+enum Axis { X, Y, Z };
 
-template <typename T>
-using Matrix = std::array<std::array<T, 4>, 4>;
+template <typename T> using Matrix = std::array<std::array<T, 4>, 4>;
 
 /**
  * 3 dimensional homogeneous vector.
  */
-template <typename T>
-using Vector = std::array<T, 4>;
+template <typename T> using Vector = std::array<T, 4>;
 
 /**
  * Creates a 3 dimensional transformation matrix for projection onto a plane.
  * @param location Distance from the origin to the plane.
  * @param normal Direction of the plane's normal.
  */
-template <typename T>
-Matrix<T> projectionMatrix(T location, Axis normal);
+template <typename T> Matrix<T> projectionMatrix(T location, Axis normal);
 
 /**
  * Creates a 3 dimensional transformation matrix for rotation.
  * @param radians Rotation angle.
  * @param axis Axis of rotation.
  */
-template <typename T>
-Matrix<T> rotationMatrix(double radians, Axis axis);
+template <typename T> Matrix<T> rotationMatrix(double radians, Axis axis);
 
 /**
  * Creates a 3 dimensional transformation matrix for scaling.
@@ -59,8 +53,7 @@ Matrix<T> rotationMatrix(double radians, Axis axis);
  * @param y Scale in y-direction
  * @param z Scale in z-direction
  */
-template <typename T>
-Matrix<T> scaleMatrix(T x, T y, T z);
+template <typename T> Matrix<T> scaleMatrix(T x, T y, T z);
 
 /**
  * Creates a 3 dimensional transformation matrix for translation.
@@ -68,17 +61,18 @@ Matrix<T> scaleMatrix(T x, T y, T z);
  * @param y Translation in the the y-direction.
  * @param z Translation in the the z-direction.
  */
-template <typename T>
-Matrix<T> translationMatrix(T x, T y, T z);
+template <typename T> Matrix<T> translationMatrix(T x, T y, T z);
 
-}
-
-template <typename T>
-homogeneous::Vector<T> operator*(const homogeneous::Matrix<T>& a, const homogeneous::Vector<T>& b);
+}  // namespace homogeneous
 
 template <typename T>
-homogeneous::Matrix<T> operator*(const homogeneous::Matrix<T>& a, const homogeneous::Matrix<T>& b);
+homogeneous::Vector<T> operator*(const homogeneous::Matrix<T>& a,
+                                 const homogeneous::Vector<T>& b);
 
-}
+template <typename T>
+homogeneous::Matrix<T> operator*(const homogeneous::Matrix<T>& a,
+                                 const homogeneous::Matrix<T>& b);
+
+}  // namespace rtengine
 
 #include "homogeneouscoordinates.cc"

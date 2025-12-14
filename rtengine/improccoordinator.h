@@ -20,24 +20,22 @@
 
 #include <memory>
 
+#include "LUT.h"
 #include "array2D.h"
 #include "colortemp.h"
 #include "curves.h"
 #include "dcrop.h"
 #include "imagesource.h"
 #include "improcfun.h"
-#include "LUT.h"
 #include "rtengine.h"
 
 #include "rtgui/threadutils.h"
 
-namespace Glib
-{
+namespace Glib {
 class Thread;
 }
 
-namespace rtengine
-{
+namespace rtengine {
 
 using namespace procparams;
 
@@ -45,31 +43,35 @@ class Crop;
 class TweakOperator;
 
 /** @brief Manages the image processing, espc. of the preview windows
-  *
-  * There is one ImProcCoordinator per edit panel.
-  *
-  * The ImProcCoordinator handle an sized down image representation of the full image, that is used when paning
-  * and in the Navigator object.
-  *
-  * Each ImProcCoordinator handles an rtengine::Crop list, which process images too with their own pipeline,
-  * but using this class' LUT and other precomputed parameters. The main preview area is displaying a non framed Crop object,
-  * while detail windows are framed Crop objects.
-  */
+ *
+ * There is one ImProcCoordinator per edit panel.
+ *
+ * The ImProcCoordinator handle an sized down image representation of the full image, that
+ * is used when paning and in the Navigator object.
+ *
+ * Each ImProcCoordinator handles an rtengine::Crop list, which process images too with
+ * their own pipeline, but using this class' LUT and other precomputed parameters. The
+ * main preview area is displaying a non framed Crop object, while detail windows are
+ * framed Crop objects.
+ */
 class ImProcCoordinator final : public StagedImageProcessor, public HistogramObservable
 {
 
     friend class Crop;
 
 protected:
-    Imagefloat *orig_prev;
-    Imagefloat *oprevi;
-    Imagefloat *spotprev;
-    LabImage *oprevl;
-    LabImage *nprevl;
-    Imagefloat *fattal_11_dcrop_cache; // global cache for ToneMapFattal02 used in 1:1 detail windows (except when denoise is active)
-    Image8 *previmg;  // displayed image in monitor color space, showing the output profile as well (soft-proofing enabled, which then correspond to workimg) or not
-    Image8 *workimg;  // internal image in output color space for analysis
-    CieImage *ncie;
+    Imagefloat* orig_prev;
+    Imagefloat* oprevi;
+    Imagefloat* spotprev;
+    LabImage* oprevl;
+    LabImage* nprevl;
+    Imagefloat* fattal_11_dcrop_cache;  // global cache for ToneMapFattal02 used in 1:1
+                                        // detail windows (except when denoise is active)
+    Image8*
+        previmg;  // displayed image in monitor color space, showing the output profile as
+                  // well (soft-proofing enabled, which then correspond to workimg) or not
+    Image8* workimg;  // internal image in output color space for analysis
+    CieImage* ncie;
 
     ImageSource* imgsrc;
 
@@ -80,7 +82,7 @@ protected:
     ColorTemp autoWBloc;
 
     double lastAwbEqual;
-    StandardObserver lastAwbObserver{ColorTemp::DEFAULT_OBSERVER};
+    StandardObserver lastAwbObserver{ ColorTemp::DEFAULT_OBSERVER };
     double lastAwbTempBias;
     Glib::ustring lastAwbauto;
 
@@ -97,7 +99,8 @@ protected:
 
     void freeAll();
 
-    // Precomputed values used by DetailedCrop ----------------------------------------------
+    // Precomputed values used by DetailedCrop
+    // ----------------------------------------------
 
     float bwAutoR, bwAutoG, bwAutoB;
     float CAMMean;
@@ -111,7 +114,7 @@ protected:
     LUTf satcurve;
     LUTf lhskcurve;
     LUTf clcurve;
-//    multi_array2D<float, 3> conversionBuffer;
+    //    multi_array2D<float, 3> conversionBuffer;
     multi_array2D<float, 4> conversionBuffer;
     LUTf wavclCurve;
     LUTf clToningcurve;
@@ -187,24 +190,23 @@ protected:
     AutoBlackxListener* ablxListener;
     AutoBWListener* abwListener;
     AutoWBListener* awbListener;
-    FlatFieldAutoClipListener *flatFieldAutoClipListener;
-    AutoContrastListener *bayerAutoContrastListener;
-    AutoContrastListener *xtransAutoContrastListener;
-    AutoContrastListener *pdSharpenAutoContrastListener;
-    AutoRadiusListener *pdSharpenAutoRadiusListener;
-    FrameCountListener *frameCountListener;
-    ImageTypeListener *imageTypeListener;
-    FilmNegListener *filmNegListener;
+    FlatFieldAutoClipListener* flatFieldAutoClipListener;
+    AutoContrastListener* bayerAutoContrastListener;
+    AutoContrastListener* xtransAutoContrastListener;
+    AutoContrastListener* pdSharpenAutoContrastListener;
+    AutoRadiusListener* pdSharpenAutoRadiusListener;
+    FrameCountListener* frameCountListener;
+    ImageTypeListener* imageTypeListener;
+    FilmNegListener* filmNegListener;
     AutoColorTonListener* actListener;
     AutoprimListener* primListener;
     AutoChromaListener* adnListener;
     WaveletListener* awavListener;
     RetinexListener* dehaListener;
     CompgamutListener* acmaxListener;
-  
-//    LocallabListener* locallListener;
 
-    
+    //    LocallabListener* locallListener;
+
     HistogramListener* hListener;
     std::vector<SizeListener*> sizeListeners;
 
@@ -216,7 +218,7 @@ protected:
 
     void backupParams();
     void restoreParams();
-    void allocCache (Imagefloat* &imgfloat);
+    void allocCache(Imagefloat*& imgfloat);
     void notifyHistogramChanged();
     void reallocAll();
     /// Updates L, R, G, and B histograms. Returns true unless not updated.
@@ -228,10 +230,11 @@ protected:
     /// Updates all waveforms. Returns true unless not updated.
     bool updateWaveforms();
     void setScale(int prevscale);
-    void updatePreviewImage (int todo, bool panningRelatedChange);
+    void updatePreviewImage(int todo, bool panningRelatedChange);
 
     MyMutex mProcessing;
-    const std::unique_ptr<ProcParams> params;  // used for the rendering, can be eventually tweaked
+    const std::unique_ptr<ProcParams>
+        params;  // used for the rendering, can be eventually tweaked
     std::unique_ptr<ProcParams> paramsBackup;  // backup of the untweaked procparams
     TweakOperator* tweakOperator;
 
@@ -246,7 +249,7 @@ protected:
     Glib::Thread* thread;
     MyMutex updaterThreadStart;
     MyMutex paramsUpdateMutex;
-    int  changeSinceLast;
+    int changeSinceLast;
     bool updaterRunning;
     const std::unique_ptr<ProcParams> nextParams;
     bool destroying;
@@ -266,8 +269,8 @@ protected:
     cmsHTRANSFORM customTransformIn;
     cmsHTRANSFORM customTransformOut;
     ImProcFunctions ipf;
-    
-    //locallab
+
+    // locallab
     LocallabListener* locallListener;
     LUTf lllocalcurve;
     LUTf cllocalcurve;
@@ -297,7 +300,7 @@ protected:
     LUTf jzlocalcurve;
     LUTf czlocalcurve;
     LUTf czjzlocalcurve;
-    
+
     LocretigainCurve locRETgainCurve;
     LocretitransCurve locRETtransCurve;
     LocretigainCurverab locRETgainCurverab;
@@ -346,7 +349,7 @@ protected:
     LocCCmaskCurve locccmascieCurve;
     LocLLmaskCurve locllmascieCurve;
     LocHHmaskCurve lochhmascieCurve;
-    
+
     LocwavCurve locwavCurve;
     LocwavCurve loclmasCurveblwav;
     LocwavCurve loclmasCurvecolwav;
@@ -374,7 +377,7 @@ protected:
     std::vector<float> stdtms;
     std::vector<float> meanretis;
     std::vector<float> stdretis;
-    
+
     bool lastspotdup;
     bool previewDeltaE;
     int locallColorMask;
@@ -396,76 +399,79 @@ protected:
     int locallcieMask;
 
 public:
+    ImProcCoordinator();
+    ~ImProcCoordinator() override;
+    void assign(ImageSource* imgsrc);
 
-    ImProcCoordinator ();
-    ~ImProcCoordinator () override;
-    void assign     (ImageSource* imgsrc);
+    void getParams(procparams::ProcParams* dst, bool tweaked = false) override;
 
-    void        getParams (procparams::ProcParams* dst, bool tweaked=false) override;
+    void startProcessing(int changeCode) override;
+    ProcParams* beginUpdateParams() override;
+    void endUpdateParams(ProcEvent change)
+        override;  // must be called after beginUpdateParams, triggers update
+    void endUpdateParams(int changeFlags) override;
+    void stopProcessing() override;
 
-    void        startProcessing (int changeCode) override;
-    ProcParams* beginUpdateParams () override;
-    void        endUpdateParams (ProcEvent change) override;  // must be called after beginUpdateParams, triggers update
-    void        endUpdateParams (int changeFlags) override;
-    void        stopProcessing () override;
+    std::string* retistrsav;
 
-    std::string *retistrsav;
+    void setPreviewScale(int scale) override { setScale(scale); }
+    int getPreviewScale() override { return scale; }
 
-    void setPreviewScale    (int scale) override
-    {
-        setScale(scale);
-    }
-    int  getPreviewScale    () override
-    {
-        return scale;
-    }
+    // void fullUpdatePreviewImage  ();
 
-    //void fullUpdatePreviewImage  ();
+    int getFullWidth() override { return fullw; }
+    int getFullHeight() override { return fullh; }
 
-    int getFullWidth () override
-    {
-        return fullw;
-    }
-    int getFullHeight () override
-    {
-        return fullh;
-    }
+    int getPreviewWidth() override { return pW; }
+    int getPreviewHeight() override { return pH; }
 
-    int getPreviewWidth () override
-    {
-        return pW;
-    }
-    int getPreviewHeight () override
-    {
-        return pH;
-    }
+    DetailedCrop* createCrop(::EditDataProvider* editDataProvider,
+                             bool isDetailWindow) override;
 
-    DetailedCrop* createCrop  (::EditDataProvider *editDataProvider, bool isDetailWindow) override;
-
-    void setTweakOperator (TweakOperator *tOperator) override;
-    void unsetTweakOperator (TweakOperator *tOperator) override;
-    bool getAutoWB   (double& temp, double& green, double equal, StandardObserver observer, double tempBias) override;
-    void getCamWB    (double& temp, double& green, StandardObserver observer) override;
-    void getSpotWB   (int x, int y, int rectSize, double& temp, double& green) override;
-    bool getFilmNegativeSpot(int x, int y, int spotSize, FilmNegativeParams::RGB &refInput, FilmNegativeParams::RGB &refOutput) override;
-    void getAutoCrop (double ratio, int &x, int &y, int &w, int &h) override;
+    void setTweakOperator(TweakOperator* tOperator) override;
+    void unsetTweakOperator(TweakOperator* tOperator) override;
+    bool getAutoWB(double& temp,
+                   double& green,
+                   double equal,
+                   StandardObserver observer,
+                   double tempBias) override;
+    void getCamWB(double& temp, double& green, StandardObserver observer) override;
+    void getSpotWB(int x, int y, int rectSize, double& temp, double& green) override;
+    bool getFilmNegativeSpot(int x,
+                             int y,
+                             int spotSize,
+                             FilmNegativeParams::RGB& refInput,
+                             FilmNegativeParams::RGB& refOutput) override;
+    void getAutoCrop(double ratio, int& x, int& y, int& w, int& h) override;
     bool getHighQualComputed() override;
     void setHighQualComputed() override;
-    void setMonitorProfile (const Glib::ustring& profile, RenderingIntent intent) override;
-    void getMonitorProfile (Glib::ustring& profile, RenderingIntent& intent) const override;
-    void setSoftProofing   (bool softProof, bool gamutCheck) override;
-    void getSoftProofing   (bool &softProof, bool &gamutCheck) override;
-    ProcEvent setSharpMask (bool sharpMask) override;
-    bool updateTryLock () override
-    {
-        return updaterThreadStart.trylock();
-    }
-    void updateUnLock () override
-    {
-        updaterThreadStart.unlock();
-    }
+    void setMonitorProfile(const Glib::ustring& profile, RenderingIntent intent) override;
+    void getMonitorProfile(Glib::ustring& profile,
+                           RenderingIntent& intent) const override;
+    void setSoftProofing(bool softProof, bool gamutCheck) override;
+    void getSoftProofing(bool& softProof, bool& gamutCheck) override;
+    ProcEvent setSharpMask(bool sharpMask) override;
+    bool updateTryLock() override { return updaterThreadStart.trylock(); }
+    void updateUnLock() override { updaterThreadStart.unlock(); }
 
-    void setLocallabMaskVisibility(bool previewDeltaE, int locallColorMask, int locallColorMaskinv, int locallExpMask, int locallExpMaskinv, int locallSHMask, int locallSHMaskinv, int locallvibMask, int locallsoftMask, int locallblMask, int localltmMask, int locallretiMask, int locallsharMask, int localllcMask, int locallcbMask, int localllogMask, int locall_Mask, int locallcieMask) override
+    void setLocallabMaskVisibility(bool previewDeltaE,
+                                   int locallColorMask,
+                                   int locallColorMaskinv,
+                                   int locallExpMask,
+                                   int locallExpMaskinv,
+                                   int locallSHMask,
+                                   int locallSHMaskinv,
+                                   int locallvibMask,
+                                   int locallsoftMask,
+                                   int locallblMask,
+                                   int localltmMask,
+                                   int locallretiMask,
+                                   int locallsharMask,
+                                   int localllcMask,
+                                   int locallcbMask,
+                                   int localllogMask,
+                                   int locall_Mask,
+                                   int locallcieMask) override
     {
         this->previewDeltaE = previewDeltaE;
         this->locallColorMask = locallColorMask;
@@ -487,31 +493,23 @@ public:
         this->locallcieMask = locallcieMask;
     }
 
-    void setProgressListener (ProgressListener* pl) override
-    {
-        plistener = pl;
-    }
-    void setPreviewImageListener    (PreviewImageListener* il) override
+    void setProgressListener(ProgressListener* pl) override { plistener = pl; }
+    void setPreviewImageListener(PreviewImageListener* il) override
     {
         imageListener = il;
     }
-    void setSizeListener     (SizeListener* il) override
+    void setSizeListener(SizeListener* il) override { sizeListeners.push_back(il); }
+    void delSizeListener(SizeListener* il) override
     {
-        sizeListeners.push_back(il);
-    }
-    void delSizeListener     (SizeListener* il) override
-    {
-        std::vector<SizeListener*>::iterator it = std::find(sizeListeners.begin(), sizeListeners.end(), il);
+        std::vector<SizeListener*>::iterator it =
+            std::find(sizeListeners.begin(), sizeListeners.end(), il);
 
         if (it != sizeListeners.end()) {
             sizeListeners.erase(it);
         }
     }
-    void setAutoExpListener  (AutoExpListener* ael) override
-    {
-        aeListener = ael;
-    }
-    void setHistogramListener (HistogramListener *h) override
+    void setAutoExpListener(AutoExpListener* ael) override { aeListener = ael; }
+    void setHistogramListener(HistogramListener* h) override
     {
         if (hListener) {
             hListener->setObservable(nullptr);
@@ -521,114 +519,70 @@ public:
             h->setObservable(this);
         }
     }
-    void setAutoCamListener  (AutoCamListener* acl) override
-    {
-        acListener = acl;
-    }
-    void setAutoBlackListener  (AutoBlackListener* abl) override
-    {
-        ablListener = abl;
-    }
-    void setAutoBlackxListener  (AutoBlackxListener* ablx) override
-    {
-        ablxListener = ablx;
-    }
-    
-    void setAutoBWListener   (AutoBWListener* abw) override
-    {
-        abwListener = abw;
-    }
-    void setAutoWBListener   (AutoWBListener* awb) override
-    {
-        awbListener = awb;
-    }
-    void setAutoColorTonListener   (AutoColorTonListener* bwct) override
+    void setAutoCamListener(AutoCamListener* acl) override { acListener = acl; }
+    void setAutoBlackListener(AutoBlackListener* abl) override { ablListener = abl; }
+    void setAutoBlackxListener(AutoBlackxListener* ablx) override { ablxListener = ablx; }
+
+    void setAutoBWListener(AutoBWListener* abw) override { abwListener = abw; }
+    void setAutoWBListener(AutoWBListener* awb) override { awbListener = awb; }
+    void setAutoColorTonListener(AutoColorTonListener* bwct) override
     {
         actListener = bwct;
     }
-    void setAutoprimListener   (AutoprimListener* pri) override
-    {
-        primListener = pri;
-    }
-    void setAutoChromaListener  (AutoChromaListener* adn) override
-    {
-        adnListener = adn;
-    }
-    void setCompgamutListener  (CompgamutListener* cop) override
-    {
-        acmaxListener = cop;
-    }
-    void setRetinexListener  (RetinexListener* adh) override
-    {
-        dehaListener = adh;
-    }
-    void setLocallabListener  (LocallabListener* lla) override
-    {
-        locallListener = lla;
-    }
-    void setWaveletListener  (WaveletListener* awa) override
-    {
-        awavListener = awa;
-    }
+    void setAutoprimListener(AutoprimListener* pri) override { primListener = pri; }
+    void setAutoChromaListener(AutoChromaListener* adn) override { adnListener = adn; }
+    void setCompgamutListener(CompgamutListener* cop) override { acmaxListener = cop; }
+    void setRetinexListener(RetinexListener* adh) override { dehaListener = adh; }
+    void setLocallabListener(LocallabListener* lla) override { locallListener = lla; }
+    void setWaveletListener(WaveletListener* awa) override { awavListener = awa; }
 
-    void setFrameCountListener  (FrameCountListener* fcl) override
+    void setFrameCountListener(FrameCountListener* fcl) override
     {
         frameCountListener = fcl;
     }
 
-    void setFlatFieldAutoClipListener  (FlatFieldAutoClipListener* ffacl) override
+    void setFlatFieldAutoClipListener(FlatFieldAutoClipListener* ffacl) override
     {
         flatFieldAutoClipListener = ffacl;
     }
-    void setBayerAutoContrastListener  (AutoContrastListener* acl) override
+    void setBayerAutoContrastListener(AutoContrastListener* acl) override
     {
         bayerAutoContrastListener = acl;
     }
 
-    void setXtransAutoContrastListener  (AutoContrastListener* acl) override
+    void setXtransAutoContrastListener(AutoContrastListener* acl) override
     {
         xtransAutoContrastListener = acl;
     }
 
-    void setpdSharpenAutoRadiusListener  (AutoRadiusListener* acl) override
+    void setpdSharpenAutoRadiusListener(AutoRadiusListener* acl) override
     {
         pdSharpenAutoRadiusListener = acl;
     }
 
-    void setpdSharpenAutoContrastListener  (AutoContrastListener* acl) override
+    void setpdSharpenAutoContrastListener(AutoContrastListener* acl) override
     {
         pdSharpenAutoContrastListener = acl;
     }
 
-    void setImageTypeListener  (ImageTypeListener* itl) override
+    void setImageTypeListener(ImageTypeListener* itl) override
     {
         imageTypeListener = itl;
     }
 
-    void setFilmNegListener  (FilmNegListener* fnl) override
+    void setFilmNegListener(FilmNegListener* fnl) override { filmNegListener = fnl; }
+
+    void saveInputICCReference(const Glib::ustring& fname, bool apply_wb) override;
+
+    InitialImage* getInitialImage() override { return imgsrc; }
+
+    cmsHTRANSFORM& getCustomTransformIn() { return customTransformIn; }
+
+    cmsHTRANSFORM& getCustomTransformOut() { return customTransformOut; }
+
+    struct DenoiseInfoStore
     {
-        filmNegListener = fnl;
-    }
-
-    void saveInputICCReference (const Glib::ustring& fname, bool apply_wb) override;
-
-    InitialImage*  getInitialImage () override
-    {
-        return imgsrc;
-    }
-
-    cmsHTRANSFORM& getCustomTransformIn ()
-    {
-        return customTransformIn;
-    }
-
-    cmsHTRANSFORM& getCustomTransformOut ()
-    {
-        return customTransformOut;
-    }
-
-    struct DenoiseInfoStore {
-        DenoiseInfoStore() : chM(0), max_r{}, max_b{}, ch_M{}, valid(false)  {}
+        DenoiseInfoStore() : chM(0), max_r{}, max_b{}, ch_M{}, valid(false) {}
         float chM;
         float max_r[9];
         float max_b[9];
@@ -644,4 +598,4 @@ public:
     void requestUpdateWaveform() override;
 };
 
-}
+}  // namespace rtengine

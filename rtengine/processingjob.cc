@@ -18,26 +18,29 @@
  */
 #include "processingjob.h"
 
-namespace rtengine
+namespace rtengine {
+
+ProcessingJob* ProcessingJob::create(const Glib::ustring& fname,
+                                     bool isRaw,
+                                     const procparams::ProcParams& pparams,
+                                     bool fast)
 {
 
-ProcessingJob* ProcessingJob::create (const Glib::ustring& fname, bool isRaw, const procparams::ProcParams& pparams, bool fast)
-{
-
-    return new ProcessingJobImpl (fname, isRaw, pparams, fast);
+    return new ProcessingJobImpl(fname, isRaw, pparams, fast);
 }
 
-ProcessingJob* ProcessingJob::create (InitialImage* initialImage, const procparams::ProcParams& pparams, bool fast)
+ProcessingJob* ProcessingJob::create(InitialImage* initialImage,
+                                     const procparams::ProcParams& pparams,
+                                     bool fast)
 {
 
-    return new ProcessingJobImpl (initialImage, pparams, fast);
+    return new ProcessingJobImpl(initialImage, pparams, fast);
 }
 
-void ProcessingJob::destroy (ProcessingJob* job)
+void ProcessingJob::destroy(ProcessingJob* job)
 {
 
     delete static_cast<ProcessingJobImpl*>(job);
 }
 
-}
-
+}  // namespace rtengine

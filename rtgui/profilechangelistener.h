@@ -18,37 +18,32 @@
  */
 #pragma once
 
-namespace Glib
-{
+namespace Glib {
 
 class ustring;
 
 }
 
-namespace rtengine
-{
+namespace rtengine {
 class ProcEvent;
 
-namespace procparams
-{
+namespace procparams {
 
 class ProcParams;
 class PartialProfile;
 
-}
+}  // namespace procparams
 
-}
+}  // namespace rtengine
 
 class ProfileChangeListener
 {
 public:
     virtual ~ProfileChangeListener() = default;
-    virtual void profileChange(
-        const rtengine::procparams::PartialProfile* nparams,
-        const rtengine::ProcEvent& event,
-        const Glib::ustring& descr,
-        const ParamsEdited* paramsEdited = nullptr,
-        bool fromLastSaved = false
-    ) = 0;
+    virtual void profileChange(const rtengine::procparams::PartialProfile* nparams,
+                               const rtengine::ProcEvent& event,
+                               const Glib::ustring& descr,
+                               const ParamsEdited* paramsEdited = nullptr,
+                               bool fromLastSaved = false) = 0;
     virtual void setDefaults(const rtengine::procparams::ProcParams* defparams) = 0;
 };

@@ -27,7 +27,7 @@ class Context;
 class ImageSurface;
 class Surface;
 class SurfacePattern;
-}
+}  // namespace Cairo
 
 namespace Gdk {
 class Pixbuf;
@@ -36,7 +36,7 @@ class Pixbuf;
 namespace Gtk {
 class Widget;
 class Window;
-}
+}  // namespace Gtk
 
 namespace hidpi {
 
@@ -46,7 +46,8 @@ class ScaledDeviceSize;
 
 enum class PixelSpace { LOGICAL, PHYSICAL };
 
-struct LogicalCoord {
+struct LogicalCoord
+{
     int x = 0;
     int y = 0;
 
@@ -61,7 +62,8 @@ struct LogicalCoord {
     LogicalCoord operator-(const LogicalCoord& other) const;
 };
 
-struct DeviceCoord {
+struct DeviceCoord
+{
     int x = 0;
     int y = 0;
 
@@ -74,7 +76,8 @@ struct DeviceCoord {
     DeviceCoord operator-(const DeviceSize& other) const;
 };
 
-struct LogicalSize {
+struct LogicalSize
+{
     int width = 0;
     int height = 0;
 
@@ -82,29 +85,36 @@ struct LogicalSize {
 
     LogicalSize() = default;
     LogicalSize(int logical_width, int logical_height)
-            : width(logical_width), height(logical_height) {}
+        : width(logical_width), height(logical_height)
+    {
+    }
 
     ScaledDeviceSize scaleToDevice(int device_scale) const;
 
     constexpr PixelSpace pixelSpace() const { return PixelSpace::LOGICAL; }
 
-    bool operator==(const LogicalSize& other) const {
+    bool operator==(const LogicalSize& other) const
+    {
         return width == other.width && height == other.height;
     }
 };
 
-struct DeviceSize {
+struct DeviceSize
+{
     int width = 0;
     int height = 0;
 
     DeviceSize() : width(0), height(0) {}
     DeviceSize(int device_width, int device_height)
-            : width(device_width), height(device_height) {}
+        : width(device_width), height(device_height)
+    {
+    }
 
     constexpr PixelSpace pixelSpace() const { return PixelSpace::PHYSICAL; }
 };
 
-struct ScaledDeviceSize {
+struct ScaledDeviceSize
+{
     int width = 0;
     int height = 0;
     int device_scale = 1;
@@ -114,7 +124,8 @@ struct ScaledDeviceSize {
     constexpr PixelSpace pixelSpace() const { return PixelSpace::PHYSICAL; }
 };
 
-class DevicePixbuf {
+class DevicePixbuf
+{
 public:
     DevicePixbuf();
     DevicePixbuf(const Glib::RefPtr<Gdk::Pixbuf>& ptr, int device_scale);
@@ -142,25 +153,32 @@ Cairo::RefPtr<Cairo::SurfacePattern>
 getSourceForSurface(const Cairo::RefPtr<Cairo::Context>& context);
 
 void getDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,
-                    double& x_scale, double& y_scale);
+                    double& x_scale,
+                    double& y_scale);
 void setDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface,
-                    int x_scale, int y_scale);
-inline void setDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface, int scale) {
+                    int x_scale,
+                    int y_scale);
+inline void setDeviceScale(const Cairo::RefPtr<Cairo::Surface>& surface, int scale)
+{
     setDeviceScale(surface, scale, scale);
 }
 
 void getDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface,
-                    double& x_scale, double& y_scale);
+                    double& x_scale,
+                    double& y_scale);
 void setDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface,
-                    int x_scale, int y_scale);
-inline void setDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface, int scale) {
+                    int x_scale,
+                    int y_scale);
+inline void setDeviceScale(const Cairo::RefPtr<Cairo::ImageSurface>& surface, int scale)
+{
     setDeviceScale(surface, scale, scale);
 }
 
 }  // namespace hidpi
 
 // Position in image pixel coordinates
-struct ImageCoord {
+struct ImageCoord
+{
     int x = 0;
     int y = 0;
 
@@ -169,7 +187,8 @@ struct ImageCoord {
 };
 
 // Pixel aligned size in image pixels
-struct ImageSize {
+struct ImageSize
+{
     int width = 0;
     int height = 0;
 

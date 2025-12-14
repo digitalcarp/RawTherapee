@@ -21,27 +21,27 @@
 #include <array>
 #include <vector>
 
-namespace rtengine
-{
+namespace rtengine {
 
-namespace procparams
-{
+namespace procparams {
 
 class ProcParams;
 
 class PartialProfile;
 
-}
+}  // namespace procparams
 
-}
+}  // namespace rtengine
 
-struct GeneralParamsEdited {
+struct GeneralParamsEdited
+{
     bool rank;
     bool colorlabel;
     bool intrash;
 };
 
-struct ToneCurveParamsEdited {
+struct ToneCurveParamsEdited
+{
     bool curve;
     bool curve2;
     bool curveMode;
@@ -65,7 +65,8 @@ struct ToneCurveParamsEdited {
     bool clampOOG;
 };
 
-struct RetinexParamsEdited {
+struct RetinexParamsEdited
+{
     bool enabled;
     bool str;
     bool scal;
@@ -105,8 +106,8 @@ struct RetinexParamsEdited {
     bool isUnchanged() const;
 };
 
-
-struct LCurveParamsEdited {
+struct LCurveParamsEdited
+{
     bool enabled;
     bool brightness;
     bool contrast;
@@ -125,8 +126,8 @@ struct LCurveParamsEdited {
     bool clcurve;
 };
 
-
-struct LocalContrastParamsEdited {
+struct LocalContrastParamsEdited
+{
     bool enabled;
     bool radius;
     bool amount;
@@ -134,7 +135,8 @@ struct LocalContrastParamsEdited {
     bool lightness;
 };
 
-struct RGBCurvesParamsEdited {
+struct RGBCurvesParamsEdited
+{
     bool enabled;
     bool lumamode;
     bool rcurve;
@@ -142,7 +144,8 @@ struct RGBCurvesParamsEdited {
     bool bcurve;
 };
 
-struct ColorToningEdited {
+struct ColorToningEdited
+{
     bool enabled;
     bool opacityCurve;
     bool colorCurve;
@@ -181,14 +184,16 @@ struct ColorToningEdited {
     bool labregionsShowMask;
 };
 
-struct SharpenEdgeParamsEdited {
+struct SharpenEdgeParamsEdited
+{
     bool enabled;
     bool passes;
     bool amount;
     bool threechannels;
 };
 
-struct SharpenMicroParamsEdited {
+struct SharpenMicroParamsEdited
+{
     bool enabled;
     bool matrix;
     bool amount;
@@ -196,7 +201,8 @@ struct SharpenMicroParamsEdited {
     bool uniformity;
 };
 
-struct SharpeningParamsEdited {
+struct SharpeningParamsEdited
+{
     bool enabled;
     bool contrast;
     bool autoContrast;
@@ -218,7 +224,8 @@ struct SharpeningParamsEdited {
     bool deconvdamping;
 };
 
-struct CaptureSharpeningParamsEdited {
+struct CaptureSharpeningParamsEdited
+{
     bool enabled;
     bool contrast;
     bool autoContrast;
@@ -234,7 +241,8 @@ struct CaptureSharpeningParamsEdited {
     bool isUnchanged() const;
 };
 
-struct VibranceParamsEdited {
+struct VibranceParamsEdited
+{
     bool enabled;
     bool pastels;
     bool saturated;
@@ -245,7 +253,8 @@ struct VibranceParamsEdited {
     bool skintonescurve;
 };
 
-struct WBParamsEdited {
+struct WBParamsEdited
+{
     bool enabled;
     bool method;
     bool temperature;
@@ -260,22 +269,24 @@ struct WBParamsEdited {
     bool itcwb_sampling;
     bool itcwb_green;
     bool compat_version;
-
 };
 
-struct DefringeParamsEdited {
+struct DefringeParamsEdited
+{
     bool enabled;
     bool radius;
     bool threshold;
     bool huecurve;
 };
 
-struct ImpulseDenoiseParamsEdited {
+struct ImpulseDenoiseParamsEdited
+{
     bool enabled;
     bool thresh;
 };
 
-struct ColorAppearanceParamsEdited {
+struct ColorAppearanceParamsEdited
+{
     bool curve;
     bool curve2;
     bool curve3;
@@ -322,7 +333,8 @@ struct ColorAppearanceParamsEdited {
     bool greensc;
 };
 
-struct DirPyrDenoiseParamsEdited {
+struct DirPyrDenoiseParamsEdited
+{
     bool enabled;
     bool enhance;
     bool median;
@@ -347,7 +359,8 @@ struct DirPyrDenoiseParamsEdited {
     bool passes;
 };
 
-struct EPDParamsEdited {
+struct EPDParamsEdited
+{
     bool enabled;
     bool strength;
     bool gamma;
@@ -356,14 +369,16 @@ struct EPDParamsEdited {
     bool reweightingIterates;
 };
 
-struct FattalToneMappingParamsEdited {
+struct FattalToneMappingParamsEdited
+{
     bool enabled;
     bool threshold;
     bool amount;
     bool anchor;
 };
 
-struct SHParamsEdited {
+struct SHParamsEdited
+{
     bool enabled;
     bool highlights;
     bool htonalwidth;
@@ -373,7 +388,8 @@ struct SHParamsEdited {
     bool lab;
 };
 
-struct CGParamsEdited {
+struct CGParamsEdited
+{
     bool enabled;
     bool th_c;
     bool th_m;
@@ -389,7 +405,8 @@ struct CGParamsEdited {
     bool rolloff;
 };
 
-struct ToneEqualizerParamsEdited {
+struct ToneEqualizerParamsEdited
+{
     bool enabled;
     std::array<bool, 6> bands;
     bool regularization;
@@ -397,7 +414,8 @@ struct ToneEqualizerParamsEdited {
     bool pivot;
 };
 
-struct CropParamsEdited {
+struct CropParamsEdited
+{
     bool enabled;
     bool x;
     bool y;
@@ -409,13 +427,15 @@ struct CropParamsEdited {
     bool guide;
 };
 
-struct CoarseTransformParamsEdited {
+struct CoarseTransformParamsEdited
+{
     bool rotate;
     bool hflip;
     bool vflip;
 };
 
-struct CommonTransformParamsEdited {
+struct CommonTransformParamsEdited
+{
     bool method;
     bool scale;
     bool scale_horizontally;
@@ -423,11 +443,13 @@ struct CommonTransformParamsEdited {
     bool autofill;
 };
 
-struct RotateParamsEdited {
+struct RotateParamsEdited
+{
     bool degree;
 };
 
-struct DistortionParamsEdited {
+struct DistortionParamsEdited
+{
     bool amount;
     bool defish;
     bool focal_length;
@@ -435,7 +457,8 @@ struct DistortionParamsEdited {
 class LocallabParamsEdited
 {
 public:
-    struct LocallabSpotEdited {
+    struct LocallabSpotEdited
+    {
         // Control spot settings
         bool name;
         bool isvisible;
@@ -623,7 +646,7 @@ public:
         bool ghs_agx;
         bool ghs_smooth;
         bool ghs_inv;
-        
+
         bool multsh[7];
         bool highlights;
         bool h_tonalwidth;
@@ -790,7 +813,7 @@ public:
         bool enacontrast;
         bool denoratio;
         bool denomask;
-       
+
         // Tone Mapping
         bool visitonemap;
         bool exptonemap;
@@ -1049,7 +1072,7 @@ public:
         bool lowthresl;
         bool higthresl;
         bool decayl;
-        //mask
+        // mask
         bool visimask;
         bool complexmask;
         bool expmask;
@@ -1079,7 +1102,7 @@ public:
         bool Lmask_curve;
         bool LLmask_curvewav;
         bool csthresholdmask;
-        //locallabcie
+        // locallabcie
         bool visicie;
         bool complexcie;
         bool expcie;
@@ -1207,9 +1230,9 @@ public:
         bool labgridcieGx;
         bool labgridcieGy;
         bool labgridcieWx;
-        bool labgridcieWy;       
+        bool labgridcieWy;
         bool labgridcieMx;
-        bool labgridcieMy;       
+        bool labgridcieMy;
         bool whitescie;
         bool blackscie;
         bool illMethod;
@@ -1262,14 +1285,14 @@ public:
         bool decaycie;
         bool strumaskcie;
         bool toolcie;
-		bool fftcieMask;
-		bool contcie;
-		bool blurcie;
+        bool fftcieMask;
+        bool contcie;
+        bool blurcie;
         bool highmaskcie;
         bool shadmaskcie;
         bool LLmaskciecurvewav;
         bool csthresholdcie;
-		
+
         LocallabSpotEdited(bool v);
 
         void set(bool v);
@@ -1280,7 +1303,8 @@ public:
     std::vector<LocallabSpotEdited> spots;
 };
 
-struct LensProfParamsEdited {
+struct LensProfParamsEdited
+{
     bool lcpFile;
     bool useDist;
     bool useVign;
@@ -1297,7 +1321,8 @@ struct LensProfParamsEdited {
     bool isUnchanged() const;
 };
 
-struct PerspectiveParamsEdited {
+struct PerspectiveParamsEdited
+{
     bool method;
     bool horizontal;
     bool vertical;
@@ -1316,7 +1341,8 @@ struct PerspectiveParamsEdited {
     bool control_lines;
 };
 
-struct GradientParamsEdited {
+struct GradientParamsEdited
+{
     bool enabled;
     bool degree;
     bool feather;
@@ -1325,14 +1351,16 @@ struct GradientParamsEdited {
     bool centerY;
 };
 
-struct PCVignetteParamsEdited {
+struct PCVignetteParamsEdited
+{
     bool enabled;
     bool strength;
     bool feather;
     bool roundness;
 };
 
-struct VignettingParamsEdited {
+struct VignettingParamsEdited
+{
     bool amount;
     bool radius;
     bool strength;
@@ -1340,15 +1368,16 @@ struct VignettingParamsEdited {
     bool centerY;
 };
 
-struct ChannelMixerParamsEdited {
+struct ChannelMixerParamsEdited
+{
     bool enabled;
     bool red[3];
     bool green[3];
     bool blue[3];
-
 };
 
-struct BlackWhiteParamsEdited {
+struct BlackWhiteParamsEdited
+{
     bool enabledcc;
     bool enabled;
     bool method;
@@ -1374,12 +1403,14 @@ struct BlackWhiteParamsEdited {
     bool algo;
 };
 
-struct CACorrParamsEdited {
+struct CACorrParamsEdited
+{
     bool red;
     bool blue;
 };
 
-struct ResizeParamsEdited {
+struct ResizeParamsEdited
+{
     bool scale;
     bool appliesTo;
     bool method;
@@ -1392,7 +1423,8 @@ struct ResizeParamsEdited {
     bool allowUpscaling;
 };
 
-struct FramingParamsEdited {
+struct FramingParamsEdited
+{
     bool enabled;
     bool framingMethod;
     bool aspectRatio;
@@ -1422,7 +1454,8 @@ public:
     bool entries;
 };
 
-struct ColorManagementParamsEdited {
+struct ColorManagementParamsEdited
+{
     bool inputProfile;
     bool toneCurve;
     bool applyLookTable;
@@ -1477,7 +1510,8 @@ struct ColorManagementParamsEdited {
     bool outputBPC;
 };
 
-struct WaveletParamsEdited {
+struct WaveletParamsEdited
+{
     bool enabled;
     bool strength;
     bool balance;
@@ -1513,7 +1547,7 @@ struct WaveletParamsEdited {
     bool Backmethod;
     bool Tilesmethod;
     bool complexmethod;
-    //bool denmethod;
+    // bool denmethod;
     bool mixmethod;
     bool slimethod;
     bool quamethod;
@@ -1567,7 +1601,7 @@ struct WaveletParamsEdited {
     bool levelsigm;
     bool ccwcurve;
     bool blcurve;
-    //bool opacityCurveSH;
+    // bool opacityCurveSH;
     bool opacityCurveBY;
     bool wavdenoise;
     bool wavdenoiseh;
@@ -1617,7 +1651,8 @@ struct WaveletParamsEdited {
     bool labgridBHigh;
 };
 
-struct DirPyrEqualizerParamsEdited {
+struct DirPyrEqualizerParamsEdited
+{
     bool enabled;
     bool gamutlab;
     bool mult[6];
@@ -1627,25 +1662,29 @@ struct DirPyrEqualizerParamsEdited {
     bool hueskin;
 };
 
-struct HSVEqualizerParamsEdited {
+struct HSVEqualizerParamsEdited
+{
     bool enabled;
     bool hcurve;
     bool scurve;
     bool vcurve;
 };
 
-struct FilmSimulationParamsEdited {
+struct FilmSimulationParamsEdited
+{
     bool enabled;
     bool clutFilename;
     bool strength;
 };
 
-struct SoftLightParamsEdited {
+struct SoftLightParamsEdited
+{
     bool enabled;
     bool strength;
 };
 
-struct DehazeParamsEdited {
+struct DehazeParamsEdited
+{
     bool enabled;
     bool strength;
     bool showDepthMap;
@@ -1653,8 +1692,10 @@ struct DehazeParamsEdited {
     bool saturation;
 };
 
-struct RAWParamsEdited {
-    struct BayerSensor {
+struct RAWParamsEdited
+{
+    struct BayerSensor
+    {
         bool method;
         bool border;
         bool imageNum;
@@ -1694,7 +1735,8 @@ struct RAWParamsEdited {
         bool isUnchanged() const;
     };
 
-    struct XTransSensor {
+    struct XTransSensor
+    {
         bool method;
         bool dualDemosaicAutoContrast;
         bool dualDemosaicContrast;
@@ -1730,7 +1772,8 @@ struct RAWParamsEdited {
     bool ff_clipControl;
     bool exPos;
 
-    struct PreprocessWBParamsEdited {
+    struct PreprocessWBParamsEdited
+    {
         bool mode;
 
         bool isUnchanged() const;
@@ -1741,13 +1784,14 @@ struct RAWParamsEdited {
     bool isUnchanged() const;
 };
 
-
-struct MetaDataParamsEdited {
+struct MetaDataParamsEdited
+{
     bool mode;
     bool exifKeys;
 };
 
-struct FilmNegativeParamsEdited {
+struct FilmNegativeParamsEdited
+{
     bool enabled;
     bool redRatio;
     bool greenExp;
@@ -1759,7 +1803,8 @@ struct FilmNegativeParamsEdited {
     bool isUnchanged() const;
 };
 
-struct ParamsEdited {
+struct ParamsEdited
+{
     GeneralParamsEdited general;
     ToneCurveParamsEdited toneCurve;
     LCurveParamsEdited labCurve;
@@ -1782,7 +1827,7 @@ struct ParamsEdited {
     ImpulseDenoiseParamsEdited impulseDenoise;
     SHParamsEdited sh;
     CGParamsEdited cg;
-    
+
     ToneEqualizerParamsEdited toneEqualizer;
     CropParamsEdited crop;
     CoarseTransformParamsEdited coarse;
@@ -1818,5 +1863,7 @@ struct ParamsEdited {
 
     void set(bool v);
     void initFrom(const std::vector<rtengine::procparams::ProcParams>& src);
-    void combine(rtengine::procparams::ProcParams& toEdit, const rtengine::procparams::ProcParams& mods, bool forceSet);
+    void combine(rtengine::procparams::ProcParams& toEdit,
+                 const rtengine::procparams::ProcParams& mods,
+                 bool forceSet);
 };

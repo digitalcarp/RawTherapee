@@ -26,33 +26,30 @@
 #include "rawimage.h"
 #include "settings.h"
 
-namespace rtengine
-{
+namespace rtengine {
 
-namespace
-{
+namespace {
 
-class PDAFGreenEqulibrateThreshold: public RawImageSource::GreenEqulibrateThreshold {
+class PDAFGreenEqulibrateThreshold : public RawImageSource::GreenEqulibrateThreshold
+{
     static constexpr float BASE_THRESHOLD = 0.5f;
     static constexpr int TILE_SIZE = 200;
     static constexpr float AREA = TILE_SIZE * TILE_SIZE;
     static constexpr int PIXEL_COUNT_FACTOR = 12;
-    
+
 public:
-    PDAFGreenEqulibrateThreshold(int w, int h):
-        RawImageSource::GreenEqulibrateThreshold(BASE_THRESHOLD),
-        w_(w),
-        h_(h)
+    PDAFGreenEqulibrateThreshold(int w, int h)
+        : RawImageSource::GreenEqulibrateThreshold(BASE_THRESHOLD), w_(w), h_(h)
     {
         int ctiles = w_ / TILE_SIZE;
         int rtiles = h_ / TILE_SIZE;
-        tiles_.resize(rtiles+1, std::vector<float>(ctiles+1));
+        tiles_.resize(rtiles + 1, std::vector<float>(ctiles + 1));
     }
 
     void processTiles()
     {
-        for(size_t i = 0; i < tiles_.size(); ++i) {
-            for(size_t j = 0; j < tiles_[i].size(); ++j) {
+        for (size_t i = 0; i < tiles_.size(); ++i) {
+            for (size_t j = 0; j < tiles_[i].size(); ++j) {
                 tiles_[i][j] = tiles_[i][j] * PIXEL_COUNT_FACTOR / (AREA * AREA);
             }
         }
@@ -60,20 +57,20 @@ public:
 
     void increment(int row, int col)
     {
-        auto &r = tiles_[row / TILE_SIZE];
+        auto& r = tiles_[row / TILE_SIZE];
         ++r[col / TILE_SIZE];
     }
-    
+
     float operator()(int row, int col) const override
     {
         int y = row / TILE_SIZE;
         int x = col / TILE_SIZE;
 
-        int cy = y * TILE_SIZE + TILE_SIZE/2;
-        int cx = x * TILE_SIZE + TILE_SIZE/2;
+        int cy = y * TILE_SIZE + TILE_SIZE / 2;
+        int cx = x * TILE_SIZE + TILE_SIZE / 2;
 
-        int x1 = col > cx ? x+1 : x-1;
-        int y1 = row > cy ? y+1 : y-1;
+        int x1 = col > cx ? x + 1 : x - 1;
+        int y1 = row > cy ? y + 1 : y - 1;
 
         float fxy = tile_factor(y, x);
         float f = 0.f;
@@ -120,29 +117,26 @@ public:
     }
 
 private:
-    float tile_factor(int y, int x) const
-    {
-        return tiles_[y][x];
-    }
-    
+    float tile_factor(int y, int x) const { return tiles_[y][x]; }
+
     int w_;
     int h_;
     std::vector<std::vector<float>> tiles_;
 };
 
-
-class PDAFLineDenoiseRowFilter: public RawImageSource::CFALineDenoiseRowBlender {
+class PDAFLineDenoiseRowFilter : public RawImageSource::CFALineDenoiseRowBlender
+{
 public:
-    PDAFLineDenoiseRowFilter(const std::vector<int> &pattern, int offset):
-        pattern_(pattern),
-        offset_(offset)
-    {}
+    PDAFLineDenoiseRowFilter(const std::vector<int>& pattern, int offset)
+        : pattern_(pattern), offset_(offset)
+    {
+    }
 
     float operator()(int row) const override
     {
         static constexpr float BORDER[] = { 1.f, 1.f, 0.8f, 0.5f, 0.2f };
-        static constexpr int BORDER_WIDTH = sizeof(BORDER)/sizeof(float) - 1;
-        
+        static constexpr int BORDER_WIDTH = sizeof(BORDER) / sizeof(float) - 1;
+
         if (!pattern_.empty()) {
             int key = (row - offset_) % pattern_.back();
             auto it = std::lower_bound(pattern_.begin(), pattern_.end(), key);
@@ -151,7 +145,7 @@ public:
             int d = b - key;
 
             if (it > pattern_.begin()) {
-                int b2 = *(it-1);
+                int b2 = *(it - 1);
                 int d2 = key - b2;
                 d = std::min(d, d2);
             }
@@ -166,79 +160,72 @@ private:
     int offset_;
 };
 
-} // namespace
+}  // namespace
 
-PDAFLinesFilter::PDAFLinesFilter(RawImage *ri):
-    ri_(ri),
-    W_(ri->get_width()),
-    H_(ri->get_height()),
-    offset_(0)
+PDAFLinesFilter::PDAFLinesFilter(RawImage* ri)
+    : ri_(ri), W_(ri->get_width()), H_(ri->get_height()), offset_(0)
 {
     gthresh_ = new PDAFGreenEqulibrateThreshold(W_, H_);
 
     CameraConstantsStore* ccs = CameraConstantsStore::getInstance();
-    const CameraConst *cc = ccs->get(ri_->get_maker().c_str(), ri_->get_model().c_str());
+    const CameraConst* cc = ccs->get(ri_->get_maker().c_str(), ri_->get_model().c_str());
 
     if (cc) {
         pattern_ = cc->get_pdafPattern();
-        if(!pattern_.empty()) {
+        if (!pattern_.empty()) {
             offset_ = cc->get_pdafOffset();
         }
     }
 }
-
 
 PDAFLinesFilter::~PDAFLinesFilter()
 {
     delete gthresh_;
 }
 
-
-RawImageSource::GreenEqulibrateThreshold &PDAFLinesFilter::greenEqThreshold()
+RawImageSource::GreenEqulibrateThreshold& PDAFLinesFilter::greenEqThreshold()
 {
     return *gthresh_;
 }
 
-
-std::unique_ptr<RawImageSource::CFALineDenoiseRowBlender> PDAFLinesFilter::lineDenoiseRowBlender()
+std::unique_ptr<RawImageSource::CFALineDenoiseRowBlender>
+PDAFLinesFilter::lineDenoiseRowBlender()
 {
-    return std::unique_ptr<RawImageSource::CFALineDenoiseRowBlender>(new PDAFLineDenoiseRowFilter(pattern_, offset_));
+    return std::unique_ptr<RawImageSource::CFALineDenoiseRowBlender>(
+        new PDAFLineDenoiseRowFilter(pattern_, offset_));
 }
 
-
-int PDAFLinesFilter::markLine(const array2D<float> &rawData, PixelsMap &bpMap, int y)
+int PDAFLinesFilter::markLine(const array2D<float>& rawData, PixelsMap& bpMap, int y)
 {
     rowmap_.clear();
-    rowmap_.resize((W_+1)/2, false);
+    rowmap_.resize((W_ + 1) / 2, false);
     int marked = 0;
-    
-    for (int x = 1 + (ri_->FC(y, 0) & 1); x < W_-1; x += 2) {
-        const float
-            g0 = rawData[y][x],
-            g1 = rawData[y-1][x+1],
-            g2 = rawData[y+1][x+1],
-            g3 = rawData[y-1][x-1],
-            g4 = rawData[y+1][x-1];
+
+    for (int x = 1 + (ri_->FC(y, 0) & 1); x < W_ - 1; x += 2) {
+        const float g0 = rawData[y][x], g1 = rawData[y - 1][x + 1],
+                    g2 = rawData[y + 1][x + 1], g3 = rawData[y - 1][x - 1],
+                    g4 = rawData[y + 1][x - 1];
         if (g0 > max(g1, g2, g3, g4)) {
             const float gu = g2 + g4;
             const float gd = g1 + g3;
             const float gM = max(gu, gd);
             const float gm = min(gu, gd);
             const float d = (gM - gm) / gM;
-            if (d < 0.2f && (1.f - (gm + gM)/(4.f * g0)) > std::min(d, 0.1f)) {
-                rowmap_[x/2] = true;
+            if (d < 0.2f && (1.f - (gm + gM) / (4.f * g0)) > std::min(d, 0.1f)) {
+                rowmap_[x / 2] = true;
             }
         }
     }
 
-    PDAFGreenEqulibrateThreshold *m = static_cast<PDAFGreenEqulibrateThreshold *>(gthresh_);
+    PDAFGreenEqulibrateThreshold* m =
+        static_cast<PDAFGreenEqulibrateThreshold*>(gthresh_);
 
-    for (int x = 2 + (ri_->FC(y, 1) & 1); x < W_-2; x += 2) {
-        const int i = x/2;
-        if (rowmap_[i+1]) {
+    for (int x = 2 + (ri_->FC(y, 1) & 1); x < W_ - 2; x += 2) {
+        const int i = x / 2;
+        if (rowmap_[i + 1]) {
             if (rowmap_[i]) {
-                if (rowmap_[i-1]) {
-                    for (int xx = x-2; xx <= x+2; ++xx) {
+                if (rowmap_[i - 1]) {
+                    for (int xx = x - 2; xx <= x + 2; ++xx) {
                         if (!bpMap.get(xx, y)) {
                             bpMap.set(xx, y);
                             m->increment(y, xx);
@@ -257,33 +244,34 @@ int PDAFLinesFilter::markLine(const array2D<float> &rawData, PixelsMap &bpMap, i
     return marked;
 }
 
-
-int PDAFLinesFilter::mark(const array2D<float> &rawData, PixelsMap &bpMap)
+int PDAFLinesFilter::mark(const array2D<float>& rawData, PixelsMap& bpMap)
 {
 
     if (pattern_.empty()) {
         if (settings->verbose) {
-            std::cout << "no PDAF pattern known for " << ri_->get_maker() << " " << ri_->get_model() << std::endl;
+            std::cout << "no PDAF pattern known for " << ri_->get_maker() << " "
+                      << ri_->get_model() << std::endl;
         }
         return 0;
     }
-        
+
     size_t idx = 0;
     int off = offset_;
-        
+
     int found = 0;
-    for (int y = 1; y < H_-1; ++y) {
+    for (int y = 1; y < H_ - 1; ++y) {
         int yy = pattern_[idx] + off;
         if (y == yy) {
             int n = 0;
             n += markLine(rawData, bpMap, y);
-            n += (y-1 <= 0   ) ? 0 : markLine(rawData, bpMap, y-1);
-            n += (y+1 >= H_-1) ? 0 : markLine(rawData, bpMap, y+1);
-            
+            n += (y - 1 <= 0) ? 0 : markLine(rawData, bpMap, y - 1);
+            n += (y + 1 >= H_ - 1) ? 0 : markLine(rawData, bpMap, y + 1);
+
             if (n) {
                 found += n;
                 if (settings->verbose) {
-                    std::cout << "marked " << n << " pixels in PDAF line at " << y << std::endl;
+                    std::cout << "marked " << n << " pixels in PDAF line at " << y
+                              << std::endl;
                 }
             }
         } else if (y > yy) {
@@ -296,10 +284,10 @@ int PDAFLinesFilter::mark(const array2D<float> &rawData, PixelsMap &bpMap)
     }
 
     if (settings->verbose) {
-        static_cast<PDAFGreenEqulibrateThreshold *>(gthresh_)->print();
+        static_cast<PDAFGreenEqulibrateThreshold*>(gthresh_)->print();
     }
-    static_cast<PDAFGreenEqulibrateThreshold *>(gthresh_)->processTiles();
+    static_cast<PDAFGreenEqulibrateThreshold*>(gthresh_)->processTiles();
     return found;
 }
 
-} // namespace rtengine
+}  // namespace rtengine

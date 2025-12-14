@@ -20,47 +20,55 @@
 
 #include "guiutils.h"
 #include "options.h"
-#include "thumbnail.h"
 #include "rtengine/utils.h"
+#include "thumbnail.h"
 
-namespace
-{
+namespace {
 
-void thumbInterp(const unsigned char* src, int sw, int sh, unsigned char* dst, int dw, int dh)
+void thumbInterp(const unsigned char* src,
+                 int sw,
+                 int sh,
+                 unsigned char* dst,
+                 int dw,
+                 int dh)
 {
     const auto& options = App::get().options();
 
     if (options.thumbInterp == 0) {
-        rtengine::nearestInterp (src, sw, sh, dst, dw, dh);
+        rtengine::nearestInterp(src, sw, sh, dst, dw, dh);
     } else if (options.thumbInterp == 1) {
-        rtengine::bilinearInterp (src, sw, sh, dst, dw, dh);
+        rtengine::bilinearInterp(src, sw, sh, dst, dw, dh);
     }
 }
 
-}
+}  // namespace
 
 BatchQueueEntryUpdater batchQueueEntryUpdater;
 
-BatchQueueEntryUpdater::BatchQueueEntryUpdater ()
+BatchQueueEntryUpdater::BatchQueueEntryUpdater()
     : tostop(false), stopped(true), thread(nullptr), qMutex(nullptr)
 {
 }
 
-void BatchQueueEntryUpdater::process (guint8* oimg, int ow, int oh, int newh, int device_scale,
-                                      BQEntryUpdateListener* listener,
-                                      rtengine::procparams::ProcParams* pparams,
-                                      Thumbnail* thumbnail)
+void BatchQueueEntryUpdater::process(guint8* oimg,
+                                     int ow,
+                                     int oh,
+                                     int newh,
+                                     int device_scale,
+                                     BQEntryUpdateListener* listener,
+                                     rtengine::procparams::ProcParams* pparams,
+                                     Thumbnail* thumbnail)
 {
     if (!oimg && (!pparams || !thumbnail)) {
-        //printf("WARNING! !oimg && (!pparams || !thumbnail)\n");
+        // printf("WARNING! !oimg && (!pparams || !thumbnail)\n");
         return;
     }
 
     if (!qMutex) {
-        qMutex = new MyMutex ();
+        qMutex = new MyMutex();
     }
 
-    qMutex->lock ();
+    qMutex->lock();
     // look up if an older version is in the queue
     std::list<Job>::iterator i;
 
@@ -77,7 +85,7 @@ void BatchQueueEntryUpdater::process (guint8* oimg, int ow, int oh, int newh, in
         }
 
     // not found, create and append new job
-    if (i == jqueue.end ()) {
+    if (i == jqueue.end()) {
         Job j;
         j.oimg = oimg;
         j.ow = ow;
@@ -87,60 +95,69 @@ void BatchQueueEntryUpdater::process (guint8* oimg, int ow, int oh, int newh, in
         j.listener = listener;
         j.pparams = pparams;
         j.thumbnail = thumbnail;
-        jqueue.push_back (j);
+        jqueue.push_back(j);
     }
 
-    qMutex->unlock ();
+    qMutex->unlock();
 
     // Start thread if not running yet
     if (stopped) {
         stopped = false;
-        tostop  = false;
+        tostop = false;
 
-        thread = Glib::Thread::create(sigc::mem_fun(*this, &BatchQueueEntryUpdater::processThread), (unsigned long int)0, true, true, Glib::THREAD_PRIORITY_LOW);
+        thread = Glib::Thread::create(
+            sigc::mem_fun(*this, &BatchQueueEntryUpdater::processThread),
+            (unsigned long int)0, true, true, Glib::THREAD_PRIORITY_LOW);
     }
 }
 
-void BatchQueueEntryUpdater::processThread ()
+void BatchQueueEntryUpdater::processThread()
 {
     // TODO: process visible jobs first
     bool isEmpty = false;
 
     while (!tostop && !isEmpty) {
 
-        qMutex->lock ();
-        isEmpty = jqueue.empty (); // do NOT put into while() since it must be within mutex section
+        qMutex->lock();
+        isEmpty = jqueue.empty();  // do NOT put into while() since it must be within
+                                   // mutex section
         Job current;
 
         if (!isEmpty) {
-            current = jqueue.front ();
-            jqueue.pop_front ();
+            current = jqueue.front();
+            jqueue.pop_front();
         }
 
-        qMutex->unlock ();
+        qMutex->unlock();
 
-        if(isEmpty) {
+        if (isEmpty) {
             break;
         }
 
         bool newBuffer = false;
 
         if (current.thumbnail && current.pparams) {
-            // the thumbnail and the pparams are provided, it means that we have to build the original preview image
+            // the thumbnail and the pparams are provided, it means that we have to build
+            // the original preview image
             double tmpscale;
-            rtengine::IImage8* img = current.thumbnail->processThumbImage (*current.pparams, current.oh, tmpscale);
+            rtengine::IImage8* img = current.thumbnail->processThumbImage(
+                *current.pparams, current.oh, tmpscale);
 
-            //current.thumbnail->decreaseRef (); // WARNING: decreasing refcount (and maybe deleting) thumbnail, with or without processed image
+            // current.thumbnail->decreaseRef (); // WARNING: decreasing refcount (and
+            // maybe deleting) thumbnail, with or without processed image
             if (img) {
                 int prevw = img->getWidth();
                 int prevh = img->getHeight();
 #ifndef NDEBUG
 
                 if (current.ow != img->getWidth() || current.oh != img->getHeight()) {
-                    printf("WARNING!  Expected image size: %dx%d ; image size is: %dx%d\n", current.ow, current.oh, img->getWidth(), img->getHeight());
+                    printf(
+                        "WARNING!  Expected image size: %dx%d ; image size is: %dx%d\n",
+                        current.ow, current.oh, img->getWidth(), img->getHeight());
                 }
 
-                assert ((current.ow + 1)*current.oh >= img->getWidth()*img->getHeight());
+                assert((current.ow + 1) * current.oh
+                       >= img->getWidth() * img->getHeight());
 #endif
                 current.ow = prevw;
                 current.oh = prevh;
@@ -163,13 +180,14 @@ void BatchQueueEntryUpdater::processThread ()
             int scaledHeight = size.height * current.device_scale;
             int scaledWidth = size.width * current.device_scale;
 
-            guint8* img = new guint8 [scaledWidth * scaledHeight * 3];
-            thumbInterp (current.oimg, current.ow, current.oh, img, scaledWidth, scaledHeight);
-            current.listener->updateImage (img, size, current.device_scale, current.ow, current.oh,
-                                           newBuffer ? current.oimg : nullptr);
+            guint8* img = new guint8[scaledWidth * scaledHeight * 3];
+            thumbInterp(current.oimg, current.ow, current.oh, img, scaledWidth,
+                        scaledHeight);
+            current.listener->updateImage(img, size, current.device_scale, current.ow,
+                                          current.oh, newBuffer ? current.oimg : nullptr);
         }
 
-        if(current.oimg) {
+        if (current.oimg) {
             delete[] current.oimg;
             current.oimg = nullptr;
         }
@@ -178,14 +196,13 @@ void BatchQueueEntryUpdater::processThread ()
     stopped = true;
 }
 
-
-void BatchQueueEntryUpdater::removeJobs (BQEntryUpdateListener* listener)
+void BatchQueueEntryUpdater::removeJobs(BQEntryUpdateListener* listener)
 {
     if (!qMutex) {
         return;
     }
 
-    qMutex->lock ();
+    qMutex->lock();
     bool ready = false;
 
     while (!ready) {
@@ -194,16 +211,16 @@ void BatchQueueEntryUpdater::removeJobs (BQEntryUpdateListener* listener)
 
         for (i = jqueue.begin(); i != jqueue.end(); ++i)
             if (i->listener == listener) {
-                jqueue.erase (i);
+                jqueue.erase(i);
                 ready = false;
                 break;
             }
     }
 
-    qMutex->unlock ();
+    qMutex->unlock();
 }
 
-void BatchQueueEntryUpdater::terminate  ()
+void BatchQueueEntryUpdater::terminate()
 {
     // never started or currently not running?
     if (!qMutex || stopped) {
@@ -217,18 +234,16 @@ void BatchQueueEntryUpdater::terminate  ()
         Glib::Thread::self()->yield();
 
         if (!stopped) {
-            thread->join ();
+            thread->join();
         }
     }
 
     // Remove remaining jobs
-    qMutex->lock ();
+    qMutex->lock();
 
     while (!jqueue.empty()) {
-        jqueue.pop_front ();
+        jqueue.pop_front();
     }
 
-    qMutex->unlock ();
+    qMutex->unlock();
 }
-
-

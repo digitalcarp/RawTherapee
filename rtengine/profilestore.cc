@@ -28,16 +28,21 @@
 #include "dynamicprofile.h"
 #include "procparams.h"
 
-#include "rtgui/options.h"
 #include "rtgui/multilangmgr.h"
+#include "rtgui/options.h"
 
 using namespace rtengine;
 using namespace rtengine::procparams;
 
-ProfileStore::ProfileStore () : storeState (STORESTATE_NOTINITIALIZED), internalDefaultProfile (nullptr), internalDefaultEntry (nullptr), internalDynamicEntry (nullptr), loadAll (true)
+ProfileStore::ProfileStore()
+    : storeState(STORESTATE_NOTINITIALIZED),
+      internalDefaultProfile(nullptr),
+      internalDefaultEntry(nullptr),
+      internalDynamicEntry(nullptr),
+      loadAll(true)
 {
     internalDefaultProfile = new AutoPartialProfile();
-    internalDefaultProfile->set (true);
+    internalDefaultProfile->set(true);
 }
 
 ProfileStore* ProfileStore::getInstance()
@@ -46,8 +51,7 @@ ProfileStore* ProfileStore::getInstance()
     return &instance;
 }
 
-
-bool ProfileStore::init (bool loadAll)
+bool ProfileStore::init(bool loadAll)
 {
     if (storeState == STORESTATE_DELETED) {
         return false;
@@ -55,17 +59,21 @@ bool ProfileStore::init (bool loadAll)
 
     this->loadAll = loadAll;
 
-    if ((storeState == STORESTATE_NOTINITIALIZED || storeState == STORESTATE_DIRTY) && loadAll) {
+    if ((storeState == STORESTATE_NOTINITIALIZED || storeState == STORESTATE_DIRTY)
+        && loadAll)
+    {
         storeState = STORESTATE_BEINGINITIALIZED;
-        _parseProfiles ();
-        std::stable_partition(entries.begin(), entries.end(), [](const ProfileStoreEntry *e) { return e->type == PSET_FOLDER; });
+        _parseProfiles();
+        std::stable_partition(
+            entries.begin(), entries.end(),
+            [](const ProfileStoreEntry* e) { return e->type == PSET_FOLDER; });
         storeState = STORESTATE_INITIALIZED;
     }
 
     return storeState == STORESTATE_INITIALIZED;
 }
 
-ProfileStore::~ProfileStore ()
+ProfileStore::~ProfileStore()
 {
     if (storeState == STORESTATE_NOTINITIALIZED) {
         return;
@@ -75,10 +83,10 @@ ProfileStore::~ProfileStore ()
     storeState = STORESTATE_DELETED;
 
     {
-        MyMutex::MyLock lock (parseMutex);
+        MyMutex::MyLock lock(parseMutex);
 
-        clearProfileList ();
-        partProfiles.clear ();
+        clearProfileList();
+        partProfiles.clear();
         clearFileList();
         delete internalDefaultProfile;
         delete internalDefaultEntry;
@@ -92,17 +100,17 @@ ProfileStore::~ProfileStore ()
  * parseProfiles may need to ask for initialization of this object, and then will
  * ask a mutex lock on it, has it been initialized by this call or not
  *
- * This method will scan the directory tree again and update the profile list. When finished,
- * the listeners will be called in order to update with the new list
+ * This method will scan the directory tree again and update the profile list. When
+ * finished, the listeners will be called in order to update with the new list
  */
-void ProfileStore::parseProfilesOnce ()
+void ProfileStore::parseProfilesOnce()
 {
 
     for (auto listener : listeners) {
         listener->storeCurrentValue();
     }
 
-    init (true);  // safe even if already initialized
+    init(true);  // safe even if already initialized
 
     for (auto listener : listeners) {
         listener->updateProfileList();
@@ -110,101 +118,119 @@ void ProfileStore::parseProfilesOnce ()
     }
 }
 
-void ProfileStore::parseProfiles ()
+void ProfileStore::parseProfiles()
 {
 
     storeState = STORESTATE_DIRTY;
-    parseProfilesOnce ();
+    parseProfilesOnce();
 }
 
-void ProfileStore::_parseProfiles ()
+void ProfileStore::_parseProfiles()
 {
     // clear loaded profiles
     folders.clear();
     clearFileList();
-    clearProfileList ();
+    clearProfileList();
 
-    folders.push_back ("<<< ROOT >>>"); // Fake path, so parentFolderId == 0 will be used to attach a ProfileStoreEntry to the root container, not sub-menu
+    folders.push_back(
+        "<<< ROOT >>>");  // Fake path, so parentFolderId == 0 will be used to attach a
+                          // ProfileStoreEntry to the root container, not sub-menu
 
     auto& options = App::get().mut_options();
     Glib::ustring p1 = options.getUserProfilePath();
     Glib::ustring p2 = options.getGlobalProfilePath();
-    bool displayLevel0 = options.useBundledProfiles && !p1.empty() && !p2.empty() && p1 != p2;
+    bool displayLevel0 =
+        options.useBundledProfiles && !p1.empty() && !p2.empty() && p1 != p2;
 
     Glib::ustring virtualPath;
     Glib::ustring currDir;
     if (!p1.empty()) {
         virtualPath = "${U}";
         currDir = "${U}";
-        parseDir (p1, virtualPath, currDir, 0, 0, displayLevel0);
+        parseDir(p1, virtualPath, currDir, 0, 0, displayLevel0);
     }
     if (p1.empty() || displayLevel0) {
         virtualPath = "${G}";
         currDir = "${G}";
-        parseDir (p2, virtualPath, currDir, 0, 0, displayLevel0);
+        parseDir(p2, virtualPath, currDir, 0, 0, displayLevel0);
     }
 
     // sort profiles
-    std::sort (entries.begin(), entries.end(), SortProfiles() );
+    std::sort(entries.begin(), entries.end(), SortProfiles());
 
-    // entries and partProfiles are empty, but the entry and profiles already exist (they have survived to clearFileList and clearProfileList)
+    // entries and partProfiles are empty, but the entry and profiles already exist (they
+    // have survived to clearFileList and clearProfileList)
     if (!internalDefaultEntry) {
-        internalDefaultEntry = new ProfileStoreEntry (Glib::ustring ("(") + M ("PROFILEPANEL_PINTERNAL") + Glib::ustring (")"), PSET_FILE, 0, 0);
+        internalDefaultEntry = new ProfileStoreEntry(
+            Glib::ustring("(") + M("PROFILEPANEL_PINTERNAL") + Glib::ustring(")"),
+            PSET_FILE, 0, 0);
     }
 
-    entries.push_back (internalDefaultEntry);
+    entries.push_back(internalDefaultEntry);
     partProfiles[internalDefaultEntry] = internalDefaultProfile;
 
     if (!internalDynamicEntry) {
-        internalDynamicEntry = new ProfileStoreEntry (Glib::ustring ("(") + M ("PROFILEPANEL_PDYNAMIC") + Glib::ustring (")"), PSET_FILE, 0, 0);
+        internalDynamicEntry = new ProfileStoreEntry(
+            Glib::ustring("(") + M("PROFILEPANEL_PDYNAMIC") + Glib::ustring(")"),
+            PSET_FILE, 0, 0);
         // do not add it to the entries. This is here only for the preferences dialog
     }
 
     // Check if the default profiles has been found.
-    if (findEntryFromFullPathU (options.defProfRaw) == nullptr) {
-        options.setDefProfRawMissing (true);
+    if (findEntryFromFullPathU(options.defProfRaw) == nullptr) {
+        options.setDefProfRawMissing(true);
 
         if (settings->verbose) {
-            printf ("WARNING: Default profile \"%s\" for raw images not found!\n", options.defProfRaw.c_str());
+            printf("WARNING: Default profile \"%s\" for raw images not found!\n",
+                   options.defProfRaw.c_str());
         }
     }
 
-    if (findEntryFromFullPathU (options.defProfImg) == nullptr) {
-        options.setDefProfImgMissing (true);
+    if (findEntryFromFullPathU(options.defProfImg) == nullptr) {
+        options.setDefProfImgMissing(true);
 
         if (settings->verbose) {
-            printf ("WARNING: Default profile \"%s\" for standard images not found!\n", options.defProfImg.c_str());
+            printf("WARNING: Default profile \"%s\" for standard images not found!\n",
+                   options.defProfImg.c_str());
         }
     }
 }
 
 /// @return Returns true if some files has been found (directories are ignored)
-bool ProfileStore::parseDir (Glib::ustring& realPath, Glib::ustring& virtualPath, Glib::ustring& currDir, unsigned int parentId, unsigned char level, bool displayLevel0)
+bool ProfileStore::parseDir(Glib::ustring& realPath,
+                            Glib::ustring& virtualPath,
+                            Glib::ustring& currDir,
+                            unsigned int parentId,
+                            unsigned char level,
+                            bool displayLevel0)
 {
     bool fileFound = false;
 
     // reload the available profiles from the profile dir
-    if (!realPath.empty() && Glib::file_test (realPath, Glib::FILE_TEST_EXISTS) && Glib::file_test (realPath, Glib::FILE_TEST_IS_DIR)) {
-        unsigned int folder = 0; // folder's own Id
+    if (!realPath.empty() && Glib::file_test(realPath, Glib::FILE_TEST_EXISTS)
+        && Glib::file_test(realPath, Glib::FILE_TEST_IS_DIR))
+    {
+        unsigned int folder = 0;  // folder's own Id
 
         // add this entry to the folder list
-        folders.push_back (virtualPath);
-        folder = (unsigned int) (folders.size()) - 1;
+        folders.push_back(virtualPath);
+        folder = (unsigned int)(folders.size()) - 1;
 
         if (level > 0 || displayLevel0) {
             // replace the virtual folder name by a localized text
             if (currDir == "${U}") {
-                currDir = M ("PROFILEPANEL_MYPROFILES");
+                currDir = M("PROFILEPANEL_MYPROFILES");
             } else if (currDir == "${G}") {
-                currDir = M ("PROFILEPANEL_GLOBALPROFILES");
+                currDir = M("PROFILEPANEL_GLOBALPROFILES");
             }
 
             // add this localized text to the file list
-            entries.push_back ( new ProfileStoreEntry (currDir, PSET_FOLDER, parentId, folder) );
+            entries.push_back(
+                new ProfileStoreEntry(currDir, PSET_FOLDER, parentId, folder));
         }
 
         // walking through the directory
-        Glib::Dir* dir = new Glib::Dir (realPath);
+        Glib::Dir* dir = new Glib::Dir(realPath);
 
         for (Glib::DirIterator i = dir->begin(); i != dir->end(); ++i) {
             currDir = *i;
@@ -213,43 +239,47 @@ bool ProfileStore::parseDir (Glib::ustring& realPath, Glib::ustring& virtualPath
                 continue;
             }
 
-            Glib::ustring fname = Glib::build_filename (realPath, currDir);
+            Glib::ustring fname = Glib::build_filename(realPath, currDir);
 
-            if (Glib::file_test (fname, Glib::FILE_TEST_IS_DIR)) {
-                Glib::ustring vp (Glib::build_filename (virtualPath, currDir));
-                Glib::ustring rp (Glib::build_filename (realPath,    currDir));
-                fileFound = parseDir (rp, vp, currDir, folder, level + 1, 0);
+            if (Glib::file_test(fname, Glib::FILE_TEST_IS_DIR)) {
+                Glib::ustring vp(Glib::build_filename(virtualPath, currDir));
+                Glib::ustring rp(Glib::build_filename(realPath, currDir));
+                fileFound = parseDir(rp, vp, currDir, folder, level + 1, 0);
             } else {
-                size_t lastdot = currDir.find_last_of ('.');
+                size_t lastdot = currDir.find_last_of('.');
 
-                if (lastdot != Glib::ustring::npos && lastdot == currDir.length() - 4 && currDir.substr (lastdot).casefold() == App::PARAM_FILE_EXTENSION) {
+                if (lastdot != Glib::ustring::npos && lastdot == currDir.length() - 4
+                    && currDir.substr(lastdot).casefold() == App::PARAM_FILE_EXTENSION)
+                {
                     // file found
                     if (settings->verbose) {
-                        printf ("Processing file %s...", fname.c_str());
+                        printf("Processing file %s...", fname.c_str());
                     }
 
-                    Glib::ustring name = currDir.substr (0, lastdot);
+                    Glib::ustring name = currDir.substr(0, lastdot);
 
                     // create the partial profile
-                    AutoPartialProfile *pProf = new AutoPartialProfile();
-                    int res = pProf->load (fname);
+                    AutoPartialProfile* pProf = new AutoPartialProfile();
+                    int res = pProf->load(fname);
 
                     if (!res && pProf->pparams->ppVersion >= 220) {
                         fileFound = true;
 
                         if (settings->verbose) {
-                            printf ("OK\n");
+                            printf("OK\n");
                         }
 
                         // adding this file to the list
-                        ProfileStoreEntry* filePSE = new ProfileStoreEntry (name, PSET_FILE, folder, 0);
-                        entries.push_back (filePSE);
+                        ProfileStoreEntry* filePSE =
+                            new ProfileStoreEntry(name, PSET_FILE, folder, 0);
+                        entries.push_back(filePSE);
 
                         // map the partial profile
                         partProfiles[filePSE] = pProf;
-                        //partProfiles.insert( std::pair<ProfileStoreEntry*, rtengine::procparams::AutoPartialProfile*> (filePSE, pProf) );
+                        // partProfiles.insert( std::pair<ProfileStoreEntry*,
+                        // rtengine::procparams::AutoPartialProfile*> (filePSE, pProf) );
                     } else if (settings->verbose) {
-                        printf ("failed!\n");
+                        printf("failed!\n");
                     }
                 }
             }
@@ -269,7 +299,7 @@ bool ProfileStore::parseDir (Glib::ustring& realPath, Glib::ustring& virtualPath
     return fileFound;
 }
 
-int ProfileStore::findFolderId (const Glib::ustring &path) const
+int ProfileStore::findFolderId(const Glib::ustring& path) const
 {
     // initialization must have been done when calling this
     for (size_t i = 0; i < folders.size(); ++i) {
@@ -282,12 +312,12 @@ int ProfileStore::findFolderId (const Glib::ustring &path) const
 }
 
 /** @brief Return the ProfileStoreEntry object that match the given file and path
-  *
-  * @param fullPath  Path of the file; the filename may end by the standard extension,
-  *                  but have to begin with a virtual location ( ${G} or ${U} )
-  *                  Will return null on invalid path or if the entry can't be found
-  */
-const ProfileStoreEntry* ProfileStore::findEntryFromFullPathU (Glib::ustring path)
+ *
+ * @param fullPath  Path of the file; the filename may end by the standard extension,
+ *                  but have to begin with a virtual location ( ${G} or ${U} )
+ *                  Will return null on invalid path or if the entry can't be found
+ */
+const ProfileStoreEntry* ProfileStore::findEntryFromFullPathU(Glib::ustring path)
 {
     if (path.empty()) {
         return nullptr;
@@ -303,37 +333,36 @@ const ProfileStoreEntry* ProfileStore::findEntryFromFullPathU (Glib::ustring pat
 
     // consistently apply casefold() to make sure dot position is correct
     const Glib::ustring casefolded_path = path.casefold();
-    const Glib::ustring::size_type lastdot_pos = casefolded_path.find_last_of ('.');
+    const Glib::ustring::size_type lastdot_pos = casefolded_path.find_last_of('.');
 
-    if (
-        lastdot_pos != Glib::ustring::npos
-        && lastdot_pos <= casefolded_path.size() - 4
-        && !casefolded_path.compare (lastdot_pos, 4, App::PARAM_FILE_EXTENSION)
-    ) {
+    if (lastdot_pos != Glib::ustring::npos && lastdot_pos <= casefolded_path.size() - 4
+        && !casefolded_path.compare(lastdot_pos, 4, App::PARAM_FILE_EXTENSION))
+    {
         // removing the extension
         // now use dot position without casefold()
-        path = path.substr (0, path.find_last_of ('.'));
+        path = path.substr(0, path.find_last_of('.'));
     }
 
-    // dir separator may come from options file and may be \ or /, we convert them to G_DIR_SEPARATOR_S
+    // dir separator may come from options file and may be \ or /, we convert them to
+    // G_DIR_SEPARATOR_S
     if (path.size() > 4 && (path[4] == '/' || path[4] == '\\')) {
-        path = path.substr (0, 4) + G_DIR_SEPARATOR_S + path.substr (5);
+        path = path.substr(0, 4) + G_DIR_SEPARATOR_S + path.substr(5);
     }
 
     // removing the filename
-    Glib::ustring fName = Glib::path_get_basename (path);
+    Glib::ustring fName = Glib::path_get_basename(path);
 
     if (!fName.empty()) {
-        path = path.substr (0, path.length() - fName.length());
+        path = path.substr(0, path.length() - fName.length());
     } else {
         // path is malformed, returning NULL;
         return nullptr;
     }
 
-    path = Glib::path_get_dirname (path);
+    path = Glib::path_get_dirname(path);
 
     // 1. find the path in the folder list
-    int parentFolderId = findFolderId (path);
+    int parentFolderId = findFolderId(path);
 
     if (parentFolderId == -1) {
         return nullptr;
@@ -342,7 +371,7 @@ const ProfileStoreEntry* ProfileStore::findEntryFromFullPathU (Glib::ustring pat
     // 2. find the entry that match the given filename and parentFolderId
     if (parentFolderId >= 0) {
         for (auto entry : entries) {
-            if (entry->parentFolderId == parentFolderId  &&  entry->label == fName) {
+            if (entry->parentFolderId == parentFolderId && entry->label == fName) {
                 return entry;
             }
         }
@@ -352,49 +381,51 @@ const ProfileStoreEntry* ProfileStore::findEntryFromFullPathU (Glib::ustring pat
 }
 
 /** Protected version of findEntryFromFullPathU */
-const ProfileStoreEntry* ProfileStore::findEntryFromFullPath (Glib::ustring path)
+const ProfileStoreEntry* ProfileStore::findEntryFromFullPath(Glib::ustring path)
 {
-    MyMutex::MyLock lock (parseMutex);
-    return findEntryFromFullPathU (path);
+    MyMutex::MyLock lock(parseMutex);
+    return findEntryFromFullPathU(path);
 }
 
-const PartialProfile* ProfileStore::getProfile (Glib::ustring path)
+const PartialProfile* ProfileStore::getProfile(Glib::ustring path)
 {
 
     if (storeState == STORESTATE_NOTINITIALIZED) {
         parseProfilesOnce();
     }
 
-    const ProfileStoreEntry *pse = findEntryFromFullPath (path);
+    const ProfileStoreEntry* pse = findEntryFromFullPath(path);
 
     if (!pse) {
         return nullptr;
     }
 
-    return getProfile (pse);
+    return getProfile(pse);
 }
 
-const PartialProfile* ProfileStore::getProfile (const ProfileStoreEntry* entry)
+const PartialProfile* ProfileStore::getProfile(const ProfileStoreEntry* entry)
 {
 
     if (storeState == STORESTATE_NOTINITIALIZED) {
         parseProfilesOnce();
     }
 
-    MyMutex::MyLock lock (parseMutex);
+    MyMutex::MyLock lock(parseMutex);
 
     if (entry == internalDefaultEntry) {
         return internalDefaultProfile;
     }
 
-    std::map<const ProfileStoreEntry*, rtengine::procparams::AutoPartialProfile*>::iterator iter = partProfiles.find (entry);
+    std::map<const ProfileStoreEntry*,
+             rtengine::procparams::AutoPartialProfile*>::iterator iter =
+        partProfiles.find(entry);
 
     if (iter != partProfiles.end()) {
         return iter->second;
     } else {
         // This shouldn't happen!
 #ifndef NDEBUG
-        printf ("WARNING! Profile not found!\n");
+        printf("WARNING! Profile not found!\n");
 #endif
         return nullptr;
     }
@@ -403,9 +434,10 @@ const PartialProfile* ProfileStore::getProfile (const ProfileStoreEntry* entry)
 /** @brief Get a pointer to the profile's vector list
  *
  * This method grants you unique access to the vector list through Mutex locking.
- * When you're done with the file list, you MUST call the releaseFileList method to release the lock.
+ * When you're done with the file list, you MUST call the releaseFileList method to
+ * release the lock.
  */
-const std::vector<const ProfileStoreEntry*>* ProfileStore::getFileList ()
+const std::vector<const ProfileStoreEntry*>* ProfileStore::getFileList()
 {
 
     if (storeState == STORESTATE_NOTINITIALIZED) {
@@ -427,14 +459,15 @@ void ProfileStore::releaseFileList()
  * If the profile doesn't already exist in the profile list,
  * it will add it with default internal values, so this method never fails
  */
-const ProcParams* ProfileStore::getDefaultProcParams (bool isRaw)
+const ProcParams* ProfileStore::getDefaultProcParams(bool isRaw)
 {
 
-    //Note: the mutex is locked in getProfile, called below
-    //      eventual initialization is done there too
+    // Note: the mutex is locked in getProfile, called below
+    //       eventual initialization is done there too
 
     const auto& options = App::get().options();
-    const PartialProfile* pProf = getProfile (isRaw ? options.defProfRaw : options.defProfImg);
+    const PartialProfile* pProf =
+        getProfile(isRaw ? options.defProfRaw : options.defProfImg);
 
     if (!pProf) {
         pProf = internalDefaultProfile;
@@ -445,17 +478,18 @@ const ProcParams* ProfileStore::getDefaultProcParams (bool isRaw)
 
 /*
  * Send back a pointer to the default partial profile for raw or standard images.
- * If it doesn't already exist in the profile list, it will add it with default internal values,
- * so this method will never fails
+ * If it doesn't already exist in the profile list, it will add it with default internal
+ * values, so this method will never fails
  */
-const PartialProfile* ProfileStore::getDefaultPartialProfile (bool isRaw)
+const PartialProfile* ProfileStore::getDefaultPartialProfile(bool isRaw)
 {
 
-    //Note: the mutex is locked in getProfile, called below
-    //      eventual initialization is done there too
+    // Note: the mutex is locked in getProfile, called below
+    //       eventual initialization is done there too
 
     const auto& options = App::get().options();
-    const PartialProfile* pProf = getProfile (isRaw ? options.defProfRaw : options.defProfImg);
+    const PartialProfile* pProf =
+        getProfile(isRaw ? options.defProfRaw : options.defProfImg);
 
     if (!pProf) {
         pProf = internalDefaultProfile;
@@ -464,12 +498,11 @@ const PartialProfile* ProfileStore::getDefaultPartialProfile (bool isRaw)
     return pProf;
 }
 
-const Glib::ustring ProfileStore::getPathFromId (int folderId) const
+const Glib::ustring ProfileStore::getPathFromId(int folderId) const
 {
     // initialization must have been done when calling this
-    return folders.at (folderId);
+    return folders.at(folderId);
 }
-
 
 void ProfileStore::clearFileList()
 {
@@ -493,51 +526,53 @@ void ProfileStore::clearProfileList()
     partProfiles.clear();
 }
 
-void ProfileStore::addListener (ProfileStoreListener *listener)
+void ProfileStore::addListener(ProfileStoreListener* listener)
 {
-    listeners.push_back (listener);
+    listeners.push_back(listener);
 }
 
-void ProfileStore::removeListener (ProfileStoreListener *listener)
+void ProfileStore::removeListener(ProfileStoreListener* listener)
 {
-    listeners.remove (listener);
+    listeners.remove(listener);
 }
 
 void ProfileStore::dumpFolderList()
 {
-    printf ("Folder list:\n------------\n");
+    printf("Folder list:\n------------\n");
 
     for (unsigned int i = 0; i < folders.size(); i++) {
-        printf (" #%3ud - %s\n", i, folders.at (i).c_str());
+        printf(" #%3ud - %s\n", i, folders.at(i).c_str());
     }
 
-    printf ("\n");
+    printf("\n");
 }
 
-PartialProfile *ProfileStore::loadDynamicProfile (const FramesMetaData *im, const Glib::ustring& filename)
+PartialProfile* ProfileStore::loadDynamicProfile(const FramesMetaData* im,
+                                                 const Glib::ustring& filename)
 {
     if (storeState == STORESTATE_NOTINITIALIZED) {
         parseProfilesOnce();
     }
 
-    PartialProfile *ret = new PartialProfile (true, true);
+    PartialProfile* ret = new PartialProfile(true, true);
 
     if (!rulesLoaded) {
         loadRules();
     }
 
     for (auto rule : dynamicRules) {
-        if (rule.matches (im, filename)) {
+        if (rule.matches(im, filename)) {
             if (settings->verbose) {
-                printf ("found matching profile %s\n", rule.profilepath.c_str());
+                printf("found matching profile %s\n", rule.profilepath.c_str());
             }
 
-            const PartialProfile *p = getProfile (rule.profilepath);
+            const PartialProfile* p = getProfile(rule.profilepath);
 
             if (p != nullptr) {
-                p->applyTo (ret->pparams);
+                p->applyTo(ret->pparams);
             } else {
-                printf ("ERROR loading matching profile from: %s\n", rule.profilepath.c_str());
+                printf("ERROR loading matching profile from: %s\n",
+                       rule.profilepath.c_str());
             }
         }
     }
@@ -545,15 +580,25 @@ PartialProfile *ProfileStore::loadDynamicProfile (const FramesMetaData *im, cons
     return ret;
 }
 
-ProfileStoreEntry::ProfileStoreEntry() : type (PSET_FOLDER), parentFolderId (0), folderId (0) {}
+ProfileStoreEntry::ProfileStoreEntry() : type(PSET_FOLDER), parentFolderId(0), folderId(0)
+{
+}
 
-ProfileStoreEntry::ProfileStoreEntry (Glib::ustring label, PSEType type, unsigned short parentFolder, unsigned short folder) : label (label), type (type), parentFolderId (parentFolder), folderId (folder) {}
+ProfileStoreEntry::ProfileStoreEntry(Glib::ustring label,
+                                     PSEType type,
+                                     unsigned short parentFolder,
+                                     unsigned short folder)
+    : label(label), type(type), parentFolderId(parentFolder), folderId(folder)
+{
+}
 
-void ProfileStoreEntry::setValues (Glib::ustring label, PSEType type, unsigned short parentFolder, unsigned short folder)
+void ProfileStoreEntry::setValues(Glib::ustring label,
+                                  PSEType type,
+                                  unsigned short parentFolder,
+                                  unsigned short folder)
 {
     this->label = label;
     this->type = type;
     parentFolderId = parentFolder;
     folderId = folder;
 }
-

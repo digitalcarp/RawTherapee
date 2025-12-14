@@ -25,7 +25,9 @@ class RtScopedConnection
 {
 public:
     RtScopedConnection() = default;
-    RtScopedConnection(sigc::connection&& conn) noexcept : m_connection(std::move(conn)) {}
+    RtScopedConnection(sigc::connection&& conn) noexcept : m_connection(std::move(conn))
+    {
+    }
 
     RtScopedConnection(const RtScopedConnection&) = delete;
     RtScopedConnection(RtScopedConnection&& other)

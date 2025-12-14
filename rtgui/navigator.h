@@ -26,20 +26,26 @@
 
 class PreviewWindow;
 
-class Navigator final :
-    public Gtk::Frame,
-    public PointerMotionListener
+class Navigator final : public Gtk::Frame, public PointerMotionListener
 {
 
     typedef const double (*TMatrix)[3];
 
 private:
-    DelayedCall<bool, const rtengine::procparams::ColorManagementParams *, int, int, int, int, int, bool> pointer_moved_delayed_call;
+    DelayedCall<bool,
+                const rtengine::procparams::ColorManagementParams*,
+                int,
+                int,
+                int,
+                int,
+                int,
+                bool>
+        pointer_moved_delayed_call;
 
     Options::NavigatorUnit currentRGBUnit;
     Options::NavigatorUnit currentHSVUnit;
-    void cycleUnitsRGB (GdkEventButton *event);
-    void cycleUnitsHSV (GdkEventButton *event);
+    void cycleUnitsRGB(GdkEventButton* event);
+    void cycleUnitsHSV(GdkEventButton* event);
 
 protected:
     Gtk::Label* dimension;
@@ -52,7 +58,6 @@ protected:
     Gtk::Label *lH, *lS, *lV;
     Gtk::Label *lLAB_A, *lLAB_B, *lLAB_L;
 
-
 public:
     PreviewWindow* previewWindow;
 
@@ -61,11 +66,33 @@ public:
 
     // pointermotionlistener interface
     //  void pointerMoved (bool validPos, int x, int y, int r, int g, int b);
-    void pointerMoved(bool validPos, const rtengine::procparams::ColorManagementParams &cmp, int x, int y, int r, int g, int b, bool raw = false) override;
-    void setInvalid (int fullWidth = -1, int fullHeight = -1);
+    void pointerMoved(bool validPos,
+                      const rtengine::procparams::ColorManagementParams& cmp,
+                      int x,
+                      int y,
+                      int r,
+                      int g,
+                      int b,
+                      bool raw = false) override;
+    void setInvalid(int fullWidth = -1, int fullHeight = -1);
 
-    void getRGBText (int r, int g, int b, Glib::ustring &sR, Glib::ustring &sG, Glib::ustring &sB, bool isRaw = false) override;
-    void getHSVText (float h, float s, float v, Glib::ustring &sH, Glib::ustring &sS, Glib::ustring &sV) override;
-    void getLABText (float l, float a, float b, Glib::ustring &sL, Glib::ustring &sA, Glib::ustring &sB) override;
-
+    void getRGBText(int r,
+                    int g,
+                    int b,
+                    Glib::ustring& sR,
+                    Glib::ustring& sG,
+                    Glib::ustring& sB,
+                    bool isRaw = false) override;
+    void getHSVText(float h,
+                    float s,
+                    float v,
+                    Glib::ustring& sH,
+                    Glib::ustring& sS,
+                    Glib::ustring& sV) override;
+    void getLABText(float l,
+                    float a,
+                    float b,
+                    Glib::ustring& sL,
+                    Glib::ustring& sA,
+                    Glib::ustring& sB) override;
 };

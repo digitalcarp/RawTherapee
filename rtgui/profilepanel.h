@@ -32,21 +32,19 @@
 
 class ProfileStoreComboBox;
 
-namespace rtengine
-{
+namespace rtengine {
 
 class ProcEvent;
 
-namespace procparams
-{
+namespace procparams {
 
 class ProcParams;
 
 class PartialProfile;
 
-}
+}  // namespace procparams
 
-}
+}  // namespace rtengine
 class RTImage;
 
 class ProfilePanel final :
@@ -57,7 +55,6 @@ class ProfilePanel final :
 {
 
 private:
-
     rtengine::procparams::PartialProfile* storedPProfile;
     Glib::ustring storedValue;
     Glib::ustring lastFilename;
@@ -66,19 +63,18 @@ private:
     RTImage* const profileFillImage;
     Gtk::ToggleButton* fillMode;
     Gtk::TreeIter currRow;
-    ProfileStoreEntry *lastSavedPSE;
-    ProfileStoreEntry *customPSE;
+    ProfileStoreEntry* lastSavedPSE;
+    ProfileStoreEntry* customPSE;
 
-    void          profileFillModeToggled ();
-    bool          isCustomSelected ();
-    bool          isLastSavedSelected ();
-    Gtk::TreeIter getCustomRow ();
-    Gtk::TreeIter getLastSavedRow ();
-    Gtk::TreeIter addCustomRow ();
-    Gtk::TreeIter addLastSavedRow ();
+    void profileFillModeToggled();
+    bool isCustomSelected();
+    bool isLastSavedSelected();
+    Gtk::TreeIter getCustomRow();
+    Gtk::TreeIter getLastSavedRow();
+    Gtk::TreeIter addCustomRow();
+    Gtk::TreeIter addLastSavedRow();
 
 protected:
-
     static PartialPasteDlg* partialProfileDlg;
     Gtk::Button* save;
     Gtk::Button* load;
@@ -91,41 +87,37 @@ protected:
     bool dontupdate;
     sigc::connection changeconn;
     static Gtk::Window* parent;
-    void changeTo (const rtengine::procparams::PartialProfile* newpp, Glib::ustring profname);
+    void changeTo(const rtengine::procparams::PartialProfile* newpp,
+                  Glib::ustring profname);
 
 public:
+    explicit ProfilePanel();
+    ~ProfilePanel() override;
 
-    explicit ProfilePanel ();
-    ~ProfilePanel () override;
+    void setProfileChangeListener(ProfileChangeListener* ppl) { tpc = ppl; }
 
-    void setProfileChangeListener (ProfileChangeListener* ppl)
-    {
-        tpc = ppl;
-    }
-
-    static void init (Gtk::Window* parentWindow);
-    static void cleanup ();
+    static void init(Gtk::Window* parentWindow);
+    static void cleanup();
     void storeCurrentValue() override;
-    void updateProfileList () override;
+    void updateProfileList() override;
     void restoreValue() override;
 
-    void initProfile (const Glib::ustring& profileFullPath, rtengine::procparams::ProcParams* lastSaved);
-    void setInitialFileName (const Glib::ustring& filename);
+    void initProfile(const Glib::ustring& profileFullPath,
+                     rtengine::procparams::ProcParams* lastSaved);
+    void setInitialFileName(const Glib::ustring& filename);
 
     // PParamsChangeListener interface
-    void procParamsChanged(
-        const rtengine::procparams::ProcParams* params,
-        const rtengine::ProcEvent& ev,
-        const Glib::ustring& descr,
-        const ParamsEdited* paramsEdited = nullptr
-    ) override;
+    void procParamsChanged(const rtengine::procparams::ProcParams* params,
+                           const rtengine::ProcEvent& ev,
+                           const Glib::ustring& descr,
+                           const ParamsEdited* paramsEdited = nullptr) override;
     void clearParamChanges() override;
 
     // gui callbacks
-    void save_clicked (GdkEventButton* event);
-    void load_clicked (GdkEventButton* event);
-    void copy_clicked (GdkEventButton* event);
-    void paste_clicked (GdkEventButton* event);
-    void selection_changed ();
+    void save_clicked(GdkEventButton* event);
+    void load_clicked(GdkEventButton* event);
+    void copy_clicked(GdkEventButton* event);
+    void paste_clicked(GdkEventButton* event);
+    void selection_changed();
     void writeOptions();
 };

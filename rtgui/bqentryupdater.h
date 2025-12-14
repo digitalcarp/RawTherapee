@@ -25,29 +25,32 @@
 
 class Thumbnail;
 
-namespace rtengine
-{
-namespace procparams
-{
+namespace rtengine {
+namespace procparams {
 
 class ProcParams;
 
 }
 
-}
+}  // namespace rtengine
 class BQEntryUpdateListener
 {
 
 public:
     virtual ~BQEntryUpdateListener() = default;
-    virtual void updateImage(guint8* img, hidpi::LogicalSize size, int deviceScale, int origw, int origh,
+    virtual void updateImage(guint8* img,
+                             hidpi::LogicalSize size,
+                             int deviceScale,
+                             int origw,
+                             int origh,
                              guint8* newOPreview) = 0;
 };
 
 class BatchQueueEntryUpdater
 {
 
-    struct Job {
+    struct Job
+    {
         guint8* oimg;
         int ow, oh, newh;
         double device_scale;
@@ -64,16 +67,20 @@ protected:
     MyMutex* qMutex;
 
 public:
-    BatchQueueEntryUpdater ();
+    BatchQueueEntryUpdater();
 
-    void process    (guint8* oimg, int ow, int oh, int newh, int device_scale,
-                     BQEntryUpdateListener* listener,
-                     rtengine::procparams::ProcParams* pparams = nullptr,
-                     Thumbnail* thumbnail = nullptr);
-    void removeJobs (BQEntryUpdateListener* listener);
-    void terminate  ();
+    void process(guint8* oimg,
+                 int ow,
+                 int oh,
+                 int newh,
+                 int device_scale,
+                 BQEntryUpdateListener* listener,
+                 rtengine::procparams::ProcParams* pparams = nullptr,
+                 Thumbnail* thumbnail = nullptr);
+    void removeJobs(BQEntryUpdateListener* listener);
+    void terminate();
 
-    void processThread ();
+    void processThread();
 };
 
 extern BatchQueueEntryUpdater batchQueueEntryUpdater;
