@@ -219,7 +219,8 @@ void CanvasPlayground::setupControls()
     auto adjustment = Gtk::Adjustment::create(
         Options::SMOOTH_SCROLL_SENSITIVITY_DEFAULT,
         Options::SMOOTH_SCROLL_SENSITIVITY_MIN,
-        Options::SMOOTH_SCROLL_SENSITIVITY_MAX);
+        Options::SMOOTH_SCROLL_SENSITIVITY_MAX,
+        1, 1);
     m_sense_slider.set_adjustment(adjustment);
     m_sense_slider.set_digits(0);
     auto sense_label = rt::make_managed<Gtk::Label>("Smooth Scroll Sensitivity");
@@ -229,7 +230,8 @@ void CanvasPlayground::setupControls()
     auto pan_adjustment = Gtk::Adjustment::create(
         Options::SMOOTH_SCROLL_PAN_SENSITIVITY_DEFAULT,
         Options::SMOOTH_SCROLL_PAN_SENSITIVITY_MIN,
-        Options::SMOOTH_SCROLL_PAN_SENSITIVITY_MAX);
+        Options::SMOOTH_SCROLL_PAN_SENSITIVITY_MAX,
+        1, 1);
     m_pan_sense_slider.set_adjustment(pan_adjustment);
     m_pan_sense_slider.set_digits(0);
     auto pan_sense_label = rt::make_managed<Gtk::Label>("Smooth Scroll Pan Sensitivity");
@@ -332,13 +334,17 @@ void CanvasPlayground::setupImageBuffer()
 void CanvasPlayground::onSmoothSensitivityChanged()
 {
     m_canvas->setSmoothScrollSensitivity(
-        m_sense_slider.get_value() / Options::SMOOTH_SCROLL_SENSITIVITY_FACTOR);
+        static_cast<int>(m_sense_slider.get_value()),
+        Options::SMOOTH_SCROLL_SENSITIVITY_MIN,
+        Options::SMOOTH_SCROLL_SENSITIVITY_MAX);
 }
 
 void CanvasPlayground::onSmoothPanSensitivityChanged()
 {
     m_canvas->setSmoothScrollPanSensitivity(
-        m_pan_sense_slider.get_value() / Options::SMOOTH_SCROLL_PAN_SENSITIVITY_FACTOR);
+        static_cast<int>(m_pan_sense_slider.get_value()),
+        Options::SMOOTH_SCROLL_PAN_SENSITIVITY_MIN,
+        Options::SMOOTH_SCROLL_PAN_SENSITIVITY_MAX);
 }
 
 void CanvasPlayground::onCameraBoundsChanged()
