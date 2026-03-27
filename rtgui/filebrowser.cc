@@ -1782,7 +1782,6 @@ void FileBrowser::requestColorLabel(int colorlabel)
 
 void FileBrowser::buttonPressed (LWButton* button, int actionCode, void* actionData, int x, int y)
 {
-
     if (actionCode >= 0 && actionCode <= 5) { // rank
         std::vector<FileBrowserEntry*> tbe;
         tbe.push_back (static_cast<FileBrowserEntry*>(actionData));
