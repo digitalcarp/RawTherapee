@@ -2174,7 +2174,11 @@ void FileBrowser::openRequested( std::vector<FileBrowserEntry*> mselected)
 
 void FileBrowser::inspectRequested(std::vector<FileBrowserEntry*> mselected)
 {
-    getInspector()->showWindow(true);
+    idle_register.add([this]() -> bool {
+        this->getInspector()->showWindow(true);
+        this->getInspector()->grab_focus();
+        return false;
+    });
 }
 
 void FileBrowser::onScaleFactorChanged()
