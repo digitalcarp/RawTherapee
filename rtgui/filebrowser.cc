@@ -2183,5 +2183,7 @@ void FileBrowser::inspectRequested(std::vector<FileBrowserEntry*> mselected)
 
 void FileBrowser::onScaleFactorChanged()
 {
-    getInspector()->onBrowserDeviceScaleChanged(get_scale_factor());
+    if (getInspector()) {
+        getInspector()->onBrowserDeviceScaleChanged(get_scale_factor());
+    }
 }
