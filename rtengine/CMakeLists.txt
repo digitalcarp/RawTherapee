@@ -116,6 +116,7 @@ set(RTENGINESOURCEFILES
     stdimagesource.cc
     svgrender.cc
     tmo_fattal02.cc
+    util/dynlib.cc
     utils.cc
     vng4_demosaic_RT.cc
     xtrans_demosaic.cc
@@ -197,6 +198,7 @@ target_link_libraries(rtengine
         tl::expected
         ZLIB::ZLIB
         ${EXTRA_LIB}
+        ${CMAKE_DL_LIBS}
 )
 
 # Atomic is required in some builds: #6821
