@@ -194,6 +194,7 @@ target_link_libraries(rtengine
         PkgConfig::LENSFUN
         PNG::PNG
         TIFF::TIFF
+        tl::expected
         ZLIB::ZLIB
         ${EXTRA_LIB}
 )
