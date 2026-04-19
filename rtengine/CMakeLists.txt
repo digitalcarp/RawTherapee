@@ -181,6 +181,7 @@ target_link_libraries(rtengine
         External::cjson
         External::jpeg_ijg
         External::klt
+        External::span
         fmt::fmt
         PkgConfig::CAIROMM
         PkgConfig::EXIV2

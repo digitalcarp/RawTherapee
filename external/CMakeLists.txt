@@ -49,3 +49,11 @@ if(NOT WITH_SYSTEM_LIBRAW)
 else()
     target_link_libraries(RtLibRaw INTERFACE PkgConfig::LIBRAW)
 endif()
+
+add_library(span INTERFACE)
+add_library(External::span ALIAS span)
+target_include_directories(span INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/span-lite)
+target_compile_definitions(span INTERFACE
+    span_FEATURE_MEMBER_AT=2
+    span_FEATURE_NON_MEMBER_FIRST_LAST_SUB=1
+)
