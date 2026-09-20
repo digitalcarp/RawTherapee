@@ -31,8 +31,7 @@ using namespace rt::canvas;
 
 namespace {
 
-template <class F>
-void draw(const DrawContext& context, F&& draw_func)
+template <class F> void draw(const DrawContext& context, F&& draw_func)
 {
     context.cr->save();
     draw_func();
@@ -57,8 +56,8 @@ void drawFrame(const DrawContext& context)
 
     WidgetSize allocated_size = model->session().camera().size;
 
-    auto color = context.canvas->get_style_context()
-        ->get_border_color(Gtk::STATE_FLAG_NORMAL);
+    auto color =
+        context.canvas->get_style_context()->get_border_color(Gtk::STATE_FLAG_NORMAL);
 
     cr->set_source_rgb(color.get_red(), color.get_green(), color.get_blue());
     cr->set_line_width(1);
@@ -139,8 +138,8 @@ void DebugRenderer::onDraw(const DrawContext& context)
         const CameraState& camera = session.camera();
 
         cr->transform(session.worldToWidgetTransform().matrix());
-        cr->arc(camera.pos.x.value(), camera.pos.y.value(),
-                3 / camera.zoom, 0, 2 * rt::numbers::pi);
+        cr->arc(camera.pos.x.value(), camera.pos.y.value(), 3 / camera.zoom, 0,
+                2 * rt::numbers::pi);
         cr->set_source_rgb(0, 1, 1);
         cr->fill();
     }

@@ -82,8 +82,7 @@ namespace rt {
  * @see https://www.foonathan.net/2016/10/strong-typedefs/
  * @see https://doc.rust-lang.org/rust-by-example/generics/new_types.html
  */
-template <class Tag, class T>
-class NewType
+template <class Tag, class T> class NewType
 {
 public:
     using TagType = Tag;
@@ -93,9 +92,8 @@ public:
 
     explicit NewType(const T& value) : m_value(value) {}
 
-    explicit NewType(T&& value)
-        noexcept(std::is_nothrow_move_constructible<T>::value)
-        : m_value(std::move(value))
+    explicit NewType(T&& value) noexcept(std::is_nothrow_move_constructible<T>::value) :
+        m_value(std::move(value))
     {
     }
 
@@ -115,13 +113,14 @@ private:
     T m_value;
 };
 
-template <class Tag, class T>
-const T& format_as(const NewType<Tag, T>& v) { return v.value(); }
+template <class Tag, class T> const T& format_as(const NewType<Tag, T>& v)
+{
+    return v.value();
+}
 
 namespace new_type {
 
-template <class T>
-struct Addition
+template <class T> struct Addition
 {
     friend T& operator+=(T& lhs, const T& rhs)
     {
@@ -135,8 +134,7 @@ struct Addition
     }
 };
 
-template <class T>
-struct Subtraction
+template <class T> struct Subtraction
 {
     friend T& operator-=(T& lhs, const T& rhs)
     {
@@ -150,8 +148,7 @@ struct Subtraction
     }
 };
 
-template <class T>
-struct Multiplication
+template <class T> struct Multiplication
 {
     friend T& operator*=(T& lhs, const T& rhs)
     {
@@ -165,8 +162,7 @@ struct Multiplication
     }
 };
 
-template <class T>
-struct Division
+template <class T> struct Division
 {
     friend T& operator/=(T& lhs, const T& rhs)
     {
@@ -181,13 +177,15 @@ struct Division
 };
 
 template <class T>
-struct FloatingPointArithmetic
-    : Addition<T>, Subtraction<T>, Multiplication<T>, Division<T>
+struct FloatingPointArithmetic :
+    Addition<T>,
+    Subtraction<T>,
+    Multiplication<T>,
+    Division<T>
 {
 };
 
-template <class T>
-struct Equality
+template <class T> struct Equality
 {
     friend bool operator==(const T& lhs, const T& rhs)
     {
@@ -199,8 +197,7 @@ struct Equality
     }
 };
 
-template <class T>
-struct Comparison
+template <class T> struct Comparison
 {
     friend bool operator<(const T& lhs, const T& rhs)
     {

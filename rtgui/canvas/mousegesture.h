@@ -58,8 +58,10 @@ public:
     // Connect event controllers to widget
     void connect(Gtk::Widget* widget);
 
-    rt::gtk4::EventControllerMotion*
-    motionController() const { return m_motion_controller.get(); }
+    rt::gtk4::EventControllerMotion* motionController() const
+    {
+        return m_motion_controller.get();
+    }
     rt::gtk4::GestureClick* clickGesture() const { return m_click_controller.get(); }
     Gtk::GestureDrag* dragGesture() const { return m_drag_controller.get(); }
 

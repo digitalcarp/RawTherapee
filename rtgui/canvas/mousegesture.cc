@@ -24,8 +24,8 @@
 
 using namespace rt::canvas;
 
-MouseGesture::MouseGesture()
-    : Glib::Object(), m_widget(nullptr), m_state(GestureState::NONE)
+MouseGesture::MouseGesture() :
+    Glib::Object(), m_widget(nullptr), m_state(GestureState::NONE)
 {
 }
 
@@ -70,13 +70,13 @@ void MouseGesture::connect(Gtk::Widget* widget)
 
 void MouseGesture::onEnter(double x, double y)
 {
-    WidgetPoint pos{WidgetScalar(x), WidgetScalar(y)};
+    WidgetPoint pos{ WidgetScalar(x), WidgetScalar(y) };
     signal_enter.emit(pos);
 }
 
 void MouseGesture::onMotion(double x, double y)
 {
-    WidgetPoint pos{WidgetScalar(x), WidgetScalar(y)};
+    WidgetPoint pos{ WidgetScalar(x), WidgetScalar(y) };
     signal_motion.emit(pos);
 
     if (m_state == GestureState::NONE) {
@@ -91,7 +91,7 @@ void MouseGesture::onLeave()
 
 void MouseGesture::onButtonPressed(int n_press, double x, double y)
 {
-    WidgetPoint pos{WidgetScalar(x), WidgetScalar(y)};
+    WidgetPoint pos{ WidgetScalar(x), WidgetScalar(y) };
     const guint button = m_click_controller->get_current_button();
     m_current_button = button;
 
@@ -123,7 +123,7 @@ void MouseGesture::onButtonPressed(int n_press, double x, double y)
 
 void MouseGesture::onButtonReleased(int n_press, double x, double y)
 {
-    WidgetPoint pos{WidgetScalar(x), WidgetScalar(y)};
+    WidgetPoint pos{ WidgetScalar(x), WidgetScalar(y) };
     const guint button = m_click_controller->get_current_button();
     m_current_button = button;
 
@@ -146,7 +146,7 @@ void MouseGesture::onButtonReleased(int n_press, double x, double y)
 
 void MouseGesture::onDragUpdate(double dx, double dy)
 {
-    WidgetVec delta{WidgetScalar(dx), WidgetScalar(dy)};
+    WidgetVec delta{ WidgetScalar(dx), WidgetScalar(dy) };
     const guint button = m_click_controller->get_current_button();
     m_current_button = button;
 
@@ -177,7 +177,7 @@ void MouseGesture::onDragUpdate(double dx, double dy)
 
 void MouseGesture::onDragEnd(double dx, double dy)
 {
-    WidgetVec delta{WidgetScalar(dx), WidgetScalar(dy)};
+    WidgetVec delta{ WidgetScalar(dx), WidgetScalar(dy) };
     const guint button = m_drag_controller->get_current_button();
     m_current_button = button;
 

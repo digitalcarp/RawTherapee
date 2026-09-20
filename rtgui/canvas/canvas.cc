@@ -30,7 +30,7 @@
 #include <gtkmm/gesturezoom.h>
 
 #ifdef GDK_WINDOWING_QUARTZ
-    #include <gdk/gdkquartz.h>
+#include <gdk/gdkquartz.h>
 #endif
 
 using namespace rt::canvas;
@@ -62,8 +62,11 @@ GdkModifierType keyvalToModifier(guint keyval)
     }
 }
 
-double mapSliderLog(int value, int slider_min, int slider_max,
-                    double output_min, double output_max)
+double mapSliderLog(int value,
+                    int slider_min,
+                    int slider_max,
+                    double output_min,
+                    double output_max)
 {
     double t = (value - slider_min) / static_cast<double>(slider_max - slider_min);
     double log_min = std::log10(output_min);
@@ -73,20 +76,20 @@ double mapSliderLog(int value, int slider_min, int slider_max,
 
 }  // namespace
 
-Canvas::Canvas(CanvasModel* model)
-    : Gtk::Widget(),
-      m_renderer(nullptr),
-      m_model(model),
-      m_smooth_scroll_zoom_sensitivity(1),
-      m_smooth_scroll_pan_sensitivity(1),
-      m_scroll_zoom_accum(0),
-      m_camera_zoom_begin(1),
-      m_pan(PanningInput::NONE),
-      m_scroll_mode(ScrollMode::ZOOM),
-      m_is_pan_zoom_enabled(false),
-      m_reverse_discrete_scroll_dir(false),
-      m_reverse_smooth_scroll_dir(false),
-      m_is_cursor_inside_canvas(false)
+Canvas::Canvas(CanvasModel* model) :
+    Gtk::Widget(),
+    m_renderer(nullptr),
+    m_model(model),
+    m_smooth_scroll_zoom_sensitivity(1),
+    m_smooth_scroll_pan_sensitivity(1),
+    m_scroll_zoom_accum(0),
+    m_camera_zoom_begin(1),
+    m_pan(PanningInput::NONE),
+    m_scroll_mode(ScrollMode::ZOOM),
+    m_is_pan_zoom_enabled(false),
+    m_reverse_discrete_scroll_dir(false),
+    m_reverse_smooth_scroll_dir(false),
+    m_is_cursor_inside_canvas(false)
 {
     set_name("RtCanvas");
 
@@ -98,35 +101,28 @@ Canvas::Canvas(CanvasModel* model)
         sigc::mem_fun(*this, &Canvas::onScrollChanged));
 
     m_zoom_controller = Gtk::GestureZoom::create(*this);
-    m_zoom_controller->signal_begin().connect(
-        sigc::mem_fun(*this, &Canvas::onZoomBegin));
+    m_zoom_controller->signal_begin().connect(sigc::mem_fun(*this, &Canvas::onZoomBegin));
     m_zoom_controller->signal_scale_changed().connect(
         sigc::mem_fun(*this, &Canvas::onZoomChanged));
 
     m_mouse_gesture.connect(this);
 
-    m_mouse_gesture.signal_drag_begin.connect(
-        sigc::mem_fun(*this, &Canvas::onDragBegin));
+    m_mouse_gesture.signal_drag_begin.connect(sigc::mem_fun(*this, &Canvas::onDragBegin));
     m_mouse_gesture.signal_drag_update.connect(
         sigc::mem_fun(*this, &Canvas::onDragUpdate));
-    m_mouse_gesture.signal_drag_end.connect(
-        sigc::mem_fun(*this, &Canvas::onDragEnd));
+    m_mouse_gesture.signal_drag_end.connect(sigc::mem_fun(*this, &Canvas::onDragEnd));
 
     m_mouse_gesture.signal_pending_press.connect(
         sigc::mem_fun(*this, &Canvas::onPendingPress));
-    m_mouse_gesture.signal_clicked.connect(
-        sigc::mem_fun(*this, &Canvas::onClick));
+    m_mouse_gesture.signal_clicked.connect(sigc::mem_fun(*this, &Canvas::onClick));
     m_mouse_gesture.signal_cancel_press.connect(
         sigc::mem_fun(*this, &Canvas::onCancelPress));
 
-    m_mouse_gesture.signal_enter.connect(
-        sigc::mem_fun(*this, &Canvas::onEnter));
-    m_mouse_gesture.signal_motion.connect(
-        sigc::mem_fun(*this, &Canvas::onMotion));
+    m_mouse_gesture.signal_enter.connect(sigc::mem_fun(*this, &Canvas::onEnter));
+    m_mouse_gesture.signal_motion.connect(sigc::mem_fun(*this, &Canvas::onMotion));
     m_mouse_gesture.signal_free_motion.connect(
         sigc::mem_fun(*this, &Canvas::onFreeMotion));
-    m_mouse_gesture.signal_leave.connect(
-        sigc::mem_fun(*this, &Canvas::onLeave));
+    m_mouse_gesture.signal_leave.connect(sigc::mem_fun(*this, &Canvas::onLeave));
 
     property_scale_factor().signal_changed().connect(
         sigc::mem_fun(*this, &Canvas::onScaleFactorChanged));
@@ -154,7 +150,10 @@ void Canvas::setSmoothScrollPanSensitivity(int value, int min, int max)
     m_smooth_scroll_pan_sensitivity = mapped;
 }
 
-bool Canvas::isPanning() const { return rt::any(m_pan & PanningInput::ACTIVE); }
+bool Canvas::isPanning() const
+{
+    return rt::any(m_pan & PanningInput::ACTIVE);
+}
 
 void Canvas::onCameraUpdate()
 {
@@ -176,7 +175,10 @@ void Canvas::changeCursor(std::optional<CursorShape> shape)
     }
 }
 
-bool Canvas::on_event(GdkEvent* event) { return m_scroll_controller->onEvent(event); }
+bool Canvas::on_event(GdkEvent* event)
+{
+    return m_scroll_controller->onEvent(event);
+}
 
 bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
@@ -247,7 +249,7 @@ void Canvas::onLeave()
 
 void Canvas::onPendingPress(WidgetPoint pos)
 {
-    ClickContext context{m_model, &m_mouse_gesture};
+    ClickContext context{ m_model, &m_mouse_gesture };
     if (tryPanPendingPress(context, pos)) return;
 }
 
@@ -311,7 +313,7 @@ void Canvas::onScrollBegin()
 
 bool Canvas::onScrollChanged(double dx, double dy)
 {
-    WidgetVec delta{WidgetScalar(dx), WidgetScalar(dy)};
+    WidgetVec delta{ WidgetScalar(dx), WidgetScalar(dy) };
 
     if (tryPanZoomScroll(delta)) return true;
 
@@ -329,7 +331,7 @@ void Canvas::onZoomChanged(double scale)
         double x = 0, y = 0;
         m_zoom_controller->get_bounding_box_center(x, y);
 
-        WidgetPoint new_cursor_pos{WidgetScalar(x), WidgetScalar(y)};
+        WidgetPoint new_cursor_pos{ WidgetScalar(x), WidgetScalar(y) };
         m_model->session().setCursorPos(new_cursor_pos);
 
         double new_zoom = scale * m_camera_zoom_begin;
@@ -364,11 +366,11 @@ bool Canvas::onKeyPressed(guint keyval, guint keycode, GdkModifierType state)
             if (session.modifiers() & GDK_MOD1_MASK) {
                 session.zoomFit(WorldPoint{}, static_cast<WorldSize>(image.fullSize()),
                                 Session::ZoomFitFlags::ADD_MARGIN
-                                | Session::ZoomFitFlags::ALLOW_ZOOM_IN);
+                                    | Session::ZoomFitFlags::ALLOW_ZOOM_IN);
             } else {
                 session.zoomFit(WorldPoint{}, static_cast<WorldSize>(image.fullSize()),
                                 Session::ZoomFitFlags::ADD_MARGIN
-                                | Session::ZoomFitFlags::ALLOW_ZOOM_IN);
+                                    | Session::ZoomFitFlags::ALLOW_ZOOM_IN);
             }
             return true;
         }
@@ -405,8 +407,9 @@ void Canvas::get_preferred_width_vfunc(int& minimum_width, int& natural_width) c
     natural_width = RTScalable::scalePixelSize(640);
 }
 
-void Canvas::get_preferred_height_for_width_vfunc(
-    int width, int& minimum_height, int& natural_height) const
+void Canvas::get_preferred_height_for_width_vfunc(int width,
+                                                  int& minimum_height,
+                                                  int& natural_height) const
 {
     minimum_height = RTScalable::scalePixelSize(64);
     natural_height = width / NATURAL_ASPECT_RATIO;
@@ -418,8 +421,9 @@ void Canvas::get_preferred_height_vfunc(int& minimum_height, int& natural_height
     natural_height = RTScalable::scalePixelSize(480);
 }
 
-void Canvas::get_preferred_width_for_height_vfunc(
-    int height, int& minimum_width, int& natural_width) const
+void Canvas::get_preferred_width_for_height_vfunc(int height,
+                                                  int& minimum_width,
+                                                  int& natural_width) const
 {
     minimum_width = RTScalable::scalePixelSize(64);
     natural_width = height * NATURAL_ASPECT_RATIO;
@@ -429,12 +433,12 @@ void Canvas::on_size_allocate(Gtk::Allocation& allocation)
 {
     set_allocation(allocation);
 
-    m_model->setCameraSize(WidgetSize{
-        WidgetScalar(static_cast<double>(allocation.get_width())),
-        WidgetScalar(static_cast<double>(allocation.get_height()))});
+    m_model->setCameraSize(
+        WidgetSize{ WidgetScalar(static_cast<double>(allocation.get_width())),
+                    WidgetScalar(static_cast<double>(allocation.get_height())) });
     signal_widget_size_update.emit();
 
-    if(m_gdk_window) {
+    if (m_gdk_window) {
         m_gdk_window->move_resize(allocation.get_x(), allocation.get_y(),
                                   allocation.get_width(), allocation.get_height());
     }
@@ -454,6 +458,7 @@ void Canvas::on_realize()
     attributes.width = allocation.get_width();
     attributes.height = allocation.get_height();
 
+    // clang-format off
     attributes.event_mask = get_events()
         | Gdk::EXPOSURE_MASK
         | Gdk::POINTER_MOTION_MASK
@@ -466,11 +471,12 @@ void Canvas::on_realize()
         | Gdk::LEAVE_NOTIFY_MASK
         | Gdk::SCROLL_MASK
         | Gdk::SMOOTH_SCROLL_MASK;
+    // clang-format on
     attributes.window_type = GDK_WINDOW_CHILD;
     attributes.wclass = GDK_INPUT_OUTPUT;
 
-    m_gdk_window = Gdk::Window::create(get_parent_window(), &attributes,
-                                       GDK_WA_X | GDK_WA_Y);
+    m_gdk_window =
+        Gdk::Window::create(get_parent_window(), &attributes, GDK_WA_X | GDK_WA_Y);
     set_window(m_gdk_window);
     // Receive expose events
     m_gdk_window->set_user_data(gobj());
@@ -497,14 +503,16 @@ bool Canvas::tryPanPendingPress(const ClickContext& context, WidgetPoint pos)
     const guint button = context.controller->get_current_button();
 
     if (button == GDK_BUTTON_PRIMARY
-        && rt::any(session.panZoomFlags() & PanZoomFlags::PRIMARY_BUTTON_PAN)) {
+        && rt::any(session.panZoomFlags() & PanZoomFlags::PRIMARY_BUTTON_PAN))
+    {
         m_prev_pan_pos = pos;
         session.changeCursorShape(PAN_CURSOR);
         m_pan |= PanningInput::PRIMARY;
         return true;
     }
     if (button == GDK_BUTTON_MIDDLE
-        && rt::any(session.panZoomFlags() & PanZoomFlags::MIDDLE_BUTTON_PAN)) {
+        && rt::any(session.panZoomFlags() & PanZoomFlags::MIDDLE_BUTTON_PAN))
+    {
         m_prev_pan_pos = pos;
         session.changeCursorShape(PAN_CURSOR);
         m_pan |= PanningInput::MIDDLE;
@@ -770,8 +778,8 @@ void Canvas::updateZoom(double new_zoom, bool preserve_cursor)
     if (new_zoom >= camera.zoom && camera.zoom >= session.maxZoom()) return;
 
     signal_pan_zoom.emit();
-    auto mode = preserve_cursor ? Session::ZoomMode::PRESERVE_CURSOR
-                                : Session::ZoomMode::BASIC;
+    auto mode =
+        preserve_cursor ? Session::ZoomMode::PRESERVE_CURSOR : Session::ZoomMode::BASIC;
     m_model->setCameraZoom(new_zoom, mode);
 }
 

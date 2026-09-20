@@ -109,14 +109,15 @@ public:
 protected:
     // Custom widget implementation
     Gtk::SizeRequestMode get_request_mode_vfunc() const override;
-    void get_preferred_width_vfunc(
-        int& minimum_width, int& natural_width) const override;
-    void get_preferred_height_for_width_vfunc(
-        int width, int& minimum_height, int& natural_height) const override;
-    void get_preferred_height_vfunc(
-        int& minimum_height, int& natural_height) const override;
-    void get_preferred_width_for_height_vfunc(
-        int height, int& minimum_width, int& natural_width) const override;
+    void get_preferred_width_vfunc(int& minimum_width, int& natural_width) const override;
+    void get_preferred_height_for_width_vfunc(int width,
+                                              int& minimum_height,
+                                              int& natural_height) const override;
+    void get_preferred_height_vfunc(int& minimum_height,
+                                    int& natural_height) const override;
+    void get_preferred_width_for_height_vfunc(int height,
+                                              int& minimum_width,
+                                              int& natural_width) const override;
     void on_size_allocate(Gtk::Allocation& allocation) override;
     // TODO(GTK4): on_realize and on_unrealize are no longer needed since
     //             Gdk.Window was removed for snapshots
@@ -189,5 +190,6 @@ private:
 }  // namespace canvas
 }  // namespace rt
 
-template <>
-struct rt::EnumAsBitflags<rt::canvas::PanningInput> : std::true_type {};
+template <> struct rt::EnumAsBitflags<rt::canvas::PanningInput> : std::true_type
+{
+};

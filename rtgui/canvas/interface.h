@@ -62,9 +62,12 @@ struct DrawContext
     Cairo::RefPtr<Cairo::Context> cr;
     Gtk::Widget* canvas;
 
-    DrawContext(Gtk::Widget* widget, CanvasModel* m,
-                const Cairo::RefPtr<Cairo::Context>& cairo)
-        : model(m), cr(cairo), canvas(widget) {}
+    DrawContext(Gtk::Widget* widget,
+                CanvasModel* m,
+                const Cairo::RefPtr<Cairo::Context>& cairo) :
+        model(m), cr(cairo), canvas(widget)
+    {
+    }
 };
 
 class CursorMonitor

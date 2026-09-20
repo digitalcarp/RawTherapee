@@ -44,54 +44,63 @@ namespace rt {
  *     bool no_flags_set = rt::none(result);
  * }
  */
-template <class T>
-struct EnumAsBitflags : std::false_type {};
+template <class T> struct EnumAsBitflags : std::false_type
+{
+};
 
 template <class T, class Result = typename std::remove_cv<T>::type>
-using EnableIfFlags = typename std::enable_if<
-    EnumAsBitflags<typename std::remove_cv<T>::type>::value, Result>::type;
+using EnableIfFlags =
+    typename std::enable_if<EnumAsBitflags<typename std::remove_cv<T>::type>::value,
+                            Result>::type;
 
-template <class T>
-constexpr rt::EnableIfFlags<T, bool> any(T value)
+template <class T> constexpr rt::EnableIfFlags<T, bool> any(T value)
 {
     using U = typename std::underlying_type<T>::type;
     return static_cast<bool>(static_cast<U>(value));
 }
 
-template <class T>
-constexpr rt::EnableIfFlags<T, bool> none(T value) { return !any(value); }
+template <class T> constexpr rt::EnableIfFlags<T, bool> none(T value)
+{
+    return !any(value);
+}
 
 }  // namespace rt
 
-template <class T>
-constexpr rt::EnableIfFlags<T> operator|(T lhs, T rhs) {
+template <class T> constexpr rt::EnableIfFlags<T> operator|(T lhs, T rhs)
+{
     using U = typename std::underlying_type<T>::type;
     return static_cast<T>(static_cast<U>(lhs) | static_cast<U>(rhs));
 }
 
-template <class T>
-constexpr rt::EnableIfFlags<T> operator&(T lhs, T rhs) {
+template <class T> constexpr rt::EnableIfFlags<T> operator&(T lhs, T rhs)
+{
     using U = typename std::underlying_type<T>::type;
     return static_cast<T>(static_cast<U>(lhs) & static_cast<U>(rhs));
 }
 
-template <class T>
-constexpr rt::EnableIfFlags<T> operator^(T lhs, T rhs) {
+template <class T> constexpr rt::EnableIfFlags<T> operator^(T lhs, T rhs)
+{
     using U = typename std::underlying_type<T>::type;
     return static_cast<T>(static_cast<U>(lhs) ^ static_cast<U>(rhs));
 }
 
-template <class T>
-constexpr rt::EnableIfFlags<T> operator~(T val) {
+template <class T> constexpr rt::EnableIfFlags<T> operator~(T val)
+{
     using U = typename std::underlying_type<T>::type;
     return static_cast<T>(~static_cast<U>(val));
 }
 
-template <class T>
-constexpr rt::EnableIfFlags<T>& operator|=(T& lhs, T rhs) { return lhs = lhs | rhs; }
+template <class T> constexpr rt::EnableIfFlags<T>& operator|=(T& lhs, T rhs)
+{
+    return lhs = lhs | rhs;
+}
 
-template <class T>
-constexpr rt::EnableIfFlags<T>& operator&=(T& lhs, T rhs) { return lhs = lhs & rhs; }
+template <class T> constexpr rt::EnableIfFlags<T>& operator&=(T& lhs, T rhs)
+{
+    return lhs = lhs & rhs;
+}
 
-template <class T>
-constexpr rt::EnableIfFlags<T>& operator^=(T& lhs, T rhs) { return lhs = lhs ^ rhs; }
+template <class T> constexpr rt::EnableIfFlags<T>& operator^=(T& lhs, T rhs)
+{
+    return lhs = lhs ^ rhs;
+}

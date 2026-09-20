@@ -27,14 +27,14 @@
 using namespace rt;
 using namespace rt::canvas;
 
-Session::Session()
-    : m_modifiers(GdkModifierType(0)),
-      m_cursor_shape(CSArrow),
-      m_pan_zoom_flags(PanZoomFlags::ALL),
-      m_bound_mode(CameraBounds::NONE),
-      m_zoom_mode(ZoomMode::BASIC),
-      m_min_zoom(0.01),
-      m_max_zoom(256.0)
+Session::Session() :
+    m_modifiers(GdkModifierType(0)),
+    m_cursor_shape(CSArrow),
+    m_pan_zoom_flags(PanZoomFlags::ALL),
+    m_bound_mode(CameraBounds::NONE),
+    m_zoom_mode(ZoomMode::BASIC),
+    m_min_zoom(0.01),
+    m_max_zoom(256.0)
 {
     regenerateTransforms();
 }
@@ -426,7 +426,6 @@ void CanvasModel::zoomFit(Session::ZoomFitFlags flags)
 
 geom::IntBBox CanvasModel::buildImageBBox() const
 {
-    return geom::IntBBox(
-        geom::IntPoint(),
-        static_cast<geom::IntPoint>(m_image_model.fullSize().asPoint()));
+    return geom::IntBBox(geom::IntPoint(),
+                         static_cast<geom::IntPoint>(m_image_model.fullSize().asPoint()));
 }

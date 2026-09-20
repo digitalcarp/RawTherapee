@@ -94,11 +94,7 @@ public:
         PRESERVE_CURSOR  // Set zoom but preserve relative cursor position on screen
     };
 
-    enum class ZoomFitFlags {
-        NONE = 0,
-        ADD_MARGIN = (1 << 0),
-        ALLOW_ZOOM_IN = (1 << 1)
-    };
+    enum class ZoomFitFlags { NONE = 0, ADD_MARGIN = (1 << 0), ALLOW_ZOOM_IN = (1 << 1) };
 
     Session();
 
@@ -115,10 +111,14 @@ public:
     double minZoom() const { return m_min_zoom; }
     double maxZoom() const { return m_max_zoom; }
 
-    const SpaceTransform<WorldSpace, WidgetSpace>&
-    worldToWidgetTransform() const { return m_world_to_widget; }
-    const SpaceTransform<WidgetSpace, WorldSpace>&
-    widgetToWorldTransform() const { return m_widget_to_world; }
+    const SpaceTransform<WorldSpace, WidgetSpace>& worldToWidgetTransform() const
+    {
+        return m_world_to_widget;
+    }
+    const SpaceTransform<WidgetSpace, WorldSpace>& widgetToWorldTransform() const
+    {
+        return m_widget_to_world;
+    }
 
     void setCameraPos(WorldPoint pos);
     void setCameraZoom(double zoom, ZoomMode mode = ZoomMode::BASIC);
@@ -137,7 +137,8 @@ public:
     void refreshCamera(const geom::IntBBox& content);
 
     void zoom11();
-    void zoomFit(WorldPoint top_left, WorldSize img_size,
+    void zoomFit(WorldPoint top_left,
+                 WorldSize img_size,
                  ZoomFitFlags flags = ZoomFitFlags::NONE);
 
     void queueDraw() { m_events.signal_queue_draw.emit(); }
@@ -176,8 +177,10 @@ private:
 class ImageModel
 {
 public:
-    const Cairo::RefPtr<Cairo::ImageSurface>&
-    imageSurface() const { return m_img_surface; }
+    const Cairo::RefPtr<Cairo::ImageSurface>& imageSurface() const
+    {
+        return m_img_surface;
+    }
 
     IntWorldSize fullSize() const { return m_img_size; }
 
@@ -226,8 +229,10 @@ private:
 }  // namespace canvas
 }  // namespace rt
 
-template <>
-struct rt::EnumAsBitflags<rt::canvas::Session::PanZoomFlags> : std::true_type {};
+template <> struct rt::EnumAsBitflags<rt::canvas::Session::PanZoomFlags> : std::true_type
+{
+};
 
-template <>
-struct rt::EnumAsBitflags<rt::canvas::Session::ZoomFitFlags> : std::true_type {};
+template <> struct rt::EnumAsBitflags<rt::canvas::Session::ZoomFitFlags> : std::true_type
+{
+};

@@ -28,22 +28,27 @@
 namespace rt {
 namespace canvas {
 
-struct WorldSpace {};
-struct CameraSpace {};
-struct WidgetSpace {};
+struct WorldSpace
+{
+};
+struct CameraSpace
+{
+};
+struct WidgetSpace
+{
+};
 
 template <class Space, class T>
-struct Scalar
-    : NewType<Space, T>,
-      new_type::Equality<Scalar<Space, T>>,
-      new_type::Comparison<Scalar<Space, T>>,
-      new_type::FloatingPointArithmetic<Scalar<Space, T>>
+struct Scalar :
+    NewType<Space, T>,
+    new_type::Equality<Scalar<Space, T>>,
+    new_type::Comparison<Scalar<Space, T>>,
+    new_type::FloatingPointArithmetic<Scalar<Space, T>>
 {
     // Make constructors available
     using NewType<Space, T>::NewType;
 
-    template <class U>
-    explicit constexpr operator Scalar<Space, U>() const
+    template <class U> explicit constexpr operator Scalar<Space, U>() const
     {
         return Scalar<Space, U>(static_cast<U>(this->value()));
     }
@@ -59,29 +64,24 @@ using IntWidgetScalar = Scalar<WidgetSpace, int>;
 static_assert(sizeof(WorldScalar) == sizeof(double), "Extra padding in Scalar<T>");
 static_assert(sizeof(IntWorldScalar) == sizeof(int), "Extra padding in Scalar<T>");
 
-template <class Space, class T>
-struct Vec;
+template <class Space, class T> struct Vec;
 
-template <class Space, class T>
-struct Point
+template <class Space, class T> struct Point
 {
     Scalar<Space, T> x;
     Scalar<Space, T> y;
 
-    Vec<Space, T> asVec() const { return Vec<Space, T>{x, y}; }
+    Vec<Space, T> asVec() const { return Vec<Space, T>{ x, y }; }
 
     bool operator==(const Point& other) const { return x == other.x && y == other.y; }
     bool operator!=(const Point& other) const { return !(*this == other); }
 
     // static_cast<WorldPoint>(IntWorldPoint{})
     // static_cast<IntWorldPoint>(WorldPoint{})
-    template <class U>
-    explicit operator Point<Space, U>() const
+    template <class U> explicit operator Point<Space, U>() const
     {
-        return Point<Space, U>{
-            static_cast<Scalar<Space, U>>(x),
-            static_cast<Scalar<Space, U>>(y)
-        };
+        return Point<Space, U>{ static_cast<Scalar<Space, U>>(x),
+                                static_cast<Scalar<Space, U>>(y) };
     }
 
     // static_cast<geom::IntPoint>(IntWorldPoint{})
@@ -89,7 +89,7 @@ struct Point
               typename std::enable_if<std::is_same<U, int>::value, int>::type = 0>
     explicit operator geom::IntPoint() const
     {
-        return geom::IntPoint{x.value(), y.value()};
+        return geom::IntPoint{ x.value(), y.value() };
     }
 
     // static_cast<geom::Point>(WorldPoint{})
@@ -97,12 +97,12 @@ struct Point
               typename std::enable_if<std::is_same<U, double>::value, int>::type = 0>
     explicit operator geom::Point() const
     {
-        return geom::Point{x.value(), y.value()};
+        return geom::Point{ x.value(), y.value() };
     }
 
     friend Point operator+(Point point, Vec<Space, T> offset)
     {
-        return Point{point.x + offset.x, point.y + offset.y};
+        return Point{ point.x + offset.x, point.y + offset.y };
     }
 
     friend Point& operator+=(Point& point, Vec<Space, T> offset)
@@ -114,12 +114,12 @@ struct Point
 
     friend Vec<Space, T> operator-(Point lhs, Point rhs)
     {
-        return Vec<Space, T>{lhs.x - rhs.x , lhs.y - rhs.y};
+        return Vec<Space, T>{ lhs.x - rhs.x, lhs.y - rhs.y };
     }
 
     friend Point operator-(Point point, Vec<Space, T> offset)
     {
-        return Point{point.x - offset.x , point.y - offset.y};
+        return Point{ point.x - offset.x, point.y - offset.y };
     }
 
     friend Point& operator-=(Point& point, Vec<Space, T> offset)
@@ -136,8 +136,7 @@ using WidgetPoint = Point<WidgetSpace, double>;
 
 using IntWorldPoint = Point<WorldSpace, int>;
 
-template <class Space, class T>
-struct Vec
+template <class Space, class T> struct Vec
 {
     Scalar<Space, T> x;
     Scalar<Space, T> y;
@@ -148,7 +147,7 @@ struct Vec
     friend Vec operator*(Vec vec, double scale)
     {
         Scalar<Space, T> s(scale);
-        return Vec{vec.x * s, vec.y * s};
+        return Vec{ vec.x * s, vec.y * s };
     }
 
     friend Vec& operator*=(Vec& vec, double scale)
@@ -162,7 +161,7 @@ struct Vec
     friend Vec operator/(Vec vec, double scale)
     {
         Scalar<Space, T> s(scale);
-        return Vec{vec.x / s, vec.y / s};
+        return Vec{ vec.x / s, vec.y / s };
     }
 
     friend Vec& operator/=(Vec& vec, double scale)
@@ -178,14 +177,13 @@ using WorldVec = Vec<WorldSpace, double>;
 using CameraVec = Vec<CameraSpace, double>;
 using WidgetVec = Vec<WidgetSpace, double>;
 
-template <class Space, class T>
-struct Size
+template <class Space, class T> struct Size
 {
     Scalar<Space, T> width;
     Scalar<Space, T> height;
 
-    Point<Space, T> asPoint() const { return Point<Space, T>{width, height}; }
-    Vec<Space, T> asVec() const { return Vec<Space, T>{width, height}; }
+    Point<Space, T> asPoint() const { return Point<Space, T>{ width, height }; }
+    Vec<Space, T> asVec() const { return Vec<Space, T>{ width, height }; }
 
     bool operator==(const Size& other) const
     {
@@ -195,19 +193,16 @@ struct Size
 
     // static_cast<WorldSize>(IntWorldSize{})
     // static_cast<IntWorldSize>(WorldSize{})
-    template <class U>
-    explicit operator Size<Space, U>() const
+    template <class U> explicit operator Size<Space, U>() const
     {
-        return Size<Space, U>{
-            static_cast<Scalar<Space, U>>(width),
-            static_cast<Scalar<Space, U>>(height)
-        };
+        return Size<Space, U>{ static_cast<Scalar<Space, U>>(width),
+                               static_cast<Scalar<Space, U>>(height) };
     }
 
     friend Size operator*(Size size, double scale)
     {
         Scalar<Space, T> s(scale);
-        return Size{size.width * s, size.height * s};
+        return Size{ size.width * s, size.height * s };
     }
 
     friend Size& operator*=(Size& size, double scale)
@@ -221,7 +216,7 @@ struct Size
     friend Size operator/(Size size, double scale)
     {
         Scalar<Space, T> s(scale);
-        return Size{size.width / s, size.height / s};
+        return Size{ size.width / s, size.height / s };
     }
 
     friend Size& operator/=(Size& size, double scale)
@@ -248,8 +243,7 @@ struct CameraState
     int device_scale = 1.0;
 };
 
-template <class FromSpace, class ToSpace>
-class SpaceTransform
+template <class FromSpace, class ToSpace> class SpaceTransform
 {
 public:
     static SpaceTransform build(const CameraState& camera);
@@ -263,7 +257,7 @@ public:
         double x = point.x.value();
         double y = point.y.value();
         m_matrix.transform_point(x, y);
-        return {Scalar<ToSpace, double>(x), Scalar<ToSpace, double>(y)};
+        return { Scalar<ToSpace, double>(x), Scalar<ToSpace, double>(y) };
     }
 
     Vec<ToSpace, double> operator()(Vec<FromSpace, double> vec) const
@@ -271,7 +265,7 @@ public:
         double x = vec.x.value();
         double y = vec.y.value();
         m_matrix.transform_distance(x, y);
-        return {Scalar<ToSpace, double>(x), Scalar<ToSpace, double>(y)};
+        return { Scalar<ToSpace, double>(x), Scalar<ToSpace, double>(y) };
     }
 
     Size<ToSpace, double> operator()(Size<FromSpace, double> vec) const
@@ -279,7 +273,7 @@ public:
         double width = vec.width.value();
         double height = vec.height.value();
         m_matrix.transform_distance(width, height);
-        return {Scalar<ToSpace, double>(width), Scalar<ToSpace, double>(height)};
+        return { Scalar<ToSpace, double>(width), Scalar<ToSpace, double>(height) };
     }
 
     Scalar<ToSpace, double> operator()(Scalar<FromSpace, double> value) const
@@ -295,7 +289,7 @@ public:
         double x = point.x.value();
         double y = point.y.value();
         m_matrix.transform_point(x, y);
-        return {Scalar<ToSpace, double>(x), Scalar<ToSpace, double>(y)};
+        return { Scalar<ToSpace, double>(x), Scalar<ToSpace, double>(y) };
     }
 
     Scalar<ToSpace, double> operator()(Scalar<FromSpace, int> value) const
@@ -426,18 +420,18 @@ inline WorldPoint cameraToWorld(CameraPoint point, const CameraState& camera)
 
 inline WorldPoint toWorldPoint(geom::Point p)
 {
-    return WorldPoint{WorldScalar(p.x), WorldScalar(p.y)};
+    return WorldPoint{ WorldScalar(p.x), WorldScalar(p.y) };
 }
 
 }  // namespace canvas
 }  // namespace rt
 
 template <class Space, class T>
-struct fmt::formatter<rt::canvas::Point<Space, T>>
-    : fmt::formatter<rt::canvas::Scalar<Space, T>>
+struct fmt::formatter<rt::canvas::Point<Space, T>> :
+    fmt::formatter<rt::canvas::Scalar<Space, T>>
 {
-    auto format(rt::canvas::Point<Space, T> p, fmt::format_context& ctx) const
-        -> fmt::format_context::iterator
+    auto format(rt::canvas::Point<Space, T> p,
+                fmt::format_context& ctx) const -> fmt::format_context::iterator
     {
         using Underlying = fmt::formatter<rt::canvas::Scalar<Space, T>>;
         auto out = ctx.out();
@@ -451,11 +445,11 @@ struct fmt::formatter<rt::canvas::Point<Space, T>>
 };
 
 template <class Space, class T>
-struct fmt::formatter<rt::canvas::Vec<Space, T>>
-    : fmt::formatter<rt::canvas::Scalar<Space, T>>
+struct fmt::formatter<rt::canvas::Vec<Space, T>> :
+    fmt::formatter<rt::canvas::Scalar<Space, T>>
 {
-    auto format(rt::canvas::Vec<Space, T> v, fmt::format_context& ctx) const
-        -> fmt::format_context::iterator
+    auto format(rt::canvas::Vec<Space, T> v,
+                fmt::format_context& ctx) const -> fmt::format_context::iterator
     {
         using Underlying = fmt::formatter<rt::canvas::Scalar<Space, T>>;
         auto out = ctx.out();
@@ -469,11 +463,11 @@ struct fmt::formatter<rt::canvas::Vec<Space, T>>
 };
 
 template <class Space, class T>
-struct fmt::formatter<rt::canvas::Size<Space, T>>
-    : fmt::formatter<rt::canvas::Scalar<Space, T>>
+struct fmt::formatter<rt::canvas::Size<Space, T>> :
+    fmt::formatter<rt::canvas::Scalar<Space, T>>
 {
-    auto format(rt::canvas::Size<Space, T> s, fmt::format_context& ctx) const
-        -> fmt::format_context::iterator
+    auto format(rt::canvas::Size<Space, T> s,
+                fmt::format_context& ctx) const -> fmt::format_context::iterator
     {
         using Underlying = fmt::formatter<rt::canvas::Scalar<Space, T>>;
         auto out = ctx.out();
