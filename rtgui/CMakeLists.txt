@@ -12,9 +12,10 @@ set(CLISOURCEFILES
 
 set(RT_GUI_CANVAS_SOURCES
     canvas/canvas.cc
-    canvas/model.cc
+    canvas/imagecanvas.cc
+    canvas/imagemodel.cc
+    canvas/imagerender.cc
     canvas/mousegesture.cc
-    canvas/render.cc
 )
 
 set(RT_GUI_TOOL_PANEL_SOURCES

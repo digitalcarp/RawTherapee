@@ -19,9 +19,9 @@
 
 #include "inspector.h"
 
-#include "canvas/canvas.h"
-#include "canvas/model.h"
-#include "canvas/render.h"
+#include "canvas/imagecanvas.h"
+#include "canvas/imagemodel.h"
+#include "canvas/imagerender.h"
 #include "guiutils.h"
 #include "multilangmgr.h"
 #include "options.h"
@@ -48,7 +48,7 @@ struct InspectorBuffer
 };
 
 Inspector::Inspector()
-    : m_canvas_model(std::make_unique<CanvasModel>()),
+    : m_canvas_model(std::make_unique<ImageCanvasModel>()),
       m_renderer(std::make_unique<InspectorRenderer>()),
       m_curr_image(nullptr),
       m_is_active(false),
@@ -63,7 +63,7 @@ Inspector::Inspector()
 {
     set_name("Inspector");
 
-    m_canvas = rt::make_managed<Canvas>(m_canvas_model.get());
+    m_canvas = rt::make_managed<ImageCanvas>(m_canvas_model.get());
     m_canvas->setRenderer(m_renderer.get());
     onPreferencesChanged();  // Configure pan zoom based on options
     pack_start(*m_canvas, true, true);
@@ -100,20 +100,20 @@ Inspector::Inspector()
         m_window->set_size_request(500, 500);
         m_window->fullscreen();
 
-        m_canvas_model->session().setCameraBounds(Session::CameraBounds::INSPECTOR_WINDOW);
+        m_canvas_model->session()->setCameraBounds(EditorSession::CameraBounds::INSPECTOR_WINDOW);
 
         m_canvas->enablePanZoom(true);
         m_canvas->signal_pan_zoom.connect(
             sigc::mem_fun(*this, &Inspector::onCanvasPanZoom));
         m_canvas->signal_widget_size_update.connect(
             sigc::mem_fun(*this, &Inspector::onCanvasSizeChanged));
-        m_canvas_model->session().canvasEvents().signal_camera_update.connect(
+        m_canvas_model->session()->canvasEvents().signal_camera_update.connect(
             sigc::mem_fun(*this, &Inspector::onCameraUpdate));
 
         m_is_initialized = false;  // Delay init to avoid flickering on some systems
         m_is_active = true;  // Always track inspected thumbnails
     } else {
-        m_canvas_model->session().setCameraBounds(Session::CameraBounds::INSPECTOR_PANEL);
+        m_canvas_model->session()->setCameraBounds(EditorSession::CameraBounds::INSPECTOR_PANEL);
         m_renderer->setDrawFrame(true);
     }
 
@@ -173,10 +173,10 @@ bool Inspector::onKeyPressed(guint keyval, guint keycode, GdkModifierType state)
                     m_canvas_model->setCameraPosZoom(m_last_camera_pos, 1.0);
                 } else {
                     m_canvas_model->setCameraZoom(
-                        1.0, m_canvas_model->session().preferredZoomMode());
+                        1.0, m_canvas_model->session()->zoomMode());
                 }
                 recordObservedRect();
-                m_canvas_model->session().queueDraw();
+                m_canvas_model->session()->queueDraw();
             }
             m_fit_to_screen = false;
             return true;
@@ -186,7 +186,7 @@ bool Inspector::onKeyPressed(guint keyval, guint keycode, GdkModifierType state)
             if (m_is_pinned) {
                 m_canvas_model->zoomFit();
                 recordObservedRect();
-                m_canvas_model->session().queueDraw();
+                m_canvas_model->session()->queueDraw();
             }
             return true;
         case GDK_KEY_F11:
@@ -260,7 +260,7 @@ bool Inspector::onWindowFocusOut(GdkEventFocus* event)
     // is lost. Reset the value here so that the first button press is not
     // ignored when the window is opened again afterwards.
     m_is_key_down = false;
-    m_canvas_model->session().onWindowFocusLost(m_canvas_model.get());
+    m_canvas_model->session()->onWindowFocusLost(m_canvas_model.get());
     return false;
 }
 
@@ -275,7 +275,7 @@ void Inspector::onBrowserDeviceScaleChanged(int device_scale)
     // window initially and the browser must have already been mapped, we can
     // preload the device scale to prevent the flicker.
     if (m_window && !m_is_device_scale_initialized) {
-        m_canvas_model->session().setDeviceScale(device_scale);
+        m_canvas_model->session()->setDeviceScale(device_scale);
         m_is_device_scale_initialized = true;
     }
 }
@@ -294,7 +294,7 @@ void Inspector::onCanvasSizeChanged()
 void Inspector::onCameraUpdate()
 {
     if (!m_fit_to_screen) {
-        const CameraState& camera = m_canvas_model->session().camera();
+        const CameraState& camera = m_canvas_model->session()->camera();
         m_last_camera_pos = camera.pos;
     }
 }
@@ -317,14 +317,14 @@ void Inspector::onPreferencesChanged()
 
     switch (options.zoom11Mode) {
         case Options::Zoom11Mode::CENTER_CURSOR:
-            m_canvas_model->session().setZoomMode(Session::ZoomMode::CENTER_CURSOR);
+            m_canvas_model->session()->setZoomMode(ZoomMode::CENTER_CURSOR);
             break;
         case Options::Zoom11Mode::PRESERVE_CURSOR:
-            m_canvas_model->session().setZoomMode(Session::ZoomMode::PRESERVE_CURSOR);
+            m_canvas_model->session()->setZoomMode(ZoomMode::PRESERVE_CURSOR);
             break;
         case Options::Zoom11Mode::BASIC:
         default:
-            m_canvas_model->session().setZoomMode(Session::ZoomMode::BASIC);
+            m_canvas_model->session()->setZoomMode(ZoomMode::BASIC);
             break;
     }
 }
@@ -348,7 +348,7 @@ void Inspector::mouseMove(rtengine::Coord2D pos)
 
     m_canvas_model->setCameraPos(WorldPoint{WorldScalar(x), WorldScalar(y)});
     recordObservedRect();
-    m_canvas_model->session().queueDraw();
+    m_canvas_model->session()->queueDraw();
 }
 
 void Inspector::switchImage(const Glib::ustring& full_path)
@@ -478,7 +478,7 @@ void Inspector::showImageOnCanvas()
 
     m_last_image_path = m_curr_image->filepath;
     recordObservedRect();
-    m_canvas_model->session().queueDraw();
+    m_canvas_model->session()->queueDraw();
 }
 
 void Inspector::clearCanvas()
@@ -486,7 +486,7 @@ void Inspector::clearCanvas()
     m_canvas_model->image().setImageSurface(
         Cairo::RefPtr<Cairo::ImageSurface>{}, IntWorldSize{});
     m_canvas_model->setCameraPosZoom(WorldPoint{}, 1.0);
-    m_canvas_model->session().queueDraw();
+    m_canvas_model->session()->queueDraw();
 }
 
 void Inspector::recordObservedRect()
@@ -503,7 +503,7 @@ void Inspector::recordObservedRect()
 
     geom::Rect img_bbox(geom::Point(), geom::Point(width, height));
 
-    geom::Rect cam_bbox = m_canvas_model->session().cameraBBox();
+    geom::Rect cam_bbox = m_canvas_model->session()->cameraBBox();
 
     std::optional<geom::Rect> observed_bbox = cam_bbox.intersect(img_bbox);
     if (!observed_bbox) {

@@ -19,8 +19,6 @@
 
 #include "canvas.h"
 
-#include "model.h"
-
 #include "guiutils.h"
 #include "rtscalable.h"
 
@@ -37,7 +35,6 @@ using namespace rt::canvas;
 
 namespace {
 
-using PanZoomFlags = Session::PanZoomFlags;
 using ScrollUnit = rt::gtk4::ScrollUnit;
 
 constexpr CursorShape PAN_CURSOR = CSHandClosed;
@@ -78,7 +75,6 @@ double mapSliderLog(int value,
 
 Canvas::Canvas(CanvasModel* model) :
     Gtk::Widget(),
-    m_renderer(nullptr),
     m_model(model),
     m_smooth_scroll_zoom_sensitivity(1),
     m_smooth_scroll_pan_sensitivity(1),
@@ -127,12 +123,12 @@ Canvas::Canvas(CanvasModel* model) :
     property_scale_factor().signal_changed().connect(
         sigc::mem_fun(*this, &Canvas::onScaleFactorChanged));
 
-    Session& session = m_model->session();
-    session.canvasEvents().signal_camera_update.connect(
+    Session* session = m_model->session();
+    session->canvasEvents().signal_camera_update.connect(
         sigc::mem_fun(*this, &Canvas::onCameraUpdate));
-    session.canvasEvents().signal_queue_draw.connect(
+    session->canvasEvents().signal_queue_draw.connect(
         sigc::mem_fun(*this, &Canvas::queue_draw));
-    m_change_cursor_connection = session.canvasEvents().signal_change_cursor.connect(
+    m_change_cursor_connection = session->canvasEvents().signal_change_cursor.connect(
         sigc::mem_fun(*this, &Canvas::changeCursor));
 }
 
@@ -157,12 +153,12 @@ bool Canvas::isPanning() const
 
 void Canvas::onCameraUpdate()
 {
-    Session& session = m_model->session();
+    Session* session = m_model->session();
 
     updateCursorShape();
 
     for (CursorMonitor* listener : m_cursor_monitors) {
-        listener->onMotion(m_model, session.cursorPos());
+        listener->onMotion(m_model, session->cursorPos());
     }
 }
 
@@ -180,24 +176,12 @@ bool Canvas::on_event(GdkEvent* event)
     return m_scroll_controller->onEvent(event);
 }
 
-bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
-{
-    if (!m_renderer) return true;
-
-    DrawContext context(this, m_model, cr);
-    cr->save();
-    m_renderer->onDraw(context);
-    cr->restore();
-
-    return true;
-}
-
 void Canvas::onEnter(WidgetPoint pos)
 {
     m_is_cursor_inside_canvas = true;
 
-    Session& session = m_model->session();
-    session.setCursorPos(pos);
+    Session* session = m_model->session();
+    session->setCursorPos(pos);
     updateCursorShape();
 
     for (CursorMonitor* listener : m_cursor_monitors) {
@@ -207,8 +191,8 @@ void Canvas::onEnter(WidgetPoint pos)
 
 void Canvas::onMotion(WidgetPoint pos)
 {
-    Session& session = m_model->session();
-    session.setCursorPos(pos);
+    Session* session = m_model->session();
+    session->setCursorPos(pos);
 
     if (!isPanning()) {
         for (CursorMonitor* listener : m_cursor_monitors) {
@@ -249,8 +233,7 @@ void Canvas::onLeave()
 
 void Canvas::onPendingPress(WidgetPoint pos)
 {
-    ClickContext context{ m_model, &m_mouse_gesture };
-    if (tryPanPendingPress(context, pos)) return;
+    if (tryPanPendingPress(pos)) return;
 }
 
 void Canvas::onClick(int n_press, WidgetPoint pos)
@@ -322,7 +305,7 @@ bool Canvas::onScrollChanged(double dx, double dy)
 
 void Canvas::onZoomBegin(GdkEventSequence* /* sequence */)
 {
-    m_camera_zoom_begin = m_model->session().camera().zoom;
+    m_camera_zoom_begin = m_model->session()->camera().zoom;
 }
 
 void Canvas::onZoomChanged(double scale)
@@ -332,7 +315,7 @@ void Canvas::onZoomChanged(double scale)
         m_zoom_controller->get_bounding_box_center(x, y);
 
         WidgetPoint new_cursor_pos{ WidgetScalar(x), WidgetScalar(y) };
-        m_model->session().setCursorPos(new_cursor_pos);
+        m_model->session()->setCursorPos(new_cursor_pos);
 
         double new_zoom = scale * m_camera_zoom_begin;
         updateZoom(new_zoom);
@@ -342,36 +325,22 @@ void Canvas::onZoomChanged(double scale)
 
 bool Canvas::onKeyPressed(guint keyval, guint keycode, GdkModifierType state)
 {
-    Session& session = m_model->session();
+    Session* session = m_model->session();
     const int updated_state = state | keyvalToModifier(keyval);
-    session.setModifiers(GdkModifierType(updated_state));
+    session->setModifiers(GdkModifierType(updated_state));
 
     if (m_is_pan_zoom_enabled) {
-        const PanZoomFlags flags = session.panZoomFlags();
+        const PanZoomFlags flags = session->panZoomFlags();
         const bool allow_space_pan = rt::any(flags & PanZoomFlags::SPACE_KEY_PAN);
 
         if ((keyval == GDK_KEY_space) && allow_space_pan) {
             if (m_is_cursor_inside_canvas) {
-                m_prev_pan_pos = session.cursorPos();
-                session.changeCursorShape(PAN_CURSOR);
+                m_prev_pan_pos = session->cursorPos();
+                session->changeCursorShape(PAN_CURSOR);
                 m_pan |= PanningInput::SPACEBAR;
             }
             return true;
-        } else if (keyval == GDK_KEY_z) {
-            session.zoom11();
-            return true;
-        } else if (keyval == GDK_KEY_f) {
-            const ImageModel& image = m_model->image();
-            // TODO: Zoom to crop when alt not held down
-            if (session.modifiers() & GDK_MOD1_MASK) {
-                session.zoomFit(WorldPoint{}, static_cast<WorldSize>(image.fullSize()),
-                                Session::ZoomFitFlags::ADD_MARGIN
-                                    | Session::ZoomFitFlags::ALLOW_ZOOM_IN);
-            } else {
-                session.zoomFit(WorldPoint{}, static_cast<WorldSize>(image.fullSize()),
-                                Session::ZoomFitFlags::ADD_MARGIN
-                                    | Session::ZoomFitFlags::ALLOW_ZOOM_IN);
-            }
+        } else if (onZoomKeyPressed(keyval)) {
             return true;
         }
     }
@@ -381,9 +350,9 @@ bool Canvas::onKeyPressed(guint keyval, guint keycode, GdkModifierType state)
 
 void Canvas::onKeyReleased(guint keyval, guint keycode, GdkModifierType state)
 {
-    Session& session = m_model->session();
+    Session* session = m_model->session();
     const int updated_state = state & ~keyvalToModifier(keyval);
-    session.setModifiers(GdkModifierType(updated_state));
+    session->setModifiers(GdkModifierType(updated_state));
 
     if (m_is_pan_zoom_enabled) {
         if (keyval == GDK_KEY_space) {
@@ -495,26 +464,26 @@ void Canvas::onScaleFactorChanged()
     signal_widget_size_update.emit();
 }
 
-bool Canvas::tryPanPendingPress(const ClickContext& context, WidgetPoint pos)
+bool Canvas::tryPanPendingPress(WidgetPoint pos)
 {
     if (!m_is_pan_zoom_enabled) return false;
 
-    Session& session = m_model->session();
-    const guint button = context.controller->get_current_button();
+    Session* session = m_model->session();
+    const guint button = m_mouse_gesture.get_current_button();
 
     if (button == GDK_BUTTON_PRIMARY
-        && rt::any(session.panZoomFlags() & PanZoomFlags::PRIMARY_BUTTON_PAN))
+        && rt::any(session->panZoomFlags() & PanZoomFlags::PRIMARY_BUTTON_PAN))
     {
         m_prev_pan_pos = pos;
-        session.changeCursorShape(PAN_CURSOR);
+        session->changeCursorShape(PAN_CURSOR);
         m_pan |= PanningInput::PRIMARY;
         return true;
     }
     if (button == GDK_BUTTON_MIDDLE
-        && rt::any(session.panZoomFlags() & PanZoomFlags::MIDDLE_BUTTON_PAN))
+        && rt::any(session->panZoomFlags() & PanZoomFlags::MIDDLE_BUTTON_PAN))
     {
         m_prev_pan_pos = pos;
-        session.changeCursorShape(PAN_CURSOR);
+        session->changeCursorShape(PAN_CURSOR);
         m_pan |= PanningInput::MIDDLE;
         return true;
     }
@@ -535,10 +504,10 @@ bool Canvas::tryPanZoomScroll(WidgetVec scroll_delta)
 
 bool Canvas::tryZoomScroll(WidgetVec scroll_delta)
 {
-    const Session& session = m_model->session();
-    const CameraState& camera = session.camera();
-    const PanZoomFlags flags = session.panZoomFlags();
-    const GdkModifierType state = session.modifiers();
+    const Session* session = m_model->session();
+    const CameraState& camera = session->camera();
+    const PanZoomFlags flags = session->panZoomFlags();
+    const GdkModifierType state = session->modifiers();
     const bool is_smooth = m_scroll_controller->get_scroll_unit() == ScrollUnit::SURFACE;
 
     auto allow = [&](PanZoomFlags test) { return rt::any(flags & test); };
@@ -611,10 +580,10 @@ bool Canvas::tryZoomScroll(WidgetVec scroll_delta)
 
 bool Canvas::tryPanScroll(WidgetVec scroll_delta)
 {
-    const Session& session = m_model->session();
-    const CameraState& camera = session.camera();
-    const PanZoomFlags flags = session.panZoomFlags();
-    const GdkModifierType state = session.modifiers();
+    const Session* session = m_model->session();
+    const CameraState& camera = session->camera();
+    const PanZoomFlags flags = session->panZoomFlags();
+    const GdkModifierType state = session->modifiers();
     const bool is_smooth = m_scroll_controller->get_scroll_unit() == ScrollUnit::SURFACE;
 
     auto allow = [&](PanZoomFlags test) { return rt::any(flags & test); };
@@ -703,12 +672,12 @@ bool Canvas::tryPanScroll(WidgetVec scroll_delta)
 
 void Canvas::updatePan(WidgetPoint delta_pos)
 {
-    Session& session = m_model->session();
-    const CameraState& camera = session.camera();
+    Session* session = m_model->session();
+    const CameraState& camera = session->camera();
 
     WidgetVec widget_offset = delta_pos - m_prev_pan_pos;
 
-    WorldVec adjustment = session.widgetToWorldTransform()(widget_offset);
+    WorldVec adjustment = session->widgetToWorldTransform()(widget_offset);
     WorldPoint new_pos = camera.pos - adjustment;
 
     m_prev_pan_pos = delta_pos;
@@ -718,10 +687,10 @@ void Canvas::updatePan(WidgetPoint delta_pos)
 
 void Canvas::updatePanWithScroll(WidgetVec delta)
 {
-    Session& session = m_model->session();
-    const CameraState& camera = session.camera();
+    Session* session = m_model->session();
+    const CameraState& camera = session->camera();
 
-    WorldVec bounds = session.widgetToWorldTransform()(camera.size.asVec());
+    WorldVec bounds = session->widgetToWorldTransform()(camera.size.asVec());
     double step = rt::min(bounds.x.value(), bounds.y.value());
     double pan_sensitivity = 0.1;
 
@@ -771,34 +740,34 @@ void Canvas::updateHorizontalPanWithScroll(WidgetVec delta)
 
 void Canvas::updateZoom(double new_zoom, bool preserve_cursor)
 {
-    Session& session = m_model->session();
-    const CameraState& camera = session.camera();
+    Session* session = m_model->session();
+    const CameraState& camera = session->camera();
 
-    if (new_zoom <= camera.zoom && camera.zoom <= session.minZoom()) return;
-    if (new_zoom >= camera.zoom && camera.zoom >= session.maxZoom()) return;
+    if (new_zoom <= camera.zoom && camera.zoom <= session->minZoom()) return;
+    if (new_zoom >= camera.zoom && camera.zoom >= session->maxZoom()) return;
 
     signal_pan_zoom.emit();
-    auto mode =
-        preserve_cursor ? Session::ZoomMode::PRESERVE_CURSOR : Session::ZoomMode::BASIC;
+    auto mode = preserve_cursor ? ZoomMode::PRESERVE_CURSOR : ZoomMode::BASIC;
     m_model->setCameraZoom(new_zoom, mode);
 }
 
 void Canvas::updateCursorShape()
 {
-    Session& session = m_model->session();
+    Session* session = m_model->session();
 
     std::optional<CursorShape> shape;
     if (isPanning()) {
         shape = PAN_CURSOR;
     }
+
     if (!shape) {
-        shape = m_model->isCursorInsideImage() ? CSCrosshair : CSArrow;
+        shape = queryCursorShape();
     }
 
     // Prevent recursive cursor shape updates
     ConnectionBlocker blocker(m_change_cursor_connection);
-    if (*shape != session.cursorShape()) {
-        session.changeCursorShape(*shape);
+    if (*shape != session->cursorShape()) {
+        session->changeCursorShape(*shape);
         m_cursor_manager.setCursor(*shape);
     }
 }

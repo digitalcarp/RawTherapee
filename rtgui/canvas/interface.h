@@ -23,51 +23,117 @@
 
 #include "cursormanager.h"  // For CursorShape
 
-#include <cairomm/refptr.h>
+#include "rtengine/util/enum.h"
+
+#include <sigc++/sigc++.h>
+
+#include <optional>
 
 namespace Cairo {
 class Context;
 }
 
 namespace Gtk {
-
 class Widget;
-
 }  // namespace Gtk
 
 namespace rt {
 namespace canvas {
 
-class CanvasModel;
 class MouseGesture;
 
-struct ClickContext
-{
-    CanvasModel* model;
-    const MouseGesture* controller;
+// clang-format off
+enum class PanZoomFlags {
+    NONE = 0,
+    PRIMARY_BUTTON_PAN   = (1 << 0),
+    MIDDLE_BUTTON_PAN    = (1 << 1),
+    SPACE_KEY_PAN        = (1 << 2),
+    PAN_WITH_SCROLL      = (1 << 3),
+    PAN_WITH_MOD_SCROLL  = (1 << 4),
+    ZOOM_WITH_SCROLL     = (1 << 5),
+    ZOOM_WITH_MOD_SCROLL = (1 << 6),
+    // Aggregate masks
+    PAN    = PRIMARY_BUTTON_PAN | MIDDLE_BUTTON_PAN | SPACE_KEY_PAN
+             | PAN_WITH_SCROLL | PAN_WITH_MOD_SCROLL,
 
-    ClickContext(CanvasModel* m, const MouseGesture* c) : model(m), controller(c) {}
+    ZOOM   = ZOOM_WITH_SCROLL | ZOOM_WITH_MOD_SCROLL,
+
+    SCROLL = PAN_WITH_SCROLL | PAN_WITH_MOD_SCROLL
+             | ZOOM_WITH_SCROLL | ZOOM_WITH_MOD_SCROLL,
+
+    ALL    = PAN | ZOOM
+};
+// clang-format on
+
+enum class ZoomMode {
+    BASIC,           // Set value directly
+    CENTER_CURSOR,   // Set zoom centered on cursor
+    PRESERVE_CURSOR  // Set zoom but preserve relative cursor position on screen
 };
 
-struct KeyContext
+struct CanvasEvents
 {
-    CanvasModel* model;
+    using CameraUpdateSignal = sigc::signal<void()>;
+    using QueueDrawSignal = sigc::signal<void()>;
+    using ChangeCursorSignal = sigc::signal<void(std::optional<CursorShape>)>;
 
-    KeyContext(CanvasModel* m) : model(m) {}
+    CameraUpdateSignal signal_camera_update;
+    QueueDrawSignal signal_queue_draw;
+    ChangeCursorSignal signal_change_cursor;
 };
 
-struct DrawContext
+class Session
 {
-    const CanvasModel* model;
-    Cairo::RefPtr<Cairo::Context> cr;
-    Gtk::Widget* canvas;
+public:
+    virtual ~Session() = default;
 
-    DrawContext(Gtk::Widget* widget,
-                CanvasModel* m,
-                const Cairo::RefPtr<Cairo::Context>& cairo) :
-        model(m), cr(cairo), canvas(widget)
-    {
-    }
+    virtual const CameraState& camera() const = 0;
+    virtual WidgetPoint cursorPos() const = 0;
+    virtual CursorShape cursorShape() const = 0;
+    virtual GdkModifierType modifiers() const = 0;
+
+    virtual PanZoomFlags panZoomFlags() const = 0;
+    virtual ZoomMode zoomMode() const = 0;
+
+    virtual double minZoom() const = 0;
+    virtual double maxZoom() const = 0;
+
+    virtual const SpaceTransform<WorldSpace, WidgetSpace>&
+    worldToWidgetTransform() const = 0;
+    virtual const SpaceTransform<WidgetSpace, WorldSpace>&
+    widgetToWorldTransform() const = 0;
+
+    virtual CanvasEvents& canvasEvents() = 0;
+
+    virtual void setCameraPos(WorldPoint pos) = 0;
+    virtual void setCameraZoom(double zoom, ZoomMode mode = ZoomMode::BASIC) = 0;
+    virtual void setCameraPosZoom(WorldPoint pos, double zoom) = 0;
+    virtual void setCameraSize(WidgetSize size) = 0;
+    virtual void setDeviceScale(int device_scale) = 0;
+
+    virtual void setCursorPos(WidgetPoint pos) = 0;
+    virtual void setModifiers(GdkModifierType state) = 0;
+
+    virtual void setPanZoomFlags(PanZoomFlags flags) = 0;
+    virtual void setZoomMode(ZoomMode mode) = 0;
+
+    virtual void changeCursorShape(std::optional<CursorShape> shape) = 0;
+};
+
+class CanvasModel
+{
+public:
+    virtual ~CanvasModel() = default;
+
+    virtual Session* session() = 0;
+    virtual const Session* session() const = 0;
+
+    virtual void setCameraPos(WorldPoint pos) = 0;
+    virtual void setCameraZoom(double zoom, ZoomMode mode = ZoomMode::BASIC) = 0;
+    virtual void setCameraPosZoom(WorldPoint pos, double zoom) = 0;
+    virtual void setCameraSize(WidgetSize size) = 0;
+    virtual void setDeviceScale(int device_scale) = 0;
+    virtual void refreshCamera() = 0;
 };
 
 class CursorMonitor
@@ -80,13 +146,9 @@ public:
     virtual void onLeave(const CanvasModel* model) {}
 };
 
-class Renderer
-{
-public:
-    virtual ~Renderer() = default;
-
-    virtual void onDraw(const DrawContext& context) = 0;
-};
-
 }  // namespace canvas
 }  // namespace rt
+
+template <> struct rt::EnumAsBitflags<rt::canvas::PanZoomFlags> : std::true_type
+{
+};

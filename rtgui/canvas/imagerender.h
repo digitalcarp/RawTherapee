@@ -24,6 +24,30 @@
 namespace rt {
 namespace canvas {
 
+class ImageCanvasModel;
+
+struct DrawContext
+{
+    Gtk::Widget* canvas;
+    const ImageCanvasModel* model;
+    Cairo::RefPtr<Cairo::Context> cr;
+
+    DrawContext(Gtk::Widget* widget,
+                const ImageCanvasModel* m,
+                const Cairo::RefPtr<Cairo::Context>& cairo) :
+        canvas(widget), model(m), cr(cairo)
+    {
+    }
+};
+
+class Renderer
+{
+public:
+    virtual ~Renderer() = default;
+
+    virtual void onDraw(const DrawContext& context) = 0;
+};
+
 class ImageRenderer final : public Renderer
 {
 public:

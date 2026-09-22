@@ -61,7 +61,7 @@ enum class ScrollMode {
     PAN    // Scrolling initiates panning by default
 };
 
-class Canvas final : public Gtk::Widget
+class Canvas : public Gtk::Widget
 {
 public:
     using PanZoomSignal = sigc::signal<void()>;
@@ -69,6 +69,9 @@ public:
 
     Canvas(CanvasModel* model);
     ~Canvas();
+
+    CanvasModel* model() { return m_model; }
+    const CanvasModel* model() const { return m_model; }
 
     void enablePanZoom(bool value) { m_is_pan_zoom_enabled = value; }
     void setSmoothScrollZoomSensitivity(int value, int min, int max);
@@ -87,7 +90,6 @@ public:
     {
         m_cursor_monitors.push_back(listener);
     }
-    void setRenderer(Renderer* renderer) { m_renderer = renderer; }
 
     void changeCursor(std::optional<CursorShape> shape);
 
@@ -125,7 +127,20 @@ protected:
     void on_unrealize() override;
     bool on_event(GdkEvent* event) override;
 
-    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
+    // Canvas behaviour customization
+
+    virtual bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override
+    {
+        return false;
+    }
+
+    /**
+     * Check for zoom key shortcuts and trigger if detected.
+     *
+     * @return true if a zoom key was pressed
+     */
+    virtual bool onZoomKeyPressed(guint keyval) { return false; }
+    virtual std::optional<CursorShape> queryCursorShape() const { return std::nullopt; }
 
 private:
     // Event controller slots
@@ -149,7 +164,7 @@ private:
     void onCameraUpdate();
 
     bool isPanning() const;
-    bool tryPanPendingPress(const ClickContext& context, WidgetPoint pos);
+    bool tryPanPendingPress(WidgetPoint pos);
     bool tryPanZoomScroll(WidgetVec scroll_delta);
     bool tryZoomScroll(WidgetVec scroll_delta);
     bool tryPanScroll(WidgetVec scroll_delta);
@@ -169,7 +184,6 @@ private:
     sigc::connection m_change_cursor_connection;
 
     std::vector<CursorMonitor*> m_cursor_monitors;
-    Renderer* m_renderer;
     CanvasModel* m_model;
 
     // Pan/zoom state

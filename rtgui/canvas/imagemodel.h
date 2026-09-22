@@ -19,15 +19,14 @@
 
 #pragma once
 
-#include "coord.h"
 #include "interface.h"
 
 #include "rtengine/math/rect.h"
 #include "rtengine/util/enum.h"
 
+#include <cairomm/refptr.h>
 #include <cairomm/surface.h>
 #include <gdk/gdk.h>
-#include <sigc++/sigc++.h>
 
 #include <memory>
 #include <optional>
@@ -35,45 +34,11 @@
 namespace rt {
 namespace canvas {
 
-class CanvasModel;
+class ImageCanvasModel;
 
-struct CanvasEvents
-{
-    using CameraUpdateSignal = sigc::signal<void()>;
-    using QueueDrawSignal = sigc::signal<void()>;
-    using ChangeCursorSignal = sigc::signal<void(std::optional<CursorShape>)>;
-
-    CameraUpdateSignal signal_camera_update;
-    QueueDrawSignal signal_queue_draw;
-    ChangeCursorSignal signal_change_cursor;
-};
-
-class Session
+class EditorSession : public Session
 {
 public:
-    // clang-format off
-    enum class PanZoomFlags {
-        NONE = 0,
-        PRIMARY_BUTTON_PAN   = (1 << 0),
-        MIDDLE_BUTTON_PAN    = (1 << 1),
-        SPACE_KEY_PAN        = (1 << 2),
-        PAN_WITH_SCROLL      = (1 << 3),
-        PAN_WITH_MOD_SCROLL  = (1 << 4),
-        ZOOM_WITH_SCROLL     = (1 << 5),
-        ZOOM_WITH_MOD_SCROLL = (1 << 6),
-        // Aggregate masks
-        PAN    = PRIMARY_BUTTON_PAN | MIDDLE_BUTTON_PAN | SPACE_KEY_PAN
-                 | PAN_WITH_SCROLL | PAN_WITH_MOD_SCROLL,
-
-        ZOOM   = ZOOM_WITH_SCROLL | ZOOM_WITH_MOD_SCROLL,
-
-        SCROLL = PAN_WITH_SCROLL | PAN_WITH_MOD_SCROLL
-                 | ZOOM_WITH_SCROLL | ZOOM_WITH_MOD_SCROLL,
-
-        ALL    = PAN | ZOOM
-    };
-    // clang-format on
-
     enum class CameraBounds {
         // No bounds
         NONE,
@@ -88,49 +53,44 @@ public:
         INSPECTOR_WINDOW
     };
 
-    enum class ZoomMode {
-        BASIC,           // Set value directly
-        CENTER_CURSOR,   // Set zoom centered on cursor
-        PRESERVE_CURSOR  // Set zoom but preserve relative cursor position on screen
-    };
-
     enum class ZoomFitFlags { NONE = 0, ADD_MARGIN = (1 << 0), ALLOW_ZOOM_IN = (1 << 1) };
 
-    Session();
+    EditorSession();
 
     rt::geom::Rect cameraBBox() const;
 
-    const CameraState& camera() const { return m_camera; }
-    WidgetPoint cursorPos() const { return m_cursor_pos; }
-    GdkModifierType modifiers() const { return m_modifiers; }
-    CursorShape cursorShape() const { return m_cursor_shape; }
-    PanZoomFlags panZoomFlags() const { return m_pan_zoom_flags; }
+    const CameraState& camera() const override { return m_camera; }
+    WidgetPoint cursorPos() const override { return m_cursor_pos; }
+    GdkModifierType modifiers() const override { return m_modifiers; }
+    CursorShape cursorShape() const override { return m_cursor_shape; }
+    PanZoomFlags panZoomFlags() const override { return m_pan_zoom_flags; }
+    ZoomMode zoomMode() const override { return m_zoom_mode; }
+
+    double minZoom() const override { return m_min_zoom; }
+    double maxZoom() const override { return m_max_zoom; }
+
     CameraBounds cameraBounds() const { return m_bound_mode; }
-    ZoomMode preferredZoomMode() const { return m_zoom_mode; }
 
-    double minZoom() const { return m_min_zoom; }
-    double maxZoom() const { return m_max_zoom; }
-
-    const SpaceTransform<WorldSpace, WidgetSpace>& worldToWidgetTransform() const
+    const SpaceTransform<WorldSpace, WidgetSpace>& worldToWidgetTransform() const override
     {
         return m_world_to_widget;
     }
-    const SpaceTransform<WidgetSpace, WorldSpace>& widgetToWorldTransform() const
+    const SpaceTransform<WidgetSpace, WorldSpace>& widgetToWorldTransform() const override
     {
         return m_widget_to_world;
     }
 
-    void setCameraPos(WorldPoint pos);
-    void setCameraZoom(double zoom, ZoomMode mode = ZoomMode::BASIC);
-    void setCameraPosZoom(WorldPoint pos, double zoom);
-    void setCameraSize(WidgetSize size);
-    void setDeviceScale(int device_scale);
-    void setCursorPos(WidgetPoint pos) { m_cursor_pos = pos; }
-    void setModifiers(GdkModifierType state) { m_modifiers = state; }
-    void setPanZoomFlags(PanZoomFlags flags) { m_pan_zoom_flags = flags; }
-    void setCameraBounds(CameraBounds bounds) { m_bound_mode = bounds; }
-    void setZoomMode(ZoomMode mode) { m_zoom_mode = mode; }
+    void setCameraPos(WorldPoint pos) override;
+    void setCameraZoom(double zoom, ZoomMode mode = ZoomMode::BASIC) override;
+    void setCameraPosZoom(WorldPoint pos, double zoom) override;
+    void setCameraSize(WidgetSize size) override;
+    void setDeviceScale(int device_scale) override;
+    void setCursorPos(WidgetPoint pos) override { m_cursor_pos = pos; }
+    void setModifiers(GdkModifierType state) override { m_modifiers = state; }
+    void setPanZoomFlags(PanZoomFlags flags) override { m_pan_zoom_flags = flags; }
+    void setZoomMode(ZoomMode mode) override { m_zoom_mode = mode; }
 
+    void setCameraBounds(CameraBounds bounds) { m_bound_mode = bounds; }
     // Apply camera bounds before update
     void setCameraBounds(const geom::IntBBox& content, CameraBounds mode);
     void setCamera(const geom::IntBBox& content, const CameraState& new_state);
@@ -198,41 +158,39 @@ private:
     IntWorldSize m_img_size;
 };
 
-class CanvasModel
+class ImageCanvasModel : public CanvasModel
 {
 public:
-    Session& session() { return m_session; }
-    const Session& session() const { return m_session; }
+    EditorSession* session() override { return &m_session; }
+    const EditorSession* session() const override { return &m_session; }
 
     ImageModel& image() { return m_image_model; }
     const ImageModel& image() const { return m_image_model; }
 
     bool isCursorInsideImage() const;
 
-    void setCameraPos(WorldPoint pos);
-    void setCameraZoom(double zoom, Session::ZoomMode mode = Session::ZoomMode::BASIC);
-    void setCameraPosZoom(WorldPoint pos, double zoom);
-    void setCameraSize(WidgetSize size);
-    void setDeviceScale(int device_scale);
-    void setCameraBounds(Session::CameraBounds bounds);
-    void refreshCamera();
+    void setCameraPos(WorldPoint pos) override;
+    void setCameraZoom(double zoom, ZoomMode mode = ZoomMode::BASIC) override;
+    void setCameraPosZoom(WorldPoint pos, double zoom) override;
+    void setCameraSize(WidgetSize size) override;
+    void setDeviceScale(int device_scale) override;
+    void refreshCamera() override;
 
-    void zoomFit(Session::ZoomFitFlags flags = Session::ZoomFitFlags::NONE);
+    void setCameraBounds(EditorSession::CameraBounds bounds);
+
+    void zoomFit(EditorSession::ZoomFitFlags flags = EditorSession::ZoomFitFlags::NONE);
 
 private:
     rt::geom::IntBBox buildImageBBox() const;
 
-    Session m_session;
+    EditorSession m_session;
     ImageModel m_image_model;
 };
 
 }  // namespace canvas
 }  // namespace rt
 
-template <> struct rt::EnumAsBitflags<rt::canvas::Session::PanZoomFlags> : std::true_type
-{
-};
-
-template <> struct rt::EnumAsBitflags<rt::canvas::Session::ZoomFitFlags> : std::true_type
+template <>
+struct rt::EnumAsBitflags<rt::canvas::EditorSession::ZoomFitFlags> : std::true_type
 {
 };

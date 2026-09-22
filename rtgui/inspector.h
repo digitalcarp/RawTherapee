@@ -34,8 +34,8 @@
 namespace rt {
 namespace canvas {
 
-class Canvas;
-class CanvasModel;
+class ImageCanvas;
+class ImageCanvasModel;
 class InspectorRenderer;
 
 }  // namespace canvas
@@ -47,9 +47,9 @@ class Inspector final : public Gtk::Box
 {
 private:
     std::unique_ptr<Gtk::Window> m_window;
-    std::unique_ptr<rt::canvas::CanvasModel> m_canvas_model;
+    std::unique_ptr<rt::canvas::ImageCanvasModel> m_canvas_model;
     std::unique_ptr<rt::canvas::InspectorRenderer> m_renderer;
-    rt::canvas::Canvas* m_canvas;
+    rt::canvas::ImageCanvas* m_canvas;
 
     Glib::RefPtr<rt::gtk4::GestureClick> m_click_controller;
     Glib::RefPtr<rt::gtk4::EventControllerKey> m_key_controller;

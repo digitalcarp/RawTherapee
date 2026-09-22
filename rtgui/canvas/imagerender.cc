@@ -17,9 +17,9 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "render.h"
+#include "imagerender.h"
 
-#include "model.h"
+#include "imagemodel.h"
 
 #include "rtengine/math/math.h"
 
@@ -40,10 +40,10 @@ template <class F> void draw(const DrawContext& context, F&& draw_func)
 
 void drawBackground(const DrawContext& context)
 {
-    const CanvasModel* model = context.model;
+    const ImageCanvasModel* model = context.model;
     const auto& cr = context.cr;
 
-    WidgetSize allocated_size = model->session().camera().size;
+    WidgetSize allocated_size = model->session()->camera().size;
 
     context.canvas->get_style_context()->render_background(
         cr, 0, 0, allocated_size.width.value(), allocated_size.height.value());
@@ -51,10 +51,10 @@ void drawBackground(const DrawContext& context)
 
 void drawFrame(const DrawContext& context)
 {
-    const CanvasModel* model = context.model;
+    const ImageCanvasModel* model = context.model;
     const auto& cr = context.cr;
 
-    WidgetSize allocated_size = model->session().camera().size;
+    WidgetSize allocated_size = model->session()->camera().size;
 
     auto color =
         context.canvas->get_style_context()->get_border_color(Gtk::STATE_FLAG_NORMAL);
@@ -70,17 +70,17 @@ void drawFrame(const DrawContext& context)
 
 void ImageRenderer::onDraw(const DrawContext& context)
 {
-    const CanvasModel* model = context.model;
+    const ImageCanvasModel* model = context.model;
     const auto& cr = context.cr;
 
     if (!model->image().imageSurface()) return;
 
-    const Session& session = model->session();
+    const Session* session = model->session();
 
-    cr->transform(session.worldToWidgetTransform().matrix());
+    cr->transform(session->worldToWidgetTransform().matrix());
 
     auto pattern = Cairo::SurfacePattern::create(model->image().imageSurface());
-    if (session.camera().zoom >= 1.0) {
+    if (session->camera().zoom >= 1.0) {
         pattern->set_filter(Cairo::FILTER_NEAREST);
         pattern->set_extend(Cairo::EXTEND_NONE);
         cr->set_antialias(Cairo::ANTIALIAS_NONE);
@@ -93,13 +93,13 @@ void ImageRenderer::onDraw(const DrawContext& context)
 
 void DebugRenderer::onDraw(const DrawContext& context)
 {
-    const CanvasModel* model = context.model;
+    const ImageCanvasModel* model = context.model;
     const auto& cr = context.cr;
 
-    const Session& session = model->session();
+    const Session* session = model->session();
 
     cr->save();
-    cr->transform(session.worldToWidgetTransform().matrix());
+    cr->transform(session->worldToWidgetTransform().matrix());
 
     if (m_flags & Flags::GRID) {
         cr->set_source_rgba(0, 0, 0, 0.4);
@@ -135,9 +135,9 @@ void DebugRenderer::onDraw(const DrawContext& context)
     cr->restore();
 
     if (m_flags & Flags::CAMERA_ORIGIN) {
-        const CameraState& camera = session.camera();
+        const CameraState& camera = session->camera();
 
-        cr->transform(session.worldToWidgetTransform().matrix());
+        cr->transform(session->worldToWidgetTransform().matrix());
         cr->arc(camera.pos.x.value(), camera.pos.y.value(), 3 / camera.zoom, 0,
                 2 * rt::numbers::pi);
         cr->set_source_rgb(0, 1, 1);

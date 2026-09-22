@@ -17,7 +17,7 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "model.h"
+#include "imagemodel.h"
 
 #include "cursormanager.h"
 
@@ -27,7 +27,7 @@
 using namespace rt;
 using namespace rt::canvas;
 
-Session::Session() :
+EditorSession::EditorSession() :
     m_modifiers(GdkModifierType(0)),
     m_cursor_shape(CSArrow),
     m_pan_zoom_flags(PanZoomFlags::ALL),
@@ -39,7 +39,7 @@ Session::Session() :
     regenerateTransforms();
 }
 
-geom::Rect Session::cameraBBox() const
+geom::Rect EditorSession::cameraBBox() const
 {
     WorldSize size = m_widget_to_world(m_camera.size);
     WorldVec vec = size.asVec() / 2.0;
@@ -50,7 +50,7 @@ geom::Rect Session::cameraBBox() const
     return rt::geom::Rect(top_left, bot_right);
 }
 
-void Session::setCameraPos(WorldPoint pos)
+void EditorSession::setCameraPos(WorldPoint pos)
 {
     if (m_camera.pos == pos) return;
 
@@ -60,7 +60,7 @@ void Session::setCameraPos(WorldPoint pos)
     queueDraw();
 }
 
-void Session::setCameraZoom(double zoom, Session::ZoomMode mode)
+void EditorSession::setCameraZoom(double zoom, ZoomMode mode)
 {
     if (m_camera.zoom == zoom) return;
 
@@ -95,7 +95,7 @@ void Session::setCameraZoom(double zoom, Session::ZoomMode mode)
     queueDraw();
 }
 
-void Session::setCameraPosZoom(WorldPoint pos, double zoom)
+void EditorSession::setCameraPosZoom(WorldPoint pos, double zoom)
 {
     if (m_camera.pos == pos && m_camera.zoom == zoom) return;
 
@@ -106,7 +106,7 @@ void Session::setCameraPosZoom(WorldPoint pos, double zoom)
     queueDraw();
 }
 
-void Session::setCameraSize(WidgetSize size)
+void EditorSession::setCameraSize(WidgetSize size)
 {
     if (m_camera.size == size) return;
 
@@ -116,7 +116,7 @@ void Session::setCameraSize(WidgetSize size)
     queueDraw();
 }
 
-void Session::setDeviceScale(int device_scale)
+void EditorSession::setDeviceScale(int device_scale)
 {
     if (m_camera.device_scale == device_scale) return;
 
@@ -126,14 +126,14 @@ void Session::setDeviceScale(int device_scale)
     queueDraw();
 }
 
-void Session::setCameraBounds(const geom::IntBBox& content, CameraBounds bounds)
+void EditorSession::setCameraBounds(const geom::IntBBox& content, CameraBounds bounds)
 {
     if (m_bound_mode == bounds) return;
     m_bound_mode = bounds;
     refreshCamera(content);
 }
 
-void Session::setCamera(const geom::IntBBox& content, const CameraState& new_state)
+void EditorSession::setCamera(const geom::IntBBox& content, const CameraState& new_state)
 {
     switch (m_bound_mode) {
         case CameraBounds::EDITOR:
@@ -157,8 +157,8 @@ void Session::setCamera(const geom::IntBBox& content, const CameraState& new_sta
     queueDraw();
 }
 
-CameraState Session::adjustForEditor(const geom::IntBBox& content,
-                                     const CameraState& new_state)
+CameraState EditorSession::adjustForEditor(const geom::IntBBox& content,
+                                           const CameraState& new_state)
 {
     CameraState adjusted = new_state;
     adjusted.zoom = rt::clamp(new_state.zoom, m_min_zoom, m_max_zoom);
@@ -187,8 +187,8 @@ CameraState Session::adjustForEditor(const geom::IntBBox& content,
     return adjusted;
 }
 
-CameraState Session::adjustForInspectorPanel(const geom::IntBBox& content,
-                                             const CameraState& new_state)
+CameraState EditorSession::adjustForInspectorPanel(const geom::IntBBox& content,
+                                                   const CameraState& new_state)
 {
     CameraState adjusted = new_state;
     adjusted.zoom = rt::clamp(new_state.zoom, m_min_zoom, m_max_zoom);
@@ -235,8 +235,8 @@ CameraState Session::adjustForInspectorPanel(const geom::IntBBox& content,
     return adjusted;
 }
 
-CameraState Session::adjustForInspectorWindow(const geom::IntBBox& content,
-                                              const CameraState& new_state)
+CameraState EditorSession::adjustForInspectorWindow(const geom::IntBBox& content,
+                                                    const CameraState& new_state)
 {
     CameraState adjusted = new_state;
     adjusted.zoom = rt::clamp(new_state.zoom, m_min_zoom, m_max_zoom);
@@ -289,12 +289,12 @@ CameraState Session::adjustForInspectorWindow(const geom::IntBBox& content,
     return adjusted;
 }
 
-void Session::refreshCamera(const geom::IntBBox& content)
+void EditorSession::refreshCamera(const geom::IntBBox& content)
 {
     setCamera(content, m_camera);
 }
 
-void Session::changeCursorShape(std::optional<CursorShape> shape)
+void EditorSession::changeCursorShape(std::optional<CursorShape> shape)
 {
     if (shape) {
         m_cursor_shape = *shape;
@@ -302,12 +302,12 @@ void Session::changeCursorShape(std::optional<CursorShape> shape)
     m_events.signal_change_cursor.emit(shape);
 }
 
-void Session::zoom11()
+void EditorSession::zoom11()
 {
-    setCameraZoom(1.0, preferredZoomMode());
+    setCameraZoom(1.0, zoomMode());
 }
 
-void Session::zoomFit(WorldPoint top_left, WorldSize img_size, ZoomFitFlags flags)
+void EditorSession::zoomFit(WorldPoint top_left, WorldSize img_size, ZoomFitFlags flags)
 {
     WorldPoint center = top_left + (img_size.asVec()) / 2.0;
 
@@ -334,12 +334,12 @@ void Session::zoomFit(WorldPoint top_left, WorldSize img_size, ZoomFitFlags flag
     setCameraPosZoom(center, zoom);
 }
 
-void Session::onWindowFocusLost(CanvasModel* model)
+void EditorSession::onWindowFocusLost(CanvasModel* model)
 {
     m_modifiers = GdkModifierType(0);
 }
 
-void Session::regenerateTransforms()
+void EditorSession::regenerateTransforms()
 {
     m_world_to_widget = SpaceTransform<WorldSpace, WidgetSpace>::build(m_camera);
     m_widget_to_world = SpaceTransform<WidgetSpace, WorldSpace>::build(m_camera);
@@ -354,13 +354,13 @@ bool ImageModel::isInsideImage(WorldPoint pos) const
     return bbox.contains(static_cast<geom::Point>(pos));
 }
 
-bool CanvasModel::isCursorInsideImage() const
+bool ImageCanvasModel::isCursorInsideImage() const
 {
     WorldPoint pos = m_session.widgetToWorldTransform()(m_session.cursorPos());
     return m_image_model.isInsideImage(pos);
 }
 
-void CanvasModel::setCameraPos(WorldPoint pos)
+void ImageCanvasModel::setCameraPos(WorldPoint pos)
 {
     CameraState camera = m_session.camera();
     if (camera.pos == pos) return;
@@ -369,7 +369,7 @@ void CanvasModel::setCameraPos(WorldPoint pos)
     m_session.setCamera(buildImageBBox(), camera);
 }
 
-void CanvasModel::setCameraZoom(double zoom, Session::ZoomMode mode)
+void ImageCanvasModel::setCameraZoom(double zoom, ZoomMode mode)
 {
     if (m_session.camera().zoom == zoom) return;
 
@@ -377,7 +377,7 @@ void CanvasModel::setCameraZoom(double zoom, Session::ZoomMode mode)
     refreshCamera();
 }
 
-void CanvasModel::setCameraPosZoom(WorldPoint pos, double zoom)
+void ImageCanvasModel::setCameraPosZoom(WorldPoint pos, double zoom)
 {
     CameraState camera = m_session.camera();
     if (camera.pos == pos && camera.zoom == zoom) return;
@@ -387,7 +387,7 @@ void CanvasModel::setCameraPosZoom(WorldPoint pos, double zoom)
     m_session.setCamera(buildImageBBox(), camera);
 }
 
-void CanvasModel::setCameraSize(WidgetSize size)
+void ImageCanvasModel::setCameraSize(WidgetSize size)
 {
     CameraState camera = m_session.camera();
     if (camera.size == size) return;
@@ -396,7 +396,7 @@ void CanvasModel::setCameraSize(WidgetSize size)
     m_session.setCamera(buildImageBBox(), camera);
 }
 
-void CanvasModel::setDeviceScale(int device_scale)
+void ImageCanvasModel::setDeviceScale(int device_scale)
 {
     CameraState camera = m_session.camera();
     if (camera.device_scale == device_scale) return;
@@ -405,18 +405,18 @@ void CanvasModel::setDeviceScale(int device_scale)
     m_session.setCamera(buildImageBBox(), camera);
 }
 
-void CanvasModel::setCameraBounds(Session::CameraBounds bounds)
+void ImageCanvasModel::setCameraBounds(EditorSession::CameraBounds bounds)
 {
     if (m_session.cameraBounds() == bounds) return;
     m_session.setCameraBounds(buildImageBBox(), bounds);
 }
 
-void CanvasModel::refreshCamera()
+void ImageCanvasModel::refreshCamera()
 {
     m_session.refreshCamera(buildImageBBox());
 }
 
-void CanvasModel::zoomFit(Session::ZoomFitFlags flags)
+void ImageCanvasModel::zoomFit(EditorSession::ZoomFitFlags flags)
 {
     if (!m_image_model.imageSurface()) return;
 
@@ -424,7 +424,7 @@ void CanvasModel::zoomFit(Session::ZoomFitFlags flags)
                       flags);
 }
 
-geom::IntBBox CanvasModel::buildImageBBox() const
+geom::IntBBox ImageCanvasModel::buildImageBBox() const
 {
     return geom::IntBBox(geom::IntPoint(),
                          static_cast<geom::IntPoint>(m_image_model.fullSize().asPoint()));

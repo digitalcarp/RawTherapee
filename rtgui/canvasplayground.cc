@@ -17,9 +17,9 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "canvas/canvas.h"
-#include "canvas/model.h"
-#include "canvas/render.h"
+#include "canvas/imagecanvas.h"
+#include "canvas/imagemodel.h"
+#include "canvas/imagerender.h"
 
 #include "config.h"
 #include "guiutils.h"
@@ -84,7 +84,7 @@ public:
         m_canvas->onKeyReleased(keyval, keycode, state);
     }
 
-    Canvas* canvas() const { return m_canvas; }
+    ImageCanvas* canvas() const { return m_canvas; }
 
 private:
     void setupControls();
@@ -96,7 +96,7 @@ private:
     void onSmoothScrollDirectionToggled();
     void onScrollModeToggled();
 
-    std::unique_ptr<CanvasModel> m_canvas_model;
+    std::unique_ptr<ImageCanvasModel> m_canvas_model;
 
     std::unique_ptr<StdImageSource> m_img_src;
     std::unique_ptr<Imagefloat> m_img;
@@ -107,7 +107,7 @@ private:
 
     std::unique_ptr<CursorTracker> m_cursor_event_listener;
 
-    Canvas* m_canvas;
+    ImageCanvas* m_canvas;
     Gtk::Box* m_control_box;
     Gtk::ComboBoxText* m_camera_bounds;
     Gtk::Scale m_zoom_sense_slider;
@@ -127,7 +127,7 @@ void updatePosLabel(Gtk::Label* label, const T& point)
 }  // namespace
 
 CanvasPlayground::CanvasPlayground()
-    : m_canvas_model(std::make_unique<CanvasModel>()),
+    : m_canvas_model(std::make_unique<ImageCanvasModel>()),
       m_img_renderer(std::make_unique<ImageRenderer>()),
       m_debug_renderer(std::make_unique<DebugRenderer>(DebugRenderer::ALL)),
       m_editor_renderer(std::make_unique<EditorRenderer>(m_img_renderer.get()))
@@ -143,7 +143,7 @@ CanvasPlayground::CanvasPlayground()
         paned->set_position(total - 300);
     });
 
-    m_canvas = rt::make_managed<Canvas>(m_canvas_model.get());
+    m_canvas = rt::make_managed<ImageCanvas>(m_canvas_model.get());
     m_canvas->enablePanZoom(true);
     m_canvas->setRenderer(m_editor_renderer.get());
     paned->pack1(*m_canvas, true, true);
@@ -197,7 +197,7 @@ void CanvasPlayground::setupControls()
         m_cursor_event_listener->w2c = add_label("World -> Camera");
     }
 
-    m_canvas_model->setCameraBounds(Session::CameraBounds::EDITOR);
+    m_canvas_model->setCameraBounds(EditorSession::CameraBounds::EDITOR);
     m_camera_bounds = rt::make_managed<Gtk::ComboBoxText>();
     m_camera_bounds->append("Free");
     m_camera_bounds->append("Editor");
@@ -336,7 +336,7 @@ void CanvasPlayground::setupImageBuffer()
 
     img_surface->mark_dirty();
     m_canvas_model->image().setImageSurface(img_surface, img_size);
-    m_canvas_model->session().queueDraw();
+    m_canvas_model->session()->queueDraw();
 }
 
 void CanvasPlayground::onSmoothSensitivityChanged()
@@ -358,20 +358,20 @@ void CanvasPlayground::onSmoothPanSensitivityChanged()
 void CanvasPlayground::onCameraBoundsChanged()
 {
     Glib::ustring text = m_camera_bounds->get_active_text();
-    auto bounds = Session::CameraBounds::NONE;
+    auto bounds = EditorSession::CameraBounds::NONE;
     if (text == "Editor") {
-        bounds = Session::CameraBounds::EDITOR;
+        bounds = EditorSession::CameraBounds::EDITOR;
     } else if (text == "Inspector Panel") {
-        bounds = Session::CameraBounds::INSPECTOR_PANEL;
+        bounds = EditorSession::CameraBounds::INSPECTOR_PANEL;
     } else if (text == "Inspector Window") {
-        bounds = Session::CameraBounds::INSPECTOR_WINDOW;
+        bounds = EditorSession::CameraBounds::INSPECTOR_WINDOW;
     }
     m_canvas_model->setCameraBounds(bounds);
 }
 
 void CanvasPlayground::onZoom11Clicked()
 {
-    m_canvas_model->session().zoom11();
+    m_canvas_model->session()->zoom11();
 }
 
 void CanvasPlayground::onZoomFitClicked()
@@ -401,7 +401,7 @@ void CanvasPlayground::onScrollModeToggled()
 
 bool CanvasPlayground::onWindowFocusOut(GdkEventFocus* event)
 {
-    m_canvas_model->session().onWindowFocusLost(m_canvas_model.get());
+    m_canvas_model->session()->onWindowFocusLost(m_canvas_model.get());
     return false;
 }
 
@@ -521,7 +521,7 @@ int main(int argc, char* argv[])
 
 void CursorTracker::update(const CanvasModel* model, WidgetPoint pos)
 {
-    const CameraState& camera = model->session().camera();
+    const CameraState& camera = model->session()->camera();
 
     CameraPoint l2c_pos = widgetToCamera(pos, camera);
     WorldPoint l2w_pos = widgetToWorld(pos, camera);
