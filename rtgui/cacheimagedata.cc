@@ -17,16 +17,17 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "cacheimagedata.h"
+
+#include <locale.h>
 #include <vector>
+
 #include <glib/gstdio.h>
 #include <glibmm/keyfile.h>
 #include <glibmm/fileutils.h>
-#include "version.h"
-#include <locale.h>
 
 #include "rtengine/procparams.h"
+#include "rtengine/rtapp.h"
 #include "rtengine/settings.h"
-
 
 namespace
 {

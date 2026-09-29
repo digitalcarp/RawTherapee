@@ -50,12 +50,11 @@
 #include "jpeg.h"
 #include "procparams.h"
 #include "rt_math.h"
+#include "rtapp.h"
 #include "settings.h"
 #include "utils.h"
 
 #include "rtgui/options.h"
-#include "rtgui/version.h"
-
 
 using namespace std;
 using namespace rtengine;

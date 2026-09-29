@@ -35,13 +35,13 @@
 #include "color.h"
 #include "colortemp.h"
 #include "curves.h"
+#include "rtapp.h"
 #include "utils.h"
 
 #include "rtgui/multilangmgr.h"
 #include "rtgui/options.h"
 #include "rtgui/paramsedited.h"
 #include "rtgui/ppversion.h"
-#include "rtgui/version.h"
 
 using namespace std;
 

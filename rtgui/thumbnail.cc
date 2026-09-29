@@ -27,6 +27,7 @@
 #include "rtengine/imagedata.h"
 #include "rtengine/procparams.h"
 #include "rtengine/profiling.h"
+#include "rtengine/rtapp.h"
 #include "rtengine/rtthumbnail.h"
 #include <glib/gstdio.h>
 #include <glibmm/timezone.h>
@@ -44,7 +45,6 @@
 #include "paramsedited.h"
 #include "ppversion.h"
 #include "procparamchangers.h"
-#include "version.h"
 
 #ifdef _WIN32
 #include "rtengine/leanwindows.h"
